@@ -1,0 +1,23 @@
+{
+  "name": "react-socket-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "server": "node server/index.js",
+    "client": "cd client && yarn start",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "concurrently \"yarn server\" \"yarn client\"",
+    "NOTE": "dont run the 'dev' comand, it doesnt work!! know more at LEARNINGS.md"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "browser-image-compression": "^1.0.6",
+    "express": "^4.16.4",
+    "socket.io": "^2.2.0"
+  },
+  "devDependencies": {
+    "concurrently": "^5.0.2"
+  }
+}
