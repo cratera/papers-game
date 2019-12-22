@@ -95,7 +95,8 @@ function killGame(name, creatorId) {
   }
 
   if (creatorId === game.creator) {
-    delete game;
+    // Q: how overcome this?
+    delete games[name];
   } else {
     throw 'notTheCreator';
   }

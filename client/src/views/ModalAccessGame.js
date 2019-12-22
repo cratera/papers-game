@@ -41,7 +41,7 @@ export default function ModalaccessGame({ variant }) {
 
         const errorMsg = (errorMsgMap[err] || errorMsgMap.ups)();
 
-        console.error('accessGame() err:', errorMsg);
+        console.warn('accessGame() err:', errorMsg);
 
         return setState(state => ({ ...state, errorMsg }));
       }

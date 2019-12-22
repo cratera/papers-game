@@ -1,19 +1,29 @@
 {
-  "name": "react-socket-app",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "papers-game-web",
+  "version": "0.1.0",
+  "description": "Papers is the perfect web game for your dinner party. Gather up your friends and have fun!",
+  "author": "Sandrina Pereira (development) and Margarida Botelho (design)",
+  "license": "ISC",
   "scripts": {
-    "server": "nodemon --watch server server/index.js",
+    "start": "node server",
+    "dev_server": "nodemon --watch server server",
+    "dev_client": "cd client && yarn start",
+    "build": "cd client/ && yarn && yarn build",
     "client": "cd client && yarn start",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "concurrently \"yarn server\" \"yarn client\"",
     "NOTE": "dont run the 'dev' comand, it doesnt work!! know more at LEARNINGS.md",
     "ngrok_client": "/Users/sandrina-p/Documents/git/ngrok http 3000 -host-header='localhost:3000'",
-    "ngrok_server": "/Users/sandrina-p/Documents/git/ngrok http 4001"
+    "ngrok_server": "/Users/sandrina-p/Documents/git/ngrok http 4001",
+    "NOTE_NGROK": "doesnt work... limit of connections is 20 and this will use much more"
   },
-  "author": "",
-  "license": "ISC",
+  "engines": {
+    "node": "12.x"
+  },
+  "cacheDirectories": [
+    "node_modules",
+    "client/node_modules"
+  ],
   "dependencies": {
     "body-parser": "^1.19.0",
     "express": "^4.16.4",

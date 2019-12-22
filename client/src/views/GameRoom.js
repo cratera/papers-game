@@ -42,7 +42,7 @@ export default function GameRoom(props) {
             },
           };
 
-          console.error('accessGame', err);
+          console.warn('accessGame', err);
           return (reactions[err] || reactions.ups)();
         }
 

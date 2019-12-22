@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import io from 'socket.io-client';
 import { createUniqueId } from 'utils/index.js';
-import ContextDevTool from 'react-context-devtool';
 
 const PapersContext = React.createContext({});
 
@@ -9,7 +8,8 @@ const PapersContext = React.createContext({});
 export class PapersContextProvider extends Component {
   constructor(props) {
     super(props);
-    this.URL = `${window.location.hostname}:4001`;
+    const isDev = process.env.NODE_ENV !== 'production';
+    this.URL = isDev ? `${window.location.hostname}:5000` : window.location;
 
     this.state = {
       socket: null,
@@ -41,23 +41,25 @@ export class PapersContextProvider extends Component {
       accessGame: this.accessGame.bind(this),
       recoverGame: this.recoverGame.bind(this),
     };
+
+    this.PapersAPI.open();
   }
 
   // Maybe it should be a Route to ask for this,
   // because it might want to retrieve different stuff...
   // ex: on room/:id, i don't care about profile.gameId,
   // instead I want the room/:id
-  componentDidMount() {
-    const { id, gameId } = this.state.profile;
+  // componentDidMount() {
+  //   const { id, gameId } = this.state.profile;
 
-    console.log('Player status:', { id, gameId });
+  //   console.log('Player status:', { id, gameId });
 
-    // Q: How I do this with useEffect?
-    if (id && gameId) {
-      const socket = this.PapersAPI.open();
-      this.PapersAPI.recoverGame(socket);
-    }
-  }
+  //   // Q: How I do this with useEffect?
+  //   if (id && gameId) {
+  //     const socket = this.PapersAPI.open();
+  //     this.PapersAPI.recoverGame(socket);
+  //   }
+  // }
 
   // =========== Papers API
 
@@ -76,10 +78,8 @@ export class PapersContextProvider extends Component {
     }
     console.log('creating a socket!', playerId);
 
-    // https://github.com/facebook/create-react-app/issues/8094#issuecomment-567985246
-    socket = io(this.URL, {
-      query: { playerId, gameId },
-    });
+    // TIL: https://github.com/facebook/create-react-app/issues/8094#issuecomment-567985246
+    socket = io(this.URL);
 
     socket.on('connect', () => {
       console.log('connected!', playerId);
@@ -251,7 +251,7 @@ export class PapersContextProvider extends Component {
           ups: `recover-game: Ups!', ${JSON.stringify(err)}`,
         };
 
-        console.error(errorMsgMap[err] || errorMsgMap.ups);
+        console.warn(errorMsgMap[err] || errorMsgMap.ups);
         return;
       }
 
@@ -276,7 +276,6 @@ export class PapersContextProvider extends Component {
           ...this.PapersAPI,
         }}
       >
-        <ContextDevTool context={PapersContext} id="PapersContext" displayName="PapersContext" />
         {this.props.children}
       </PapersContext.Provider>
     );

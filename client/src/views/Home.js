@@ -94,7 +94,7 @@ export default function Home(props) {
   const StepWelcomeBack = () => (
     <div css={Styles.step}>
       <h1>
-        Welcome back!
+        Welcome back
         <span css={Theme.typography.h1}>{state.name}</span>
       </h1>
       <AvatarMeme />
