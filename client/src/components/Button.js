@@ -1,18 +1,19 @@
 /** @jsx jsx */
-import { jsx, css } from '@emotion/core';
+import { jsx } from '@emotion/core';
 import { memo } from 'react';
 import * as Styles from './ButtonStyles.js';
 
-function Button({ variant, hasBlock, children, ...restProps}) {
+function Button({ as, variant, hasBlock, children, ...restProps }) {
+  const Tag = as || 'button';
   return (
-    <button { ...restProps } css={Styles.button({ variant, hasBlock })}>
+    <Tag {...restProps} css={Styles.button({ variant, hasBlock })}>
       {children}
-    </button>
-  )
+    </Tag>
+  );
 }
 
 Button.defaultProps = {
-  variant: 'primary'
+  variant: 'primary',
 };
 
 export default memo(Button);

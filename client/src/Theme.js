@@ -1,4 +1,4 @@
-import { css } from '@emotion/core'
+import { css } from '@emotion/core';
 
 export const colors = {
   grayDark: '#484F5D',
@@ -6,13 +6,14 @@ export const colors = {
   grayLight: '#E5E6E8',
   primary: '#0038FF',
   bg: '#fff',
-}
+};
 
 export const typography = {
   h1: css`
     font-size: 4rem;
     font-weight: 700;
     line-height: 4.8rem;
+    display: block;
   `,
   h2: css`
     font-size: 3.2rem;
@@ -27,12 +28,12 @@ export const typography = {
   `,
   secondary: css`
     font-size: 1.6rem;
-    color: ${colors.grayMedium}
+    color: ${colors.grayMedium};
   `,
   small: css`
     font-size: 1.4rem;
-  `
-}
+  `,
+};
 
 export const base = css`
   background-color: white;

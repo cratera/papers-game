@@ -1,65 +1,45 @@
 /** @jsx jsx */
-import { jsx } from '@emotion/core'
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route
-} from "react-router-dom";
-import { base } from './Theme.js';
-import Home from 'routes/Home.js';
-import Room from 'routes/Room.js';
+import { jsx } from '@emotion/core';
+import { Fragment } from 'react';
+import { Redirect, Switch, Route } from 'react-router-dom';
+import { base } from 'Theme.js';
+import Home from 'views/Home.js';
+import GameRoom from 'views/GameRoom.js';
+import CoreContext, { CoreContextProvider } from 'store/CoreContext.js';
+import { PapersContextProvider } from 'store/PapersContext.js';
 
-// import socket from "socket.io-client";
-
-export default function App() {
+export default function App(props) {
   return (
-    <div css={base}>
-      <Router>
-        {/* <Link to="/">Home</Link>
-        <Link to="/room/123">Room</Link> */}
-        
-        <Switch>
-          <Route path="/room/:id">
-            <Room />
-          </Route>
-          <Route path="/">
-            <Home />
-          </Route>
-        </Switch>
-      </Router>
-    </div>
-  )
+    <CoreContextProvider>
+      <PapersContextProvider>
+        <div css={base}>
+          <Switch>
+            <Route path="/game/:id">
+              <GameRoom />
+            </Route>
+            <Route path="/game">
+              <Redirect to="/" />
+            </Route>
+            <Route path="/">
+              <Home />
+            </Route>
+          </Switch>
+        </div>
+        <CoreContext.Consumer>
+          {({ room, modal }) => {
+            const ModalComponent = modal.component;
+            const props = modal.props || {};
+            return (
+              <Fragment>
+                {/* {room && room.name && (
+                  <Redirect push to={`/room/${room.name}`} />
+                )} */}
+                {ModalComponent && <ModalComponent {...props} />}
+              </Fragment>
+            );
+          }}
+        </CoreContext.Consumer>
+      </PapersContextProvider>
+    </CoreContextProvider>
+  );
 }
-
-// class App extends React.Component {
-//   constructor() {
-//     super();
-//     this.io = socket();
-
-//     this.state = {
-//       color: 'white'
-//     };
-//   }
-
-//   setColor = (color) => {
-//     this.io.emit('change color', color)
-//   }
-
-//   componentDidMount = () => {
-//       this.io.on('change color', (col) => {
-//           document.body.style.backgroundColor = col
-//       })
-//   }
-
-//   render() {
-//     return (
-//       <div style={{ textAlign: "center" }}>
-//         <button id="blue" onClick={() => this.setColor('blue')}>Blue</button>
-//         <button id="red" onClick={() => this.setColor('red')}>Red</button>
-
-//       </div>
-//     )
-//   }
-// }
-
-// export default App;

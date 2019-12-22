@@ -1,7 +1,16 @@
 {
-  "extends": ["plugin:prettier/recommended"],
+  "parserOptions": {
+    "ecmaVersion": 2019
+  },
+  "extends": ["standard", "plugin:prettier/recommended", "plugin:react/recommended"],
   "plugins": ["prettier"],
   "rules": {
-    "prettier/prettier": "error"
+    "prettier/prettier": "error",
+    "react/jsx-max-props-per-line": [
+      1,
+      {
+        "maximum": 1
+      }
+    ]
   }
 }

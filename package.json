@@ -4,23 +4,33 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "server": "node server/index.js",
+    "server": "nodemon --watch server server/index.js",
     "client": "cd client && yarn start",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "concurrently \"yarn server\" \"yarn client\"",
-    "NOTE": "dont run the 'dev' comand, it doesnt work!! know more at LEARNINGS.md"
+    "NOTE": "dont run the 'dev' comand, it doesnt work!! know more at LEARNINGS.md",
+    "ngrok_client": "/Users/sandrina-p/Documents/git/ngrok http 3000 -host-header='localhost:3000'",
+    "ngrok_server": "/Users/sandrina-p/Documents/git/ngrok http 4001"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "browser-image-compression": "^1.0.6",
+    "body-parser": "^1.19.0",
     "express": "^4.16.4",
     "socket.io": "^2.2.0"
   },
   "devDependencies": {
     "concurrently": "^5.0.2",
     "eslint-config-prettier": "^6.7.0",
+    "eslint-config-recommended": "^4.0.0",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-plugin-import": "^2.19.1",
+    "eslint-plugin-node": "^10.0.0",
     "eslint-plugin-prettier": "^3.1.2",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-react": "^7.17.0",
+    "eslint-plugin-standard": "^4.0.1",
+    "nodemon": "^2.0.2",
     "prettier": "1.19.1"
   }
 }
