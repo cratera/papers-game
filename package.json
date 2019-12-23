@@ -16,7 +16,7 @@
     "deploy_heroku": "git add . && git commit -am 'heroku local deploy' && git push heroku master"
   },
   "engines": {
-    "node": "13.1.x"
+    "node": "12.x"
   },
   "cacheDirectories": [
     "node_modules",
