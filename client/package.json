@@ -2,16 +2,6 @@
   "name": "papers-game-client",
   "version": "0.1.0",
   "private": true,
-  "dependencies": {
-    "@emotion/core": "^10.0.22",
-    "@emotion/styled": "^10.0.23",
-    "browser-image-compression": "^1.0.6",
-    "react": "^16.8.2",
-    "react-dom": "^16.8.2",
-    "react-router-dom": "^5.1.2",
-    "react-scripts": "3.3.0",
-    "socket.io-client": "^2.2.0"
-  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
@@ -29,6 +19,16 @@
     "not ie <= 11",
     "not op_mini all"
   ],
+  "dependencies": {
+    "@emotion/core": "^10.0.22",
+    "@emotion/styled": "^10.0.23",
+    "browser-image-compression": "^1.0.6",
+    "react": "^16.8.2",
+    "react-dom": "^16.8.2",
+    "react-router-dom": "^5.1.2",
+    "react-scripts": "3.3.0",
+    "socket.io-client": "^2.2.0"
+  },
   "devDependencies": {
     "babel-plugin-emotion": "^10.0.23"
   }

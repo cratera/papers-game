@@ -45,9 +45,9 @@ if (!isDev && cluster.isMaster) {
   });
 
   // All remaining requests return the React app, so it can handle routing.
-  // app.get('*', function(request, response) {
-  //   response.sendFile(path.resolve(__dirname, clientDir, 'index.html'));
-  // });
+  app.get('*', function(request, response) {
+    response.sendFile(path.resolve(__dirname, clientDir, 'index.html'));
+  });
 
   // Q: Why both app and server cannot listen to PORT? What's the diff?
   // app.listen(PORT, function() {
@@ -58,48 +58,61 @@ if (!isDev && cluster.isMaster) {
   //   );
   // });
 
-  // app.get('/', (req, res) => {
-  //   res.send('Welcome to socket Papers API');
-  // });
+  app.get('/', (req, res) => {
+    res.send('Welcome to socket Papers API');
+  });
 
-  // app.use(function(req, res, next) {
-  //   res.status(404).send('Ups, Turn back!');
-  // });
+  app.use(function(req, res, next) {
+    res.status(404).send('Ups, Turn back!');
+  });
 
   // ============= PAPERS GAME SOCKET API ============= //
 
   const buildPlayerRoom = playerId => `player/${playerId}`;
 
+  function setNewPlayerRoom(playerId) {
+    console.log('newPlayerRoom:', playerId);
+    const playerRoom = io.sockets.in(buildPlayerRoom(playerId));
+
+    playerRoom.on('join', (coisas, mais) => {
+      console.log('join default:', coisas, mais);
+    });
+
+    playerRoom.on('joined', (coisas, mais) => {
+      console.log('joined manual:', coisas, mais);
+    });
+  }
+
   io.use(function(socket, next) {
+    console.log('xx', socket.handshake);
     const { playerId, gameId } = socket.handshake.query || {};
     console.log('New socket:', playerId, gameId, socket.id);
-    socket.papersProfile = { playerId: 1, gameId: 2 };
 
-    next();
-    // if (playerId && gameId) {
-    //   socket.papersProfile = { playerId, gameId };
-    //   const playerRoom = buildPlayerRoom(playerId);
-    //   // const gameRoom = `game/${gameId}`;
+    if (playerId && gameId) {
+      socket.papersProfile = { playerId, gameId };
+      const playerRoom = buildPlayerRoom(playerId);
 
-    //   io.in(playerRoom).clients((err, clients) => {
-    //     if (err) {
-    //       // Q: How to handle this on client / server? :/
-    //       return next(new Error('Auth error: missing token'));
-    //     }
-    //     if (!clients) {
-    //       setNewPlayerRoom();
-    //     }
-    //     socket.join(playerRoom);
-    //     next();
-    //   });
-    // } else {
-    //   console.error('New socket error - missing a token:', playerId, gameId, socket.id);
+      io.in(playerRoom).clients((err, clients) => {
+        if (err) {
+          // Q: How to handle this on client / server? :/
+          return next(new Error('Auth error: missing token'));
+        }
 
-    //   // Q: How to handle this on client / server? :/
-    //   return next(new Error('Auth error: missing token'));
-    // }
+        if (!clients) {
+          setNewPlayerRoom();
+        }
+        socket.join(playerRoom);
+        next();
+      });
+    } else {
+      socket.papersProfile = { playerId: 'fake_1221', gameId: 'fake_room' };
+      console.error('New socket error - missing a token:', playerId, gameId, socket.id);
+      next();
+      // Q: How to handle this on client / server? :/
+      // return next(new Error('Auth error: missing token'));
+    }
   }).on('connection', socket => {
-    socket.emit('opened');
+    socket.emit('connect');
 
     socket.on('recover-game', cb => {
       const { playerId, gameId } = socket.papersProfile;
@@ -213,7 +226,7 @@ if (!isDev && cluster.isMaster) {
       verifyPlayerConnections(playerId, gameId);
     });
 
-    socket.on('recover-player', () => {
+    socket.on('recover-player', cb => {
       const { playerId, gameId } = socket.papersProfile;
       console.log('recover-player', playerId, gameId);
 
@@ -226,7 +239,7 @@ if (!isDev && cluster.isMaster) {
         });
       } catch (error) {
         console.warn('Recover Player failed:', error);
-        cb(error);
+        cb && cb(error);
       }
     });
 
