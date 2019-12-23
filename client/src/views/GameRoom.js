@@ -1,11 +1,11 @@
 /** @jsx jsx */
 import { jsx, css } from '@emotion/core';
 import { Fragment, useState, useContext, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Redirect, Link, useParams } from 'react-router-dom';
 
 import PapersContext from 'store/PapersContext.js';
 import Button from 'components/Button.js';
-// import { usePrevious } from 'utils';
+import { usePrevious } from 'utils';
 
 export default function GameRoom(props) {
   const { id: urlGameId } = useParams();
@@ -13,13 +13,17 @@ export default function GameRoom(props) {
   const { profile, game } = Papers.state;
   const gameId = game && game.name;
   const profileId = profile && profile.id;
-  const playerIsAfk = game && game.players[profileId].isAfk;
+  const playerIsAfk = game && game.players[profileId] && game.players[profileId].isAfk;
   const [status, setStatus] = useState('loading');
-  // const prevgameIdStored = usePrevious(gameIdStored);
+  const prevGameId = usePrevious(gameId);
 
   useEffect(() => {
     if (!profileId) {
       return setStatus('needProfile');
+    }
+
+    if (prevGameId && !gameId) {
+      console.log('Left game');
     }
 
     if (gameId === urlGameId) {
@@ -104,6 +108,12 @@ export default function GameRoom(props) {
     );
   }
 
+  if (!game) {
+    // Let's hope this only happens when the user left the game.
+    // Need a global state for these cases.
+    return <Redirect push to="/" />;
+  }
+
   return (
     <Fragment>
       <p>
@@ -111,11 +121,11 @@ export default function GameRoom(props) {
       </p>
       <h1>Players:</h1>
       <ul>
-        {Object.keys(game.players).map(playerId => {
+        {Object.keys(game.players).map((playerId, i) => {
           const { avatar, name, isAfk } = game.players[playerId];
 
           return (
-            <li key={playerId}>
+            <li key={`${i}_playerId`}>
               {/* TODO - avatar component!! */}-{' '}
               <img
                 src={avatar}

@@ -185,10 +185,10 @@ if (!isDev && cluster.isMaster) {
 
       try {
         model.leaveGame(gameId, playerId);
-
         socket.leave(gameId, () => {
           cb(null);
           io.to(gameId).emit('game-update', 'leave-player', playerId);
+          socket.disconnect();
         });
       } catch (error) {
         console.error('Failed to leave room.', error);

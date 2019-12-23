@@ -18,7 +18,6 @@ class PapersContextComp extends Component {
 
     this.state = {
       socket: null,
-      status: 'LOADING', // LOADING || READY || ???
       profile: {
         id: window.localStorage.getItem('profile_id') || null,
         name: window.localStorage.getItem('profile_name') || null,
@@ -47,6 +46,7 @@ class PapersContextComp extends Component {
 
       accessGame: this.accessGame.bind(this),
       recoverGame: this.recoverGame.bind(this),
+      leaveGame: this.leaveGame.bind(this),
     };
   }
 
@@ -208,6 +208,8 @@ class PapersContextComp extends Component {
           // TIL: destruct dynamic keys from an object!
           const { [playerKey[0]]: playerToRemove, ...otherPlayers } = game;
 
+          console.log(('playerId:', playerId));
+          console.log(playerToRemove, otherPlayers);
           return {
             ...game,
             players: otherPlayers,
@@ -236,7 +238,7 @@ class PapersContextComp extends Component {
 
       // this should be based on previous game no?
       this.setState(state => ({
-        game: updateGame(state),
+        game: updateGame(state.game),
       }));
     });
   }
@@ -275,13 +277,16 @@ class PapersContextComp extends Component {
   _removeGameFromState() {
     window.localStorage.removeItem('profile_gameId');
 
+    // Out of a room, there is no point in being connected
+    this.state.socket.close();
+
     this.setState(state => ({
-      status: 'READY',
       profile: {
         ...state.profile,
         gameId: null,
       },
       game: null,
+      socket: null,
     }));
   }
 
@@ -304,7 +309,6 @@ class PapersContextComp extends Component {
       console.log('recover-game success:', result.game.name);
 
       this.setState({
-        status: 'READY',
         game: result.game,
       });
     });
