@@ -14,9 +14,11 @@ Do you know when you spend 3 hours with a issue and the answer is one line of co
 - 💪 Decided to do it by myself from scratch. Install create-react-app, add express and... add socket.io. The error didn't happen! 😱 Why?
 - 🐛 A small different. The boilerplate was using `concurrently` to run the two servers (react and express) at the same time. That's the cause of the error!
 - 💡 Solution: Start the two servers in two different terminals. `yarn server` and `yarn client` without using `concurrently`.
+- [Update] that wasnt the problem. the problem was `url` when calling `io(url)`. [issue](https://github.com/socketio/socket.io/issues/1942#issuecomment-71443823)
 
 # Node / Express / WebSockets
 
 - Did my first REST API (HTTP GET/POST) with params using Express + fetch - from scratch.
 - Hmm... not sure if HTTP is better than WebSockets in this case. Moving to WebSockets.
--
+- Ngrok: Can't use it for alpha test. It has a limit of 20 connections per minute. I'll try Heroku.
+- Heroku status: [stackoverflow question](https://stackoverflow.com/questions/59455178/heroku-websockets-connected-clients-is-empty-and-cant-reuse-stored-values)

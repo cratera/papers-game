@@ -2,7 +2,7 @@
 /node_modules
 
 # production
-/build
+# /build -- needed for heroku
 
 # misc
 .DS_Store

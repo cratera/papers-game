@@ -9,10 +9,10 @@ export class PapersContextProvider extends Component {
   constructor(props) {
     super(props);
     const isDev = process.env.NODE_ENV !== 'production';
-    // TIL: 🤯🐛🤬 (AFTER 2 HOURS trying to make this work on dev)
-    // Opening a github issue about it... (window.location.host)
-    const socketUrl = isDev ? `${window.location.hostname}:5000` : window.location.host;
-    this.URL = socketUrl;
+    // TIL: 🤯🐛🤬 (AFTER 1 DAY trying to make this work..)
+    // on dev: https://github.com/socketio/socket.io/issues/1942#issuecomment-71443823
+    // and on Heroku: https://github.com/socketio/socket.io-website/issues/139
+    this.URL = isDev ? `${window.location.hostname}:5000` : window.location.host;
 
     this.state = {
       socket: null,
@@ -64,9 +64,10 @@ export class PapersContextProvider extends Component {
 
   // =========== Papers API
 
-  open() {
+  open(passedGameId) {
     let socket = this.state.socket;
-    const { id: playerId, gameId } = this.state.profile;
+    const { id: playerId, gameId: gameIdStored } = this.state.profile;
+    const gameId = passedGameId || gameIdStored;
 
     if (socket) {
       if (socket.connected) {
@@ -79,8 +80,10 @@ export class PapersContextProvider extends Component {
     }
     console.log('creating a socket!', playerId);
 
-    socket = io(`${this.URL}`, {
+    socket = io(this.URL, {
       query: { playerId, gameId },
+      // TIL: https://stackoverflow.com/a/57459569/4737729
+      transports: ['websocket'],
     });
 
     socket.on('connect', () => {
@@ -117,7 +120,7 @@ export class PapersContextProvider extends Component {
     let socket = this.state.socket;
 
     if (!socket) {
-      socket = this.PapersAPI.open();
+      socket = this.PapersAPI.open(gameName);
     }
 
     // This can happen when the user left the chat.

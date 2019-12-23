@@ -11,6 +11,10 @@ const socketIO = require('socket.io');
 
 const model = require('./model.js');
 
+const gamesStored = {};
+
+console.log('Reading server/index.js');
+
 // Multi-process to utilize all CPU cores.
 if (!isDev && cluster.isMaster) {
   console.error(`Node cluster master ${process.pid} is running`);
@@ -28,7 +32,7 @@ if (!isDev && cluster.isMaster) {
 } else {
   const app = express();
   const server = http.createServer(app);
-  const io = socketIO(server);
+  const io = socketIO(server, { transports: ['websocket'] });
   const clientDir = '../client/build';
 
   server.listen(PORT, () => {
@@ -84,9 +88,15 @@ if (!isDev && cluster.isMaster) {
   }
 
   io.use(function(socket, next) {
-    console.log('xx', socket.handshake);
     const { playerId, gameId } = socket.handshake.query || {};
     console.log('New socket:', playerId, gameId, socket.id);
+
+    console.log('gamesStored:', gamesStored);
+
+    io.clients((error, clients) => {
+      if (error) throw error;
+      console.log('clients connected:', clients); // => [String]
+    });
 
     if (playerId && gameId) {
       socket.papersProfile = { playerId, gameId };
@@ -105,10 +115,9 @@ if (!isDev && cluster.isMaster) {
         next();
       });
     } else {
-      socket.papersProfile = { playerId: 'fake_1221', gameId: 'fake_room' };
-      console.error('New socket error - missing a token:', playerId, gameId, socket.id);
-      next();
       // Q: How to handle this on client / server? :/
+      console.error('New socket error - missing a token:', playerId, gameId, socket.id);
+      return;
       // return next(new Error('Auth error: missing token'));
     }
   }).on('connection', socket => {
@@ -141,6 +150,8 @@ if (!isDev && cluster.isMaster) {
     socket.on('create-game', ({ gameId, player }, cb) => {
       console.log('create-game', gameId, player.name);
 
+      gamesStored[gameId] = true;
+
       try {
         const game = model.createGame(gameId, player);
 
@@ -158,6 +169,10 @@ if (!isDev && cluster.isMaster) {
     socket.on('join-game', ({ gameId, player }, cb) => {
       console.log('join-game', gameId, player.id);
 
+      gamesStored[gameId] = true;
+
+      console.log('gamesstored after join-game:', gamesStored);
+
       try {
         const game = model.joinGame(gameId, player);
 
@@ -168,7 +183,7 @@ if (!isDev && cluster.isMaster) {
           cb(null, game);
         });
       } catch (error) {
-        console.error('Failed to create game', error);
+        console.error('Failed to join game', error);
         cb(error);
       }
     });

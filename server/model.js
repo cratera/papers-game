@@ -1,5 +1,7 @@
 const utils = require('./utils');
 
+// Q: So... doing this to store games doesn't work across
+// multiple sessions, each new session, reads this?
 const games = {};
 
 function getRoom(name, playerId) {
@@ -39,6 +41,7 @@ function createGame(name, creator) {
 }
 
 function joinGame(name, playerJoining) {
+  console.log('joinGame, games:', Object.keys(games));
   const game = games[name];
 
   if (!game) {

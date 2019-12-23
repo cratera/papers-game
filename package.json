@@ -6,16 +6,13 @@
   "license": "ISC",
   "scripts": {
     "start": "node server",
+    "dev": "concurrently \"yarn dev_server\" \"yarn dev_client\"",
     "dev_server": "nodemon --watch server server",
     "dev_client": "cd client && yarn start",
-    "build": "cd client/ && yarn && yarn build",
-    "client": "cd client && yarn start",
+    "build_client": "cd client/ && yarn build",
+    "install": "yarn install && cd client && yarn install",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "concurrently \"yarn server\" \"yarn client\"",
-    "NOTE": "dont run the 'dev' comand, it doesnt work!! know more at LEARNINGS.md",
-    "ngrok_client": "/Users/sandrina-p/Documents/git/ngrok http 3000 -host-header='localhost:3000'",
-    "ngrok_server": "/Users/sandrina-p/Documents/git/ngrok http 4001",
-    "NOTE_NGROK": "doesnt work... limit of connections is 20 and this will use much more"
+    "deploy_heroku": "git add . && git commit -am 'heroku local deploy' && git push heroku master"
   },
   "engines": {
     "node": "12.x"
