@@ -12,11 +12,12 @@
     "dev_client": "cd client && yarn start",
     "build_client": "cd client/ && yarn build",
     "setup": "yarn install && cd client && yarn install",
+    "setup_npm": "npm i && cd client && npm i",
     "test": "echo \"Error: no test specified\" && exit 1",
     "deploy_heroku": "git add . && git commit -am 'heroku local deploy' && git push heroku master"
   },
   "engines": {
-    "node": "12.x"
+    "node": ">=12.* <=13.*"
   },
   "cacheDirectories": [
     "node_modules",

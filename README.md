@@ -8,7 +8,6 @@
 
 ```bash
 yarn setup
-(or npm run setup)
 ```
 
 - Start the project: (choose dev or prod)
