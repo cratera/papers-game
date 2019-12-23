@@ -2,7 +2,7 @@
 /node_modules
 
 # production
-# /build -- needed for heroku
+# /build -- needed for heroku - no need to run yarn install there. all the time
 
 # misc
 .DS_Store

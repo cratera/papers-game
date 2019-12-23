@@ -6,16 +6,17 @@
   "license": "ISC",
   "scripts": {
     "start": "node server",
+    "prod": "yarn build_client && yarn start",
     "dev": "concurrently \"yarn dev_server\" \"yarn dev_client\"",
     "dev_server": "nodemon --watch server server",
     "dev_client": "cd client && yarn start",
     "build_client": "cd client/ && yarn build",
-    "install": "yarn install && cd client && yarn install",
+    "setup": "yarn install && cd client && yarn install",
     "test": "echo \"Error: no test specified\" && exit 1",
     "deploy_heroku": "git add . && git commit -am 'heroku local deploy' && git push heroku master"
   },
   "engines": {
-    "node": "12.x"
+    "node": "13.1.x"
   },
   "cacheDirectories": [
     "node_modules",
