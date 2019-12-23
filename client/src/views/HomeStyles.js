@@ -5,7 +5,7 @@ export const container = css`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 1.6rem 1.6rem 6rem;
+  padding: 1.6rem 1.6rem 5rem; // confirm the bottom of iphoneX
   height: 100vh;
   overflow: hidden;
 `;
@@ -28,9 +28,10 @@ export const paragraph = css`
 `;
 
 export const step = css`
-  margin-top: 5vh;
+  margin-top: 10vh;
   display: block;
   text-align: center;
+  height: 100%;
 `;
 
 export const input = css`
@@ -50,17 +51,29 @@ export const input = css`
 
 export const avatarPlace = css`
   width: 80vw;
-  height: 80vw;
-  border-radius: 50%;
-  border: 3px solid ${Theme.colors.grayLight};
-  margin: 1.6rem auto;
+  height: 60vw;
+  max-width: 30rem;
+  max-height: 25rem;
+  border-radius: 0.5rem;
+  border: 1px solid ${Theme.colors.grayMedium};
+  margin: 2.4rem auto;
   display: flex;
   align-items: center;
+  flex-direction: column;
   justify-content: center;
+
+  svg {
+    display: inline-block;
+    margin-bottom: 0.8rem;
+  }
 `;
 
 export const avatarImg = css`
   ${avatarPlace}
+  height: 80vw;
+  max-width: 30rem;
+  max-height: 30rem;
+  border-radius: 50%;
   border: none;
   object-fit: cover;
 `;
@@ -72,6 +85,8 @@ export const memeContainer = css`
 
 export const memeFace = css`
   ${avatarImg}
+  background: ${Theme.colors.grayDark};
+  margin: -0.6rem 0;
   width: 7rem;
   height: 7rem;
   position: absolute;
@@ -84,7 +99,6 @@ export const memeBody = css`
   width: 20rem;
   height: 20rem;
   fill: ${Theme.colors.grayDark};
-  margin-top: 2rem;
 `;
 
 export const btnBack = css`
@@ -98,6 +112,7 @@ export const ctas = css`
   & > button:not(:last-child),
   & > a:not(:last-child) {
     margin-right: 1.6rem;
+    margin-bottom: 1.6rem;
   }
 `;
 

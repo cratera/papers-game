@@ -11,9 +11,10 @@ function getRoom(name, playerId) {
     throw 'notFound';
   }
 
-  if (!game.players[playerId]) {
-    throw 'dontBelong';
-  }
+  // In the future, add auth?
+  // if (!game.players[playerId]) {
+  //   throw 'dontBelong';
+  // }
 
   return game;
 }
@@ -41,11 +42,10 @@ function createGame(name, creator) {
 }
 
 function joinGame(name, playerJoining) {
-  console.log('joinGame, games:', Object.keys(games));
   const game = games[name];
 
   if (!game) {
-    throw 'notFound';
+    throw String('notFound');
   }
 
   game.players[playerJoining.id] = playerJoining;
@@ -68,11 +68,9 @@ function recoverPlayer(name, playerId) {
   const game = games[name];
 
   if (!game) {
-    console.error('rejoinGame not found', name);
     throw 'notFound';
   }
 
-  // TODO - verify if player doesnt exist. use ?.
   game.players[playerId].isAfk = false;
 
   return game;
@@ -85,6 +83,7 @@ function leaveGame(name, playerId) {
     throw 'notFound';
   }
 
+  // How to do this?
   delete game.players[playerId];
 
   return game;
@@ -101,7 +100,7 @@ function killGame(name, creatorId) {
     // Q: how overcome this?
     delete games[name];
   } else {
-    throw 'notTheCreator';
+    throw 'notFound';
   }
   return null;
 }

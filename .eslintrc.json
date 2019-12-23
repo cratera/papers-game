@@ -2,7 +2,7 @@
   "parserOptions": {
     "ecmaVersion": 2019
   },
-  "extends": ["react-app", "standard", "plugin:prettier/recommended", "plugin:react/recommended"],
+  "extends": ["standard", "plugin:prettier/recommended", "plugin:react/recommended"],
   "plugins": ["prettier"],
   "rules": {
     "prettier/prettier": "error",

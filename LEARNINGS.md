@@ -22,3 +22,4 @@ Do you know when you spend 3 hours with a issue and the answer is one line of co
 - Hmm... not sure if HTTP is better than WebSockets in this case. Moving to WebSockets.
 - Ngrok: Can't use it for alpha test. It has a limit of 20 connections per minute. I'll try Heroku.
 - Heroku status: [stackoverflow question](https://stackoverflow.com/questions/59455178/heroku-websockets-connected-clients-is-empty-and-cant-reuse-stored-values)
+- WOW socket [emit-cheatsheet](https://socket.io/docs/emit-cheatsheet/)

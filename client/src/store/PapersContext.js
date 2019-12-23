@@ -1,17 +1,19 @@
 import React, { Component } from 'react';
 import io from 'socket.io-client';
 import { createUniqueId } from 'utils/index.js';
+import { withRouter, matchPath } from 'react-router';
 
 const PapersContext = React.createContext({});
 
 // TODO - split into 2 Contexts: methods (mutations) and state (lookups)
-export class PapersContextProvider extends Component {
+class PapersContextComp extends Component {
   constructor(props) {
     super(props);
     const isDev = process.env.NODE_ENV !== 'production';
     // TIL: 🤯🐛🤬 (AFTER 1 DAY trying to make this work..)
-    // on dev: https://github.com/socketio/socket.io/issues/1942#issuecomment-71443823
-    // and on Heroku: https://github.com/socketio/socket.io-website/issues/139
+    // - on dev: https://github.com/socketio/socket.io/issues/1942#issuecomment-71443823
+    // - on Heroku:  https://github.com/socketio/socket.io-website/issues/139
+    // - Heroku still not working: https://stackoverflow.com/questions/59455178/heroku-websockets-issue-getting-connected-clients-always-empty
     this.URL = isDev ? `${window.location.hostname}:5000` : window.location.host;
 
     this.state = {
@@ -21,7 +23,7 @@ export class PapersContextProvider extends Component {
         id: window.localStorage.getItem('profile_id') || null,
         name: window.localStorage.getItem('profile_name') || null,
         avatar: window.localStorage.getItem('profile_avatar') || null,
-        // the current game this player belongs to
+        // the last game this player tryed to access
         gameId: window.localStorage.getItem('profile_gameId') || null,
       },
       game: undefined,
@@ -31,6 +33,8 @@ export class PapersContextProvider extends Component {
         settings: {},
       } */
     };
+
+    this._removeGameFromState = this._removeGameFromState.bind(this);
 
     this.PapersAPI = {
       open: this.open.bind(this),
@@ -52,13 +56,24 @@ export class PapersContextProvider extends Component {
   // instead I want the room/:id
   componentDidMount() {
     const { id, gameId } = this.state.profile;
+    const { location } = this.props;
+    const GameRoom = matchPath(location.pathname, {
+      path: '/game/:id',
+    });
 
-    console.log('Player status:', { id, gameId });
+    console.log('PapersContext Mounted:', { playedId: id, gameId });
 
-    // Q: How I do this with useEffect?
-    if (id && gameId) {
-      const socket = this.PapersAPI.open();
-      this.PapersAPI.recoverGame(socket);
+    if (GameRoom) {
+      console.log('PapersContext - on a GameRoom');
+      // do nothing... GameRoom will do it.
+    } else {
+      console.log('PapersContext - on Home');
+      // somewhere else, handle it!
+      // Update: why not at Home.js?? Cant remember...
+      if (id && gameId) {
+        const socket = this.PapersAPI.open();
+        this.PapersAPI.recoverGame(socket);
+      }
     }
   }
 
@@ -134,6 +149,10 @@ export class PapersContextProvider extends Component {
 
     console.log('accessGame', variant, gameName);
 
+    if (!gameName) {
+      return cb(new Error('Missing gameId'));
+    }
+
     socket.emit(
       `${variant}-game`,
       {
@@ -158,9 +177,9 @@ export class PapersContextProvider extends Component {
 
     socket.on('game-update', (actionType, payload) => {
       console.log('game-update:', actionType);
-      const game = this.state.game;
+
       const reaction = {
-        'new-player': () => {
+        'new-player': game => {
           const player = payload;
           return {
             ...game,
@@ -170,7 +189,7 @@ export class PapersContextProvider extends Component {
             },
           };
         },
-        'pause-player': () => {
+        'pause-player': game => {
           const playerId = payload;
           return {
             ...game,
@@ -183,7 +202,18 @@ export class PapersContextProvider extends Component {
             },
           };
         },
-        'recover-player': () => {
+        'leave-player': game => {
+          const playerId = payload;
+          const playerKey = [playerId];
+          // TIL: destruct dynamic keys from an object!
+          const { [playerKey[0]]: playerToRemove, ...otherPlayers } = game;
+
+          return {
+            ...game,
+            players: otherPlayers,
+          };
+        },
+        'recover-player': game => {
           const playerId = payload;
           return {
             ...game,
@@ -196,15 +226,18 @@ export class PapersContextProvider extends Component {
             },
           };
         },
-        ups: () => {
+        ups: game => {
           console.log('Ups! game-update', payload);
           return game;
         },
       };
 
-      const newGame = reaction[actionType] ? reaction[actionType]() : reaction.ups();
+      const updateGame = reaction[actionType] || reaction.ups;
 
-      this.setState({ game: newGame });
+      // this should be based on previous game no?
+      this.setState(state => ({
+        game: updateGame(state),
+      }));
     });
   }
 
@@ -214,15 +247,21 @@ export class PapersContextProvider extends Component {
   }
 
   recoverPlayer() {
+    console.log('recoverPlayer');
     this.state.socket.open();
     this.state.socket.emit('recover-player');
   }
 
   updateProfile(profile) {
-    const id = profile.id || createUniqueId(profile.name);
-    window.localStorage.setItem('profile_name', profile.name);
-    window.localStorage.setItem('profile_avatar', profile.avatar);
+    const id = profile.id || createUniqueId(`player_${profile.name}`);
+
     window.localStorage.setItem('profile_id', id);
+    window.localStorage.setItem('profile_name', profile.name);
+
+    if (profile.avatar) {
+      // its optional
+      window.localStorage.setItem('profile_avatar', profile.avatar);
+    }
 
     this.setState(state => ({
       profile: {
@@ -233,24 +272,27 @@ export class PapersContextProvider extends Component {
     }));
   }
 
+  _removeGameFromState() {
+    window.localStorage.removeItem('profile_gameId');
+
+    this.setState(state => ({
+      status: 'READY',
+      profile: {
+        ...state.profile,
+        gameId: null,
+      },
+      game: null,
+    }));
+  }
+
   recoverGame(socket = this.state.socket) {
-    console.log('recovering game...');
     socket.emit('recover-game', (err, result) => {
       if (err) {
-        window.localStorage.removeItem('profile_gameId');
-
-        this.setState(state => ({
-          status: 'READY',
-          profile: {
-            ...state.profile,
-            gameId: null,
-          },
-          game: null,
-        }));
+        this._removeGameFromState();
 
         const errorMsgMap = {
           notFound: 'recover-game: Does not exist',
-          dontBelong: 'recover-game: You dont belong to:',
+          // dontBelong: 'recover-game: You dont belong to:',
           empty: 'recover-game: No games stored',
           ups: `recover-game: Ups!', ${JSON.stringify(err)}`,
         };
@@ -266,6 +308,20 @@ export class PapersContextProvider extends Component {
         game: result.game,
       });
     });
+  }
+
+  leaveGame() {
+    this.state.socket.emit(
+      'leave-game',
+      {
+        gameId: this.state.game.name,
+        playerId: this.state.profile.id,
+      },
+      err => {
+        if (err) return true;
+        this._removeGameFromState();
+      }
+    );
   }
 
   render() {
@@ -285,5 +341,7 @@ export class PapersContextProvider extends Component {
     );
   }
 }
+
+export const PapersContextProvider = withRouter(PapersContextComp);
 
 export default PapersContext;

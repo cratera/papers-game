@@ -5,92 +5,78 @@ import { Link, useParams } from 'react-router-dom';
 
 import PapersContext from 'store/PapersContext.js';
 import Button from 'components/Button.js';
-import { usePrevious } from 'utils';
+// import { usePrevious } from 'utils';
 
 export default function GameRoom(props) {
+  const { id: urlGameId } = useParams();
   const Papers = useContext(PapersContext);
-  let { id: gameRoomId } = useParams();
-  const [status, setStatus] = useState('loading');
   const { profile, game } = Papers.state;
-  const gameIdStored = game && game.name;
-  const prevgameIdStored = usePrevious(gameIdStored);
+  const gameId = game && game.name;
+  const profileId = profile && profile.id;
+  const playerIsAfk = game && game.players[profileId].isAfk;
+  const [status, setStatus] = useState('loading');
+  // const prevgameIdStored = usePrevious(gameIdStored);
 
   useEffect(() => {
-    console.log('/game', { gameRoomId, gameIdStored });
-
-    if (gameRoomId === gameIdStored) {
-      console.log('Game is stored - came from other page');
-      Papers.recoverPlayer();
-      setStatus('go');
-      return;
+    if (!profileId) {
+      return setStatus('needProfile');
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    if (prevgameIdStored === undefined && gameIdStored === undefined) {
-      console.log('/game joinining', gameRoomId);
-      Papers.accessGame('join', gameRoomId, (err, result) => {
-        console.log('accessGame result:', result);
-
+    if (gameId === urlGameId) {
+      if (playerIsAfk) {
+        Papers.recoverPlayer();
+      } else {
+        setStatus('ready');
+      }
+    } else {
+      Papers.accessGame('join', urlGameId, err => {
         if (err) {
-          const reactions = {
-            notFound: () => {
-              setStatus('notFound');
-            },
-            ups: result => {
-              setStatus('ups');
-            },
+          // TODO - Move this out of here - redux(mapstatetoprops?)/context/wtv...
+          const errorMsgMap = {
+            notFound: () => 'This game does not exist.',
+            ups: () => `Ups, something went wrong! Error: ${JSON.stringify(err)}`,
           };
 
-          console.warn('accessGame', err);
-          return (reactions[err] || reactions.ups)();
-        }
+          const errrorType = errorMsgMap[err] ? err : 'ups';
+          const errorMsg = errorMsgMap[errrorType]();
 
-        setStatus('go');
+          console.warn('/game/:id - accessGame failed:', gameId, errorMsg, err);
+
+          return setStatus(errrorType);
+        }
       });
     }
-    // Disable rule because of Papers.accessGame - its always the same
-  }, [gameIdStored]); // eslint-disable-line react-hooks/exhaustive-deps
+    // Papers doesnt need to be a dep - its a method.
+  }, [profileId, gameId, playerIsAfk]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    return function onUnmount() {
-      if (game) {
+    return () => {
+      if (gameId) {
         Papers.pausePlayer();
       }
     };
+    // onUnmount, Papers is always the same
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleLeaveGroup = () => {
-    if (game.creator === profile.name) {
-      if (
-        window.confirm(
-          'You are the admin of this game. Leaving, will kick out everyone. Are you sure?'
-        )
-      ) {
-        // Papers.killGame();
-        // socket.emit(
-        //   'kill-game',
-        //   {
-        //     gameId: game.name,
-        //     creatorId: profile.id,
-        //   },
-        //   () => setGame(null)
-        // );
-      }
-    } else {
-      if (window.confirm('Are you sure you wanna leave the game?')) {
-        // Papers.leaveGame();
-        // socket.emit(
-        //   'leave-game',
-        //   {
-        //     gameId: game.name,
-        //     playerId: profile.id,
-        //   },
-        //   () => setGame(null)
-        // );
-      }
+    if (
+      window.confirm('Are you sure you wanna leave the game? You wont be able to join it again.')
+    ) {
+      Papers.leaveGame();
     }
   };
+
+  if (status === 'needProfile') {
+    return (
+      <Fragment>
+        <h1>To join {gameId} you need to create a profile before!</h1>
+        <br />
+        <Button as={Link} to="/">
+          Create profile
+        </Button>
+      </Fragment>
+    );
+  }
 
   if (status === 'loading') {
     return <h1>Loading...</h1>;
@@ -98,12 +84,23 @@ export default function GameRoom(props) {
 
   if (status === 'notFound') {
     return (
-      <div>
+      <Fragment>
         <h1>Ups, this group doesn't seem to exist!</h1>{' '}
         <Button as={Link} to="/">
           Go Home
         </Button>
-      </div>
+      </Fragment>
+    );
+  }
+
+  if (status === 'ups') {
+    return (
+      <Fragment>
+        <h1>Ups, something went wrong loading this group. See logs</h1>{' '}
+        <Button as={Link} to="/">
+          Go Home
+        </Button>
+      </Fragment>
     );
   }
 
@@ -137,9 +134,6 @@ export default function GameRoom(props) {
           );
         })}
       </ul>
-      <Button as={Link} to="/">
-        Go Home
-      </Button>
       <Button onClick={handleLeaveGroup}>Leave Game</Button>
     </Fragment>
   );

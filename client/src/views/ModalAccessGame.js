@@ -30,7 +30,7 @@ export default function ModalaccessGame({ variant }) {
   };
 
   const handleBtnClick = () => {
-    Papers.accessGame(variant, state.gameName, (err, game) => {
+    Papers.accessGame(variant, state.gameName, err => {
       if (err) {
         // TODO - Move this out of here - redux(mapstatetoprops?)/context/wtv...
         const errorMsgMap = {
@@ -46,10 +46,10 @@ export default function ModalaccessGame({ variant }) {
         return setState(state => ({ ...state, errorMsg }));
       }
 
-      setState(state => ({
-        ...state,
-        gameToRedirect: game.name,
-      }));
+      // setState(state => ({
+      //   ...state,
+      //   gameToRedirect: game.name,
+      // }));
 
       closeModal();
     });

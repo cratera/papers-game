@@ -11,9 +11,7 @@ const socketIO = require('socket.io');
 
 const model = require('./model.js');
 
-const gamesStored = {};
-
-console.log('Reading server/index.js');
+console.log(':::: Reading server/index.js');
 
 // Multi-process to utilize all CPU cores.
 if (!isDev && cluster.isMaster) {
@@ -72,11 +70,9 @@ if (!isDev && cluster.isMaster) {
 
   // ============= PAPERS GAME SOCKET API ============= //
 
-  const buildPlayerRoom = playerId => `player/${playerId}`;
-
   function setNewPlayerRoom(playerId) {
     console.log('newPlayerRoom:', playerId);
-    const playerRoom = io.sockets.in(buildPlayerRoom(playerId));
+    const playerRoom = io.sockets.in(playerId);
 
     playerRoom.on('join', (coisas, mais) => {
       console.log('join default:', coisas, mais);
@@ -91,8 +87,6 @@ if (!isDev && cluster.isMaster) {
     const { playerId, gameId } = socket.handshake.query || {};
     console.log('New socket:', playerId, gameId, socket.id);
 
-    console.log('gamesStored:', gamesStored);
-
     io.clients((error, clients) => {
       if (error) throw error;
       console.log('clients connected:', clients); // => [String]
@@ -100,9 +94,8 @@ if (!isDev && cluster.isMaster) {
 
     if (playerId && gameId) {
       socket.papersProfile = { playerId, gameId };
-      const playerRoom = buildPlayerRoom(playerId);
 
-      io.in(playerRoom).clients((err, clients) => {
+      io.in(playerId).clients((err, clients) => {
         if (err) {
           // Q: How to handle this on client / server? :/
           return next(new Error('Auth error: missing token'));
@@ -111,13 +104,15 @@ if (!isDev && cluster.isMaster) {
         if (!clients) {
           setNewPlayerRoom();
         }
-        socket.join(playerRoom);
+        socket.join(playerId, () => {
+          console.log('[socket] joined the [playerId] room:', socket.id, playerId);
+        });
         next();
       });
     } else {
       // Q: How to handle this on client / server? :/
       console.error('New socket error - missing a token:', playerId, gameId, socket.id);
-      return;
+
       // return next(new Error('Auth error: missing token'));
     }
   }).on('connection', socket => {
@@ -136,7 +131,7 @@ if (!isDev && cluster.isMaster) {
         return cb(null, { status: 'success', game });
       } catch (error) {
         const status = {
-          dontBelong: () => cb(new Error('dontBelong')),
+          // dontBelong: () => cb(new Error('dontBelong')),
           notFound: () => cb(new Error('notFound')),
           ups: () => {
             cb(new Error('notFound'));
@@ -149,8 +144,6 @@ if (!isDev && cluster.isMaster) {
 
     socket.on('create-game', ({ gameId, player }, cb) => {
       console.log('create-game', gameId, player.name);
-
-      gamesStored[gameId] = true;
 
       try {
         const game = model.createGame(gameId, player);
@@ -169,17 +162,16 @@ if (!isDev && cluster.isMaster) {
     socket.on('join-game', ({ gameId, player }, cb) => {
       console.log('join-game', gameId, player.id);
 
-      gamesStored[gameId] = true;
-
-      console.log('gamesstored after join-game:', gamesStored);
-
       try {
         const game = model.joinGame(gameId, player);
 
         socket.join(gameId, () => {
           socket.papersProfile.gameId = gameId;
-          io.to(socket.id).emit('set-game', game);
-          io.to(gameId).emit('game-update', 'new-player', player);
+          // Update similar sessions about the new game.
+          io.to(player.id).emit('set-game', game);
+
+          // Broadcast to the game this new player.
+          socket.to(gameId).broadcast.emit('game-update', 'new-player', player);
           cb(null, game);
         });
       } catch (error) {
@@ -188,16 +180,19 @@ if (!isDev && cluster.isMaster) {
       }
     });
 
-    socket.on('leave-room', ({ gameId, playerId }, cb) => {
-      console.log('leave-room', gameId, playerId);
+    socket.on('leave-game', ({ gameId, playerId }, cb) => {
+      console.log('leave-game', gameId, playerId);
+
       try {
-        const room = model.leaveRoom(gameId, playerId);
+        model.leaveGame(gameId, playerId);
+
         socket.leave(gameId, () => {
-          cb();
-          io.to(gameId).emit('game-update', room);
+          cb(null);
+          io.to(gameId).emit('game-update', 'leave-player', playerId);
         });
       } catch (error) {
         console.error('Failed to leave room.', error);
+        cb(error);
       }
     });
 
@@ -216,10 +211,8 @@ if (!isDev && cluster.isMaster) {
     });
 
     function verifyPlayerConnections(playerId, gameId) {
-      const playerRoom = buildPlayerRoom(playerId);
-
-      socket.leave(playerRoom, () => {
-        io.in(playerRoom).clients((err, clients) => {
+      socket.leave(playerId, () => {
+        io.in(playerId).clients((err, clients) => {
           if (err) return false;
 
           console.log('clients after leave:', clients);
