@@ -22,7 +22,7 @@ export const backdrop = css`
 
 export const box = css`
   position: absolute;
-  top: 10vw;
+  top: 5vw;
   width: 90vw;
   height: auto;
   left: 5vw;

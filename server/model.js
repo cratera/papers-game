@@ -1,14 +1,15 @@
 const utils = require('./utils');
 
-// Q: So... doing this to store games doesn't work across
-// multiple sessions, each new session, reads this?
+// Q: This works fine locally, but not on Heroku. Why?
+// I know it's a bad practice, but I don't know DB yet,
+// so... one thing at the time.
 const games = {};
 
 function getRoom(name, playerId) {
   const game = games[name];
 
   if (!game) {
-    throw 'notFound';
+    throw String('notFound');
   }
 
   // In the future, add auth?
@@ -27,7 +28,7 @@ function createGame(name, creator) {
   const game = {
     // id: utils.createUniqueId(`game_${name}`), // TODO - use id instead of name.
     name: utils.stringToSlug(name),
-    creator: creator.name,
+    creatorId: creator.id,
     players: {
       [creator.id]: creator,
     },
@@ -68,7 +69,7 @@ function recoverPlayer(name, playerId) {
   const game = games[name];
 
   if (!game) {
-    throw 'notFound';
+    throw String('notFound');
   }
 
   game.players[playerId].isAfk = false;
@@ -76,15 +77,24 @@ function recoverPlayer(name, playerId) {
   return game;
 }
 
-function leaveGame(name, playerId) {
+function removePlayer(name, playerId) {
   const game = games[name];
 
   if (!game) {
     throw 'notFound';
   }
 
-  // How to do this?
-  delete game.players[playerId];
+  const otherPlayers = Object.keys(game.players).reduce((acc, p) => {
+    return p === playerId ? acc : { ...acc, [p]: game.players[p] };
+  }, {});
+
+  game.players = otherPlayers;
+
+  // Set a new admin in case this was the one leaving.
+  if (game.creatorId === playerId) {
+    // The new admin is the oldest player.
+    game.creatorId = Object.keys(otherPlayers)[0];
+  }
 
   return game;
 }
@@ -109,7 +119,7 @@ module.exports = {
   getRoom,
   createGame,
   joinGame,
-  leaveGame,
+  removePlayer,
   killGame,
   pausePlayer,
   recoverPlayer,

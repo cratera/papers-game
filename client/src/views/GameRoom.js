@@ -3,6 +3,8 @@ import { jsx, css } from '@emotion/core';
 import { Fragment, useState, useContext, useEffect } from 'react';
 import { Redirect, Link, useParams } from 'react-router-dom';
 
+import { typography as Typography } from 'Theme.js';
+import * as Styles from './GameRoomStyles.js';
 import PapersContext from 'store/PapersContext.js';
 import Button from 'components/Button.js';
 import { usePrevious } from 'utils';
@@ -13,20 +15,22 @@ export default function GameRoom(props) {
   const { profile, game } = Papers.state;
   const gameId = game && game.name;
   const profileId = profile && profile.id;
-  const playerIsAfk = game && game.players[profileId] && game.players[profileId].isAfk;
-  const [status, setStatus] = useState('loading');
+  const playerIsAfk = game && game.players[profileId].isAfk;
+  const playerIsAdmin = game && game.creatorId === profileId;
+
+  const [status, setStatus] = useState('loading'); // needProfile || ready  || notFound
   const prevGameId = usePrevious(gameId);
 
   useEffect(() => {
     if (!profileId) {
-      return setStatus('needProfile');
+      return false;
     }
 
     if (prevGameId && !gameId) {
-      console.log('Left game');
+      return setStatus('leftGroup');
     }
 
-    if (gameId === urlGameId) {
+    if (urlGameId === gameId) {
       if (playerIsAfk) {
         Papers.recoverPlayer();
       } else {
@@ -53,15 +57,6 @@ export default function GameRoom(props) {
     // Papers doesnt need to be a dep - its a method.
   }, [profileId, gameId, playerIsAfk]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    return () => {
-      if (gameId) {
-        Papers.pausePlayer();
-      }
-    };
-    // onUnmount, Papers is always the same
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
   const handleLeaveGroup = () => {
     if (
       window.confirm('Are you sure you wanna leave the game? You wont be able to join it again.')
@@ -70,7 +65,13 @@ export default function GameRoom(props) {
     }
   };
 
-  if (status === 'needProfile') {
+  // This is asking for a switch / children mapping...
+
+  if (status === 'loading') {
+    return <h1>Loading...</h1>;
+  }
+
+  if (!profileId) {
     return (
       <Fragment>
         <h1>To join {gameId} you need to create a profile before!</h1>
@@ -80,10 +81,6 @@ export default function GameRoom(props) {
         </Button>
       </Fragment>
     );
-  }
-
-  if (status === 'loading') {
-    return <h1>Loading...</h1>;
   }
 
   if (status === 'notFound') {
@@ -97,6 +94,10 @@ export default function GameRoom(props) {
     );
   }
 
+  if (status === 'leftGroup' || !game) {
+    return <Redirect push to="/" />;
+  }
+
   if (status === 'ups') {
     return (
       <Fragment>
@@ -108,43 +109,64 @@ export default function GameRoom(props) {
     );
   }
 
-  if (!game) {
-    // Let's hope this only happens when the user left the game.
-    // Need a global state for these cases.
-    return <Redirect push to="/" />;
-  }
-
   return (
-    <Fragment>
-      <p>
-        A game "{game.name}" created by {game.creator} is starting here!
-      </p>
-      <h1>Players:</h1>
-      <ul>
-        {Object.keys(game.players).map((playerId, i) => {
-          const { avatar, name, isAfk } = game.players[playerId];
+    <main css={Styles.container}>
+      <header css={Styles.header}>
+        <p css={[Typography.small, Styles.cap]}>Ask your friends to join!</p>
 
-          return (
-            <li key={`${i}_playerId`}>
-              {/* TODO - avatar component!! */}-{' '}
-              <img
-                src={avatar}
-                alt=""
-                css={css`
-                  width: 2.5rem;
-                  height: 2.5rem;
-                  object-fit: cover;
-                  border-radius: 50%;
-                  margin-right: 1rem;
-                `}
-              />
-              {name}
-              {isAfk && '⚠️'}
-            </li>
-          );
-        })}
-      </ul>
-      <Button onClick={handleLeaveGroup}>Leave Game</Button>
-    </Fragment>
+        <span
+          css={css`
+            display: flex;
+            justify-content: center;
+            padding-left: 3rem; /*emoji space*/
+          `}
+        >
+          <h1 css={Typography.h1}>{game.name}</h1>
+          <Button
+            variant="flat"
+            aria-label="button share"
+            onClick={() =>
+              alert(
+                `Not implemented... but until then, ask your friends to click "Join Game" and write "${game.name}"`
+              )
+            }
+          >
+            {/* eslint-disable-next-line */} 🔗
+          </Button>
+        </span>
+      </header>
+      <div>
+        <h2 css={Typography.h3}>Lobby:</h2>
+        <ul aria-label="Lobby" css={Styles.lobby}>
+          {Object.keys(game.players).map((playerId, i) => {
+            const { avatar, name, id, isAfk } = game.players[playerId];
+            console.log('player', id);
+            const isAdmin = id === game.creatorId;
+            return (
+              <li key={id} css={Styles.lobbyItem}>
+                {/* TODO - avatar component!! */}
+                <img src={avatar} alt="" css={Styles.lobbyAvatar} />
+                {name}
+                {isAdmin && '    (Admin)'}
+                {isAfk && '    ⚠️'}
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+      <Button
+        variant="flat"
+        css={css`
+          text-align: left;
+          position: absolute;
+          top: 0;
+          left: 0;
+        `}
+        onClick={handleLeaveGroup}
+      >
+        Leave
+      </Button>
+      {playerIsAdmin && <Button onClick={() => true}>Create Teams</Button>}
+    </main>
   );
 }

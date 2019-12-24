@@ -46,23 +46,18 @@ export default function ModalaccessGame({ variant }) {
         return setState(state => ({ ...state, errorMsg }));
       }
 
-      // setState(state => ({
-      //   ...state,
-      //   gameToRedirect: game.name,
-      // }));
-
       closeModal();
     });
   };
 
   const copy = {
     join: {
-      title: "What's the game name?",
+      title: "What's the party name?",
       description: 'Ask your friend for it!',
     },
     create: {
-      title: 'Name your game',
-      description: 'Pick a short and sweet name:',
+      title: 'Give this party a name!',
+      description: 'Pick a short and sweet name.',
     },
   }[variant];
 

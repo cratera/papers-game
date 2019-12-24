@@ -37,9 +37,8 @@ class PapersContextComp extends Component {
 
     this.PapersAPI = {
       open: this.open.bind(this),
-      close: this.close.bind(this),
 
-      pausePlayer: this.pausePlayer.bind(this),
+      // pausePlayer: this.pausePlayer.bind(this),
       recoverPlayer: this.recoverPlayer.bind(this),
 
       updateProfile: this.updateProfile.bind(this),
@@ -111,26 +110,6 @@ class PapersContextComp extends Component {
     return socket;
   }
 
-  close() {
-    console.log('TODO Papers.close...');
-    // this.state.socket.open();
-    // this.state.socket.emit('close');
-
-    // const game = this.state.game;
-    // const playerId = this.state.profile.id;
-
-    // this.setState({
-    //   ...game,
-    //   players: {
-    //     ...game.players,
-    //     [playerId]: {
-    //       ...game.players[playerId],
-    //       isAfk: true,
-    //     },
-    //   },
-    // });
-  }
-
   accessGame(variant, gameName, cb) {
     let socket = this.state.socket;
 
@@ -178,6 +157,8 @@ class PapersContextComp extends Component {
     socket.on('game-update', (actionType, payload) => {
       console.log('game-update:', actionType);
 
+      // Maybe actionType should be in past?
+      // player-added, player-paused, etc...
       const reaction = {
         'new-player': game => {
           const player = payload;
@@ -191,6 +172,7 @@ class PapersContextComp extends Component {
         },
         'pause-player': game => {
           const playerId = payload;
+
           return {
             ...game,
             players: {
@@ -200,19 +182,6 @@ class PapersContextComp extends Component {
                 isAfk: true,
               },
             },
-          };
-        },
-        'leave-player': game => {
-          const playerId = payload;
-          const playerKey = [playerId];
-          // TIL: destruct dynamic keys from an object!
-          const { [playerKey[0]]: playerToRemove, ...otherPlayers } = game;
-
-          console.log(('playerId:', playerId));
-          console.log(playerToRemove, otherPlayers);
-          return {
-            ...game,
-            players: otherPlayers,
           };
         },
         'recover-player': game => {
@@ -226,6 +195,19 @@ class PapersContextComp extends Component {
                 isAfk: false,
               },
             },
+          };
+        },
+        'remove-player': game => {
+          const { playerId, creatorId } = payload;
+
+          const otherPlayers = Object.keys(game.players).reduce((acc, p) => {
+            return p === playerId ? acc : { ...acc, [p]: game.players[p] };
+          }, {});
+
+          return {
+            ...game,
+            creatorId,
+            players: otherPlayers,
           };
         },
         ups: game => {
@@ -243,15 +225,16 @@ class PapersContextComp extends Component {
     });
   }
 
-  pausePlayer() {
-    console.log('pausePlayer');
-    this.state.socket.emit('pause-player');
-  }
+  // Not needed yet.
+  // pausePlayer() {
+  //   console.log('pausePlayer');
+  //   this.state.socket.emit('pause-player');
+  // }
 
   recoverPlayer() {
     console.log('recoverPlayer');
-    this.state.socket.open();
-    this.state.socket.emit('recover-player');
+    const socket = this.state.socket.open();
+    socket.emit('recover-player');
   }
 
   updateProfile(profile) {
@@ -275,9 +258,10 @@ class PapersContextComp extends Component {
   }
 
   _removeGameFromState() {
+    console.log('removing game');
     window.localStorage.removeItem('profile_gameId');
 
-    // Out of a room, there is no point in being connected
+    // Leaving room, there is no point in being connected
     this.state.socket.close();
 
     this.setState(state => ({

@@ -70,19 +70,6 @@ if (!isDev && cluster.isMaster) {
 
   // ============= PAPERS GAME SOCKET API ============= //
 
-  function setNewPlayerRoom(playerId) {
-    console.log('newPlayerRoom:', playerId);
-    const playerRoom = io.sockets.in(playerId);
-
-    playerRoom.on('join', (coisas, mais) => {
-      console.log('join default:', coisas, mais);
-    });
-
-    playerRoom.on('joined', (coisas, mais) => {
-      console.log('joined manual:', coisas, mais);
-    });
-  }
-
   io.use(function(socket, next) {
     const { playerId, gameId } = socket.handshake.query || {};
     console.log('New socket:', playerId, gameId, socket.id);
@@ -101,9 +88,6 @@ if (!isDev && cluster.isMaster) {
           return next(new Error('Auth error: missing token'));
         }
 
-        if (!clients) {
-          setNewPlayerRoom();
-        }
         socket.join(playerId, () => {
           console.log('[socket] joined the [playerId] room:', socket.id, playerId);
         });
@@ -183,11 +167,17 @@ if (!isDev && cluster.isMaster) {
     socket.on('leave-game', ({ gameId, playerId }, cb) => {
       console.log('leave-game', gameId, playerId);
 
+      // Naming: leave-game or remove-player? humm..
       try {
-        model.leaveGame(gameId, playerId);
+        const game = model.removePlayer(gameId, playerId);
+
         socket.leave(gameId, () => {
           cb(null);
-          io.to(gameId).emit('game-update', 'leave-player', playerId);
+          // Pass creatorId in case it's a new one!
+          io.to(gameId).emit('game-update', 'remove-player', {
+            playerId,
+            creatorId: game.creatorId,
+          });
           socket.disconnect();
         });
       } catch (error) {
@@ -211,28 +201,55 @@ if (!isDev && cluster.isMaster) {
     });
 
     function verifyPlayerConnections(playerId, gameId) {
+      // CALLBACK FUCKING HELL .___.
       socket.leave(playerId, () => {
         io.in(playerId).clients((err, clients) => {
           if (err) return false;
 
-          console.log('clients after leave:', clients);
+          console.log('sockets in this playerId:', clients);
 
           if (clients.length === 0) {
-            // Let everyone know that this player went offline!
-            console.log('Player is afk:', playerId, gameId);
-            model.pausePlayer(playerId, gameId);
-            io.to(gameId).emit('game-update', 'pause-player', playerId);
+            // There's no one, but let's wait a bit...
+            // Maybe the user is refreshing the page.
+            setTimeout(() => {
+              // Just to scape the indents...
+              doLastCheck();
+            }, 2500);
           }
         });
       });
+
+      function doLastCheck() {
+        io.in(playerId).clients((err, clientsAfter) => {
+          if (err) return false;
+
+          // Let everyone know that this player is offline!
+          if (clientsAfter.length === 0) {
+            console.log('Player is afk:', playerId, gameId);
+            try {
+              const game = model.getRoom(gameId);
+
+              // If doesnt exist, its because the user
+              // emited leave-group before.
+              if (game.players[playerId]) {
+                model.pausePlayer(playerId, gameId);
+                io.to(gameId).emit('game-update', 'pause-player', playerId);
+              }
+            } catch (error) {
+              console.log(error);
+            }
+          }
+        });
+      }
     }
 
-    socket.on('pause-player', () => {
-      const { playerId, gameId } = socket.papersProfile;
-      console.log('pause-player:', playerId, gameId, socket.id);
+    // Not needed yet.
+    // socket.on('pause-player', () => {
+    //   const { playerId, gameId } = socket.papersProfile;
+    //   console.log('pause-player:', playerId, gameId, socket.id);
 
-      verifyPlayerConnections(playerId, gameId);
-    });
+    //   verifyPlayerConnections(playerId, gameId);
+    // });
 
     socket.on('recover-player', cb => {
       const { playerId, gameId } = socket.papersProfile;

@@ -5,6 +5,7 @@ export const colors = {
   grayMedium: '#7F848E',
   grayLight: '#E5E6E8',
   primary: '#0038FF',
+  primaryLight: '#E6EBFF',
   bg: '#fff',
 };
 

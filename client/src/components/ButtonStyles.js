@@ -3,12 +3,12 @@ import * as theme from '../Theme.js';
 
 const variants = {
   primary: {
-    bg: theme.colors.grayDark,
+    bg: theme.colors.primary,
     text: theme.colors.bg,
   },
   light: {
-    bg: theme.colors.bg,
-    text: theme.colors.grayDark,
+    bg: theme.colors.primaryLight,
+    text: theme.colors.primary,
   },
   flat: {
     bg: theme.colors.bg,
@@ -23,7 +23,7 @@ export const button = ({ variant, hasBlock }) => {
     padding: 1.6rem;
   `
       : `
-    box-shadow: 0px 0.4rem 1.6rem rgba(72, 79, 93, 0.3);
+    box-shadow: 0px 4px 16px rgba(0, 56, 255, 0.1);
     padding: 1.6rem 2.4rem;
   `}
     border: none;
@@ -40,8 +40,7 @@ export const button = ({ variant, hasBlock }) => {
     &:hover,
     &:focus {
       outline: 0;
-      box-shadow: 0px 0.4rem 1.6rem rgba(72, 79, 93, 0.3),
-        0 0px 5px rgba(72, 79, 93, 0.8); /* verify with maggie */
+      box-shadow: 0px 4px 16px rgba(0, 56, 255, 0.1), 0 0px 5px rgba(72, 79, 93, 0.8); /* verify with maggie */
     }
   `;
 };

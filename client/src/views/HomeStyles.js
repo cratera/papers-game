@@ -45,17 +45,18 @@ export const input = css`
 
   &:focus {
     outline: none;
-    border-color: ${Theme.colors.grayMedium};
+    border-color: ${Theme.colors.primaryLight};
   }
 `;
 
 export const avatarPlace = css`
   width: 80vw;
-  height: 60vw;
+  height: 80vw;
   max-width: 30rem;
-  max-height: 25rem;
-  border-radius: 0.5rem;
-  border: 1px solid ${Theme.colors.grayMedium};
+  max-height: 30rem;
+  border-radius: 50%;
+  background-color: ${Theme.colors.primaryLight};
+  color: ${Theme.colors.primary};
   margin: 2.4rem auto;
   display: flex;
   align-items: center;
@@ -63,17 +64,14 @@ export const avatarPlace = css`
   justify-content: center;
 
   svg {
+    stroke: ${Theme.colors.primary};
     display: inline-block;
-    margin-bottom: 0.8rem;
+    margin-bottom: 1.6rem;
   }
 `;
 
 export const avatarImg = css`
   ${avatarPlace}
-  height: 80vw;
-  max-width: 30rem;
-  max-height: 30rem;
-  border-radius: 50%;
   border: none;
   object-fit: cover;
 `;

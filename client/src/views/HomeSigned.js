@@ -83,13 +83,12 @@ export default function Home(props) {
           </h1>
         </div>
       </div>
-      {/* TODO - REDIRECT TO ROOM AUTOMATICALLY */}
       <div css={Styles.ctas}>
-        <Button hasBlock variant="light" onClick={() => openModalAccessGame('create')}>
-          Create Game
-        </Button>
         <Button hasBlock onClick={() => openModalAccessGame('join')}>
           Join Game
+        </Button>
+        <Button hasBlock variant="light" onClick={() => openModalAccessGame('create')}>
+          Create Game
         </Button>
       </div>
     </div>
