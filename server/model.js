@@ -32,8 +32,14 @@ function createGame(name, creator) {
     players: {
       [creator.id]: creator,
     },
+    words: {
+      // [playerId]: Number || [String]
+      // - Number: the user is still writing their words.
+      // - Array: list of words - the user submitted their words.
+    },
     settings: {
       rounds: 3,
+      words: 10,
     },
   };
 
@@ -81,7 +87,7 @@ function removePlayer(name, playerId) {
   const game = games[name];
 
   if (!game) {
-    throw 'notFound';
+    throw String('notFound');
   }
 
   const otherPlayers = Object.keys(game.players).reduce((acc, p) => {
@@ -103,16 +109,27 @@ function killGame(name, creatorId) {
   const game = games[name];
 
   if (!game) {
-    throw 'notFound';
+    throw String('notFound');
   }
 
   if (creatorId === game.creator) {
     // Q: how overcome this?
     delete games[name];
-  } else {
-    throw 'notFound';
   }
+
   return null;
+}
+
+function setWords(name, playerId, words) {
+  const game = games[name];
+
+  if (!game) {
+    throw String('notFound');
+  }
+
+  game.words[playerId] = words;
+
+  return game;
 }
 
 module.exports = {
@@ -123,4 +140,5 @@ module.exports = {
   killGame,
   pausePlayer,
   recoverPlayer,
+  setWords,
 };

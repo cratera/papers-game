@@ -5,19 +5,21 @@ import { Redirect, Link, useParams } from 'react-router-dom';
 
 import { typography as Typography } from 'Theme.js';
 import * as Styles from './GameRoomStyles.js';
-import PapersContext from 'store/PapersContext.js';
 import Button from 'components/Button.js';
+import CoreContext from 'store/CoreContext.js';
+import PapersContext from 'store/PapersContext.js';
+import ModalWriteWords from 'views/ModalWriteWords.js';
 import { usePrevious } from 'utils';
 
 export default function GameRoom(props) {
   const { id: urlGameId } = useParams();
   const Papers = useContext(PapersContext);
+  const { setModal } = useContext(CoreContext);
   const { profile, game } = Papers.state;
   const gameId = game && game.name;
   const profileId = profile && profile.id;
   const playerIsAfk = game && game.players[profileId].isAfk;
   const playerIsAdmin = game && game.creatorId === profileId;
-
   const [status, setStatus] = useState('loading'); // needProfile || ready  || notFound
   const prevGameId = usePrevious(gameId);
 
@@ -27,7 +29,7 @@ export default function GameRoom(props) {
     }
 
     if (prevGameId && !gameId) {
-      return setStatus('leftGroup');
+      return setStatus('leftGame');
     }
 
     if (urlGameId === gameId) {
@@ -57,7 +59,7 @@ export default function GameRoom(props) {
     // Papers doesnt need to be a dep - its a method.
   }, [profileId, gameId, playerIsAfk]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleLeaveGroup = () => {
+  const handleLeaveGame = () => {
     if (
       window.confirm('Are you sure you wanna leave the game? You wont be able to join it again.')
     ) {
@@ -86,7 +88,7 @@ export default function GameRoom(props) {
   if (status === 'notFound') {
     return (
       <Fragment>
-        <h1>Ups, this group doesn't seem to exist!</h1>{' '}
+        <h1>Ups, the game "{urlGameId}"" doesn't seem to exist!</h1>{' '}
         <Button as={Link} to="/">
           Go Home
         </Button>
@@ -94,14 +96,14 @@ export default function GameRoom(props) {
     );
   }
 
-  if (status === 'leftGroup' || !game) {
+  if (status === 'leftGame' || !game) {
     return <Redirect push to="/" />;
   }
 
   if (status === 'ups') {
     return (
       <Fragment>
-        <h1>Ups, something went wrong loading this group. See logs</h1>{' '}
+        <h1>Ups, something went wrong loading this game. See logs</h1>{' '}
         <Button as={Link} to="/">
           Go Home
         </Button>
@@ -109,6 +111,25 @@ export default function GameRoom(props) {
     );
   }
 
+  function openWords() {
+    setModal({
+      component: ModalWriteWords,
+    });
+  }
+
+  const didSubmitAllWords = plId => {
+    return game.words[plId] && game.words[plId].length === game.settings.words;
+  };
+  // Q: Maybe this should be done on the server. It's faster, right?
+  const didEveryoneSubmittedTheirWords = Object.keys(game.players).every(didSubmitAllWords);
+  const didSubmitWords = didSubmitAllWords(profileId);
+  const allWords = Object.keys(game.players)
+    .reduce((acc, playerId) => {
+      return game.words[playerId] && typeof game.words[playerId] !== 'number'
+        ? [...acc, ...game.words[playerId]]
+        : acc;
+    }, [])
+    .join(', ');
   return (
     <main css={Styles.container}>
       <header css={Styles.header}>
@@ -140,15 +161,35 @@ export default function GameRoom(props) {
         <ul aria-label="Lobby" css={Styles.lobby}>
           {Object.keys(game.players).map((playerId, i) => {
             const { avatar, name, id, isAfk } = game.players[playerId];
-            console.log('player', id);
             const isAdmin = id === game.creatorId;
+            const wordsWritten = game.words[id] || 0;
+            const wordsStatus =
+              // If it's not a number, it's an array - it means all words were submitted.
+              typeof wordsWritten === 'number'
+                ? wordsWritten > 0
+                  ? `✏️(${wordsWritten})`
+                  : ''
+                : '✅';
+
             return (
               <li key={id} css={Styles.lobbyItem}>
                 {/* TODO - avatar component!! */}
-                <img src={avatar} alt="" css={Styles.lobbyAvatar} />
-                {name}
-                {isAdmin && '    (Admin)'}
-                {isAfk && '    ⚠️'}
+                <span>
+                  <img src={avatar} alt="" css={Styles.lobbyAvatar} />
+                  <span
+                    css={css`
+                      ${id === profileId ? 'font-weight: 600;' : ''}
+                    `}
+                  >
+                    {name}
+                  </span>
+                  &nbsp;
+                  <span>
+                    {isAdmin && ' (Admin) '}
+                    {isAfk && ' ⚠️ '}
+                  </span>
+                </span>
+                <span>{wordsStatus}</span>
               </li>
             );
           })}
@@ -162,11 +203,28 @@ export default function GameRoom(props) {
           top: 0;
           left: 0;
         `}
-        onClick={handleLeaveGroup}
+        onClick={handleLeaveGame}
       >
         Leave
       </Button>
-      {playerIsAdmin && <Button onClick={() => true}>Create Teams</Button>}
+      {!didSubmitWords && (
+        <Button hasBlock onClick={openWords}>
+          Write your papers
+        </Button>
+      )}
+      {didSubmitWords && !didEveryoneSubmittedTheirWords && (
+        /* eslint-disable-next-line */
+        <span>Waiting for everyone to have submitted their words ✏️</span>
+      )}
+      {didEveryoneSubmittedTheirWords && playerIsAdmin && (
+        <Button
+          onClick={() =>
+            alert(`TODO: We have teams to build and all this words to shuffle: ${allWords}`)
+          }
+        >
+          Create Teams
+        </Button>
+      )}
     </main>
   );
 }

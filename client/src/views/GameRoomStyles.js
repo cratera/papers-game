@@ -28,6 +28,12 @@ export const lobbyItem = css`
   display: flex;
   align-items: center;
   margin-bottom: 2.4rem;
+  justify-content: space-between;
+
+  span {
+    display: flex;
+    align-items: center;
+  }
 `;
 
 export const lobbyAvatar = css`

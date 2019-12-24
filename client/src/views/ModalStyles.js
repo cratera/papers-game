@@ -104,6 +104,20 @@ export const input = css`
   }
 `;
 
+export const textarea = css`
+  border: none;
+  border: 1px solid ${Theme.colors.grayLight};
+  border-radius: 0.4rem;
+  width: 100%;
+  height: 10rem; /* enough for 10 words */
+  margin: 0 0 1.6rem;
+
+  &:focus {
+    outline: none;
+    border-color: ${Theme.colors.grayMedium};
+  }
+`;
+
 export const errorMsg = css`
   ${Theme.typography.small}
   color: #da4040;

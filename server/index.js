@@ -112,7 +112,9 @@ if (!isDev && cluster.isMaster) {
 
       try {
         const game = model.getRoom(gameId, playerId);
-        return cb(null, { status: 'success', game });
+        socket.join(gameId, () => {
+          return cb(null, { status: 'success', game });
+        });
       } catch (error) {
         const status = {
           // dontBelong: () => cb(new Error('dontBelong')),
@@ -266,6 +268,22 @@ if (!isDev && cluster.isMaster) {
         console.warn('Recover Player failed:', error);
         cb && cb(error);
       }
+    });
+
+    socket.on('set-words', ({ gameId, playerId, words }, cb) => {
+      // OPTIMIZE: Receive/pass params as individual or {} ? Should follow a convention
+      // (options: Object, callback: Function)
+      // individual is mandatory, object is optional?
+
+      // OPTMIZE: Should the playerId be passed or access through
+      // socket.papersProfile? Review this later...
+      // const { playerId, gameId } = socket.papersProfile;
+      console.log('set-words', playerId, gameId, words);
+
+      model.setWords(gameId, playerId, words);
+
+      io.to(gameId).emit('game-update', 'set-words', { words, playerId });
+      return cb && cb(null);
     });
 
     socket.on('disconnect', () => {

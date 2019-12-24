@@ -46,6 +46,8 @@ class PapersContextComp extends Component {
       accessGame: this.accessGame.bind(this),
       recoverGame: this.recoverGame.bind(this),
       leaveGame: this.leaveGame.bind(this),
+
+      setWords: this.setWords.bind(this),
     };
   }
 
@@ -155,7 +157,7 @@ class PapersContextComp extends Component {
     });
 
     socket.on('game-update', (actionType, payload) => {
-      console.log('game-update:', actionType);
+      console.log('game-update:', actionType, { payload });
 
       // Maybe actionType should be in past?
       // player-added, player-paused, etc...
@@ -210,6 +212,17 @@ class PapersContextComp extends Component {
             players: otherPlayers,
           };
         },
+        'set-words': game => {
+          const { words, playerId } = payload;
+
+          return {
+            ...game,
+            words: {
+              ...game.words,
+              [playerId]: words,
+            },
+          };
+        },
         ups: game => {
           console.log('Ups! game-update', payload);
           return game;
@@ -255,6 +268,19 @@ class PapersContextComp extends Component {
         id,
       },
     }));
+  }
+
+  setWords(words, cb) {
+    console.log('setWords()');
+    this.state.socket.emit(
+      'set-words',
+      {
+        gameId: this.state.game.name,
+        playerId: this.state.profile.id,
+        words,
+      },
+      cb
+    );
   }
 
   _removeGameFromState() {
