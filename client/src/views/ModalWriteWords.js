@@ -21,7 +21,7 @@ export default function ModalWriteWords() {
 
   const handleChange = e => {
     const value = e.target.value;
-    const words = value.split(', ').filter(word => !!word);
+    const words = value.split(/\n/g).filter(word => !!word);
     console.log('Words written:', words.length);
 
     setLocalWords(words);
@@ -45,7 +45,7 @@ export default function ModalWriteWords() {
         <div>
           <h1 css={[ModalStyles.title, Theme.typography.h3]}>Write your words.</h1>
           <p css={[Theme.typography.secondary, ModalStyles.tip]}>
-            Separate each words with a comma and space (, )
+            Write a word / expression per line
           </p>
           {wordsCount !== 10 && <p>Words missing: {wordsGoal - wordsCount} </p>}
           {errorMsg && <p css={ModalStyles.errorMsg}>{errorMsg}</p>}

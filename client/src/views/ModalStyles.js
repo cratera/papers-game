@@ -111,6 +111,7 @@ export const textarea = css`
   width: 100%;
   height: 10rem; /* enough for 10 words */
   margin: 0 0 1.6rem;
+  font-size: 1.6rem;
 
   &:focus {
     outline: none;

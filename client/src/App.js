@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { jsx } from '@emotion/core';
+import { jsx, css } from '@emotion/core';
 import { Fragment } from 'react';
 import { Redirect, Switch, Route } from 'react-router-dom';
 import { base } from 'Theme.js';
@@ -12,6 +12,17 @@ export default function App(props) {
   return (
     <CoreContextProvider>
       <PapersContextProvider>
+        <button
+          css={css`
+            position: fixed;
+            top: 0;
+            right: 0;
+            font-size: 1.3rem;
+          `}
+          onClick={() => window.location.reload()}
+        >
+          Refresh
+        </button>
         <div css={base}>
           <Switch>
             <Route path="/game/:id">
