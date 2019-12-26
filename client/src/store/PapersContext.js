@@ -46,6 +46,7 @@ class PapersContextComp extends Component {
       accessGame: this.accessGame.bind(this),
       recoverGame: this.recoverGame.bind(this),
       leaveGame: this.leaveGame.bind(this),
+      kickoutOfGame: this.kickoutOfGame.bind(this),
 
       setWords: this.setWords.bind(this),
     };
@@ -154,6 +155,12 @@ class PapersContextComp extends Component {
         },
         game,
       }));
+    });
+
+    socket.on('kickouted', () => {
+      // TODO - global status
+      console.log('Global Status: You were quickedout! 😭');
+      this._removeGameFromState();
     });
 
     socket.on('game-update', (actionType, payload) => {
@@ -324,7 +331,7 @@ class PapersContextComp extends Component {
     });
   }
 
-  leaveGame() {
+  leaveGame(playerId) {
     this.state.socket.emit(
       'leave-game',
       {
@@ -334,6 +341,19 @@ class PapersContextComp extends Component {
       err => {
         if (err) return true;
         this._removeGameFromState();
+      }
+    );
+  }
+
+  kickoutOfGame(playerId) {
+    this.state.socket.emit(
+      'kickout-of-game',
+      {
+        gameId: this.state.game.name,
+        playerId,
+      },
+      err => {
+        if (err) return true;
       }
     );
   }

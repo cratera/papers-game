@@ -188,6 +188,26 @@ if (!isDev && cluster.isMaster) {
       }
     });
 
+    socket.on('kickout-of-game', ({ gameId, playerId }, cb) => {
+      console.log('kickout-of-game', gameId, playerId);
+
+      try {
+        const game = model.removePlayer(gameId, playerId);
+
+        io.to(playerId).emit('kickouted');
+
+        // Pass creatorId in case it's a new one!
+        io.to(gameId).emit('game-update', 'remove-player', {
+          playerId,
+          creatorId: game.creatorId,
+        });
+        cb(null);
+      } catch (error) {
+        console.error('Failed to kickout.', playerId, error);
+        cb(error);
+      }
+    });
+
     socket.on('kill-room', ({ roomName, creatorId }, cb) => {
       console.log('kill-room', roomName, 'by', creatorId);
       try {
@@ -227,15 +247,17 @@ if (!isDev && cluster.isMaster) {
 
           // Let everyone know that this player is offline!
           if (clientsAfter.length === 0) {
-            console.log('Player is afk:', playerId, gameId);
             try {
               const game = model.getRoom(gameId);
 
               // If doesnt exist, its because the user
               // emited leave-group before.
               if (game.players[playerId]) {
+                console.log('Player is afk:', playerId, gameId);
                 model.pausePlayer(playerId, gameId);
                 io.to(gameId).emit('game-update', 'pause-player', playerId);
+              } else {
+                console.log('Player left:', playerId, gameId);
               }
             } catch (error) {
               console.log(error);

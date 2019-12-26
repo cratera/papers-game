@@ -18,8 +18,8 @@ export default function GameRoom(props) {
   const { profile, game } = Papers.state;
   const gameId = game && game.name;
   const profileId = profile && profile.id;
-  const playerIsAfk = game && game.players[profileId].isAfk;
-  const playerIsAdmin = game && game.creatorId === profileId;
+  const profileIsAfk = game && game.players[profileId].isAfk;
+  const profileIsAdmin = game && game.creatorId === profileId;
   const [status, setStatus] = useState('loading'); // needProfile || ready  || notFound
   const prevGameId = usePrevious(gameId);
 
@@ -29,11 +29,12 @@ export default function GameRoom(props) {
     }
 
     if (prevGameId && !gameId) {
+      // This shoudln't be here... Global Status
       return setStatus('leftGame');
     }
 
     if (urlGameId === gameId) {
-      if (playerIsAfk) {
+      if (profileIsAfk) {
         Papers.recoverPlayer();
       } else {
         setStatus('ready');
@@ -41,7 +42,6 @@ export default function GameRoom(props) {
     } else {
       Papers.accessGame('join', urlGameId, err => {
         if (err) {
-          // TODO - Move this out of here - redux(mapstatetoprops?)/context/wtv...
           const errorMsgMap = {
             notFound: () => 'This game does not exist.',
             ups: () => `Ups, something went wrong! Error: ${JSON.stringify(err)}`,
@@ -57,7 +57,13 @@ export default function GameRoom(props) {
       });
     }
     // Papers doesnt need to be a dep - its a method.
-  }, [profileId, gameId, playerIsAfk]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [profileId, gameId, profileIsAfk]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  function openWords() {
+    setModal({
+      component: ModalWriteWords,
+    });
+  }
 
   const handleLeaveGame = () => {
     if (
@@ -66,6 +72,13 @@ export default function GameRoom(props) {
       Papers.leaveGame();
     }
   };
+
+  function handleKickOut(playerId) {
+    const playerName = game.players[playerId].name;
+    if (window.confirm(`You are about to kick ${playerName}. Are you sure?`)) {
+      Papers.kickoutOfGame(playerId);
+    }
+  }
 
   // This is asking for a switch / children mapping...
 
@@ -111,12 +124,6 @@ export default function GameRoom(props) {
     );
   }
 
-  function openWords() {
-    setModal({
-      component: ModalWriteWords,
-    });
-  }
-
   const didSubmitAllWords = plId => {
     return game.words[plId] && game.words[plId].length === game.settings.words;
   };
@@ -133,27 +140,27 @@ export default function GameRoom(props) {
   return (
     <main css={Styles.container}>
       <header css={Styles.header}>
-        <p css={[Typography.small, Styles.cap]}>Ask your friends to join!</p>
-
+        {profileIsAdmin && <p css={[Typography.small, Styles.cap]}>Ask your friends to join!</p>}
         <span
           css={css`
             display: flex;
             justify-content: center;
-            padding-left: 3rem; /*emoji space*/
+            ${profileIsAdmin && `padding-left: 3rem; /*emoji space*/`}
           `}
         >
           <h1 css={Typography.h1}>{game.name}</h1>
-          <Button
-            variant="flat"
-            aria-label="button share"
-            onClick={() =>
-              alert(
-                `Not implemented... but until then, ask your friends to click "Join Game" and write "${game.name}"`
-              )
-            }
-          >
-            {/* eslint-disable-next-line */} 🔗
-          </Button>
+          {profileIsAdmin && (
+            <Button
+              variant="flat"
+              aria-label="button share"
+              // TODO this
+              onClick={() =>
+                alert(`Ask your friends to click "Join Game" and write "${game.name}"`)
+              }
+            >
+              {/* eslint-disable-next-line */} 🔗
+            </Button>
+          )}
         </span>
       </header>
       <div>
@@ -189,16 +196,21 @@ export default function GameRoom(props) {
                     {isAfk && ' ⚠️ '}
                   </span>
                 </span>
-                <span>{wordsStatus}</span>
+                <span>
+                  {wordsStatus}
+                  {profileIsAdmin && id !== profileId && (
+                    <Button variant="light" size="sm" onClick={() => handleKickOut(id)}>
+                      Kick out
+                    </Button>
+                  )}
+                </span>
               </li>
             );
           })}
         </ul>
       </div>
-      <Button
-        variant="flat"
+      <button
         css={css`
-          text-align: left;
           position: absolute;
           top: 0;
           left: 0;
@@ -206,7 +218,7 @@ export default function GameRoom(props) {
         onClick={handleLeaveGame}
       >
         Leave
-      </Button>
+      </button>
       {!didSubmitWords && (
         <Button hasBlock onClick={openWords}>
           Write your papers
@@ -216,7 +228,7 @@ export default function GameRoom(props) {
         /* eslint-disable-next-line */
         <span>Waiting for everyone to have submitted their words ✏️</span>
       )}
-      {didEveryoneSubmittedTheirWords && playerIsAdmin && (
+      {didEveryoneSubmittedTheirWords && profileIsAdmin && (
         <Button
           onClick={() =>
             alert(`TODO: We have teams to build and all this words to shuffle: ${allWords}`)

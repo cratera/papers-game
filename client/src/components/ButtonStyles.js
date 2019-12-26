@@ -16,7 +16,7 @@ const variants = {
   },
 };
 
-export const button = ({ variant, hasBlock }) => {
+export const button = ({ variant, hasBlock, size }) => {
   return css`
     ${variant === 'flat'
       ? `
@@ -26,6 +26,12 @@ export const button = ({ variant, hasBlock }) => {
     box-shadow: 0px 4px 16px rgba(0, 56, 255, 0.1);
     padding: 1.6rem 2.4rem;
   `}
+    ${size === 'sm'
+      ? `
+      padding: 0.5rem 1.5rem;
+      font-size: 1.4rem;
+  `
+      : ''}
     border: none;
     border-radius: 4.2rem;
     font-size: inherit;
