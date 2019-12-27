@@ -20,7 +20,7 @@ export const button = ({ variant, hasBlock, size }) => {
   return css`
     ${variant === 'flat'
       ? `
-    padding: 1.6rem;
+    padding: 0;
   `
       : `
     box-shadow: 0px 4px 16px rgba(0, 56, 255, 0.1);
@@ -43,10 +43,9 @@ export const button = ({ variant, hasBlock, size }) => {
     text-align: center;
     text-decoration: none;
 
-    &:hover,
     &:focus {
       outline: 0;
-      box-shadow: 0px 4px 16px rgba(0, 56, 255, 0.1), 0 0px 5px rgba(72, 79, 93, 0.8); /* verify with maggie */
+      box-shadow: 0px 4px 16px rgba(0, 56, 255, 0.1), 0 0px 5px rgba(72, 79, 93, 0.4); /* verify with maggie */
     }
   `;
 };

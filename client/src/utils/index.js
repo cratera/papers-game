@@ -25,3 +25,11 @@ export function usePrevious(value) {
   });
   return ref.current;
 }
+
+export function usePrevious2(value) {
+  const ref = useRef();
+  useEffect(() => {
+    ref.current = value;
+  });
+  return ref;
+}

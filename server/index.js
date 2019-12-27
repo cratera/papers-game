@@ -308,6 +308,15 @@ if (!isDev && cluster.isMaster) {
       return cb && cb(null);
     });
 
+    socket.on('set-teams', ({ gameId, playerId, teams }, cb) => {
+      console.log('set-teams', playerId, gameId, teams);
+
+      model.setTeams(gameId, teams);
+
+      io.to(gameId).emit('game-update', 'set-teams', teams);
+      return cb && cb(null);
+    });
+
     socket.on('disconnect', () => {
       const { playerId, gameId } = socket.papersProfile;
       console.log('socket disconnected:', playerId, socket.id);

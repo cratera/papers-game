@@ -37,8 +37,8 @@ export const lobbyItem = css`
 `;
 
 export const lobbyAvatar = css`
-  width: 2.6rem; // 5.6 too big
-  height: 2.6rem;
+  width: 3.2rem; // 5.6 too big
+  height: 3.2rem;
   object-fit: cover;
   border-radius: 50%;
   margin-right: 1.6rem;

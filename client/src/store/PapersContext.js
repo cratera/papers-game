@@ -48,6 +48,7 @@ class PapersContextComp extends Component {
       leaveGame: this.leaveGame.bind(this),
       kickoutOfGame: this.kickoutOfGame.bind(this),
 
+      setTeams: this.setTeams.bind(this),
       setWords: this.setWords.bind(this),
     };
   }
@@ -230,6 +231,14 @@ class PapersContextComp extends Component {
             },
           };
         },
+        'set-teams': game => {
+          const teams = payload;
+
+          return {
+            ...game,
+            teams,
+          };
+        },
         ups: game => {
           console.log('Ups! game-update', payload);
           return game;
@@ -288,6 +297,15 @@ class PapersContextComp extends Component {
       },
       cb
     );
+  }
+
+  setTeams(teams) {
+    console.log('setTeams()');
+    this.state.socket.emit('set-teams', {
+      gameId: this.state.game.name,
+      playerId: this.state.profile.id,
+      teams,
+    });
   }
 
   _removeGameFromState() {

@@ -22,7 +22,7 @@ function getRoom(name, playerId) {
 
 function createGame(name, creator) {
   if (games[name]) {
-    throw 'exists';
+    throw String('exists');
   }
 
   const game = {
@@ -37,6 +37,13 @@ function createGame(name, creator) {
       // - Number: the user is still writing their words.
       // - Array: list of words - the user submitted their words.
     },
+    // teams: {
+    //   A: {
+    //     id: 'A',
+    //     name: 'Dreamers',
+    //     players: [playerdId]
+    //   }
+    // }
     settings: {
       rounds: 3,
       words: 10,
@@ -132,6 +139,18 @@ function setWords(name, playerId, words) {
   return game;
 }
 
+function setTeams(name, teams) {
+  const game = games[name];
+
+  if (!game) {
+    throw String('notFound');
+  }
+
+  game.teams = teams;
+
+  return game;
+}
+
 module.exports = {
   getRoom,
   createGame,
@@ -141,4 +160,5 @@ module.exports = {
   pausePlayer,
   recoverPlayer,
   setWords,
+  setTeams,
 };
