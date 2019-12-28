@@ -1,3 +1,4 @@
+import * as Theme from 'Theme.js';
 import { css } from '@emotion/core';
 
 // Same as HomeStyles.
@@ -5,7 +6,7 @@ export const container = css`
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  padding: 1.6rem 1.6rem 5rem; // confirm the bottom of iphoneX
+  padding: 1.6rem 1.6rem 5rem; /* confirm the bottom of iphoneX */
   height: 100vh;
   overflow: hidden;
 `;
@@ -37,9 +38,28 @@ export const lobbyItem = css`
 `;
 
 export const lobbyAvatar = css`
-  width: 3.2rem; // 5.6 too big
+  width: 3.2rem; /* 5.6 too big */
   height: 3.2rem;
   object-fit: cover;
   border-radius: 50%;
   margin-right: 1.6rem;
+  background: ${Theme.colors.primaryLight};
+`;
+
+// same as TeamsStyles
+export const team = css`
+  margin-top: 0.8rem;
+  margin-bottom: 4rem;
+`;
+
+// same as TeamsStyles
+export const headerTeam = css`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 1.6rem;
+
+  button {
+    color: ${Theme.colors.primary}; /* TODO DS */
+  }
 `;

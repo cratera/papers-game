@@ -1,11 +1,12 @@
 /** @jsx jsx */
 import { jsx, css } from '@emotion/core';
-import { Fragment, useState, useContext, useEffect } from 'react';
-import { Redirect, Link } from 'react-router-dom';
+import { Fragment, useContext, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 import { typography as Typography } from 'Theme.js';
 import * as Styles from '../GameRoomStyles.js';
 import Button from 'components/Button.js';
+import ListPlayers from 'components/ListPlayers.js';
 import CoreContext from 'store/CoreContext.js';
 import PapersContext from 'store/PapersContext.js';
 import ModalWriteWords from 'views/ModalWriteWords.js';
@@ -16,20 +17,26 @@ export default function GameRoom(props) {
   const { setModal } = useContext(CoreContext);
   const { profile, game } = Papers.state;
   const profileId = profile.id;
-  const profileIsAfk = game.players[profileId].isAfk;
   const profileIsAdmin = game.creatorId === profileId;
+  const hasTeams = !!game.teams;
+  const prevHasTeams = usePrevious(!!game.teams);
 
   const didSubmitAllWords = plId => {
     return game.words[plId] && game.words[plId].length === game.settings.words;
   };
+
+  useEffect(() => {
+    if (!prevHasTeams && hasTeams) {
+      // Teams were submited, force words!
+      !didSubmitAllWords(profileId) && openWords();
+    }
+  });
 
   function openWords() {
     setModal({
       component: ModalWriteWords,
     });
   }
-
-  function goTeams() {}
 
   const handleLeaveGame = () => {
     if (
@@ -38,13 +45,6 @@ export default function GameRoom(props) {
       Papers.leaveGame();
     }
   };
-
-  function handleKickOut(playerId) {
-    const playerName = game.players[playerId].name;
-    if (window.confirm(`You are about to kick ${playerName}. Are you sure?`)) {
-      Papers.kickoutOfGame(playerId);
-    }
-  }
 
   function renderToTeamsCTA() {
     if (Object.keys(game.players).length >= 4) {
@@ -60,91 +60,92 @@ export default function GameRoom(props) {
     }
   }
 
-  // Q: Maybe this should be done on the server. It's faster, right?
-  const didEveryoneSubmittedTheirWords = Object.keys(game.players).every(didSubmitAllWords);
-  const didSubmitWords = didSubmitAllWords(profileId);
-  const hasTeams = game.teams;
-  const allWords = Object.keys(game.players)
-    .reduce((acc, playerId) => {
-      return game.words[playerId] && typeof game.words[playerId] !== 'number'
-        ? [...acc, ...game.words[playerId]]
-        : acc;
-    }, [])
-    .join(', ');
+  function renderLobbyStarting() {
+    return (
+      <Fragment>
+        <header css={Styles.header}>
+          {profileIsAdmin && <p css={[Typography.small, Styles.cap]}>Ask your friends to join!</p>}
+          <span
+            css={css`
+              display: flex;
+              justify-content: center;
+              ${profileIsAdmin && `padding-left: 3rem; /*emoji space*/`}
+            `}
+          >
+            <h1 css={Typography.h1}>{game.name}</h1>
+            {profileIsAdmin && (
+              <Button
+                variant="flat"
+                aria-label="button share"
+                // TODO this
+                onClick={() =>
+                  alert(`Ask your friends to click "Join Game" and write "${game.name}"`)
+                }
+              >
+                {/* eslint-disable-next-line */} 🔗
+              </Button>
+            )}
+          </span>
+        </header>
+        <div>
+          <h2 css={Typography.h3}>Lobby:</h2>
+          <ListPlayers players={Object.keys(game.players)} />
+        </div>
+        {renderToTeamsCTA()}
+      </Fragment>
+    );
+  }
+
+  function renderLobbyWritting() {
+    // Q: Maybe this should be done on the server. It's faster, right?
+    const didEveryoneSubmittedTheirWords = Object.keys(game.players).every(didSubmitAllWords);
+    const didSubmitWords = didSubmitAllWords(profileId);
+    const allWords = Object.keys(game.players)
+      .reduce((acc, playerId) => {
+        return game.words[playerId] && typeof game.words[playerId] !== 'number'
+          ? [...acc, ...game.words[playerId]]
+          : acc;
+      }, [])
+      .join(', ');
+
+    return (
+      <Fragment>
+        <header css={Styles.header}>
+          {!didEveryoneSubmittedTheirWords ? (
+            <span>Waiting for other players [GIF]</span>
+          ) : (
+            <span>Everyone finished! [GIF]</span>
+          )}
+        </header>
+        <div>
+          {Object.keys(game.teams).map(teamId => {
+            const { id, name, players } = game.teams[teamId];
+            return (
+              <div key={id} css={Styles.team}>
+                <header css={Styles.headerTeam}>
+                  <h1 css={Typography.h3}>{name}</h1>
+                </header>
+                <ListPlayers players={players} />
+              </div>
+            );
+          })}
+        </div>
+        {!didSubmitWords && (
+          <Button hasBlock onClick={openWords}>
+            Write your papers
+          </Button>
+        )}
+        {didEveryoneSubmittedTheirWords && profileIsAdmin && (
+          <Button onClick={() => alert(`TODO Shuffle all these words: ${allWords}`)}>
+            Start round 1!
+          </Button>
+        )}
+      </Fragment>
+    );
+  }
 
   return (
     <main css={Styles.container}>
-      <header css={Styles.header}>
-        {profileIsAdmin && <p css={[Typography.small, Styles.cap]}>Ask your friends to join!</p>}
-        <span
-          css={css`
-            display: flex;
-            justify-content: center;
-            ${profileIsAdmin && `padding-left: 3rem; /*emoji space*/`}
-          `}
-        >
-          <h1 css={Typography.h1}>{game.name}</h1>
-          {profileIsAdmin && (
-            <Button
-              variant="flat"
-              aria-label="button share"
-              // TODO this
-              onClick={() =>
-                alert(`Ask your friends to click "Join Game" and write "${game.name}"`)
-              }
-            >
-              {/* eslint-disable-next-line */} 🔗
-            </Button>
-          )}
-        </span>
-      </header>
-      <div>
-        <h2 css={Typography.h3}>Lobby:</h2>
-        {game.teams && <p>TODO TEAMS!</p>}
-        <ul aria-label="Lobby" css={Styles.lobby}>
-          {Object.keys(game.players).map((playerId, i) => {
-            const { avatar, name, id, isAfk } = game.players[playerId];
-            const isAdmin = id === game.creatorId;
-            const wordsWritten = game.words[id] || 0;
-            const wordsStatus =
-              // If it's not a number, it's an array - it means all words were submitted.
-              typeof wordsWritten === 'number'
-                ? wordsWritten > 0
-                  ? `✏️(${wordsWritten})`
-                  : ''
-                : '✅';
-
-            return (
-              <li key={id} css={Styles.lobbyItem}>
-                {/* TODO - avatar component!! */}
-                <span>
-                  <img src={avatar} alt="" css={Styles.lobbyAvatar} />
-                  <span
-                    css={css`
-                      ${id === profileId ? 'font-weight: 600;' : ''}
-                    `}
-                  >
-                    {name}
-                  </span>
-                  &nbsp;
-                  <span>
-                    {isAdmin && ' (Admin) '}
-                    {isAfk && ' ⚠️ '}
-                  </span>
-                </span>
-                <span>
-                  {wordsStatus}
-                  {profileIsAdmin && id !== profileId && (
-                    <Button variant="light" size="sm" onClick={() => handleKickOut(id)}>
-                      Kick out
-                    </Button>
-                  )}
-                </span>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
       <button
         css={css`
           position: absolute;
@@ -155,20 +156,7 @@ export default function GameRoom(props) {
       >
         Leave
       </button>
-      {!hasTeams && renderToTeamsCTA()}
-      {hasTeams && !didSubmitWords && (
-        <Button hasBlock onClick={openWords}>
-          Write your papers
-        </Button>
-      )}
-      {hasTeams && didSubmitWords && !didEveryoneSubmittedTheirWords && (
-        <span>Waiting for everyone to have submitted their words ✏️</span>
-      )}
-      {hasTeams && didEveryoneSubmittedTheirWords && profileIsAdmin && (
-        <Button onClick={() => alert(`TODO Shuffle all these words: ${allWords}`)}>
-          Start round 1!
-        </Button>
-      )}
+      {!game.teams ? renderLobbyStarting() : renderLobbyWritting()}
     </main>
   );
 }

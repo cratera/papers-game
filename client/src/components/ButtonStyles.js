@@ -7,7 +7,7 @@ const variants = {
     text: theme.colors.bg,
   },
   light: {
-    bg: theme.colors.primaryLight,
+    bg: theme.colors.bg,
     text: theme.colors.primary,
   },
   flat: {
@@ -18,20 +18,25 @@ const variants = {
 
 export const button = ({ variant, hasBlock, size }) => {
   return css`
-    ${variant === 'flat'
-      ? `
-    padding: 0;
+    ${
+      variant === 'flat'
+        ? `
+      padding: 0;
+      `
+        : `
+      box-shadow: 0px 4px 16px rgba(0, 56, 255, 0.1);
+      padding: 1.6rem 2.4rem;
   `
-      : `
-    box-shadow: 0px 4px 16px rgba(0, 56, 255, 0.1);
-    padding: 1.6rem 2.4rem;
-  `}
-    ${size === 'sm'
-      ? `
+    }
+    ${
+      size === 'sm'
+        ? `
       padding: 0.5rem 1.5rem;
       font-size: 1.4rem;
   `
-      : ''}
+        : ''
+    }
+    box-shadow: ${variants[variant].boxShadow};
     border: none;
     border-radius: 4.2rem;
     font-size: inherit;

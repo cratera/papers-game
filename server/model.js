@@ -97,6 +97,11 @@ function removePlayer(name, playerId) {
     throw String('notFound');
   }
 
+  // Everyone left...
+  if (Object.keys(game.players).length === 1) {
+    return killGame(name);
+  }
+
   const otherPlayers = Object.keys(game.players).reduce((acc, p) => {
     return p === playerId ? acc : { ...acc, [p]: game.players[p] };
   }, {});
@@ -119,10 +124,10 @@ function killGame(name, creatorId) {
     throw String('notFound');
   }
 
-  if (creatorId === game.creator) {
-    // Q: how overcome this?
-    delete games[name];
-  }
+  // if (creatorId === game.creator) {
+  // Q: how overcome this?
+  delete games[name];
+  // }
 
   return null;
 }

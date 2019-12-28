@@ -24,13 +24,14 @@ function ListPlayers({ players, enableKickout = false, ...otherProps }) {
     <ul aria-label="players list" css={Styles.lobby} {...otherProps}>
       {players.map((playerId, i) => {
         if (!game.players[playerId]) {
+          const playerName = playerId.match('_(.*)_')[1];
           return (
             <li key={playerId} css={Styles.lobbyItem}>
               <span>
                 <span css={Styles.lobbyAvatar} />
-                <span> {playerId} </span>
+                <span> {playerName} </span>
                 &nbsp;
-                <span>{' (Left?) '}</span>
+                <span>{' (Left) '}</span>
               </span>
             </li>
           );
@@ -38,10 +39,8 @@ function ListPlayers({ players, enableKickout = false, ...otherProps }) {
 
         const { avatar, name, id, isAfk } = game.players[playerId];
         const isAdmin = id === game.creatorId;
-        const wordsWritten = game.words[id] || 0;
-        const wordsStatus =
-          // If it's not a number, it's an array - it means all words were submitted.
-          typeof wordsWritten === 'number' ? (wordsWritten > 0 ? `✏️` : '') : '✅';
+        const wordsSubmitted = game.words[id];
+        const wordsStatus = !wordsSubmitted ? '[WRITTING]' : '[DONE]';
 
         return (
           <li key={id} css={Styles.lobbyItem}>

@@ -173,15 +173,20 @@ if (!isDev && cluster.isMaster) {
       try {
         const game = model.removePlayer(gameId, playerId);
 
+        if (!game) {
+          console.log('Last player leaving. Game deleted');
+        }
+
+        io.to(playerId).emit('leave-game');
         socket.leave(gameId, () => {
-          cb(null);
           // Pass creatorId in case it's a new one!
-          io.to(gameId).emit('game-update', 'remove-player', {
+          socket.to(gameId).emit('game-update', 'remove-player', {
             playerId,
             creatorId: game.creatorId,
           });
           socket.disconnect();
         });
+        cb(null);
       } catch (error) {
         console.error('Failed to leave room.', error);
         cb(error);
@@ -196,11 +201,15 @@ if (!isDev && cluster.isMaster) {
 
         io.to(playerId).emit('kickouted');
 
-        // Pass creatorId in case it's a new one!
-        io.to(gameId).emit('game-update', 'remove-player', {
-          playerId,
-          creatorId: game.creatorId,
-        });
+        if (game) {
+          // Pass creatorId in case it's a new one!
+          io.to(gameId).emit('game-update', 'remove-player', {
+            playerId,
+            creatorId: game.creatorId,
+          });
+        } else {
+          // everyone already left. there's no one in the room.
+        }
         cb(null);
       } catch (error) {
         console.error('Failed to kickout.', playerId, error);
@@ -297,8 +306,8 @@ if (!isDev && cluster.isMaster) {
       // (options: Object, callback: Function)
       // individual is mandatory, object is optional?
 
-      // OPTMIZE: Should the playerId be passed or access through
-      // socket.papersProfile? Review this later...
+      // OPTMIZE/REVIEW: Should the playerId be passed or access through
+      // Maybe it should be passed, to support local multiplayer.
       // const { playerId, gameId } = socket.papersProfile;
       console.log('set-words', playerId, gameId, words);
 

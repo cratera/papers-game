@@ -22,10 +22,10 @@ export const backdrop = css`
 
 export const box = css`
   position: absolute;
-  top: 5vw;
-  width: 90vw;
-  height: auto;
-  left: 5vw;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100%;
   background-color: white;
   border-radius: 0.4rem;
   padding: 1.6rem;
@@ -42,7 +42,7 @@ export const btnClose = css`
   border-radius: 50%;
   padding: 0;
   cursor: pointer;
-  background-color: white;
+  background-color: transparent;
 
   &::before,
   &::after {
@@ -97,21 +97,6 @@ export const input = css`
   text-align: center;
   ${Theme.typography.h1}
   margin: 0 0 1.6rem;
-
-  &:focus {
-    outline: none;
-    border-color: ${Theme.colors.grayMedium};
-  }
-`;
-
-export const textarea = css`
-  border: none;
-  border: 1px solid ${Theme.colors.grayLight};
-  border-radius: 0.4rem;
-  width: 100%;
-  height: 10rem; /* enough for 10 words */
-  margin: 0 0 1.6rem;
-  font-size: 1.6rem;
 
   &:focus {
     outline: none;

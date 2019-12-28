@@ -4,17 +4,15 @@ import { Fragment, useState, useContext, useEffect } from 'react';
 import { Switch, Route, Redirect, Link, useParams } from 'react-router-dom';
 
 import Button from 'components/Button.js';
-import CoreContext from 'store/CoreContext.js';
 import PapersContext from 'store/PapersContext.js';
-import { usePrevious } from 'utils';
 import GameLobby from './GameRoom/Lobby.js';
 import GameTeams from './GameRoom/Teams.js';
-import GameWords from './GameRoom/Words.js';
+import { usePrevious } from 'utils';
+// import GameWords from './GameRoom/Words.js';
 
 export default function GameRoom(props) {
   const { id: urlGameId } = useParams();
   const Papers = useContext(PapersContext);
-  // const { setModal } = useContext(CoreContext);
   const { profile, game } = Papers.state;
   const gameId = game && game.name;
   const profileId = profile && profile.id;
@@ -58,7 +56,7 @@ export default function GameRoom(props) {
     // Papers doesnt need to be a dep - its a method.
   }, [profileId, gameId, profileIsAfk]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // This is asking for a switch / children mapping...
+  // OPTIMIZE: This is asking for a switch / children mapping...
 
   if (status === 'loading') {
     return <h1>Loading...</h1>;
@@ -102,11 +100,6 @@ export default function GameRoom(props) {
     );
   }
 
-  if (game.teams) {
-    // CONTINUEEEE HEREEEE
-    return <GameLobby />;
-  }
-
   return (
     <Switch>
       <Route exact path="/game/:id">
@@ -116,11 +109,11 @@ export default function GameRoom(props) {
         <GameLobby />
       </Route>
       <Route path="/game/:id/teams">
-        <GameTeams />
+        {!game.teams ? <GameTeams /> : <Redirect to={`/game/${gameId}/lobby`} />}
       </Route>
-      <Route path="/game/:id/words">
+      {/* <Route path="/game/:id/words">
         <GameWords />
-      </Route>
+      </Route> */}
       <Route path="*">
         <Redirect to="/game/:id" />
       </Route>

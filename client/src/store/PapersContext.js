@@ -164,6 +164,12 @@ class PapersContextComp extends Component {
       this._removeGameFromState();
     });
 
+    socket.on('leave-game', () => {
+      // TODO - global status
+      console.log('on leave-game');
+      this._removeGameFromState();
+    });
+
     socket.on('game-update', (actionType, payload) => {
       console.log('game-update:', actionType, { payload });
 
@@ -313,7 +319,7 @@ class PapersContextComp extends Component {
     window.localStorage.removeItem('profile_gameId');
 
     // Leaving room, there is no point in being connected
-    this.state.socket.close();
+    this.state.socket && this.state.socket.close();
 
     this.setState(state => ({
       profile: {

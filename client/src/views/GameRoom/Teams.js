@@ -1,29 +1,19 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/core';
-import { Fragment, useState, useContext, useEffect } from 'react';
-import { Redirect, Link } from 'react-router-dom';
-import useDeepCompareEffect from 'use-deep-compare-effect';
+import { Fragment, useState, useContext } from 'react';
+import { Link } from 'react-router-dom';
 
 import { typography as Typography } from 'Theme.js';
 import * as Styles from './TeamsStyles.js';
 import Button from 'components/Button.js';
 import ListPlayers from 'components/ListPlayers.js';
 import PapersContext from 'store/PapersContext.js';
-import { usePrevious } from 'utils';
 
 export default function GameRoom(props) {
   const Papers = useContext(PapersContext);
   const PaperTeams = Papers.teams;
-  const { profile, game } = Papers.state;
+  const { game } = Papers.state;
   const [tempTeams, setTeams] = useState(PaperTeams);
-  const prevTeams = usePrevious(tempTeams);
-
-  // useEffect(() => {
-  //   console.log('New team!', { prev: prevTeams, newTeam: PaperTeams });
-  //   // setTeams(prevteams => {
-  //   //   return Papers.teams;
-  //   // });
-  // }, [prevTeams, PaperTeams]);
 
   function generateTeams() {
     const players = Object.keys(game.players);
@@ -100,7 +90,7 @@ export default function GameRoom(props) {
             const { id, name, players } = tempTeams[teamId];
 
             return (
-              <Fragment key={id}>
+              <div key={id} css={Styles.team}>
                 <header css={Styles.headerTeam}>
                   <h1 css={Typography.h1}>{name}</h1>
                   <Button onClick={() => handleRenameOf(id)} variant="flat">
@@ -108,7 +98,7 @@ export default function GameRoom(props) {
                   </Button>
                 </header>
                 <ListPlayers players={players} />
-              </Fragment>
+              </div>
             );
           })}
         </div>
