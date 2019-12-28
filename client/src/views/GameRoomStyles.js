@@ -28,7 +28,7 @@ export const lobby = css`
 export const lobbyItem = css`
   display: flex;
   align-items: center;
-  margin-bottom: 1.6rem; // 2.4 too big
+  margin-bottom: 1.6rem; /* 2.4 too big */
   justify-content: space-between;
 
   span {

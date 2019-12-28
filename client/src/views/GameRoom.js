@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { jsx } from '@emotion/core';
+import { jsx, css } from '@emotion/core';
 import { Fragment, useState, useContext, useEffect } from 'react';
 import { Switch, Route, Redirect, Link, useParams } from 'react-router-dom';
 
@@ -9,6 +9,7 @@ import GameLobby from './GameRoom/Lobby.js';
 import GameTeams from './GameRoom/Teams.js';
 import { usePrevious } from 'utils';
 // import GameWords from './GameRoom/Words.js';
+import GamePlaying from './GameRoom/Playing.js';
 
 export default function GameRoom(props) {
   const { id: urlGameId } = useParams();
@@ -56,6 +57,14 @@ export default function GameRoom(props) {
     // Papers doesnt need to be a dep - its a method.
   }, [profileId, gameId, profileIsAfk]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const handleLeaveGame = () => {
+    if (
+      window.confirm('Are you sure you wanna leave the game? You wont be able to join it again.')
+    ) {
+      Papers.leaveGame();
+    }
+  };
+
   // OPTIMIZE: This is asking for a switch / children mapping...
 
   if (status === 'loading') {
@@ -101,22 +110,38 @@ export default function GameRoom(props) {
   }
 
   return (
-    <Switch>
-      <Route exact path="/game/:id">
-        <Redirect to={`/game/${gameId}/lobby`} />
-      </Route>
-      <Route path="/game/:id/lobby">
-        <GameLobby />
-      </Route>
-      <Route path="/game/:id/teams">
-        {!game.teams ? <GameTeams /> : <Redirect to={`/game/${gameId}/lobby`} />}
-      </Route>
-      {/* <Route path="/game/:id/words">
+    <div>
+      <button
+        css={css`
+          position: absolute;
+          top: 0;
+          left: 0;
+        `}
+        onClick={handleLeaveGame}
+      >
+        Leave
+      </button>
+      <Switch>
+        <Route exact path="/game/:id">
+          <Redirect to={`/game/${gameId}/lobby`} />
+        </Route>
+        <Route path="/game/:id/lobby">
+          {!game.isOn ? <GameLobby /> : <Redirect to={`/game/${gameId}/play`} />}
+        </Route>
+        <Route path="/game/:id/teams">
+          {!game.teams ? <GameTeams /> : <Redirect to={`/game/${gameId}/lobby`} />}
+        </Route>
+
+        <Route path="/game/:id/play">
+          {game.words ? <GamePlaying /> : <Redirect to={`/game/${gameId}/lobby`} />}
+        </Route>
+        {/* <Route path="/game/:id/words">
         <GameWords />
       </Route> */}
-      <Route path="*">
-        <Redirect to="/game/:id" />
-      </Route>
-    </Switch>
+        <Route path="*">
+          <Redirect to="/game/:id" />
+        </Route>
+      </Switch>
+    </div>
   );
 }

@@ -38,13 +38,9 @@ export default function GameRoom(props) {
     });
   }
 
-  const handleLeaveGame = () => {
-    if (
-      window.confirm('Are you sure you wanna leave the game? You wont be able to join it again.')
-    ) {
-      Papers.leaveGame();
-    }
-  };
+  // function handleStartClick() {
+  //   Papers.startGame();
+  // }
 
   function renderToTeamsCTA() {
     if (Object.keys(game.players).length >= 4) {
@@ -135,9 +131,10 @@ export default function GameRoom(props) {
             Write your papers
           </Button>
         )}
+        {/* onClick={handleStartClick} */}
         {didEveryoneSubmittedTheirWords && profileIsAdmin && (
-          <Button onClick={() => alert(`TODO Shuffle all these words: ${allWords}`)}>
-            Start round 1!
+          <Button as={Link} to="play">
+            Start Game!
           </Button>
         )}
       </Fragment>
@@ -146,16 +143,6 @@ export default function GameRoom(props) {
 
   return (
     <main css={Styles.container}>
-      <button
-        css={css`
-          position: absolute;
-          top: 0;
-          left: 0;
-        `}
-        onClick={handleLeaveGame}
-      >
-        Leave
-      </button>
       {!game.teams ? renderLobbyStarting() : renderLobbyWritting()}
     </main>
   );

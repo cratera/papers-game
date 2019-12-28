@@ -100,6 +100,9 @@ if (!isDev && cluster.isMaster) {
       // return next(new Error('Auth error: missing token'));
     }
   }).on('connection', socket => {
+    // TODO - connect on client, and trigger recover there,
+    // otherwise, on iPhone unblock, it doesnt connect
+    // to the other clients unless the player client.
     socket.emit('connect');
 
     socket.on('recover-game', cb => {
@@ -192,6 +195,20 @@ if (!isDev && cluster.isMaster) {
         cb(error);
       }
     });
+
+    // socket.on('start-game', ({ gameId, playerId }, cb) => {
+    //   console.log('start-game', gameId, playerId);
+
+    //   try {
+    //     const game = model.startGame(gameId);
+
+    //     io.to(gameId).emit('start-game');
+    //     cb(null);
+    //   } catch (error) {
+    //     console.error('Failed to leave room.', error);
+    //     cb(error);
+    //   }
+    // });
 
     socket.on('kickout-of-game', ({ gameId, playerId }, cb) => {
       console.log('kickout-of-game', gameId, playerId);

@@ -17,7 +17,6 @@ export default function App(props) {
             position: fixed;
             top: 0;
             right: 0;
-            font-size: 1.3rem;
           `}
           onClick={() => window.location.reload()}
         >
