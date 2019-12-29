@@ -63,7 +63,7 @@ export default function ModalWriteWords() {
 
   function handleClickNext() {
     const nextEmpty = words.findIndex(word => !word);
-    const nextSlide = nextEmpty > -1 ? nextEmpty : slideIndex + 1;
+    const nextSlide = nextEmpty > -1 ? nextEmpty : slideIndex === 9 ? 0 : slideIndex + 1;
     const gutter = 24; // page padding - TODO connect emotion here
     refSlider.current.scrollTo((window.innerWidth - gutter) * nextSlide, 0);
 
@@ -120,8 +120,7 @@ export default function ModalWriteWords() {
         <div>
           {/* eslint-disable-next-line */}
           <p css={[Theme.typography.small, Theme.typography.secondary, Styles.header]}>
-            💡Write down words, sentences or expressions. Make sure everyone knows what you’re
-            talking about!
+            💡Write down words or expressions. Make sure everyone knows what you’re talking about!
           </p>
           <div
             css={Styles.slides}
@@ -136,8 +135,8 @@ export default function ModalWriteWords() {
           </p>
           <div css={Styles.sliderNav}>
             {wordsCount !== 10 ? (
-              <Button hasBlock onClick={handleClickNext}>
-                Next
+              <Button hasBlock variant="light" onClick={handleClickNext}>
+                Next paper
               </Button>
             ) : (
               <Button hasBlock onClick={handleSubmitClick}>

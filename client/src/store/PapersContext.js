@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import io from 'socket.io-client';
 import { createUniqueId } from 'utils/index.js';
 import { withRouter, matchPath } from 'react-router';
+import wordsForEveryone from './wordsForEveryone.js';
 
 const PapersContext = React.createContext({});
 
@@ -50,6 +51,11 @@ class PapersContextComp extends Component {
 
       setTeams: this.setTeams.bind(this),
       setWords: this.setWords.bind(this),
+      setWordsForEveyone: this.setWordsForEveyone.bind(this),
+
+      startGame: this.startGame.bind(this),
+      startTurn: this.startTurn.bind(this),
+      finishTurn: this.finishTurn.bind(this),
     };
   }
 
@@ -146,7 +152,7 @@ class PapersContextComp extends Component {
     );
 
     socket.on('set-game', game => {
-      console.log('set-game:', game.name);
+      console.log('on set-game', game.name);
       window.localStorage.setItem('profile_gameId', game.name);
 
       this.setState(state => ({
@@ -220,10 +226,24 @@ class PapersContextComp extends Component {
             return p === playerId ? acc : { ...acc, [p]: game.players[p] };
           }, {});
 
+          let newPlayers;
+
+          if (!game.hasStarted) {
+            newPlayers = otherPlayers;
+          } else {
+            newPlayers = {
+              ...game.players,
+              [playerId]: {
+                ...game.players[playerId],
+                hasLeft: true,
+              },
+            };
+          }
+
           return {
             ...game,
             creatorId,
-            players: otherPlayers,
+            players: newPlayers,
           };
         },
         'set-words': game => {
@@ -237,6 +257,14 @@ class PapersContextComp extends Component {
             },
           };
         },
+        'set-words-for-everyone': game => {
+          const everyonesWords = payload;
+
+          return {
+            ...game,
+            words: everyonesWords,
+          };
+        },
         'set-teams': game => {
           const teams = payload;
 
@@ -245,6 +273,37 @@ class PapersContextComp extends Component {
             teams,
           };
         },
+        'start-game': game => {
+          const { round, hasStarted } = payload;
+
+          return {
+            ...game,
+            hasStarted,
+            round,
+          };
+        },
+        'start-turn': game => {
+          const roundStatus = payload;
+
+          return {
+            ...game,
+            round: {
+              ...game.round,
+              ...roundStatus,
+            },
+          };
+        },
+        // 'finishes-turn': game => {
+        //   const roundStatus = payload;
+
+        //   return {
+        //     ...game,
+        //     round: {
+        //       ...game.round,
+        //       ...roundStatus,
+        //     },
+        //   };
+        // },
         ups: game => {
           console.log('Ups! game-update', payload);
           return game;
@@ -292,6 +351,19 @@ class PapersContextComp extends Component {
     }));
   }
 
+  setWordsForEveyone() {
+    console.log('setWordsForEveyone()');
+    const allWords = Object.keys(this.state.game.players).reduce((acc, playerId, i) => {
+      return { ...acc, [playerId]: wordsForEveryone[i] };
+    }, {});
+
+    this.state.socket.emit('set-words-for-everyone', {
+      gameId: this.state.game.name,
+      playerId: this.state.profile.id,
+      allWords,
+    });
+  }
+
   setWords(words, cb) {
     console.log('setWords()');
     this.state.socket.emit(
@@ -311,6 +383,30 @@ class PapersContextComp extends Component {
       gameId: this.state.game.name,
       playerId: this.state.profile.id,
       teams,
+    });
+  }
+
+  startGame() {
+    console.log('startGame()');
+    this.state.socket.emit('start-game', {
+      gameId: this.state.game.name,
+      playerId: this.state.profile.id,
+    });
+  }
+
+  startTurn() {
+    console.log('startTurn()');
+    this.state.socket.emit('start-turn', {
+      gameId: this.state.game.name,
+      playerId: this.state.profile.id,
+    });
+  }
+
+  finishTurn(wordsGuessed) {
+    this.state.socket.emit('start-turn', {
+      gameId: this.state.game.name,
+      playerId: this.state.profile.id,
+      wordsGuessed,
     });
   }
 

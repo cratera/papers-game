@@ -27,7 +27,6 @@ export const box = css`
   width: 100vw;
   height: 100%;
   background-color: white;
-  border-radius: 0.4rem;
   padding: 1.6rem;
 `;
 

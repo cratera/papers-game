@@ -50,7 +50,7 @@ export const slide = css`
   opacity: 0.8;
   transition: opacity 250ms;
 
-  &:first-child {
+  &:first-child /* emotion-disable-server-rendering-unsafe-selector-warning-please-do-not-use-this-the-warning-exists-for-a-reason */ {
     margin-left: 1.6rem;
   }
 
@@ -96,8 +96,9 @@ export const textarea = css`
 
 export const sliderLabel = css`
   text-align: center;
-  ${Theme.typography.small}
   ${Theme.typography.secondary}
+  ${Theme.typography.small}
+  margin-top: -0.8rem;
   margin-bottom: 2.4rem;
 `;
 

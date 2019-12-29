@@ -11,8 +11,6 @@ const socketIO = require('socket.io');
 
 const model = require('./model.js');
 
-console.log(':::: Reading server/index.js');
-
 // Multi-process to utilize all CPU cores.
 if (!isDev && cluster.isMaster) {
   console.error(`Node cluster master ${process.pid} is running`);
@@ -72,30 +70,30 @@ if (!isDev && cluster.isMaster) {
 
   io.use(function(socket, next) {
     const { playerId, gameId } = socket.handshake.query || {};
-    console.log('New socket:', playerId, gameId, socket.id);
+    console.log('|| New socket:', playerId, gameId, socket.id);
 
-    io.clients((error, clients) => {
-      if (error) throw error;
-      console.log('clients connected:', clients); // => [String]
-    });
+    // io.clients((error, clients) => {
+    //   if (error) throw error;
+    //   console.log('clients connected:', clients); // => [String]
+    // });
 
     if (playerId && gameId) {
       socket.papersProfile = { playerId, gameId };
 
-      io.in(playerId).clients((err, clients) => {
+      io.to(playerId).clients((err, clients) => {
         if (err) {
           // Q: How to handle this on client / server? :/
-          return next(new Error('Auth error: missing token'));
+          return next(new Error('Auth error: getting clients'));
         }
 
         socket.join(playerId, () => {
-          console.log('[socket] joined the [playerId] room:', socket.id, playerId);
+          console.log('|| - Joined the playerId room:', socket.id, playerId);
         });
         next();
       });
     } else {
       // Q: How to handle this on client / server? :/
-      console.error('New socket error - missing a token:', playerId, gameId, socket.id);
+      console.error('|| - New socket error - missing a token:', playerId, gameId, socket.id);
 
       // return next(new Error('Auth error: missing token'));
     }
@@ -105,156 +103,13 @@ if (!isDev && cluster.isMaster) {
     // to the other clients unless the player client.
     socket.emit('connect');
 
-    socket.on('recover-game', cb => {
-      const { playerId, gameId } = socket.papersProfile;
-      console.log('recover-game', playerId, gameId);
-
-      if (!gameId) {
-        return cb(new Error('notFound'));
-      }
-
-      try {
-        const game = model.getRoom(gameId, playerId);
-        socket.join(gameId, () => {
-          return cb(null, { status: 'success', game });
-        });
-      } catch (error) {
-        const status = {
-          // dontBelong: () => cb(new Error('dontBelong')),
-          notFound: () => cb(new Error('notFound')),
-          ups: () => {
-            cb(new Error('notFound'));
-          },
-        };
-
-        return (status[error] || status.ups)();
-      }
-    });
-
-    socket.on('create-game', ({ gameId, player }, cb) => {
-      console.log('create-game', gameId, player.name);
-
-      try {
-        const game = model.createGame(gameId, player);
-
-        socket.join(gameId, () => {
-          socket.papersProfile.gameId = gameId;
-          io.to(gameId).emit('set-game', game);
-          cb(null, game);
-        });
-      } catch (error) {
-        console.error('Failed to create game, error:', error);
-        cb(error);
-      }
-    });
-
-    socket.on('join-game', ({ gameId, player }, cb) => {
-      console.log('join-game', gameId, player.id);
-
-      try {
-        const game = model.joinGame(gameId, player);
-
-        socket.join(gameId, () => {
-          socket.papersProfile.gameId = gameId;
-          // Update similar sessions about the new game.
-          io.to(player.id).emit('set-game', game);
-
-          // Broadcast to the game this new player.
-          socket.to(gameId).broadcast.emit('game-update', 'new-player', player);
-          cb(null, game);
-        });
-      } catch (error) {
-        console.error('Failed to join game', error);
-        cb(error);
-      }
-    });
-
-    socket.on('leave-game', ({ gameId, playerId }, cb) => {
-      console.log('leave-game', gameId, playerId);
-
-      // Naming: leave-game or remove-player? humm..
-      try {
-        const game = model.removePlayer(gameId, playerId);
-
-        if (!game) {
-          console.log('Last player leaving. Game deleted');
-        }
-
-        io.to(playerId).emit('leave-game');
-        socket.leave(gameId, () => {
-          // Pass creatorId in case it's a new one!
-          socket.to(gameId).emit('game-update', 'remove-player', {
-            playerId,
-            creatorId: game.creatorId,
-          });
-          socket.disconnect();
-        });
-        cb(null);
-      } catch (error) {
-        console.error('Failed to leave room.', error);
-        cb(error);
-      }
-    });
-
-    // socket.on('start-game', ({ gameId, playerId }, cb) => {
-    //   console.log('start-game', gameId, playerId);
-
-    //   try {
-    //     const game = model.startGame(gameId);
-
-    //     io.to(gameId).emit('start-game');
-    //     cb(null);
-    //   } catch (error) {
-    //     console.error('Failed to leave room.', error);
-    //     cb(error);
-    //   }
-    // });
-
-    socket.on('kickout-of-game', ({ gameId, playerId }, cb) => {
-      console.log('kickout-of-game', gameId, playerId);
-
-      try {
-        const game = model.removePlayer(gameId, playerId);
-
-        io.to(playerId).emit('kickouted');
-
-        if (game) {
-          // Pass creatorId in case it's a new one!
-          io.to(gameId).emit('game-update', 'remove-player', {
-            playerId,
-            creatorId: game.creatorId,
-          });
-        } else {
-          // everyone already left. there's no one in the room.
-        }
-        cb(null);
-      } catch (error) {
-        console.error('Failed to kickout.', playerId, error);
-        cb(error);
-      }
-    });
-
-    socket.on('kill-room', ({ roomName, creatorId }, cb) => {
-      console.log('kill-room', roomName, 'by', creatorId);
-      try {
-        const room = model.killRoom(roomName, creatorId);
-        socket.leave(roomName, () => {
-          cb(null);
-          io.to(roomName).emit('game-update', room);
-        });
-      } catch (error) {
-        cb(error);
-        console.error('Failed to leave room.', error);
-      }
-    });
-
     function verifyPlayerConnections(playerId, gameId) {
       // CALLBACK FUCKING HELL .___.
       socket.leave(playerId, () => {
         io.in(playerId).clients((err, clients) => {
           if (err) return false;
 
-          console.log('sockets in this playerId:', clients);
+          console.log(':: - sockets in this playerId:', clients);
 
           if (clients.length === 0) {
             // There's no one, but let's wait a bit...
@@ -274,10 +129,10 @@ if (!isDev && cluster.isMaster) {
           // Let everyone know that this player is offline!
           if (clientsAfter.length === 0) {
             try {
-              const game = model.getRoom(gameId);
+              const game = model.getGame(gameId);
 
               // If doesnt exist, its because the user
-              // emited leave-group before.
+              // emited leave-game before.
               if (game.players[playerId]) {
                 console.log('Player is afk:', playerId, gameId);
                 model.pausePlayer(playerId, gameId);
@@ -293,17 +148,104 @@ if (!isDev && cluster.isMaster) {
       }
     }
 
-    // Not needed yet.
-    // socket.on('pause-player', () => {
-    //   const { playerId, gameId } = socket.papersProfile;
-    //   console.log('pause-player:', playerId, gameId, socket.id);
+    socket.on('recover-game', cb => {
+      const { playerId, gameId } = socket.papersProfile;
+      console.log(':: recover-game', playerId, gameId);
 
-    //   verifyPlayerConnections(playerId, gameId);
-    // });
+      if (!gameId) {
+        return cb(new Error('notFound'));
+      }
+
+      try {
+        const game = model.getGame(gameId, playerId);
+        socket.join(gameId, () => {
+          return cb(null, { status: 'success', game });
+        });
+      } catch (error) {
+        const status = {
+          // dontBelong: () => cb(new Error('dontBelong')),
+          notFound: () => cb(new Error('notFound')),
+          ups: () => {
+            cb(new Error('notFound'));
+          },
+        };
+
+        return (status[error] || status.ups)();
+      }
+    });
+
+    socket.on('create-game', ({ gameId, player }, cb) => {
+      console.log(':: create-game', gameId, player.id);
+
+      try {
+        const game = model.createGame(gameId, player);
+
+        socket.join(gameId, () => {
+          socket.papersProfile.gameId = gameId;
+          io.to(gameId).emit('set-game', game);
+          cb(null, game);
+        });
+      } catch (error) {
+        console.error('Failed to create game:', error);
+        cb(error);
+      }
+    });
+
+    socket.on('join-game', ({ gameId, player }, cb) => {
+      console.log(':: join-game', gameId, player.id);
+
+      try {
+        const game = model.joinGame(gameId, player);
+
+        socket.join(gameId, () => {
+          socket.papersProfile.gameId = gameId;
+          // Update similar sessions about the new game.
+          io.to(player.id).emit('set-game', game);
+
+          // Broadcast to the game this new player.
+          socket.to(gameId).emit('game-update', 'new-player', player);
+          cb(null, game);
+        });
+      } catch (error) {
+        console.error('Failed to join game:', error);
+        cb(error);
+      }
+    });
+
+    socket.on('leave-game', ({ gameId, playerId }, cb) => {
+      console.log(':: leave-game', gameId, playerId);
+
+      // Naming: leave-game or remove-player? humm..
+      try {
+        const game = model.removePlayer(gameId, playerId);
+
+        io.to(playerId).emit('leave-game');
+
+        if (!game) {
+          console.log(':: - Last player leaving. Game deleted');
+          return;
+        }
+
+        socket.leave(gameId, () => {
+          socket.to(gameId).emit('game-update', 'remove-player', {
+            playerId,
+            // Pass creatorId in case it's a new one!
+            creatorId: game.creatorId,
+            // TODO - Pass new round in case its needed a new update
+            // round
+          });
+          socket.disconnect();
+        });
+        cb(null);
+      } catch (error) {
+        console.error('Failed to leave room:', error);
+        cb(error);
+      }
+    });
 
     socket.on('recover-player', cb => {
       const { playerId, gameId } = socket.papersProfile;
-      console.log('recover-player', playerId, gameId);
+      console.log(':: recover-player', playerId, gameId);
 
       try {
         const game = model.recoverPlayer(gameId, playerId);
@@ -318,6 +260,53 @@ if (!isDev && cluster.isMaster) {
       }
     });
 
+    socket.on('kickout-of-game', ({ gameId, playerId }, cb) => {
+      console.log(':: kickout-of-game', gameId, playerId);
+
+      try {
+        const game = model.removePlayer(gameId, playerId);
+
+        io.to(playerId).emit('kickouted');
+
+        if (game) {
+          // Pass creatorId in case it's a new one!
+          io.to(gameId).emit('game-update', 'remove-player', {
+            playerId,
+            creatorId: game.creatorId,
+          });
+        } else {
+          // everyone already left. there's no one in the game.
+        }
+        cb(null);
+      } catch (error) {
+        console.error('Failed to kickout:', error);
+        cb(error);
+      }
+    });
+
+    socket.on('kill-room', ({ roomName, creatorId }, cb) => {
+      console.log(':: kill-room', roomName, 'by', creatorId);
+      try {
+        const room = model.killRoom(roomName, creatorId);
+        socket.leave(roomName, () => {
+          cb(null);
+          io.to(roomName).emit('game-update', room);
+        });
+      } catch (error) {
+        cb(error);
+        console.error('Failed to leave room:', error);
+      }
+    });
+
+    socket.on('set-teams', ({ gameId, playerId, teams }, cb) => {
+      console.log(':: set-teams', playerId, gameId, teams);
+
+      model.setTeams(gameId, teams);
+
+      io.to(gameId).emit('game-update', 'set-teams', teams);
+      return cb && cb(null);
+    });
+
     socket.on('set-words', ({ gameId, playerId, words }, cb) => {
       // OPTIMIZE: Receive/pass params as individual or {} ? Should follow a convention
       // (options: Object, callback: Function)
@@ -326,7 +315,7 @@ if (!isDev && cluster.isMaster) {
       // OPTMIZE/REVIEW: Should the playerId be passed or access through
       // Maybe it should be passed, to support local multiplayer.
       // const { playerId, gameId } = socket.papersProfile;
-      console.log('set-words', playerId, gameId, words);
+      console.log(':: set-words', playerId, gameId, words);
 
       model.setWords(gameId, playerId, words);
 
@@ -334,18 +323,66 @@ if (!isDev && cluster.isMaster) {
       return cb && cb(null);
     });
 
-    socket.on('set-teams', ({ gameId, playerId, teams }, cb) => {
-      console.log('set-teams', playerId, gameId, teams);
+    socket.on('set-words-for-everyone', ({ gameId, playerId, allWords }) => {
+      console.log('write-for-everyone 💥', playerId, gameId, allWords);
 
-      model.setTeams(gameId, teams);
+      model.setWordsForEveyone(gameId, playerId, allWords);
 
-      io.to(gameId).emit('game-update', 'set-teams', teams);
-      return cb && cb(null);
+      io.to(gameId).emit('game-update', 'set-words-for-everyone', allWords);
     });
+
+    socket.on('start-game', ({ gameId, playerId }, cb) => {
+      console.log(':: start-game', gameId, playerId);
+
+      try {
+        const game = model.startGame(gameId);
+
+        io.to(gameId).emit('game-update', 'start-game', {
+          round: game.round,
+          hasStarted: game.hasStarted,
+        });
+        cb && cb(null);
+      } catch (error) {
+        console.error('Failed to start game:', error);
+        cb && cb(error);
+      }
+    });
+
+    socket.on('start-turn', ({ gameId, playerId }, cb) => {
+      console.log(':: start-turn', gameId, playerId);
+
+      try {
+        const game = model.startTurn(gameId);
+
+        io.to(gameId).emit('game-update', 'start-turn', {
+          status: game.round.status,
+        });
+        cb && cb(null);
+      } catch (error) {
+        console.error('Failed to start turn:', error);
+        cb && cb(error);
+      }
+    });
+
+    socket.on('finish-turn', ({ gameId, playerId, wordsGuessed }, cb) => {
+      console.log(':: finish-turn', gameId, playerId, wordsGuessed);
+
+      try {
+        const game = model.finishTurn(gameId, wordsGuessed);
+
+        io.to(gameId).emit('game-update', 'finish-turn', game.round);
+        cb && cb(null);
+      } catch (error) {
+        console.error('Failed to finish turn:', error);
+        cb && cb(error);
+      }
+    });
+
+    // ---------
 
     socket.on('disconnect', () => {
       const { playerId, gameId } = socket.papersProfile;
-      console.log('socket disconnected:', playerId, socket.id);
+      console.log(':: socket disconnected:', playerId, socket.id);
 
       verifyPlayerConnections(playerId, gameId);
     });

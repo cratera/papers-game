@@ -6,6 +6,10 @@ const variants = {
     bg: theme.colors.primary,
     text: theme.colors.bg,
   },
+  success: {
+    bg: theme.colors.success,
+    text: theme.colors.white,
+  },
   light: {
     bg: theme.colors.bg,
     text: theme.colors.primary,
@@ -17,6 +21,7 @@ const variants = {
 };
 
 export const button = ({ variant, hasBlock, size }) => {
+  // WTF So fucking ugly... how can people like css-in-js??? 😭
   return css`
     ${
       variant === 'flat'
@@ -24,8 +29,8 @@ export const button = ({ variant, hasBlock, size }) => {
       padding: 0;
       `
         : `
-      box-shadow: 0px 4px 16px rgba(0, 56, 255, 0.1);
-      padding: 1.6rem 2.4rem;
+        padding: 1.6rem 2.4rem;
+        ${variant !== 'success' ? 'box-shadow: 0px 4px 16px rgba(0, 56, 255, 0.1);' : ''}
   `
     }
     ${

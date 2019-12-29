@@ -5,7 +5,7 @@ const utils = require('./utils');
 // so... one thing at the time.
 const games = {};
 
-function getRoom(name, playerId) {
+function getGame(name, playerId) {
   const game = games[name];
 
   if (!game) {
@@ -33,19 +33,51 @@ function createGame(name, creator) {
       [creator.id]: creator,
     },
     words: {
-      // [playerId]: Number || [String]
-      // - Number: the user is still writing their words.
-      // - Array: list of words - the user submitted their words.
+      // [playerId]: [String] - list of words - the user submitted their words.
     },
     // teams: {
-    //   A: {
-    //     id: 'A',
+    //   0: {
+    //     id: '0', // team index
     //     name: 'Dreamers',
     //     players: [playerdId]
     //   }
     // }
+    round: {
+      current: undefined, // Number - Round index
+      turn: undefined, // [Number, Number] - [teamIndex, playerIndex]
+      status: undefined, // String - 'getReady' | Date.now() | 'timesup'
+      wordsLeft: undefined, // Array - words left to guess.
+    },
+    score: [
+      //  Array by round for each player:
+      // { [playerId1]: [wordsGuessed0...], [playerId2]: [wordsGuessed0...] },
+      // { [playerId1]: [wordsGuessed1...], [playerId2]: [wordsGuessed2...] }
+      // ----
+      // ---- ALTERNATIVE: Organized by team and by player?
+      // byTeam: [
+      //   // [ Object(teamIndex: [words]) ]
+      //   // { 0: ['car', 'dog', ...],   1: ['poker', 'travel', ....] },
+      //   // { 0: null, 1: null },
+      //   // { 0: null, 1: null },
+      // ],
+      // byPlayer: [
+      //   // { [playerId]: [[words...], [words...], [words...]] }
+      // ],
+    ],
+    // example:
+
     settings: {
-      rounds: 3,
+      rounds: [
+        {
+          description: 'Use as many words as you need!',
+        },
+        {
+          description: 'Use only 3 words to describe the paper!',
+        },
+        {
+          description: 'Mimicry time, No talking!',
+        },
+      ],
       words: 10,
     },
   };
@@ -60,6 +92,10 @@ function joinGame(name, playerJoining) {
 
   if (!game) {
     throw String('notFound');
+  }
+
+  if (game.hasStarted && !game.players[playerJoining.id]) {
+    throw String('alreadyStarted');
   }
 
   game.players[playerJoining.id] = playerJoining;
@@ -106,11 +142,21 @@ function removePlayer(name, playerId) {
     return p === playerId ? acc : { ...acc, [p]: game.players[p] };
   }, {});
 
-  game.players = otherPlayers;
+  if (!game.hasStarted) {
+    // Remove completely the playerId
+    game.players = otherPlayers;
+  } else {
+    // The game must go on...
+    // Set the player hasleft
+    game.players[playerId].hasLeft = true;
+
+    // TODO - udpdate round turn if needed. same for afk
+    // ----- CONTINUE HERE -------
+  }
 
   // Set a new admin in case this was the one leaving.
   if (game.creatorId === playerId) {
-    // The new admin is the oldest player.
+    // Set as new admin the oldest player? It works.
     game.creatorId = Object.keys(otherPlayers)[0];
   }
 
@@ -132,18 +178,6 @@ function killGame(name, creatorId) {
   return null;
 }
 
-function setWords(name, playerId, words) {
-  const game = games[name];
-
-  if (!game) {
-    throw String('notFound');
-  }
-
-  game.words[playerId] = words;
-
-  return game;
-}
-
 function setTeams(name, teams) {
   const game = games[name];
 
@@ -156,14 +190,109 @@ function setTeams(name, teams) {
   return game;
 }
 
+function setWords(name, playerId, words) {
+  const game = games[name];
+
+  if (!game) {
+    throw String('notFound');
+  }
+
+  game.words[playerId] = words;
+
+  return game;
+}
+
+function setWordsForEveyone(name, playerId, allWords) {
+  const game = games[name];
+
+  if (!game) {
+    throw String('notFound');
+  }
+
+  game.words = allWords;
+
+  return game;
+}
+
+function _allWordsTogether(words) {
+  return Object.keys(words).reduce((acc, pId) => [...acc, ...words[pId]], []);
+}
+
+function startGame(name) {
+  const game = games[name];
+
+  if (!game) {
+    throw String('notFound');
+  }
+
+  game.hasStarted = true; // for now on a player cannot join
+  game.round = {
+    current: 0,
+    turn: [0, 0],
+    status: 'getReady',
+    wordsLeft: _allWordsTogether(game.words),
+  };
+
+  return game;
+}
+
+function startTurn(name) {
+  const game = games[name];
+
+  if (!game) {
+    throw String('notFound');
+  }
+
+  // The client is responsible for the countdown and then
+  // it sends 'finish-turn', saving on events for each second.
+  game.round.status = Date.now();
+
+  return game;
+}
+
+function finishTurn(name, wordsGuessed) {
+  const game = games[name];
+
+  if (!game) {
+    throw String('notFound');
+  }
+
+  const wordsLeft = []; // TODO - continue here...
+
+  if (wordsLeft.length > 1) {
+    game.round = {
+      current: game.round.current,
+      turn: [1, 0], // decide next turn
+      status: 'getReady',
+      wordsLeft,
+    };
+  } else {
+    // check if it's last round too!
+    game.round = {
+      current: game.round.current + 1,
+      turn: [0, 0],
+      status: 'getReady',
+      wordsLeft: _allWordsTogether(game.words),
+    };
+  }
+
+  // TODO: Store scores so far.
+
+  return game;
+}
+
 module.exports = {
-  getRoom,
+  getGame,
   createGame,
   joinGame,
   removePlayer,
   killGame,
   pausePlayer,
   recoverPlayer,
-  setWords,
   setTeams,
+  setWords,
+  setWordsForEveyone,
+  startGame,
+  startTurn,
+  finishTurn,
 };

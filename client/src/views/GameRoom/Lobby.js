@@ -38,9 +38,13 @@ export default function GameRoom(props) {
     });
   }
 
-  // function handleStartClick() {
-  //   Papers.startGame();
-  // }
+  function setWordsForEveyone() {
+    Papers.setWordsForEveyone();
+  }
+
+  function handleStartClick() {
+    Papers.startGame();
+  }
 
   function renderToTeamsCTA() {
     if (Object.keys(game.players).length >= 4) {
@@ -93,16 +97,9 @@ export default function GameRoom(props) {
   }
 
   function renderLobbyWritting() {
-    // Q: Maybe this should be done on the server. It's faster, right?
     const didEveryoneSubmittedTheirWords = Object.keys(game.players).every(didSubmitAllWords);
     const didSubmitWords = didSubmitAllWords(profileId);
-    const allWords = Object.keys(game.players)
-      .reduce((acc, playerId) => {
-        return game.words[playerId] && typeof game.words[playerId] !== 'number'
-          ? [...acc, ...game.words[playerId]]
-          : acc;
-      }, [])
-      .join(', ');
+    const writeAllShortCut = !didEveryoneSubmittedTheirWords;
 
     return (
       <Fragment>
@@ -126,16 +123,25 @@ export default function GameRoom(props) {
             );
           })}
         </div>
+        {writeAllShortCut && (
+          <Button
+            hasBlock
+            onClick={setWordsForEveyone}
+            css={css`
+              margin-bottom: 1rem;
+            `}
+          >
+            {/* eslint-disable-next-line */}
+            Write everyone's papers 💥
+          </Button>
+        )}
         {!didSubmitWords && (
           <Button hasBlock onClick={openWords}>
             Write your papers
           </Button>
         )}
-        {/* onClick={handleStartClick} */}
         {didEveryoneSubmittedTheirWords && profileIsAdmin && (
-          <Button as={Link} to="play">
-            Start Game!
-          </Button>
+          <Button onClick={handleStartClick}>Start Game!</Button>
         )}
       </Fragment>
     );

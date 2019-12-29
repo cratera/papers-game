@@ -6,6 +6,7 @@ export const colors = {
   grayLight: '#E5E6E8',
   primary: '#0038FF',
   primaryLight: '#E6EBFF',
+  success: '#4EBD81',
   bg: '#fff',
 };
 
@@ -28,7 +29,6 @@ export const typography = {
     font-size: 1.6rem;
   `,
   secondary: css`
-    font-size: 1.6rem;
     color: ${colors.grayMedium};
   `,
   small: css`

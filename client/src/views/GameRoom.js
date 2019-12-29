@@ -27,7 +27,7 @@ export default function GameRoom(props) {
     }
 
     if (prevGameId && !gameId) {
-      // This shoudln't be here... Global Status
+      // This shoudn't be here... Global Status
       return setStatus('leftGame');
     }
 
@@ -42,6 +42,7 @@ export default function GameRoom(props) {
         if (err) {
           const errorMsgMap = {
             notFound: () => 'This game does not exist.',
+            alreadyStarted: () => 'This game had already started.',
             ups: () => `Ups, something went wrong! Error: ${JSON.stringify(err)}`,
           };
 
@@ -126,14 +127,14 @@ export default function GameRoom(props) {
           <Redirect to={`/game/${gameId}/lobby`} />
         </Route>
         <Route path="/game/:id/lobby">
-          {!game.isOn ? <GameLobby /> : <Redirect to={`/game/${gameId}/play`} />}
+          {!game.hasStarted ? <GameLobby /> : <Redirect to={`/game/${gameId}/playing`} />}
         </Route>
         <Route path="/game/:id/teams">
           {!game.teams ? <GameTeams /> : <Redirect to={`/game/${gameId}/lobby`} />}
         </Route>
 
-        <Route path="/game/:id/play">
-          {game.words ? <GamePlaying /> : <Redirect to={`/game/${gameId}/lobby`} />}
+        <Route path="/game/:id/playing">
+          {game.hasStarted ? <GamePlaying /> : <Redirect to={`/game/${gameId}/lobby`} />}
         </Route>
         {/* <Route path="/game/:id/words">
         <GameWords />

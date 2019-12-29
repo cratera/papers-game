@@ -40,7 +40,7 @@ function ListPlayers({ players, enableKickout = false, ...otherProps }) {
         const { avatar, name, id, isAfk } = game.players[playerId];
         const isAdmin = id === game.creatorId;
         const wordsSubmitted = game.words[id];
-        const wordsStatus = !wordsSubmitted ? '[WRITTING]' : '[DONE]';
+        const wordsStatus = game.teams && (!wordsSubmitted ? '[WRITTING]' : '[DONE]');
 
         return (
           <li key={id} css={Styles.lobbyItem}>
