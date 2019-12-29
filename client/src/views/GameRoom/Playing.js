@@ -1,9 +1,9 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/core';
-import { Fragment, useState, useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { Fragment, useContext } from 'react';
+// import { Link } from 'react-router-dom';
 
-import { typography as Typography } from 'Theme.js';
+// import { typography as Typography } from 'Theme.js';
 import * as Styles from './PlayingStyles.js';
 import Button from 'components/Button.js';
 import PapersContext from 'store/PapersContext.js';
@@ -12,10 +12,10 @@ export default function GameRoom(props) {
   const Papers = useContext(PapersContext);
   const { profile, game } = Papers.state;
   const round = game.round;
-  const hasStatusGetReady = round.status === 'getReady';
+  // const hasStatusGetReady = round.status === 'getReady';
   const countdownStarted = ['getReady', 'timesup'].includes(round.status) ? false : round.status;
 
-  const [countdown, setCountdown] = useState(null);
+  // const [countdown, setCountdown] = useState(null);
   const roundIndex = round.current;
   const [turnTeamIndex, turnPlayerIndex] = round.turn;
   const turnPlayerId = game.teams[turnTeamIndex].players[turnPlayerIndex];
