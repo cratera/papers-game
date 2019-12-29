@@ -312,7 +312,6 @@ class PapersContextComp extends Component {
 
       const updateGame = reaction[actionType] || reaction.ups;
 
-      // this should be based on previous game no?
       this.setState(state => ({
         game: updateGame(state.game),
       }));

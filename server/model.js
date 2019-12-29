@@ -13,9 +13,9 @@ function getGame(name, playerId) {
   }
 
   // In the future, add auth?
-  // if (!game.players[playerId]) {
-  //   throw 'dontBelong';
-  // }
+  if (playerId && !game.players[playerId]) {
+    throw String('dontBelong');
+  }
 
   return game;
 }
@@ -44,7 +44,8 @@ function createGame(name, creator) {
     // }
     round: {
       current: undefined, // Number - Round index
-      turn: undefined, // [Number, Number] - [teamIndex, playerIndex]
+      turnWho: undefined, // [Number, Number] - [teamIndex, playerIndex]
+      turnCount: 0, // Number - Turn index
       status: undefined, // String - 'getReady' | Date.now() | 'timesup'
       wordsLeft: undefined, // Array - words left to guess.
     },
@@ -228,7 +229,8 @@ function startGame(name) {
   game.hasStarted = true; // for now on a player cannot join
   game.round = {
     current: 0,
-    turn: [0, 0],
+    turnWho: [0, 0],
+    turnCount: 0,
     status: 'getReady',
     wordsLeft: _allWordsTogether(game.words),
   };
@@ -259,10 +261,11 @@ function finishTurn(name, wordsGuessed) {
 
   const wordsLeft = []; // TODO - continue here...
 
-  if (wordsLeft.length > 1) {
+  if (wordsLeft.length > 0) {
     game.round = {
       current: game.round.current,
-      turn: [1, 0], // decide next turn
+      turnWho: [1, 0], // decide next turn
+      turnCount: game.round.turnCount + 1,
       status: 'getReady',
       wordsLeft,
     };
@@ -270,7 +273,8 @@ function finishTurn(name, wordsGuessed) {
     // check if it's last round too!
     game.round = {
       current: game.round.current + 1,
-      turn: [0, 0],
+      turnWho: [0, 0],
+      turnCount: 0,
       status: 'getReady',
       wordsLeft: _allWordsTogether(game.words),
     };

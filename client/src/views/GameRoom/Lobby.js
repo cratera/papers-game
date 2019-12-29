@@ -77,7 +77,7 @@ export default function GameRoom(props) {
               <Button
                 variant="flat"
                 aria-label="button share"
-                // TODO this
+                // TODO - share group link
                 onClick={() =>
                   alert(`Ask your friends to click "Join Game" and write "${game.name}"`)
                 }

@@ -30,7 +30,7 @@ export const button = ({ variant, hasBlock, size }) => {
       `
         : `
         padding: 1.6rem 2.4rem;
-        ${variant !== 'success' ? 'box-shadow: 0px 4px 16px rgba(0, 56, 255, 0.1);' : ''}
+        ${variant !== 'success' ? 'box-shadow: 0px 4px 16px rgba(0, 56, 255, 0.3);' : ''}
   `
     }
     ${

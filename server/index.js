@@ -131,13 +131,13 @@ if (!isDev && cluster.isMaster) {
             try {
               const game = model.getGame(gameId);
 
-              // If doesnt exist, its because the user
-              // emited leave-game before.
               if (game.players[playerId]) {
                 console.log('Player is afk:', playerId, gameId);
                 model.pausePlayer(playerId, gameId);
                 io.to(gameId).emit('game-update', 'pause-player', playerId);
               } else {
+                // If doesnt exist, its because the user
+                // emited leave-game before.
                 console.log('Player left:', playerId, gameId);
               }
             } catch (error) {

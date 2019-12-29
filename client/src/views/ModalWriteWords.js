@@ -14,6 +14,7 @@ import debounce from 'lodash/debounce';
 // TODO: Create Modal component when design is finished.
 export default function ModalWriteWords() {
   const Papers = useContext(PapersContext);
+  const { game, profile } = Papers.state;
   const refSlider = useRef(null);
   // const setPapersWordsThrottled = useRef(throttle(q => Papers.setWords(q), 3000)).current;
   const handleScrollDebounced = useRef(debounce(handleScroll, 250)).current;
@@ -24,8 +25,9 @@ export default function ModalWriteWords() {
   const [errorMsg, setErrorMsg] = useState(null);
   const [slideIndex, setSlideIndex] = useState(0);
 
-  const wordsGoal = Papers.state.game.settings.words;
+  const wordsGoal = game.settings.words;
   const wordsCount = words.filter(word => !!word).length;
+  const wordsAreStored = !!game.words[profile.id];
 
   const focusTextareaAtSlide = index => {
     const textarea = refSlider.current.childNodes[index].getElementsByTagName('textarea')[0];
@@ -36,6 +38,12 @@ export default function ModalWriteWords() {
       console.warn('textarea doesnt exist', refSlider.current, index, textarea);
     }
   };
+
+  useEffect(() => {
+    if (wordsAreStored) {
+      closeModal();
+    }
+  }, [wordsAreStored]); // eslint-disable-line
 
   useEffect(() => {
     refSlider.current.scrollTo(0, 0);

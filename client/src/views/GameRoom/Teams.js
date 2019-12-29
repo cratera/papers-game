@@ -8,6 +8,7 @@ import * as Styles from './TeamsStyles.js';
 import Button from 'components/Button.js';
 import ListPlayers from 'components/ListPlayers.js';
 import PapersContext from 'store/PapersContext.js';
+import { getRandomInt } from 'utils';
 
 export default function GameRoom(props) {
   const Papers = useContext(PapersContext);
@@ -21,11 +22,6 @@ export default function GameRoom(props) {
     const teams = Array.from(Array(teamsNr), () => []);
     const limit = Math.round(players.length / teamsNr);
     const newTempTeams = {};
-
-    function getRandomInt(max) {
-      const min = 0;
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
 
     function alocateTo(teamIndex, playerId) {
       if (teams[teamIndex].length === limit) {

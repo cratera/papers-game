@@ -48,7 +48,7 @@ export default function Home(props) {
     });
   }
 
-  // TODO - Create a hook for profile.
+  // TODO - Create a hook for profile?
   function updateTempProfile(key, event) {
     return {
       // name: () => {

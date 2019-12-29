@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 
 // based on https://stackoverflow.com/a/23669825/4737729
 export function encodeImgToBase64(fileToLoad, callback) {
@@ -17,6 +17,11 @@ export function createUniqueId(name) {
   return `${name}_${Math.random().toString(36).substr(2, 9)}_${new Date().getTime()}`;
 }
 
+export function getRandomInt(max) {
+  const min = 0;
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 // React Hook
 export function usePrevious(value) {
   const ref = useRef();
@@ -26,34 +31,50 @@ export function usePrevious(value) {
   return ref.current;
 }
 
-export function usePrevious2(value) {
-  const ref = useRef();
+export function useCountdown(
+  defaultDateStarted,
+  opts = {
+    intervalTime: 1000,
+    timer: 60000,
+  }
+) {
+  const [dateStarted, resetDateStarted] = useState(defaultDateStarted);
+  const [timeLeft, setTimeLeft] = useState(getTimeLeft(dateStarted));
+  const intervalTime = opts.intervalTime;
+
+  const getTimeLeftCb = useCallback(datePivot => getTimeLeft(datePivot), []); // eslint-disable-line
+
+  function getTimeLeft(datePivot) {
+    return datePivot ? opts.timer - (Date.now() - datePivot) : null;
+  }
+
+  function restartCountdown(newDate) {
+    setTimeLeft(getTimeLeft(newDate));
+    resetDateStarted(newDate);
+  }
+
   useEffect(() => {
-    ref.current = value;
-  });
-  return ref;
-}
+    if (dateStarted === null) {
+      // useCountdown was called without a dateStarted yet.
+      // Probably will use restartCountdown later in the road.
+      return;
+    }
+    const interval = setInterval(() => {
+      setTimeLeft(() => {
+        const newTimeLeft = getTimeLeftCb(dateStarted);
 
-// IOS HACK - https://stackoverflow.com/a/55425845/4737729
-export function focusAndOpenKeyboard(el, timeout = 150) {
-  // Align temp input element approximately where the input element is
-  // so the cursor doesn't jump around
-  // var __tempEl__ = document.createElement('input');
-  // __tempEl__.style.position = 'absolute';
-  // __tempEl__.style.top = el.offsetTop + 7 + 'px';
-  // __tempEl__.style.left = el.offsetLeft + 'px';
-  // __tempEl__.style.height = 0;
-  // __tempEl__.style.opacity = 0;
-  // // Put this temp element as a child of the page <body> and focus on it
-  // document.body.appendChild(__tempEl__);
-  // __tempEl__.focus();
+        if (newTimeLeft <= 0) {
+          clearInterval(interval);
 
-  // The keyboard is open. Now do a delayed focus on the target element
-  // setTimeout(() => {
-  el.focus();
-  el.click();
-  el.focus();
-  // Remove the temp element
-  // document.body.removeChild(__tempEl__);
-  // }, timeout);
+          return 0;
+        }
+
+        return newTimeLeft;
+      });
+    }, intervalTime);
+
+    return () => clearInterval(interval);
+  }, [dateStarted, getTimeLeftCb, intervalTime]);
+
+  return [timeLeft, restartCountdown];
 }
