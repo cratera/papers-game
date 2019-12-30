@@ -293,17 +293,24 @@ class PapersContextComp extends Component {
             },
           };
         },
-        // 'finishes-turn': game => {
-        //   const roundStatus = payload;
+        'finish-turn': game => {
+          window.localStorage.removeItem('turn'); // OPTIMIZE - maybe it shouldnt be here?
+          const { round, score } = payload;
 
-        //   return {
-        //     ...game,
-        //     round: {
-        //       ...game.round,
-        //       ...roundStatus,
-        //     },
-        //   };
-        // },
+          return {
+            ...game,
+            round,
+            score,
+          };
+        },
+        'start-next-round': game => {
+          const round = payload;
+
+          return {
+            ...game,
+            round,
+          };
+        },
         ups: game => {
           console.log('Ups! game-update', payload);
           return game;
@@ -401,17 +408,25 @@ class PapersContextComp extends Component {
     });
   }
 
-  finishTurn(wordsGuessed) {
-    this.state.socket.emit('start-turn', {
+  finishTurn(papersTurn) {
+    this.state.socket.emit('finish-turn', {
       gameId: this.state.game.name,
       playerId: this.state.profile.id,
-      wordsGuessed,
+      papersTurn,
+    });
+  }
+
+  startNextRound() {
+    this.state.socket.emit('start-next-round', {
+      gameId: this.state.game.name,
+      playerId: this.state.profile.id,
     });
   }
 
   _removeGameFromState() {
     console.log('removing game');
     window.localStorage.removeItem('profile_gameId');
+    window.localStorage.removeItem('turn');
 
     // Leaving room, there is no point in being connected
     this.state.socket && this.state.socket.close();

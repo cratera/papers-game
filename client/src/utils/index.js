@@ -31,21 +31,21 @@ export function usePrevious(value) {
   return ref.current;
 }
 
-export function useCountdown(
-  defaultDateStarted,
-  opts = {
+export function useCountdown(initialDate, options = {}) {
+  const opts = {
     intervalTime: 1000,
     timer: 60000,
-  }
-) {
-  const [dateStarted, resetDateStarted] = useState(defaultDateStarted);
+    ...options,
+  };
+  const [dateStarted, resetDateStarted] = useState(initialDate);
   const [timeLeft, setTimeLeft] = useState(getTimeLeft(dateStarted));
   const intervalTime = opts.intervalTime;
 
   const getTimeLeftCb = useCallback(datePivot => getTimeLeft(datePivot), []); // eslint-disable-line
 
   function getTimeLeft(datePivot) {
-    return datePivot ? opts.timer - (Date.now() - datePivot) : null;
+    const timeLeft = opts.timer - (Date.now() - datePivot);
+    return Math.max(0, timeLeft);
   }
 
   function restartCountdown(newDate) {
@@ -54,8 +54,10 @@ export function useCountdown(
   }
 
   useEffect(() => {
-    if (dateStarted === null) {
-      // useCountdown was called without a dateStarted yet.
+    console.log('useEffect - countdown');
+    const startedTimeLeft = getTimeLeftCb(dateStarted);
+    if (startedTimeLeft === 0) {
+      // useCountdown was called with a dateStarted already expired.
       // Probably will use restartCountdown later in the road.
       return;
     }

@@ -364,13 +364,30 @@ if (!isDev && cluster.isMaster) {
       }
     });
 
-    socket.on('finish-turn', ({ gameId, playerId, wordsGuessed }, cb) => {
-      console.log(':: finish-turn', gameId, playerId, wordsGuessed);
+    socket.on('finish-turn', ({ gameId, playerId, papersTurn }, cb) => {
+      console.log(':: finish-turn', gameId, playerId, papersTurn);
 
       try {
-        const game = model.finishTurn(gameId, wordsGuessed);
+        const game = model.finishTurn(gameId, playerId, papersTurn);
 
-        io.to(gameId).emit('game-update', 'finish-turn', game.round);
+        io.to(gameId).emit('game-update', 'finish-turn', {
+          round: game.round,
+          score: game.score,
+        });
+        cb && cb(null);
+      } catch (error) {
+        console.error('Failed to finish turn:', error);
+        cb && cb(error);
+      }
+    });
+
+    socket.on('start-next-round', ({ gameId, playerId }, cb) => {
+      console.log(':: start-next-round', gameId, playerId);
+
+      try {
+        const game = model.startNextRound(gameId);
+
+        io.to(gameId).emit('game-update', 'start-next-round', game.round);
         cb && cb(null);
       } catch (error) {
         console.error('Failed to finish turn:', error);

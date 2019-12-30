@@ -238,6 +238,42 @@ function startGame(name) {
   return game;
 }
 
+function _getNextTurn(game) {
+  const [teamIndex, playerIndex] = game.round.turnWho;
+  const totalTeams = Object.keys(game.teams).length;
+
+  // BUG / TODO - Handle correctly When teams are not even!
+  if (teamIndex < totalTeams - 1) {
+    const nextTeamIndex = teamIndex + 1;
+    const totalTeamPlayers = game.teams[nextTeamIndex].players.length;
+
+    if (playerIndex < totalTeamPlayers) {
+      return [nextTeamIndex, playerIndex];
+    } else {
+      return [nextTeamIndex, playerIndex, 'isOdd'];
+    }
+  } else {
+    const totalTeamPlayers = game.teams[0].players.length;
+    const nextPlayer = playerIndex + 1;
+
+    if (nextPlayer < totalTeamPlayers) {
+      return [0, nextPlayer];
+    } else {
+      return [0, 0];
+    }
+  }
+
+  // if (player < totalPlayers) {
+  //   return [team, player + 1];
+  // } else {
+  //   if (team < totalTeams) {
+  //     return [team + 1, 0];
+  //   } else {
+  //     return [0, 0];
+  //   }
+  // }
+}
+
 function startTurn(name) {
   const game = games[name];
 
@@ -246,41 +282,64 @@ function startTurn(name) {
   }
 
   // The client is responsible for the countdown and then
-  // it sends 'finish-turn', saving on events for each second.
+  // it sends 'finish-turn' with score. It saves on IO events for each second.
   game.round.status = Date.now();
 
   return game;
 }
 
-function finishTurn(name, wordsGuessed) {
+function finishTurn(name, playerId, papersTurn) {
   const game = games[name];
 
   if (!game) {
     throw String('notFound');
   }
 
-  const wordsLeft = []; // TODO - continue here...
+  const wordsLeft = [...papersTurn.wordsLeft, ...papersTurn.passed];
 
   if (wordsLeft.length > 0) {
     game.round = {
       current: game.round.current,
-      turnWho: [1, 0], // decide next turn
+      turnWho: _getNextTurn(game),
       turnCount: game.round.turnCount + 1,
       status: 'getReady',
       wordsLeft,
     };
+
+    if (!game.score[game.round.current]) {
+      game.score[game.round.current] = {};
+    }
   } else {
-    // check if it's last round too!
-    game.round = {
-      current: game.round.current + 1,
-      turnWho: [0, 0],
-      turnCount: 0,
-      status: 'getReady',
-      wordsLeft: _allWordsTogether(game.words),
-    };
+    game.round.status = 'finished';
+    game.round.wordsLeft = [];
   }
 
-  // TODO: Store scores so far.
+  if (!game.score[game.round.current]) {
+    game.score[game.round.current] = {};
+  }
+
+  const wordsSoFar = game.score[game.round.current][playerId] || [];
+  game.score[game.round.current][playerId] = [...wordsSoFar, papersTurn.guessed];
+
+  return game;
+}
+
+function startNextRound(name) {
+  const game = games[name];
+
+  if (!game) {
+    throw String('notFound');
+  }
+
+  // TODO - Do validations - if wordsLeft is 0, if round is last, etc...
+
+  game.round = {
+    current: game.round.current + 1,
+    turnWho: _getNextTurn(game),
+    turnCount: 0,
+    status: 'getReady',
+    wordsLeft: _allWordsTogether(game.words),
+  };
 
   return game;
 }
@@ -289,14 +348,18 @@ module.exports = {
   getGame,
   createGame,
   joinGame,
+
   removePlayer,
   killGame,
   pausePlayer,
   recoverPlayer,
+
   setTeams,
   setWords,
   setWordsForEveyone,
+
   startGame,
   startTurn,
   finishTurn,
+  startNextRound,
 };

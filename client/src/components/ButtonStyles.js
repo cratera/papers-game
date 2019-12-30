@@ -8,7 +8,7 @@ const variants = {
   },
   success: {
     bg: theme.colors.success,
-    text: theme.colors.white,
+    text: theme.colors.bg,
   },
   light: {
     bg: theme.colors.bg,
