@@ -56,6 +56,8 @@ class PapersContextComp extends Component {
       startGame: this.startGame.bind(this),
       startTurn: this.startTurn.bind(this),
       finishTurn: this.finishTurn.bind(this),
+
+      startNextRound: this.startNextRound.bind(this),
     };
   }
 
@@ -409,6 +411,7 @@ class PapersContextComp extends Component {
   }
 
   finishTurn(papersTurn) {
+    console.log('finishTurn()');
     this.state.socket.emit('finish-turn', {
       gameId: this.state.game.name,
       playerId: this.state.profile.id,
@@ -417,6 +420,7 @@ class PapersContextComp extends Component {
   }
 
   startNextRound() {
+    console.log('startNextRound()');
     this.state.socket.emit('start-next-round', {
       gameId: this.state.game.name,
       playerId: this.state.profile.id,
@@ -466,6 +470,7 @@ class PapersContextComp extends Component {
   }
 
   leaveGame(playerId) {
+    console.log('leaveGame()');
     this.state.socket.emit(
       'leave-game',
       {

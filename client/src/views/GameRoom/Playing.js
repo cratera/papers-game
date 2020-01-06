@@ -3,13 +3,13 @@ import { jsx, css } from '@emotion/core';
 import { Fragment, useState, useEffect, useContext } from 'react';
 // import { Link } from 'react-router-dom';
 
-// import { typography as Typography } from 'Theme.js';
+import { typography as Typography } from 'Theme.js';
 import * as Styles from './PlayingStyles.js';
 import Button from 'components/Button.js';
 import PapersContext from 'store/PapersContext.js';
 import { useCountdown, usePrevious, getRandomInt } from 'utils';
 
-export default function GameRoom(props) {
+export default function Playing(props) {
   const Papers = useContext(PapersContext);
   const { profile, game } = Papers.state;
   const round = game.round;
@@ -17,10 +17,13 @@ export default function GameRoom(props) {
   const hasStatusFinished = round.status === 'finished';
   const hasCountdownStarted = !['getReady', 'finished'].includes(round.status);
   const prevHasCountdownStarted = usePrevious(hasCountdownStarted);
-
+  const profileIsAdmin = game.creatorId === profile.id;
+  const initialTimer = 10000; // TODO - from Papers.settings?
+  const timerReady = 3400;
   const [countdown, startCountdown] = useCountdown(hasCountdownStarted ? round.status : null, {
-    timer: 63400, // 400 - threshold for io connection.
+    timer: initialTimer + timerReady, // 400 - threshold for io connection.
   }); // 3,2,1... go!
+  const initialTimerSec = Math.round(initialTimer / 1000);
   const countdownSec = Math.round(countdown / 1000);
   // const prevCountdownSec = usePrevious(countdownSec);
   // const [timesUp, setTimesup] = useState(false);
@@ -38,20 +41,48 @@ export default function GameRoom(props) {
       wordsLeft: round.wordsLeft, // [String] - words left
     }
   );
+  const [isFinalScore, setFinalScore] = useState(null);
 
   useEffect(() => {
-    if (!prevHasCountdownStarted && hasCountdownStarted) {
-      console.log('useEffect, hasCountdownStarted');
-      if (!papersTurn.current) {
-        // CONTINUE HERE - REMOVE THIS CORRECTLY WHEN A ROUND STARTS
-        //window.localStorage.removeItem('turn'); // OPTIMIZE - maybe it shouldnt be here?
-        pickNextPaper(false);
-      }
+    // use false to avoid undefined on first render.
+    if (prevHasCountdownStarted === false && hasCountdownStarted) {
+      console.log('useEffect:: hasCountdownStarted');
+      pickFirstPaper();
       startCountdown(round.status);
     }
-  }, [startCountdown, round.status, prevHasCountdownStarted, hasCountdownStarted]);
+  }, [startCountdown, round.status, prevHasCountdownStarted, hasCountdownStarted]); // eslint-disable-line
 
-  // TODO/NOTE: pickNextPaper and togglePaper should be on PapersContext
+  // TODO/NOTE: pickFirstPaper, pickNextPaper and togglePaper should be on PapersContext
+  function pickFirstPaper() {
+    setPapersTurn(() => {
+      const state = {
+        current: null,
+        passed: [],
+        guessed: [],
+        wordsLeft: round.wordsLeft,
+      };
+
+      if (round.wordsLeft.length === 0) {
+        // words ended
+        window.localStorage.setItem('turn', JSON.stringify(state));
+        return state;
+      }
+
+      const wordsToPick = [...state.wordsLeft];
+
+      const wordIndex = getRandomInt(wordsToPick.length - 1);
+      const nextPaper = wordsToPick[wordIndex];
+
+      wordsToPick.splice(wordIndex, 1);
+
+      state.current = nextPaper;
+      state.wordsLeft = wordsToPick;
+
+      window.localStorage.setItem('turn', JSON.stringify(state));
+      return state;
+    });
+  }
+
   function pickNextPaper(hasGuessed = false) {
     // OPTIMIZE/NOTE : paper & word mean the same.
     const currentPaper = papersTurn.current;
@@ -72,30 +103,10 @@ export default function GameRoom(props) {
     setPapersTurn(state => {
       const wordsModified = {};
       const wordIndex = !wordsEnded && getRandomInt(wordsToPick.length - 1);
-      let nextPaper = !wordsEnded && wordsToPick[wordIndex];
+      let nextPaper = wordsEnded ? null : wordsToPick[wordIndex];
 
       if (!wordsEnded) {
         wordsToPick.splice(wordIndex, 1);
-      } else {
-        console.log('words ended!');
-        const newState = {
-          ...state,
-          current: null,
-        };
-
-        window.localStorage.setItem('turn', JSON.stringify(newState));
-        return newState;
-      }
-
-      if (!currentPaper) {
-        // TODO - Clean this, only happens when starting turn.
-        const newState = {
-          ...state,
-          current: nextPaper,
-          wordsLeft: wordsToPick,
-        };
-        window.localStorage.setItem('turn', JSON.stringify(newState));
-        return newState;
       }
 
       if (hasGuessed) {
@@ -115,7 +126,7 @@ export default function GameRoom(props) {
             wordsModified.passed = [...wordsToPick, currentPaper];
           } else {
             // When it's the last word,
-            // but no stress because button is disable
+            // but no stress because "next paper" button is disable
             nextPaper = currentPaper;
             wordsModified.passed = [];
           }
@@ -141,7 +152,7 @@ export default function GameRoom(props) {
         const wordIndex = wordsToPick.indexOf(paper);
         wordsToPick.splice(wordIndex, 1);
 
-        wordsModified.guessed = [...state.passed, paper];
+        wordsModified.guessed = [...state.guessed, paper];
         wordsModified.passed = wordsToPick;
       } else {
         const wordsToPick = [...state.guessed];
@@ -170,22 +181,19 @@ export default function GameRoom(props) {
   }
 
   function handleFinishTurnClick() {
+    // setPapersTurn({}); should it be done here?
     Papers.finishTurn(papersTurn);
   }
 
-  // function rollbackToGetReady() {
-  //   console.log('TODO rollback startTurn()');
-  //   // Papers.startTurn()
-  //   setFakeHasCountdownStarted(false);
-  //   startCountdown(null);
-  //   setTimesup(false);
-  //   setPapersTurn({
-  //     current: null,
-  //     passed: [],
-  //     guessed: [],
-  //     wordsLeft: round.wordsLeft,
-  //   });
-  // }
+  function handleStartNextRoundClick() {
+    Papers.startNextRound();
+  }
+
+  function handleFinalWinnerClick() {
+    setFinalScore(true);
+  }
+
+  // ----------------
 
   const renderMyTurnGetReady = () => {
     return (
@@ -194,6 +202,7 @@ export default function GameRoom(props) {
         [IMG EXPLAINING]
         {isOdd && <p>Your team has one player less, so it's you again.</p>}
         <p>You ready?</p>
+        <br />
         <Button hasBlock onClick={handleStartClick}>
           Start now!
         </Button>
@@ -252,7 +261,47 @@ export default function GameRoom(props) {
   };
 
   const renderRoundScore = () => {
-    return <p>Round finished! [Show results]</p>;
+    const teamsScore = {};
+    const scorePlayers = game.score[round.current];
+
+    Object.keys(game.teams).forEach(teamId => {
+      game.teams[teamId].players.forEach(playerId => {
+        const playerScore = scorePlayers[playerId] ? scorePlayers[playerId].length : 0;
+        teamsScore[teamId] = (teamsScore[teamId] || 0) + playerScore;
+      });
+    });
+
+    const arrayOfScores = Object.values(teamsScore);
+    const arrayOfTeamsId = Object.keys(teamsScore);
+    const winnerIndex = arrayOfScores.indexOf(Math.max(...arrayOfScores));
+    const winnerId = arrayOfTeamsId[winnerIndex];
+
+    return (
+      <Fragment>
+        <h1>Round finished!</h1>
+        <div>Winner: {game.teams[winnerId].name}</div>
+        <ul>
+          Scores:
+          {Object.keys(teamsScore).map(teamId => (
+            <li key={teamId}>
+              {game.teams[teamId].name}: {teamsScore[teamId]}
+            </li>
+          ))}
+        </ul>
+        <br />
+        {round.current + 1 === game.settings.rounds.length ? (
+          <Button hasBlock onClick={handleFinalWinnerClick}>
+            Show final winner!
+          </Button>
+        ) : profileIsAdmin ? (
+          <Button hasBlock onClick={handleStartNextRoundClick}>
+            Start Round {round.current + 1 + 1} of {game.settings.rounds.length}
+          </Button>
+        ) : (
+          <p>Wait for admin ({game.players[game.creatorId].name}) to start next round.</p>
+        )}
+      </Fragment>
+    );
   };
 
   const renderGo = () => {
@@ -270,9 +319,9 @@ export default function GameRoom(props) {
     return (
       <Fragment>
         <br />
-        {countdownSec > 60 ? (
+        {countdownSec > initialTimerSec ? (
           // 3, 2, 1...
-          <p>{countdownSec - 60}...</p>
+          <p>{countdownSec - initialTimerSec}...</p>
         ) : (
           <Fragment>
             <Button hasBlock variant="success" onClick={() => pickNextPaper(true)}>
@@ -283,7 +332,8 @@ export default function GameRoom(props) {
             <br /> - current: {papersTurn.current}
             <br /> - passed: {papersTurn.passed.join(', ')}
             <br /> - guessed: {papersTurn.guessed.join(', ')}
-            <br /> - wordsLeft: {papersTurn.wordsLeft.join(', ')}
+            <br /> - wordsLeft:{' '}
+            <span css={Typography.small}>{papersTurn.wordsLeft.join(', ')}</span>
             <br />
             <br />
             {papersTurn.current && !papersTurn.wordsLeft.length && !papersTurn.passed.length ? (
@@ -308,22 +358,95 @@ export default function GameRoom(props) {
         <br />
         Timer:{' '}
         {countdownSec ? (
-          countdownSec > 60 ? (
+          countdownSec > initialTimerSec ? (
             // 3, 2, 1...
-            <p>{countdownSec - 60}...</p>
+            <p>{countdownSec - initialTimerSec}...</p>
           ) : (
-            countdown
+            countdown + '(ms)'
           )
         ) : (
           0
         )}
         <br />
-        <p>Turn {Number(round.turnCount).toString()}</p>
+        <p>Turn: {Number(round.turnCount).toString()}</p>
         <p>Team: {teamName}</p>
         <p>Player: {playerName}</p>
       </Fragment>
     );
   };
+
+  if (isFinalScore) {
+    const teamsTotalScore = {};
+
+    const getRoundScore = roundIndex => {
+      const scorePlayers = game.score[roundIndex];
+      let teamsScore = {};
+      let bestPlayer = {};
+
+      Object.keys(game.teams).forEach(teamId => {
+        game.teams[teamId].players.forEach(playerId => {
+          const playerScore = scorePlayers[playerId] ? scorePlayers[playerId].length : 0;
+          if (playerScore > (bestPlayer.score || 0)) {
+            bestPlayer = { score: playerScore, id: playerId };
+          }
+          teamsScore[teamId] = (teamsScore[teamId] || 0) + playerScore;
+        });
+
+        teamsTotalScore[teamId] = (teamsTotalScore[teamId] || 0) + teamsScore[teamId];
+      });
+
+      const arrayOfScores = Object.values(teamsScore);
+      const arrayOfTeamsId = Object.keys(teamsScore);
+      const winnerIndex = arrayOfScores.indexOf(Math.max(...arrayOfScores));
+      // const winnerId = arrayOfTeamsId[winnerIndex];
+
+      return {
+        arrayOfScores,
+        arrayOfTeamsId,
+        bestPlayer,
+      };
+    };
+
+    const scores = game.settings.rounds.map((round, index) => getRoundScore(index));
+
+    const getFinalWinner = () => {
+      const arrayOfScores = Object.values(teamsTotalScore);
+      const arrayOfTeamsId = Object.keys(teamsTotalScore);
+      const winnerScore = Math.max(...arrayOfScores);
+      const winnerIndex = arrayOfScores.indexOf(winnerScore);
+      const winnerId = arrayOfTeamsId[winnerIndex];
+
+      return `${game.teams[winnerId].name}: (${winnerScore})`;
+    };
+
+    console.log('final scores:', scores);
+    return (
+      <div css={Styles.page}>
+        {scores.map((round, index) => {
+          return (
+            <Fragment key={index}>
+              <p>Round {index}:</p>
+              <ul>
+                {Object.keys(round.arrayOfTeamsId).map((teamId, index) => (
+                  <li key={teamId}>
+                    {game.teams[teamId].name}: {round.arrayOfScores[index]}
+                  </li>
+                ))}
+              </ul>
+              <p>
+                Best Player: {game.players[round.bestPlayer.id].name} ({round.bestPlayer.score})
+              </p>
+              <br />
+            </Fragment>
+          );
+        })}
+        <br />
+        <p>**Final Team Winner** {getFinalWinner()}</p>
+        <br />
+        <Button onClick={Papers.leaveGame}>Leave game</Button>
+      </div>
+    );
+  }
 
   return (
     <div css={Styles.page}>
@@ -331,7 +454,7 @@ export default function GameRoom(props) {
         <header>
           <h1>Round {roundIndex + 1}</h1>
           <p>
-            Try to guess as many papers as possible in 1 minute.{' '}
+            Try to guess as many papers as possible in 1 minute. <br />
             {game.settings.rounds[roundIndex].description}
           </p>
           <br />
@@ -345,6 +468,8 @@ export default function GameRoom(props) {
             : !hasCountdownStarted
             ? renderMyTurnGetReady()
             : renderGo()
+          : hasStatusFinished
+          ? renderRoundScore()
           : renderOtherTurnGetReady()}
       </div>
     </div>

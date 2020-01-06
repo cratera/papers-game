@@ -295,7 +295,8 @@ function finishTurn(name, playerId, papersTurn) {
     throw String('notFound');
   }
 
-  const wordsLeft = [...papersTurn.wordsLeft, ...papersTurn.passed];
+  const current = papersTurn.current ? [papersTurn.current] : [];
+  const wordsLeft = [...papersTurn.wordsLeft, ...papersTurn.passed, ...current];
 
   if (wordsLeft.length > 0) {
     game.round = {
@@ -319,7 +320,7 @@ function finishTurn(name, playerId, papersTurn) {
   }
 
   const wordsSoFar = game.score[game.round.current][playerId] || [];
-  game.score[game.round.current][playerId] = [...wordsSoFar, papersTurn.guessed];
+  game.score[game.round.current][playerId] = [...wordsSoFar, ...papersTurn.guessed];
 
   return game;
 }

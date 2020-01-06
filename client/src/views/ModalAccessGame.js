@@ -14,6 +14,7 @@ import PapersContext from 'store/PapersContext.js';
 export default function ModalaccessGame({ variant }) {
   const Papers = useContext(PapersContext);
   const { closeModal } = useContext(CoreContext);
+  const [isAccessing, setAccessing] = useState(false);
   const [state, setState] = useState({
     gameName: null,
     gameToRedirect: null,
@@ -30,6 +31,7 @@ export default function ModalaccessGame({ variant }) {
   };
 
   const handleBtnClick = () => {
+    setAccessing(true);
     Papers.accessGame(variant, state.gameName, err => {
       if (err) {
         // TODO - Move this out of here - redux(mapstatetoprops?)/context/wtv...
@@ -42,7 +44,7 @@ export default function ModalaccessGame({ variant }) {
         const errorMsg = (errorMsgMap[err] || errorMsgMap.ups)();
 
         console.warn('accessGame() err:', errorMsg);
-
+        setAccessing(false);
         return setState(state => ({ ...state, errorMsg }));
       }
 
@@ -79,6 +81,7 @@ export default function ModalaccessGame({ variant }) {
         {state.gameName && state.gameName.length >= 3 && (
           <Button hasBlock onClick={handleBtnClick}>
             Let's go!
+            {isAccessing && '⏳'}
           </Button>
         )}
       </div>
