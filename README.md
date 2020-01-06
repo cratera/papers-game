@@ -1,6 +1,6 @@
 # Papers Game
 
-- In development. MVP will be released on New Years Eve 2020 🎉
+- In development... Made it work 🚧. Now making it better ✨
 
 ## Run the Game locally:
 

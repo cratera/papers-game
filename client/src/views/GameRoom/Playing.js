@@ -397,7 +397,7 @@ export default function Playing(props) {
 
       const arrayOfScores = Object.values(teamsScore);
       const arrayOfTeamsId = Object.keys(teamsScore);
-      const winnerIndex = arrayOfScores.indexOf(Math.max(...arrayOfScores));
+      // const winnerIndex = arrayOfScores.indexOf(Math.max(...arrayOfScores));
       // const winnerId = arrayOfTeamsId[winnerIndex];
 
       return {

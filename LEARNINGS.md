@@ -23,3 +23,7 @@ Do you know when you spend 3 hours with a issue and the answer is one line of co
 - Ngrok: Can't use it for alpha test. It has a limit of 20 connections per minute. I'll try Heroku.
 - Heroku status: [stackoverflow question](https://stackoverflow.com/questions/59455178/heroku-websockets-connected-clients-is-empty-and-cant-reuse-stored-values)
 - WOW socket [emit-cheatsheet](https://socket.io/docs/emit-cheatsheet/)
+
+# React
+
+- Working on React for 3 years now, this is the first time where I can use **hooks** for real. It's not being a very easy learning curve with `useEffect`, I confess. But I'll get there.
