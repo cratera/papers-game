@@ -13,10 +13,17 @@ yarn setup
 - Start the project: (choose dev or prod)
 
 ```bash
-## dev mode
+# DEV
+
+## Run in a first tab:
+yarn dev_server
+## Run in a second tab:
+yarn dev_client
+
+## Or run them together:
 yarn dev
 
-## prod mode
+# PROD
 yarn prod
 ```
 
