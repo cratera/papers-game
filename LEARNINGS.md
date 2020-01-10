@@ -21,8 +21,10 @@ Do you know when you spend 3 hours with a issue and the answer is one line of co
 - Did my first REST API (HTTP GET/POST) with params using Express + fetch - from scratch.
 - Hmm... not sure if HTTP is better than WebSockets in this case. Moving to WebSockets.
 - Ngrok: Can't use it for alpha test. It has a limit of 20 connections per minute. I'll try Heroku.
-- Heroku status: [stackoverflow question](https://stackoverflow.com/questions/59455178/heroku-websockets-connected-clients-is-empty-and-cant-reuse-stored-values)
 - WOW socket [emit-cheatsheet](https://socket.io/docs/emit-cheatsheet/)
+- Deployment status: Trying to figure it out.
+  - Heroku try: [stackoverflow question](https://stackoverflow.com/questions/59455178/heroku-websockets-connected-clients-is-empty-and-cant-reuse-stored-values)
+  - Zeit Now - Need to [try this](https://zeit.co/guides/deploying-pusher-channels-with-zeit-now)
 
 # React
 

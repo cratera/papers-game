@@ -56,36 +56,3 @@ table {
 input {
   color: inherit;
 }
-
-/* ========================= */
-
-/* TODO - move this to Global emotion.js */
-html {
-  font-size: 62.5%;
-  /* hum... review this and font-family */
-  letter-spacing: -0.5px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Roboto', 'Helvetica Neue', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-body {
-  box-sizing: border-box;
-  font-size: 1.6rem;
-  line-height: 1.4;
-}
-
-body * {
-  box-sizing: inherit;
-}
-
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  border: 0;
-}

@@ -11,6 +11,7 @@ export const CoreContextProvider = ({ children }) => {
   });
 
   function setModal(modal) {
+    console.debug('Setting Modal:', modal.component.name);
     setState(state => ({ ...state, modal }));
   }
 
@@ -23,11 +24,7 @@ export const CoreContextProvider = ({ children }) => {
     closeModal,
   };
 
-  return (
-    <CoreContext.Provider value={{ ...state, ...methods }}>
-      {children}
-    </CoreContext.Provider>
-  );
+  return <CoreContext.Provider value={{ ...state, ...methods }}>{children}</CoreContext.Provider>;
 };
 
 export default CoreContext;
