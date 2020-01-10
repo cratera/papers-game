@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import io from 'socket.io-client';
+
 import { createUniqueId } from 'utils/index.js';
 import { withRouter, matchPath } from 'react-router';
 import wordsForEveryone from './wordsForEveryone.js';
@@ -7,6 +8,7 @@ import wordsForEveryone from './wordsForEveryone.js';
 const PapersContext = React.createContext({});
 
 // TODO - split into 2 Contexts: methods (mutations) and state (lookups)
+// TODO - Rethink all socket/state logic
 class PapersContextComp extends Component {
   constructor(props) {
     super(props);
