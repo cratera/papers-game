@@ -139,13 +139,18 @@ export default function HomeNewPlayer(props) {
 
   return (
     <Page>
-      {state.step > 0 && (
-        <Page.Header>
+      <Page.Header>
+        {/* {window.navigator && !window.navigator.standalone ? (
+          <p css={Theme.typography.small}>
+            Open this as an App. Click share and "Add to Homescreen"
+          </p>
+        ) : null} */}
+        {state.step > 0 && (
           <Button variant="flat" onClick={goBackStep}>
             Back
           </Button>
-        </Page.Header>
-      )}
+        )}
+      </Page.Header>
       <Page.Main css={Styles.main({ centered: state.step === 0 })}>
         <CurrentStep />
       </Page.Main>

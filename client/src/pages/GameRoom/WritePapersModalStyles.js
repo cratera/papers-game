@@ -2,7 +2,7 @@ import { css } from '@emotion/core';
 import * as Theme from 'Theme.js';
 
 export const header = css`
-  margin: 1.6rem 2.4rem 0 0;
+  margin: 0 2.4rem 0 0;
   display: flex;
   align-items: center;
 `;

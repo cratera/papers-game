@@ -1,13 +1,15 @@
 /** @jsx jsx */
+import { useState, useEffect } from 'react';
 import { jsx, Global, css } from '@emotion/core';
 
 export const colors = {
   grayDark: '#484F5D',
   grayMedium: '#7F848E',
   grayLight: '#E5E6E8',
-  primary: '#0038FF',
-  primaryLight: '#E6EBFF',
+  primary: '#FF8F50',
+  primaryLight: '#FFE9DC',
   success: '#4EBD81',
+  successLight: '#DCF2E6',
   danger: '#e51d1d', // TODO/REVIEW @mmbotelho
   bg: '#fff',
 };
@@ -54,9 +56,22 @@ export const bp = {
 };
 
 export function ThemeGlobal() {
+  const [vh, setVh] = useState('100vh');
+
+  useEffect(() => {
+    setVh(`${window.innerHeight * 0.01}px`)
+
+    window.addEventListener('resize', () => {
+      setVh(`${window.innerHeight * 0.01}px`)
+    });
+  }, []);
+
   return (
     <Global
       styles={css`
+        :root {
+          --vh: ${vh};
+        }
         html {
           font-size: 62.5%;
           letter-spacing: -0.5px;

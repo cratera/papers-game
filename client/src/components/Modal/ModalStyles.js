@@ -22,8 +22,10 @@ export const backdrop = css`
 export const box = css`
   position: absolute;
   top: 0;
-  left: 0;
+  left: 50%;
+  transform: translateX(-50%);
   width: 100vw;
+  max-width: 50rem;
   height: 100%;
   background-color: white;
   padding: 1.6rem;

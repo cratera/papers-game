@@ -1,9 +1,14 @@
 import { css } from '@emotion/core';
 import * as Theme from 'Theme.js';
 
-export const avatar = ({ hasMargin }) => css`
-  width: 4.8rem;
-  height: 4.8rem;
+const sizes = {
+  md: '4.8rem',
+  lg: '5.6rem',
+};
+
+export const avatar = ({ hasMargin, size = 'md' }) => css`
+  width: ${sizes[size]};
+  height: ${sizes[size]};
   object-fit: cover;
   border-radius: 50%;
   background: ${Theme.colors.primaryLight};

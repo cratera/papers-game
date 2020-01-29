@@ -1,4 +1,5 @@
 import { css } from '@emotion/core';
+import * as Theme from 'Theme.js';
 
 const gutter = '1.6rem';
 const fadeH = '4rem';
@@ -12,6 +13,7 @@ export const page = css`
   max-width: 50rem;
   margin: 0 auto;
   height: 100vh;
+  height: calc(var(--vh) * 100);
   overflow: hidden;
   display: grid;
   /* grid-template-areas: 'header' 'main' 'ctas'; [1] */
@@ -39,8 +41,8 @@ export const main = css`
   overflow: scroll;
   padding: ${headerH} ${gutter} 0;
 
-  /* space for fadeout */
   &::after {
+    /* OPTMIZE - Show this only if there's footer? */
     content: '';
     display: block;
     height: calc(${fadeH} + ${gutter});
@@ -56,6 +58,10 @@ export const ctas = css`
   grid-area: ctas;
   align-self: end;
   padding: 0 ${gutter} 5.6rem;
+
+  ${Theme.bp.xs} {
+    padding: 0 ${gutter} 3.2rem;
+  }
 
   /* fadeout effect */
   box-shadow: 0 -${fadeH} 3rem white;

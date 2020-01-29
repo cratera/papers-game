@@ -152,7 +152,9 @@ export default function WritePapersModal() {
         <p>
           {slideIndex + 1} of {wordsGoal}
         </p>
-        <p>{wordsCount} papers filled</p>
+        <p>
+          {wordsCount} {wordsCount === 1 ? 'paper' : 'papers'} filled
+        </p>
       </div>
       <div css={Styles.sliderNav}>
         {wordsCount !== 10 ? (
