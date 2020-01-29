@@ -4,6 +4,8 @@
 
 ## Run the Game locally:
 
+Make sure a recent version of [Node.js](https://nodejs.org/en/) is installed. You'll also need [Yarn](https://yarnpkg.com/getting-started/install). With those 2 things you are ready to go!
+
 - Install dependencies for server and client
 
 ```bash
@@ -29,7 +31,7 @@ yarn prod
 
 - Access `localhost:3000` and have fun!
 
-Note: The game should be played on a mobile vertical viewport
+Note: The game should be played on a vertical viewport.
 
 ## Deploy the Game (on heroku):
 

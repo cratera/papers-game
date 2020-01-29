@@ -452,6 +452,7 @@ export default function Playing(props) {
   return (
     <Page>
       <Page.Header>
+        {/* eslint-disable-next-line */}
         <strong css={Typography.h3}>[ 🚧 🙈 It works, but it's ugly!]</strong>
       </Page.Header>
       <Page.Main>

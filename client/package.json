@@ -10,7 +10,10 @@
     "serve": "serve build"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": "react-app",
+    "rules": {
+      "jsx-a11y/accessible-emoji": "off"
+    }
   },
   "browserslist": [
     ">0.2%",
