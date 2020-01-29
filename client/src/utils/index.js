@@ -22,6 +22,12 @@ export function getRandomInt(max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+export function msToSecPretty(ms) {
+  const minutes = Math.floor(ms / 60000);
+  const seconds = ((ms % 60000) / 1000).toFixed(0);
+  return (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+}
+
 // React Hook
 export function usePrevious(value) {
   const ref = useRef();

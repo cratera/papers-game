@@ -5,10 +5,11 @@ import { Fragment, useState, useEffect, useContext } from 'react';
 
 import { typography as Typography } from 'Theme.js';
 import * as Styles from './PlayingStyles.js';
+import Avatar from 'components/Avatar';
 import Button from 'components/Button';
 import Page from 'components/Page';
 import PapersContext from 'store/PapersContext.js';
-import { useCountdown, usePrevious, getRandomInt } from 'utils';
+import { useCountdown, usePrevious, getRandomInt, msToSecPretty } from 'utils';
 
 export default function Playing(props) {
   const Papers = useContext(PapersContext);
@@ -199,14 +200,22 @@ export default function Playing(props) {
   const renderMyTurnGetReady = () => {
     return (
       <Fragment>
-        <h2>It's your turn!</h2>
-        [IMG EXPLAINING]
-        {isOdd && <p>Your team has one player less, so it's you again.</p>}
-        <p>You ready?</p>
-        <br />
-        <Button hasBlock onClick={handleStartClick}>
-          Start now!
-        </Button>
+        <Page.Main>
+          <div css={Styles.header}>
+            <h1 css={Styles.headerTitle}>It's your turn!</h1>
+            <br />
+            <br />
+            <br />
+            <br />
+            [IMG EXPLAINING]
+          </div>
+          {isOdd && <p>Your team has one player less, so it's you again.</p>}
+        </Page.Main>
+        <Page.CTAs>
+          <Button hasBlock onClick={handleStartClick}>
+            Start now!
+          </Button>
+        </Page.CTAs>
       </Fragment>
     );
   };
@@ -219,7 +228,7 @@ export default function Playing(props) {
       border-bottom: 1px solid #eee;
     `;
     return (
-      <Fragment>
+      <Page.Main>
         <h1>{type === 'timesup' ? "Time's Up!" : 'No more words'}</h1>
         <p>
           Your team got <strong>{papersTurn.guessed.length}</strong> papers!
@@ -257,7 +266,7 @@ export default function Playing(props) {
         <Button hasBlock onClick={handleFinishTurnClick}>
           Finish my turn
         </Button>
-      </Fragment>
+      </Page.Main>
     );
   };
 
@@ -278,7 +287,7 @@ export default function Playing(props) {
     const winnerId = arrayOfTeamsId[winnerIndex];
 
     return (
-      <Fragment>
+      <Page.Main>
         <h1>Round finished!</h1>
         <div>Winner: {game.teams[winnerId].name}</div>
         <ul>
@@ -301,7 +310,7 @@ export default function Playing(props) {
         ) : (
           <p>Wait for admin ({game.players[game.creatorId].name}) to start next round.</p>
         )}
-      </Fragment>
+      </Page.Main>
     );
   };
 
@@ -318,7 +327,7 @@ export default function Playing(props) {
     }
 
     return (
-      <Fragment>
+      <Page.Main>
         <br />
         {countdownSec > initialTimerSec ? (
           // 3, 2, 1...
@@ -346,35 +355,59 @@ export default function Playing(props) {
             )}
           </Fragment>
         )}
+      </Page.Main>
+    );
+  };
+
+  const renderOthersTurn = () => {
+    const teamName = game.teams[turnTeamIndex].name;
+    const player = game.players[turnPlayerId];
+    return (
+      <Fragment>
+        <Page.Main>
+          <div css={Styles.to.wrapper}>
+            <div css={Styles.header}>
+              <h1 css={Styles.headerTitle}>Round {roundIndex + 1}</h1>
+              <p css={Typography.secondary}>
+                Try to guess as many papers as possible in 1 minute.{' '}
+                {game.settings.rounds[roundIndex].description}
+              </p>
+            </div>
+            <div css={Styles.to.main}>
+              <p css={Typography.secondary}>
+                {!hasCountdownStarted
+                  ? 'Not started yet'
+                  : countdownSec
+                  ? 'The pressure is on!'
+                  : 'Times up!'}
+              </p>
+              {hasCountdownStarted ? (
+                countdownSec > initialTimerSec ? (
+                  // 3, 2, 1...
+                  <p css={Typography.h1}>{countdownSec - initialTimerSec}...</p>
+                ) : (
+                  <p css={Typography.h1}>{countdownSec ? msToSecPretty(countdown) : '00:00'}</p>
+                )
+              ) : (
+                // TODO this
+                <p css={Typography.h1}>00:{initialTimerSec}</p>
+              )}
+            </div>
+          </div>
+        </Page.Main>
+        <Page.CTAs>
+          <div css={Styles.tos.container}>
+            <p css={[Styles.tos.title, Typography.h3]}>Turn {round.turnCount + 1}</p>
+            <Avatar css={Styles.tos.avatar} hasMargin size="lg" src={player.avatar}></Avatar>
+            <p css={[Styles.tos.name, Typography.h3]}>{player.name}</p>
+            <p css={[Styles.tos.team, Typography.secondary]}>{teamName}</p>
+          </div>
+        </Page.CTAs>
       </Fragment>
     );
   };
 
-  const renderOtherTurnGetReady = () => {
-    const teamName = game.teams[turnTeamIndex].name;
-    const playerName = game.players[turnPlayerId].name;
-    return (
-      <Fragment>
-        Wait for your turn...
-        <br />
-        Timer:{' '}
-        {countdownSec ? (
-          countdownSec > initialTimerSec ? (
-            // 3, 2, 1...
-            <p>{countdownSec - initialTimerSec}...</p>
-          ) : (
-            countdown + '(ms)'
-          )
-        ) : (
-          0
-        )}
-        <br />
-        <p>Turn: {Number(round.turnCount).toString()}</p>
-        <p>Team: {teamName}</p>
-        <p>Player: {playerName}</p>
-      </Fragment>
-    );
-  };
+  // ------- isFinalScore
 
   if (isFinalScore) {
     const teamsTotalScore = {};
@@ -420,64 +453,51 @@ export default function Playing(props) {
       return `${game.teams[winnerId].name}: (${winnerScore})`;
     };
 
-    console.log('final scores:', scores);
     return (
-      <div css={Styles.page}>
-        {scores.map((round, index) => {
-          return (
-            <Fragment key={index}>
-              <p>Round {index}:</p>
-              <ul>
-                {Object.keys(round.arrayOfTeamsId).map((teamId, index) => (
-                  <li key={teamId}>
-                    {game.teams[teamId].name}: {round.arrayOfScores[index]}
-                  </li>
-                ))}
-              </ul>
-              <p>
-                Best Player: {game.players[round.bestPlayer.id].name} ({round.bestPlayer.score})
-              </p>
-              <br />
-            </Fragment>
-          );
-        })}
-        <br />
-        <p>**Final Team Winner** {getFinalWinner()}</p>
-        <br />
-        <Button onClick={Papers.leaveGame}>Leave game</Button>
-      </div>
+      <Page>
+        <Page.Main>
+          {scores.map((round, index) => {
+            return (
+              <Fragment key={index}>
+                <p>Round {index}:</p>
+                <ul>
+                  {Object.keys(round.arrayOfTeamsId).map((teamId, index) => (
+                    <li key={teamId}>
+                      {game.teams[teamId].name}: {round.arrayOfScores[index]}
+                    </li>
+                  ))}
+                </ul>
+                <p>
+                  Best Player: {game.players[round.bestPlayer.id].name} ({round.bestPlayer.score})
+                </p>
+                <br />
+              </Fragment>
+            );
+          })}
+          <br />
+          <p>**Final Team Winner** {getFinalWinner()}</p>
+          <br />
+          <Button onClick={Papers.leaveGame}>Leave game</Button>
+        </Page.Main>
+      </Page>
     );
   }
+
+  // -------- other stuff
 
   return (
     <Page>
       <Page.Header>
         {/* eslint-disable-next-line */}
-        <strong css={Typography.h3}>[ 🚧 🙈 It works, but it's ugly!]</strong>
+        <strong css={Typography.secondary}>[ 🚧 🙈 It's still ugly, but it works!]</strong>
       </Page.Header>
-      <Page.Main>
-        {!hasCountdownStarted && (
-          <header>
-            <h1>Round {roundIndex + 1}</h1>
-            <p>
-              Try to guess as many papers as possible in 1 minute. <br />
-              {game.settings.rounds[roundIndex].description}
-            </p>
-            <br />
-          </header>
-        )}
-        <div>
-          {isMyTurn
-            ? hasStatusFinished
-              ? renderRoundScore()
-              : !hasCountdownStarted
-              ? renderMyTurnGetReady()
-              : renderGo()
-            : hasStatusFinished
-            ? renderRoundScore()
-            : renderOtherTurnGetReady()}
-        </div>
-      </Page.Main>
+      {hasStatusFinished
+        ? renderRoundScore()
+        : isMyTurn
+        ? !hasCountdownStarted
+          ? renderMyTurnGetReady()
+          : renderGo()
+        : renderOthersTurn()}
     </Page>
   );
 }
