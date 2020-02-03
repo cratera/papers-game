@@ -1,7 +1,6 @@
 /** @jsx jsx */
-import { jsx, css } from '@emotion/core';
+import { jsx } from '@emotion/core';
 import { Fragment, useState, useEffect, useContext } from 'react';
-// import { Link } from 'react-router-dom';
 
 import { typography as Typography, colors } from 'Theme.js';
 import * as Styles from './PlayingStyles.js';
