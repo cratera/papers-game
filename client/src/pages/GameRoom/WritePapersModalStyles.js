@@ -56,7 +56,7 @@ export const slide = css`
   flex-shrink: 0;
   scroll-snap-align: center;
   background: ${Theme.colors.bg};
-  box-shadow: 0px 4px 16px rgba(0, 56, 255, 0.2);
+  box-shadow: 0px 4px 16px rgba(0, 56, 255, 0.1);
   opacity: 0.8;
   transition: opacity 250ms;
 

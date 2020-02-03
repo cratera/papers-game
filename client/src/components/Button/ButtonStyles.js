@@ -35,7 +35,8 @@ export const button = ({ variant, hasBlock, size }) => {
         font-size: 1.6rem;
         display: flex;
         align-items: center;
-        justify-items: center;
+        justify-content: center;
+        padding: 0;
 
         svg {
           width: 2.4rem;
@@ -49,7 +50,7 @@ export const button = ({ variant, hasBlock, size }) => {
       `
         : `
         padding: 1.6rem 2.4rem;
-        ${variant === 'success' ? '' : 'box-shadow: 0px 4px 16px rgba(148, 148, 148, 0.3);'}
+        ${variant === 'success' ? '' : 'box-shadow: 0px 4px 16px rgba(204, 127, 81, 0.3);'}
   `
     }
     ${

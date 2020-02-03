@@ -30,13 +30,20 @@ export default function AccessGameModal({ variant }) {
   };
 
   const handleBtnClick = () => {
+    if (isAccessing) {
+      return;
+    }
+
     setAccessing(true);
+    setState(state => ({ ...state, errorMsg: null }));
+
     Papers.accessGame(variant, state.gameName, err => {
       if (err) {
         // TODO - Move this out of here - redux(mapstatetoprops?)/context/wtv...
         const errorMsgMap = {
           exists: () => 'Choose other name.',
           notFound: () => 'This game does not exist.',
+          alreadyStarted: () => 'The game already started.',
           ups: () => `Ups, something went wrong! Error: ${JSON.stringify(err)}`,
         };
 

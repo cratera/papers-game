@@ -49,7 +49,6 @@ app.use(function(req, res, next) {
 
 // ============= PAPERS GAME SOCKET API ============= //
 
-console.log('s::::', PapersIO);
 io.use((socket, next) => PapersIO.use(io, socket, next)).on('connection', socket =>
   PapersIO.connection(io, socket)
 );

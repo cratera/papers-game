@@ -59,10 +59,10 @@ export function ThemeGlobal() {
   const [vh, setVh] = useState('100vh');
 
   useEffect(() => {
-    setVh(`${window.innerHeight * 0.01}px`)
+    setVh(`${window.innerHeight * 0.01}px`);
 
     window.addEventListener('resize', () => {
-      setVh(`${window.innerHeight * 0.01}px`)
+      setVh(`${window.innerHeight * 0.01}px`);
     });
   }, []);
 
@@ -79,6 +79,9 @@ export function ThemeGlobal() {
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
           color: ${colors.grayDark};
+          -moz-user-select: none;
+          -webkit-user-select: none;
+          -webkit-touch-callout: none; /* prevent ios text selection on click */
         }
 
         body {

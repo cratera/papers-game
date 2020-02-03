@@ -3,7 +3,7 @@ import { jsx, css } from '@emotion/core';
 import { Fragment, useState, useEffect, useContext } from 'react';
 // import { Link } from 'react-router-dom';
 
-import { typography as Typography } from 'Theme.js';
+import { typography as Typography, colors } from 'Theme.js';
 import * as Styles from './PlayingStyles.js';
 import Avatar from 'components/Avatar';
 import Button from 'components/Button';
@@ -20,13 +20,14 @@ export default function Playing(props) {
   const hasCountdownStarted = !['getReady', 'finished'].includes(round.status);
   const prevHasCountdownStarted = usePrevious(hasCountdownStarted);
   const profileIsAdmin = game.creatorId === profile.id;
-  const initialTimer = 10000; // TODO - from Papers.settings?
+  const initialTimer = 30000; // TODO - from Papers.settings?
   const timerReady = 3400;
   const [countdown, startCountdown] = useCountdown(hasCountdownStarted ? round.status : null, {
     timer: initialTimer + timerReady, // 400 - threshold for io connection.
   }); // 3,2,1... go!
   const initialTimerSec = Math.round(initialTimer / 1000);
   const countdownSec = Math.round(countdown / 1000);
+  const blurTime = 1500;
   // const prevCountdownSec = usePrevious(countdownSec);
   // const [timesUp, setTimesup] = useState(false);
 
@@ -44,6 +45,11 @@ export default function Playing(props) {
     }
   );
   const [isFinalScore, setFinalScore] = useState(null);
+
+  const [isVisiblePassedPapers, togglePassedPapers] = useState(false);
+  const [paperAnim, setPaperAnimation] = useState(null);
+  const [isPaperBlur, setPaperBlur] = useState(hasCountdownStarted);
+  const [isPaperChanging, setIsPaperChanging] = useState(false);
 
   useEffect(() => {
     // use false to avoid undefined on first render.
@@ -83,6 +89,7 @@ export default function Playing(props) {
       window.localStorage.setItem('turn', JSON.stringify(state));
       return state;
     });
+    setTimeout(() => setPaperBlur(true), blurTime);
   }
 
   function pickNextPaper(hasGuessed = false) {
@@ -144,9 +151,29 @@ export default function Playing(props) {
       window.localStorage.setItem('turn', JSON.stringify(newState));
       return newState;
     });
+    setPaperBlur(false);
+  }
+
+  function handlePaperClick(hasGuessed) {
+    if (isPaperChanging) {
+      return;
+    }
+    // TODO / BUG clear all timeouts around...
+    setPaperBlur(false);
+    setIsPaperChanging(true);
+    setPaperAnimation(hasGuessed ? 'gotcha' : 'nop');
+
+    setTimeout(() => {
+      setPaperAnimation(null);
+      pickNextPaper(hasGuessed);
+      setTimeout(() => setIsPaperChanging(false), 500);
+      setTimeout(() => setPaperBlur(true), blurTime);
+    }, 1000);
   }
 
   function togglePaper(paper, hasGuessed) {
+    // TODO/BUG: When papers are all guessed and here I select one as not guessed.
+    //  - The timer continues but the current word is empty.
     setPapersTurn(state => {
       const wordsModified = {};
       if (hasGuessed) {
@@ -185,6 +212,9 @@ export default function Playing(props) {
   function handleFinishTurnClick() {
     // setPapersTurn({}); should it be done here?
     Papers.finishTurn(papersTurn);
+    /* just to double check... */
+    setPaperBlur(false);
+    setIsPaperChanging(false);
   }
 
   function handleStartNextRoundClick() {
@@ -203,11 +233,13 @@ export default function Playing(props) {
         <Page.Main>
           <div css={Styles.header}>
             <h1 css={Styles.headerTitle}>It's your turn!</h1>
-            <br />
-            <br />
-            <br />
-            <br />
-            [IMG EXPLAINING]
+            <div css={Styles.inst.container}>
+              <p css={Styles.inst.first}>Click here if your team guesses the paper</p>
+              <img css={Styles.inst.img} src="/images/instructions.png" alt="instructions" />
+              <p css={Styles.inst.second}>
+                Click here to go to the next paper. don’t worry, you can always go back!
+              </p>
+            </div>
           </div>
           {isOdd && <p>Your team has one player less, so it's you again.</p>}
         </Page.Main>
@@ -221,63 +253,78 @@ export default function Playing(props) {
   };
 
   const renderTurnScore = type => {
-    const StyleLi = css`
-      display: flex;
-      justify-content: space-between;
-      padding: 0.8rem 0;
-      border-bottom: 1px solid #eee;
-    `;
     return (
-      <Page.Main>
-        <h1>{type === 'timesup' ? "Time's Up!" : 'No more words'}</h1>
-        <p>
-          Your team got <strong>{papersTurn.guessed.length}</strong> papers!
-        </p>
-        <p>Guessed:</p>
-        <ul>
-          {papersTurn.guessed.map((paper, i) => (
-            <li css={StyleLi} key={`${i}_${paper}`}>
-              - {paper}
-              <Button
-                variant="flat"
-                aria-label="mark as not guessed"
-                onClick={() => togglePaper(paper, false)}
-              >
-                {/* eslint-disable-next-line */}✅
-              </Button>{' '}
-            </li>
-          ))}
-        </ul>
-        <p>Passed:</p>
-        <ul>
-          {papersTurn.passed.map((paper, i) => (
-            <li css={StyleLi} key={`${i}_${paper}`}>
-              - {paper}
-              <Button
-                variant="flat"
-                aria-label="mark as guessed"
-                onClick={() => togglePaper(paper, true)}
-              >
-                {/* eslint-disable-next-line */}❌
-              </Button>
-            </li>
-          ))}
-        </ul>
-        <Button hasBlock onClick={handleFinishTurnClick}>
-          Finish my turn
-        </Button>
-      </Page.Main>
+      <Fragment>
+        <Page.Main css={Styles.tscore.main}>
+          <div css={Styles.tscore.header}>
+            <p css={[Styles.tscore.headerKicker]}>
+              {type === 'timesup' ? "Time's Up!" : 'All papers done!'}
+            </p>
+            <h1 css={Typography.h1}>
+              Your team got <strong>{papersTurn.guessed.length}</strong> papers right!
+            </h1>
+          </div>
+          {papersTurn.guessed.length ? (
+            <ul css={Styles.tscore.list}>
+              {papersTurn.guessed.map((paper, i) => (
+                <li css={Styles.tscore.item} key={`${i}_${paper}`}>
+                  {paper}
+                  <Button
+                    css={Styles.tscore.btn('remove')}
+                    variant="icon"
+                    aria-label="mark as not guessed"
+                    onClick={() => togglePaper(paper, false)}
+                  />
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p css={{ marginTop: '4rem' }}>More luck next time...</p>
+          )}
+          {!!papersTurn.passed.length && (
+            <Button
+              css={Styles.tscore.btnToggle}
+              onClick={() => togglePassedPapers(bool => !bool)}
+              variant="flat"
+            >
+              {isVisiblePassedPapers ? 'Hide' : 'Show'} the papers you didn't get
+            </Button>
+          )}
+          {isVisiblePassedPapers && !!papersTurn.passed.length && (
+            <ul css={Styles.tscore.list}>
+              {papersTurn.passed.map((paper, i) => (
+                <li css={Styles.tscore.item} key={`${i}_${paper}`}>
+                  {paper}
+                  <Button
+                    css={Styles.tscore.btn('add')}
+                    variant="icon"
+                    aria-label="mark as guessed"
+                    onClick={() => togglePaper(paper, true)}
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
+        </Page.Main>
+        <Page.CTAs>
+          <Button hasBlock onClick={handleFinishTurnClick}>
+            Finish my turn
+          </Button>
+        </Page.CTAs>
+      </Fragment>
     );
   };
 
   const renderRoundScore = () => {
     const teamsScore = {};
     const scorePlayers = game.score[round.current];
+    let myTeamId = null;
 
     Object.keys(game.teams).forEach(teamId => {
       game.teams[teamId].players.forEach(playerId => {
         const playerScore = scorePlayers[playerId] ? scorePlayers[playerId].length : 0;
         teamsScore[teamId] = (teamsScore[teamId] || 0) + playerScore;
+        myTeamId = myTeamId || (playerId === profile.id ? teamId : null);
       });
     });
 
@@ -285,32 +332,43 @@ export default function Playing(props) {
     const arrayOfTeamsId = Object.keys(teamsScore);
     const winnerIndex = arrayOfScores.indexOf(Math.max(...arrayOfScores));
     const winnerId = arrayOfTeamsId[winnerIndex];
-
+    const myTeamWon = myTeamId === winnerId;
     return (
-      <Page.Main>
-        <h1>Round finished!</h1>
-        <div>Winner: {game.teams[winnerId].name}</div>
-        <ul>
-          Scores:
-          {Object.keys(teamsScore).map(teamId => (
-            <li key={teamId}>
-              {game.teams[teamId].name}: {teamsScore[teamId]}
-            </li>
-          ))}
-        </ul>
-        <br />
-        {round.current + 1 === game.settings.rounds.length ? (
-          <Button hasBlock onClick={handleFinalWinnerClick}>
-            Show final winner!
-          </Button>
-        ) : profileIsAdmin ? (
-          <Button hasBlock onClick={handleStartNextRoundClick}>
-            Start Round {round.current + 1 + 1} of {game.settings.rounds.length}
-          </Button>
-        ) : (
-          <p>Wait for admin ({game.players[game.creatorId].name}) to start next round.</p>
-        )}
-      </Page.Main>
+      <Fragment>
+        <Page.Main css={Styles.tscore.main}>
+          <p css={Styles.tscore.headerKicker}>Round {roundIndex + 1} finished!</p>
+          <h1 css={Typography.h1}>
+            {myTeamWon ? (
+              <span css={{ color: colors.success }}>Your team won!</span>
+            ) : (
+              <span css={{ color: colors.danger }}>Your team lost!</span>
+            )}
+          </h1>
+          <ul>
+            Scores:
+            {Object.keys(teamsScore).map(teamId => (
+              <li key={teamId}>
+                {game.teams[teamId].name}: {teamsScore[teamId]}
+              </li>
+            ))}
+          </ul>
+        </Page.Main>
+        <Page.CTAs>
+          {round.current + 1 === game.settings.rounds.length ? (
+            <Button hasBlock onClick={handleFinalWinnerClick}>
+              Show final winner!
+            </Button>
+          ) : profileIsAdmin ? (
+            <Button hasBlock onClick={handleStartNextRoundClick}>
+              Start Round {round.current + 1 + 1} of {game.settings.rounds.length}
+            </Button>
+          ) : (
+            <p css={{ textAlign: 'center' }}>
+              Wait for admin ({game.players[game.creatorId].name}) to start next round.
+            </p>
+          )}
+        </Page.CTAs>
+      </Fragment>
     );
   };
 
@@ -326,36 +384,77 @@ export default function Playing(props) {
       return renderTurnScore('timesup');
     }
 
+    if (countdownSec > initialTimerSec) {
+      return (
+        <Page.Main>
+          <p css={[Styles.count321, { marginTop: '20vh' }]}>{countdownSec - initialTimerSec}...</p>
+        </Page.Main>
+      );
+    }
+
     return (
-      <Page.Main>
-        <br />
-        {countdownSec > initialTimerSec ? (
-          // 3, 2, 1...
-          <p>{countdownSec - initialTimerSec}...</p>
-        ) : (
-          <Fragment>
-            <Button hasBlock variant="success" onClick={() => pickNextPaper(true)}>
-              Got it!
-            </Button>
-            <br />
-            {countdownSec}
-            <br /> - current: {papersTurn.current}
+      <Fragment>
+        <Page.Main>
+          <Button
+            hasBlock
+            variant="success"
+            css={isPaperChanging && Styles.go.ctaDim}
+            onClick={() => handlePaperClick(true)}
+          >
+            Got it!
+          </Button>
+          <div css={Styles.go.main}>
+            <p
+              css={[
+                Styles.count321,
+                Styles.go.count,
+                { marginTop: '3.2rem', color: countdown <= 10500 && colors.danger },
+              ]}
+            >
+              {msToSecPretty(countdown)}
+            </p>
+            <div
+              css={[Styles.go.paper, Styles.go[paperAnim]]}
+              onMouseDown={() => setPaperBlur(false)}
+              onTouchStart={() => setPaperBlur(false)}
+              onMouseUp={() => setPaperBlur(true)}
+              onTouchEnd={() => setPaperBlur(true)}
+            >
+              <span
+                css={[
+                  Styles.go.paperWord,
+                  isPaperBlur && Styles.go.blur,
+                  paperAnim === 'gotcha' && Styles.go.paperWordInsideGotch,
+                ]}
+              >
+                {papersTurn.current}
+              </span>
+              <span css={Styles.go.tipBlur} aria-hidden="true">
+                {isPaperBlur && !isPaperChanging && 'Press to reveal'}
+              </span>
+            </div>
+          </div>
+          <div hidden css={Typography.small}>
             <br /> - passed: {papersTurn.passed.join(', ')}
             <br /> - guessed: {papersTurn.guessed.join(', ')}
-            <br /> - wordsLeft:{' '}
-            <span css={Typography.small}>{papersTurn.wordsLeft.join(', ')}</span>
-            <br />
-            <br />
-            {papersTurn.current && !papersTurn.wordsLeft.length && !papersTurn.passed.length ? (
-              <p>----- Last paper!! -----</p>
-            ) : (
-              <Button hasBlock variant="light" onClick={() => pickNextPaper(false)}>
-                Next paper
-              </Button>
-            )}
-          </Fragment>
-        )}
-      </Page.Main>
+            <br /> - wordsLeft: {papersTurn.wordsLeft.join(', ')}
+          </div>
+        </Page.Main>
+        <Page.CTAs>
+          {papersTurn.current && !papersTurn.wordsLeft.length && !papersTurn.passed.length ? (
+            <p css={{ textAlign: 'center', color: colors.grayMedium }}>Last paper!</p>
+          ) : (
+            <Button
+              hasBlock
+              variant="light"
+              css={isPaperChanging && Styles.go.ctaDim}
+              onClick={() => handlePaperClick(false)}
+            >
+              Next paper
+            </Button>
+          )}
+        </Page.CTAs>
+      </Fragment>
     );
   };
 
@@ -381,17 +480,24 @@ export default function Playing(props) {
                   ? 'The pressure is on!'
                   : 'Times up!'}
               </p>
-              {hasCountdownStarted ? (
-                countdownSec > initialTimerSec ? (
-                  // 3, 2, 1...
-                  <p css={Typography.h1}>{countdownSec - initialTimerSec}...</p>
-                ) : (
-                  <p css={Typography.h1}>{countdownSec ? msToSecPretty(countdown) : '00:00'}</p>
-                )
-              ) : (
-                // TODO this
-                <p css={Typography.h1}>00:{initialTimerSec}</p>
-              )}
+              <p
+                css={[
+                  Typography.h1,
+                  {
+                    color:
+                      hasCountdownStarted && countdown <= 10500 ? colors.danger : colors.primary,
+                  },
+                ]}
+              >
+                {hasCountdownStarted
+                  ? countdownSec > initialTimerSec
+                    ? countdownSec - initialTimerSec + '...' // 3, 2, 1...
+                    : countdownSec
+                    ? msToSecPretty(countdown) // counting...
+                    : '00:00' // timeout
+                  : msToSecPretty(initialTimer) // waiting to start
+                }
+              </p>
             </div>
           </div>
         </Page.Main>
@@ -411,6 +517,7 @@ export default function Playing(props) {
 
   if (isFinalScore) {
     const teamsTotalScore = {};
+    let myTeamId = null;
 
     const getRoundScore = roundIndex => {
       const scorePlayers = game.score[roundIndex];
@@ -419,6 +526,7 @@ export default function Playing(props) {
 
       Object.keys(game.teams).forEach(teamId => {
         game.teams[teamId].players.forEach(playerId => {
+          myTeamId = myTeamId || (playerId === profile.id ? teamId : null);
           const playerScore = scorePlayers[playerId] ? scorePlayers[playerId].length : 0;
           if (playerScore > (bestPlayer.score || 0)) {
             bestPlayer = { score: playerScore, id: playerId };
@@ -431,6 +539,7 @@ export default function Playing(props) {
 
       const arrayOfScores = Object.values(teamsScore);
       const arrayOfTeamsId = Object.keys(teamsScore);
+
       // const winnerIndex = arrayOfScores.indexOf(Math.max(...arrayOfScores));
       // const winnerId = arrayOfTeamsId[winnerIndex];
 
@@ -449,13 +558,24 @@ export default function Playing(props) {
       const winnerScore = Math.max(...arrayOfScores);
       const winnerIndex = arrayOfScores.indexOf(winnerScore);
       const winnerId = arrayOfTeamsId[winnerIndex];
+      const myTeamWon = myTeamId === winnerId;
 
-      return `${game.teams[winnerId].name}: (${winnerScore})`;
+      return (
+        <h1 css={[Typography.h1, { textAlign: 'center' }]}>
+          {myTeamWon ? (
+            <span css={{ color: colors.success }}>Your team won!</span>
+          ) : (
+            <span css={{ color: colors.danger }}>Your team lost!</span>
+          )}
+        </h1>
+      );
     };
 
     return (
       <Page>
         <Page.Main>
+          {getFinalWinner()}
+          <br />
           {scores.map((round, index) => {
             return (
               <Fragment key={index}>
@@ -474,11 +594,10 @@ export default function Playing(props) {
               </Fragment>
             );
           })}
-          <br />
-          <p>**Final Team Winner** {getFinalWinner()}</p>
-          <br />
-          <Button onClick={Papers.leaveGame}>Leave game</Button>
         </Page.Main>
+        <Page.CTAs>
+          <Button onClick={Papers.leaveGame}>Leave game</Button>
+        </Page.CTAs>
       </Page>
     );
   }
@@ -487,10 +606,7 @@ export default function Playing(props) {
 
   return (
     <Page>
-      <Page.Header>
-        {/* eslint-disable-next-line */}
-        <strong css={Typography.secondary}>[ 🚧 🙈 It's still ugly, but it works!]</strong>
-      </Page.Header>
+      <Page.Header></Page.Header>
       {hasStatusFinished
         ? renderRoundScore()
         : isMyTurn

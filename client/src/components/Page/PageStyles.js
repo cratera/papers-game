@@ -50,7 +50,7 @@ export const main = css`
   }
 `;
 
-export const ctas = css`
+export const ctas = ({ hasChildren }) => css`
   position: relative;
   display: flex;
   flex-direction: column;
@@ -61,6 +61,10 @@ export const ctas = css`
 
   ${Theme.bp.xs} {
     padding: 0 ${gutter} 3.2rem;
+  }
+
+  &:empty {
+    padding: 0;
   }
 
   /* fadeout effect */
