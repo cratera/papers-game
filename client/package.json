@@ -33,6 +33,7 @@
     "socket.io-client": "^2.2.0"
   },
   "devDependencies": {
-    "babel-plugin-emotion": "^10.0.23"
+    "babel-plugin-emotion": "^10.0.23",
+    "prop-types": "^15.7.2"
   }
 }
