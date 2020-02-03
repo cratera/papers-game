@@ -101,6 +101,9 @@ export const go = {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none; /* prevent ios text selection on click */
   `,
 
   ctaDim: css`

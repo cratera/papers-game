@@ -88,7 +88,7 @@ export default function Playing(props) {
       window.localStorage.setItem('turn', JSON.stringify(state));
       return state;
     });
-    setTimeout(() => setPaperBlur(true), blurTime);
+    setPaperBlur(false);
   }
 
   function pickNextPaper(hasGuessed = false) {

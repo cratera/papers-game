@@ -65,6 +65,7 @@ export const button = ({ variant, hasBlock, size }) => {
     border: none;
     border-radius: 4.2rem;
     font-size: inherit;
+    line-height: 1.4;
     background-color: ${variants[variant].bg};
     color: ${variants[variant].text};
     width: ${hasBlock ? '100%' : ''};

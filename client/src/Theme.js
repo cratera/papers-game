@@ -79,9 +79,6 @@ export function ThemeGlobal() {
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
           color: ${colors.grayDark};
-          -moz-user-select: none;
-          -webkit-user-select: none;
-          -webkit-touch-callout: none; /* prevent ios text selection on click */
         }
 
         body {
