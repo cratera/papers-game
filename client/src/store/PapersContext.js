@@ -389,11 +389,15 @@ class PapersContextComp extends Component {
 
   setTeams(teams) {
     console.log('setTeams()');
-    this.state.socket.emit('set-teams', {
-      gameId: this.state.game.name,
-      playerId: this.state.profile.id,
-      teams,
-    });
+    this.state.socket.emit(
+      'set-teams',
+      {
+        gameId: this.state.game.name,
+        playerId: this.state.profile.id,
+        teams,
+      },
+      e => console.warn('TODO HANDLE ERROR', e)
+    );
   }
 
   startGame() {

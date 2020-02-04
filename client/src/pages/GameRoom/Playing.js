@@ -19,7 +19,7 @@ export default function Playing(props) {
   const hasCountdownStarted = !['getReady', 'finished'].includes(round.status);
   const prevHasCountdownStarted = usePrevious(hasCountdownStarted);
   const profileIsAdmin = game.creatorId === profile.id;
-  const initialTimer = 30000; // TODO - from Papers.settings?
+  const initialTimer = 60000; // TODO - from Papers.settings?
   const timerReady = 3400;
   const [countdown, startCountdown] = useCountdown(hasCountdownStarted ? round.status : null, {
     timer: initialTimer + timerReady, // 400 - threshold for io connection.

@@ -41,7 +41,7 @@ Note: The game should be played on a vertical viewport.
 yarn build_client
 ```
 
-- Send to heroku
+- Send to heroku for the 1º time
 
 ```bash
 # Creat heroku site
@@ -50,4 +50,11 @@ heroku create
 git push heroku master
 # Open the site deployed
 heroku open
+```
+
+- Send to heroku 2º time
+
+```bash
+# One single command
+yarn deploy_heroku
 ```

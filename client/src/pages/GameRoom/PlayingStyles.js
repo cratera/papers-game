@@ -126,6 +126,7 @@ export const go = {
     box-shadow: 0 0.4rem 1.6rem rgba(0, 56, 255, 0.1);
     padding: 1.6rem;
     height: 60vw;
+    min-height: 300px;
     display: flex;
     justify-content: center;
     align-items: center;

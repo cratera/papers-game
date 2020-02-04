@@ -230,7 +230,11 @@ function connection(io, socket) {
   socket.on('set-teams', ({ gameId, playerId, teams }, cb) => {
     console.log(':: set-teams', playerId, gameId, teams);
 
-    model.setTeams(gameId, teams);
+    try {
+      model.setTeams(gameId, teams);
+    } catch (e) {
+      cb(e);
+    }
 
     io.to(gameId).emit('game-update', 'set-teams', teams);
     return cb && cb(null);
