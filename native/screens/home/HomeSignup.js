@@ -9,9 +9,6 @@ import * as Theme from '@theme';
 import Button from '@components/button';
 import PapersContext from '@store/PapersContext.js';
 // import { encodeImgToBase64 } from 'utils/index.js';
-import { createStackNavigator } from '@react-navigation/stack';
-
-const Stack = createStackNavigator();
 
 const Styles = {
   main: () => {},
@@ -27,39 +24,34 @@ export default function HomeNewPlayer(props) {
     avatarStatus: null, // loading || loaded || error?
   });
 
-  const StepWelcome = ({ route, navigation }) => (
-    <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+  const StepWelcome = () => (
+    <View>
       <Text css={Styles.logo} accessibilityRole="none">
         🎲
       </Text>
       <Text style={Theme.Typography.h1}>Welcome!</Text>
-      <Text style={[Theme.Typography.secondary, { textAlign: 'center' }]}>
+      <Text style={[Theme.Typography.secondary]}>
         {/* Styles.paragraph,  */}
-        Papers is the perfect game for your <Text numberOfLines={1}>dinner party!</Text>
+        Papers is the perfect game for your <Text numberOfLines={1}>dinner party</Text>
         {'\n'}
         <Text>Made with love by Maggie and Sandy 😎</Text>
       </Text>
-
-      <Button style={{ alignSelf: 'stretch' }} onPress={() => navigation.navigate('StepName')}>
-        Next
-      </Button>
     </View>
   );
 
-  const StepName = ({ route, navigation }) => (
+  const StepName = () => (
     <ScrollView keyboardShouldPersistTaps="always">
       <Text nativeID="inputNameLabel">How should we call you?</Text>
       {/* css={Styles.input} */}
       <TextInput
         inputAccessoryViewID="name"
         autoFocus
-        blurOnSubmit={false}
         nativeID="inputNameLabel"
         onChangeText={text => updateTempProfile('name', text)}
         defaultValue={state.name}
       />
 
-      {state.name && <Button onPress={() => navigation.navigate('StepAvatar')}>Next</Button>}
+      {state.name && <Button onPress={goNextStep}>Next</Button>}
     </ScrollView>
   );
 
@@ -117,9 +109,12 @@ export default function HomeNewPlayer(props) {
     }[key]();
   }
 
-  // function goNextStep(step) {
-  //   navigation.navigate(stepMap[step + 1]);
-  // }
+  function goNextStep() {
+    setState(state => ({
+      ...state,
+      step: state.step + 1,
+    }));
+  }
 
   function goBackStep() {
     setState(state => ({
@@ -135,35 +130,37 @@ export default function HomeNewPlayer(props) {
     });
   }
 
+  const CurrentStep = {
+    0: StepWelcome,
+    1: StepName,
+    2: StepAvatar,
+  }[state.step];
+
   return (
-    // <Page>
-    //   <Page.Header>
-    //     {/* {window.navigator && !window.navigator.standalone ? (
-    //       <p css={Theme.typography.small}>
-    //         Open this as an App. Click share and "Add to Homescreen"
-    //       </p>
-    //     ) : null} */}
-    //     {/* {state.step > 0 && (
-    //       <Button variant="flat" onPress={goBackStep}>
-    //         Back
-    //       </Button>
-    //     )} */}
-    //   </Page.Header>
-    //   <Page.Main css={Styles.main({ centered: state.step === 0 })}>
-    <Stack.Navigator>
-      <Stack.Screen name="StepWelcome" component={StepWelcome} initialParams={{ step: 0 }} />
-      <Stack.Screen name="StepName" component={StepName} initialParams={{ step: 1 }} />
-      <Stack.Screen name="StepAvatar" component={StepAvatar} initialParams={{ step: 2 }} />
-    </Stack.Navigator>
-    //   </Page.Main>
-    //   {/* <Page.CTAs>
-    //     {state.step === 0 && <Button onPress={goNextStep}>Next</Button>}
-    //     {state.step === 2 && (
-    //       <Button onPress={setProfile} variant={state.avatar ? 'primary' : 'flat'}>
-    //         {state.avatar ? 'Finish' : 'Skip this step'}
-    //       </Button>
-    //     )}
-    //   </Page.CTAs> */}
-    // </Page>
+    <Page>
+      <Page.Header>
+        {/* {window.navigator && !window.navigator.standalone ? (
+          <p css={Theme.typography.small}>
+            Open this as an App. Click share and "Add to Homescreen"
+          </p>
+        ) : null} */}
+        {state.step > 0 && (
+          <Button variant="flat" onPress={goBackStep}>
+            Back
+          </Button>
+        )}
+      </Page.Header>
+      <Page.Main css={Styles.main({ centered: state.step === 0 })}>
+        <CurrentStep />
+      </Page.Main>
+      <Page.CTAs>
+        {state.step === 0 && <Button onPress={goNextStep}>Next</Button>}
+        {state.step === 2 && (
+          <Button onPress={setProfile} variant={state.avatar ? 'primary' : 'flat'}>
+            {state.avatar ? 'Finish' : 'Skip this step'}
+          </Button>
+        )}
+      </Page.CTAs>
+    </Page>
   );
 }
