@@ -55,7 +55,6 @@ const styles = StyleSheet.create({
   flat: {
     borderRadius: 0,
     height: 'auto',
-    alignSelf: 'flex-start',
     paddingVertical: 0,
     paddingHorizontal: 0,
   },

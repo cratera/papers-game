@@ -35,31 +35,42 @@ export default StyleSheet.create({
   cta: {
     marginBottom: 16,
   },
+  ctaBottom: {
+    marginBottom: 56,
+    textAlign: 'center',
+  },
   avatarPlace: {
     width: 256,
     height: 256,
     borderRadius: 140,
     backgroundColor: Theme.colors.primaryLight,
     marginVertical: 24,
-    display: 'flex',
+    alignSelf: 'center',
+  },
+  avatarPlaceContent: {
+    flex: 1,
     alignItems: 'center',
     flexDirection: 'column',
     justifyContent: 'center',
     alignSelf: 'center',
-
-    // svg {
-    //   /* camera */
-    //   stroke: ${Theme.colors.primary};
-    //   display: inline-block;
-    //   margin-bottom: 1.6rem;
-    // }
+  },
+  avatarSvg: {
+    /* camera */
+    marginTop: -16,
+    marginBottom: 16,
   },
   avatarImg: {
     // ${avatarPlace}
     resizeMode: 'cover',
   },
   avatarTxt: {
+    fontSize: 16,
     color: Theme.colors.primary,
+  },
+
+  feedback: {
+    textAlign: 'center',
+    color: Theme.colors.grayMedium,
   },
 
   // -----

@@ -3,11 +3,11 @@ import { StyleSheet, Text, TouchableHighlight } from 'react-native';
 
 import * as Styles from './ButtonStyles.js';
 
-function Button({ as, variant, hasBlock, size, children, ...restProps }) {
+function Button({ as, variant, hasBlock, size, children, style, ...restProps }) {
   // const Tag = as || 'TouchableHighlight';
   return (
     <TouchableHighlight {...restProps}>
-      <Text style={Styles.button({ variant, size })}>{children}</Text>
+      <Text style={[Styles.button({ variant, size }), style]}>{children}</Text>
     </TouchableHighlight>
   );
 }
