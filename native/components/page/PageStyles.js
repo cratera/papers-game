@@ -1,86 +1,76 @@
-import { css } from '@emotion/core';
-import * as Theme from 'Theme.js';
+import { StyleSheet } from 'react-native';
+import * as Theme from '@theme';
 
-const gutter = '1.6rem';
-const fadeH = '4rem';
-const headerH = '6.4rem';
+const statusBarH = 16;
+const gutter = 16;
+const fadeH = 40;
+const headerH = statusBarH + 64;
 
-// [1] - REVIEW - How to handle headers. Discuss with @mmbotelho.
+export default StyleSheet.create({
+  page: {
+    width: '100%',
+    maxWidth: 500,
+    marginHorizontal: 'auto',
+    flex: 1,
+    alignItems: 'stretch',
+    backgroundColor: Theme.colors.bg,
+  },
+  header: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: headerH,
+    backgroundColor: Theme.colors.bg,
+    paddingTop: statusBarH,
+    paddingBottom: 8,
+    paddingHorizontal: 40,
+    flexDirection: 'row',
+    alignItems: 'center',
+    zIndex: 1,
+  },
+  main: {
+    paddingTop: headerH,
+    flexGrow: 1,
+    paddingHorizontal: gutter,
+    alignSelf: 'stretch',
+  },
+  ctas: {
+    paddingHorizontal: gutter,
+  },
 
-export const page = css`
-  position: relative;
-  width: 100vw;
-  max-width: 50rem;
-  margin: 0 auto;
-  height: 100vh;
-  height: calc(var(--vh) * 100);
-  overflow: hidden;
-  display: grid;
-  /* grid-template-areas: 'header' 'main' 'ctas'; [1] */
-  grid-template-areas: 'main' 'main' 'ctas';
-  grid-template-rows: ${headerH} 1fr auto;
-  justify-content: 'space-between';
-`;
+  // export const ctas = ({ hasChildren }) => css`
+  //   position: relative;
+  //   display: flex;
+  //   flex-direction: column;
+  //   align-items: stretch;
+  //   grid-area: ctas;
+  //   align-self: end;
+  //   padding: 0 ${gutter} 5.6rem;
 
-export const header = ({ hasChildren }) => css`
-  /* grid-area: header; */
-  position: absolute;
-  top: 0;
-  width: 100%; /* [1] */
+  //   ${Theme.bp.xs} {
+  //     padding: 0 ${gutter} 3.2rem;
+  //   }
 
-  height: ${headerH};
-  padding: 0 0.4rem 0.8rem ${gutter}; /* 0.4 is for icon on the corner */
-  display: flex;
-  justify-content: ${hasChildren ? 'space-between' : 'flex-end'};
-  align-items: center;
-`;
+  //   &:empty {
+  //     padding: 0;
+  //   }
 
-export const main = css`
-  grid-area: main;
-  place-self: stretch;
-  overflow: scroll;
-  padding: ${headerH} ${gutter} 0;
+  //   /* fadeout effect */
+  //   box-shadow: 0 -${fadeH} 3rem white;
 
-  &::after {
-    /* OPTMIZE - Show this only if there's footer? */
-    content: '';
-    display: block;
-    height: calc(${fadeH} + ${gutter});
-    flex-shrink: 0;
-  }
-`;
+  //   &::before {
+  //     content: '';
+  //     display: block;
+  //     height: 1px;
+  //     width: calc(100% + (${gutter} * 2));
+  //     margin-left: -${gutter};
+  //     margin-top: -${fadeH};
+  //   }
 
-export const ctas = ({ hasChildren }) => css`
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  grid-area: ctas;
-  align-self: end;
-  padding: 0 ${gutter} 5.6rem;
-
-  ${Theme.bp.xs} {
-    padding: 0 ${gutter} 3.2rem;
-  }
-
-  &:empty {
-    padding: 0;
-  }
-
-  /* fadeout effect */
-  box-shadow: 0 -${fadeH} 3rem white;
-
-  &::before {
-    content: '';
-    display: block;
-    height: 1px;
-    width: calc(100% + (${gutter} * 2));
-    margin-left: -${gutter};
-    margin-top: -${fadeH};
-  }
-
-  & > button:not(:last-child),
-  & > a:not(:last-child) {
-    margin-bottom: 1.6rem;
-  }
-`;
+  //   & > button:not(:last-child),
+  //   & > a:not(:last-child) {
+  //     margin-bottom: 1.6rem;
+  //   }
+  // `;
+});

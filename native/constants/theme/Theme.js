@@ -12,7 +12,7 @@ export const colors = {
   bg: '#ffffff',
 };
 
-export const Typography = StyleSheet.create({
+export const typography = StyleSheet.create({
   h1: {
     fontSize: 40,
     fontWeight: 'bold',
@@ -39,6 +39,13 @@ export const Typography = StyleSheet.create({
   italic: {
     color: colors.grayMedium,
     fontStyle: 'italic',
+  },
+});
+
+// Utils
+export const u = StyleSheet.create({
+  center: {
+    textAlign: 'center',
   },
 });
 

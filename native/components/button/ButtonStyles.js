@@ -53,8 +53,11 @@ const styles = StyleSheet.create({
     padding: 0,
   },
   flat: {
+    borderRadius: 0,
+    height: 'auto',
     alignSelf: 'flex-start',
-    padding: 0,
+    paddingVertical: 0,
+    paddingHorizontal: 0,
   },
 
   // ${variant === 'success' ? '' : 'box-shadow: 0px 4px 16px rgba(204, 127, 81, 0.3);'}

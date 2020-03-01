@@ -1,14 +1,12 @@
 import React from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 
-// import * as Styles from './PageStyles.js';
+import Styles from './PageStyles.js';
 // import SettingsToggle from 'components/Settings';
-
-const Styles = {};
 
 const Page = ({ children, ...otherProps }) => {
   return (
-    <View css={Styles.page} {...otherProps}>
+    <View style={Styles.page} {...otherProps}>
       {children}
     </View>
   );
@@ -16,25 +14,44 @@ const Page = ({ children, ...otherProps }) => {
 
 const Header = ({ children, ...otherProps }) => {
   return (
-    // css={Styles.header({ hasChildren: !!children })}
-    <View {...otherProps}>
+    <View
+      style={[
+        Styles.header,
+        {
+          justifyContent: !!children ? 'space-between' : 'flex-end',
+        },
+      ]}
+      {...otherProps}
+    >
       {children}
-      <Text>[TG]</Text>
+      <Text>[⚙️]</Text>
       {/* <SettingsToggle /> */}
     </View>
   );
 };
 
-const Main = ({ children, ...otherProps }) => {
+const Main = ({ children, styles, ...otherProps }) => {
   return (
-    // css={Styles.main}
-    <View {...otherProps}>{children}</View>
+    <View style={[styles, Styles.main]} {...otherProps}>
+      {children}
+    </View>
   );
 };
 
 const CTAs = ({ children, ...otherProps }) => {
-  // css={Styles.ctas}
-  return <View {...otherProps}>{children}</View>;
+  return (
+    <View
+      style={[
+        Styles.ctas,
+        {
+          paddingBottom: !!children ? 56 : 0,
+        },
+      ]}
+      {...otherProps}
+    >
+      {children}
+    </View>
+  );
 };
 
 export default Page;
