@@ -2,13 +2,13 @@ import React, { Fragment, useContext, useState } from 'react';
 import {
   Image,
   KeyboardAvoidingView,
-  ScrollView,
   StyleSheet,
   TextInput,
   TouchableHighlight,
   Text,
   View,
 } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 
 import { Svg, Path } from 'react-native-svg';
 
@@ -238,14 +238,7 @@ export default class HomeSignup extends React.Component {
   }
 
   setProfile() {
-    const state = this.state;
-    console.log('TODO!', state);
-    alert(
-      `TODO!! UpdateProfile name: ${state.name} and avatar: ${state.avatar ? 'true' : 'empty'}`
-    );
-    // Papers.updateProfile({
-    //   name: state.name,
-    //   avatar: state.avatar,
-    // });
+    const { name, avatar } = this.state;
+    this.props.onSubmit({ name, avatar });
   }
 }

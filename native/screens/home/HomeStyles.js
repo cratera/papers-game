@@ -75,31 +75,26 @@ export default StyleSheet.create({
 
   // -----
 
-  // memeContainer: {
-  //   position: 'relative';
-  //   marginBottom: 48,
+  memeContainer: {
+    position: 'relative',
+    marginBottom: 48,
 
-  //   // ${Theme.bp.xs} {
-  //   //   margin-bottom: 1.4rem;
-  //   // }
-  // }
-
-  // memeFace: css`
-  //   ${avatarImg}
-  //   background: ${Theme.colors.grayDark};
-  //   margin: -0.6rem 0;
-  //   width: 7rem;
-  //   height: 7rem;
-  //   position: absolute;
-  //   top: 0;
-  //   left: 50%;
-  //   transform: translateX(-50%);
-  //   z-index: 1;
-  // `;
-
-  // memeBody: css`
-  //   width: 20rem;
-  //   height: 20rem;
-  //   opacity: 0.8;
-  // `;
+    // ${Theme.bp.xs} {
+    //   margin-bottom: 1.4rem;
+    // }
+  },
+  memeHead: {
+    zIndex: 1,
+  },
+  memeFace: {
+    backgroundColor: Theme.colors.grayDark,
+    width: 70,
+    height: 70,
+    marginBottom: -60,
+  },
+  memeBody: {
+    width: 200,
+    height: 200,
+    opacity: 0.8,
+  },
 });

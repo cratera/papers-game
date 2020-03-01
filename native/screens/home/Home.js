@@ -10,12 +10,17 @@ import HomeSignup from './HomeSignup.js';
 
 export default function HomeScreen({ navigation }) {
   const Papers = React.useContext(PapersContext);
+  const { profile } = Papers.state;
   const storedGameId = Papers.state.game && Papers.state.game.name;
 
   if (storedGameId) {
+    console.warn('TODO: Redirect to game room');
     // return <Redirect push to={`/game/${storedGameId}`} />;
   }
 
-  // Continue here!
-  return Papers.state.profile.name ? <HomeSigned /> : <HomeSignup />;
+  return Papers.state.profile.name ? <HomeSigned /> : <HomeSignup onSubmit={handleUpdateProfile} />;
+
+  function handleUpdateProfile({ name, avatar }) {
+    Papers.updateProfile({ name, avatar });
+  }
 }

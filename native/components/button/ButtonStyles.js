@@ -35,11 +35,16 @@ const styles = StyleSheet.create({
     height: 44,
     borderRadius: 22,
     overflow: 'hidden', // so borderRadius works.
-    fontSize: 14,
-    lineHeight: 14,
+    fontSize: 16,
+    lineHeight: 16,
     flexShrink: 0,
     textAlign: 'center',
-    // boxShadow: variants[variant].boxShadow,
+
+    // BUG IOS: Shadow doesn't work on safari 🤦‍♀️
+    // shadowColor: Theme.colors.primary,
+    // shadowRadius: 2,
+    // shadowOffset: { width: 4, height: 2 },
+    // shadowOpacity: 0.7,
   },
 
   // ------- variants
@@ -58,6 +63,12 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
     paddingHorizontal: 0,
   },
+  light: {
+    // REVIEW DESIGN with @mmbotelho
+    borderWidth: 2,
+    lineHeight: 14, // make up the border
+    borderColor: Theme.colors.primary,
+  },
 
   // ${variant === 'success' ? '' : 'box-shadow: 0px 4px 16px rgba(204, 127, 81, 0.3);'}
 
@@ -72,11 +83,11 @@ const styles = StyleSheet.create({
 export const button = ({ variant, size }) => {
   return [
     styles.base,
-    styles[variant],
-    styles[size],
     {
       backgroundColor: variants[variant].bg,
       color: variants[variant].text,
     },
+    styles[variant],
+    styles[size],
   ];
 };

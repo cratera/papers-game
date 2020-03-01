@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 // import io from 'socket.io-client';
 
-// import { createUniqueId } from 'utils/index.js';
+import { createUniqueId } from '@constants/utils.js';
 // import { withRouter, matchPath } from 'react-router';
 // import wordsForEveryone from './wordsForEveryone.js';
 
@@ -20,8 +20,8 @@ class PapersContextComp extends Component {
     this.state = {
       socket: null,
       profile: {
-        id: undefined, // window.localStorage.getItem('profile_id') || null,
-        name: undefined, // window.localStorage.getItem('profile_name') || null,
+        id: 'test___11', // window.localStorage.getItem('profile_id') || null,
+        name: 'sandy', // window.localStorage.getItem('profile_name') || null,
         avatar: undefined, // window.localStorage.getItem('profile_avatar') || null,
         // the last game this player tryed to access
         gameId: undefined, // window.localStorage.getItem('profile_gameId') || null,
@@ -344,13 +344,15 @@ class PapersContextComp extends Component {
   updateProfile(profile) {
     const id = profile.id || createUniqueId(`player_${profile.name}`);
 
-    window.localStorage.setItem('profile_id', id);
-    window.localStorage.setItem('profile_name', profile.name);
+    // TOODO - Save this on storage
 
-    if (profile.avatar) {
-      // its optional
-      window.localStorage.setItem('profile_avatar', profile.avatar);
-    }
+    // window.localStorage.setItem('profile_id', id);
+    // window.localStorage.setItem('profile_name', profile.name);
+
+    // if (profile.avatar) {
+    //   // its optional
+    //   window.localStorage.setItem('profile_avatar', profile.avatar);
+    // }
 
     this.setState(state => ({
       profile: {

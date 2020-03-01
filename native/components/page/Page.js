@@ -30,9 +30,9 @@ const Header = ({ children, ...otherProps }) => {
   );
 };
 
-const Main = ({ children, styles, ...otherProps }) => {
+const Main = ({ children, style, ...otherProps }) => {
   return (
-    <View style={[styles, Styles.main]} {...otherProps}>
+    <View style={[Styles.main, style]} {...otherProps}>
       {children}
     </View>
   );
