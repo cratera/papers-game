@@ -86,9 +86,14 @@ export default class HomeSignup extends React.Component {
         </Text>
         <Text style={[Theme.typography.h1, Theme.u.center]}>Welcome!</Text>
         <TheText style={[Theme.typography.secondary, Styles.paragraph]}>
-          Papers is the perfect game for your <TheText numberOfLines={1}>dinner party.</TheText>
+          Papers is the perfect game for your{' '}
+          <TheText style={Theme.typography.secondary} numberOfLines={1}>
+            dinner party.
+          </TheText>
           {'\n'}
-          <TheText>Made with love by Maggie and Sandy 😎</TheText>
+          <TheText style={Theme.typography.secondary}>
+            Made with love by Maggie and Sandy 😎
+          </TheText>
         </TheText>
       </View>
     );
@@ -177,7 +182,7 @@ export default class HomeSignup extends React.Component {
         </View>
 
         {this.state.avatar ? (
-          <Button style={Styles.ctaBottom} onPress={this.goNextStep}>
+          <Button style={Styles.ctaBottom} onPress={this.setProfile}>
             Finish
           </Button>
         ) : (

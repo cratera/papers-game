@@ -25,12 +25,12 @@ const AvatarMeme = ({ avatar, onChange }) => (
     >
       {avatar ? (
         <Image
-          style={[Styles.avatarPlace, Styles.avatarImg, Styles.memeFace]}
+          style={[Styles.avatarPlace, Styles.memeFace, Styles.avatarImg]}
           source={{ uri: avatar }}
           accessibilityLabel="Your uploaded avatar"
         />
       ) : (
-        <View style={[Styles.avatarPlace, Styles.avatarImg, Styles.memeFace]} />
+        <View style={[Styles.avatarPlace, Styles.memeFace]} />
       )}
     </TouchableHighlight>
     <Image style={Styles.memeBody} source={danceGif} accessible={false} />

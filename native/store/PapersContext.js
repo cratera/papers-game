@@ -20,8 +20,8 @@ class PapersContextComp extends Component {
     this.state = {
       socket: null,
       profile: {
-        id: 'test___11', // window.localStorage.getItem('profile_id') || null,
-        name: 'sandy', // window.localStorage.getItem('profile_name') || null,
+        id: undefined, // window.localStorage.getItem('profile_id') || null,
+        name: undefined, // window.localStorage.getItem('profile_name') || null,
         avatar: undefined, // window.localStorage.getItem('profile_avatar') || null,
         // the last game this player tryed to access
         gameId: undefined, // window.localStorage.getItem('profile_gameId') || null,

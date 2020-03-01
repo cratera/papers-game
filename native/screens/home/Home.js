@@ -18,9 +18,9 @@ export default function HomeScreen({ navigation }) {
     // return <Redirect push to={`/game/${storedGameId}`} />;
   }
 
-  return Papers.state.profile.name ? <HomeSigned /> : <HomeSignup onSubmit={handleUpdateProfile} />;
-
   function handleUpdateProfile({ name, avatar }) {
     Papers.updateProfile({ name, avatar });
   }
+
+  return Papers.state.profile.name ? <HomeSigned /> : <HomeSignup onSubmit={handleUpdateProfile} />;
 }
