@@ -61,7 +61,8 @@ const styles = StyleSheet.create({
   },
   flat: {
     borderRadius: 0,
-    height: 'auto',
+    height: 10,
+    alignSelf: 'center',
     paddingVertical: 0,
     paddingHorizontal: 0,
   },
