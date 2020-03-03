@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 
 import Styles from './PageStyles.js';
-// import SettingsToggle from 'components/Settings';
+import SettingsToggle from '@components/settings';
 
 const Page = ({ children, ...otherProps }) => {
   return (
@@ -19,13 +19,13 @@ const Header = ({ children, ...otherProps }) => {
         Styles.header,
         {
           justifyContent: !!children ? 'space-between' : 'flex-end',
+          paddingRight: 8,
         },
       ]}
       {...otherProps}
     >
       {children}
-      <Text>[⚙️]</Text>
-      {/* <SettingsToggle /> */}
+      <SettingsToggle />
     </View>
   );
 };

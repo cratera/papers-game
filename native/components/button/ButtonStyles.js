@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
   base: {
     paddingVertical: 16,
     paddingHorizontal: 24,
-    height: 44,
+    minHeight: 44,
     borderRadius: 22,
     overflow: 'hidden', // so borderRadius works.
     fontSize: 16,
@@ -52,10 +52,12 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     fontSize: 16,
+    lineHeight: 44,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 0,
+    paddingVertical: 0,
+    paddingHorizontal: 0,
   },
   flat: {
     borderRadius: 0,
@@ -74,9 +76,12 @@ const styles = StyleSheet.create({
 
   // --------- sizes
   sm: {
+    minHeight: 34,
+    borderRadius: 17,
     paddingVertical: 5,
     paddingHorizontal: 15,
     fontSize: 14,
+    lineHeight: 20,
   },
 });
 
