@@ -30,8 +30,8 @@ export default function usePickAvatar() {
     if (result.uri || result.base64) {
       return result.uri || `data:image/png;base64,${result.base64}`;
     }
-
-    return false;
+    console.log('usePickAvatar canceleed', result);
+    return null;
   }
 
   return pickAvatar;

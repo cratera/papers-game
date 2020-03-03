@@ -1,24 +1,52 @@
 import React from 'react';
 
 import * as Theme from '@theme';
-import { StyleSheet, Modal, View } from 'react-native';
+import { Platform, StyleSheet, Modal, View } from 'react-native';
 
 import Button from '@components/button';
 
-export default function TheModal({ children, onClose, ...otherProps }) {
+const ModalWeb = ({ children, visible, ...otherProps }) => {
+  if (!visible) {
+    return null;
+  }
   return (
-    <Modal animationType="slide" transparent={false} presentationStyle="fullScreen" {...otherProps}>
+    <View {...otherProps} style={Styles.modalWeb}>
+      {children}
+    </View>
+  );
+};
+
+export default function TheModal({ children, visible, onClose, ...otherProps }) {
+  const Component = Platform.OS === 'web' ? ModalWeb : Modal;
+
+  return (
+    <Component
+      animationType="slide"
+      transparent={false}
+      presentationStyle="fullScreen"
+      visible={visible}
+      {...otherProps}
+    >
       <View style={Styles.close}>
         <Button variant="icon" onPress={onClose}>
           [X]
         </Button>
       </View>
       <View style={Styles.content}>{children}</View>
-    </Modal>
+    </Component>
   );
 }
 
 const Styles = StyleSheet.create({
+  modalWeb: {
+    position: 'fixed',
+    top: '0',
+    left: '0',
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#ffffff',
+    zIndex: 4,
+  },
   content: {
     flex: 1,
     paddingTop: 32,
@@ -28,6 +56,6 @@ const Styles = StyleSheet.create({
     position: 'absolute',
     top: 32,
     right: 8,
-    zIndex: 21,
+    zIndex: 2,
   },
 });
