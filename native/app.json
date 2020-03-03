@@ -1,10 +1,14 @@
 {
   "expo": {
-    "name": "Papers Game",
-    "slug": "native",
+    "name": "Papers Game - beta",
+    "slug": "papers-game",
     "privacy": "public",
     "sdkVersion": "36.0.0",
-    "platforms": ["ios", "android", "web"],
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -17,9 +21,13 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true
-    }
+    },
+    "description": "Papers is the perfect game for your dinner party. Made with love by Maggie and Sandy 😎\n\nWIP: About 20% done. Come back in April ;)",
+    "githubUrl": "https://github.com/sandrina-p/papers-game"
   }
 }
