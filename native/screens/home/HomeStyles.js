@@ -85,16 +85,17 @@ export default StyleSheet.create({
   },
   memeHead: {
     zIndex: 1,
+    height: 70,
   },
   memeFace: {
     backgroundColor: Theme.colors.grayDark,
     width: 70,
     height: 70,
-    marginBottom: -60,
   },
   memeBody: {
     width: 200,
     height: 200,
     opacity: 0.8,
+    marginTop: -35,
   },
 });

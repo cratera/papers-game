@@ -20,11 +20,7 @@ import AccessGameModal from './AccessGameModal.js';
 
 const AvatarMeme = ({ avatar, onChange }) => (
   <View style={Styles.memeContainer}>
-    <TouchableHighlight
-      underlayColor={Theme.colors.greyDark}
-      style={Styles.memeHead}
-      onPress={onChange}
-    >
+    <TouchableHighlight underlayColor={Theme.colors.bg} style={Styles.memeHead} onPress={onChange}>
       {avatar ? (
         <Image
           style={[Styles.avatarPlace, Styles.memeFace, Styles.avatarImg]}

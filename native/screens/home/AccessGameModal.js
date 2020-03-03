@@ -64,7 +64,7 @@ export default function AccessGameModal({ isOpen, variant, onClose }) {
               inputAccessoryViewID="name"
               autoFocus
               autoCompleteType="off"
-              autoCorrect="false"
+              autoCorrect={false}
               nativeID="inputNameLabel"
               value={state.gameName}
               onChangeText={handleInputChange}

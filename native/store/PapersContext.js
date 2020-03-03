@@ -129,9 +129,8 @@ export class PapersContextProvider extends Component {
   }
 
   accessGame(variant, gameName, cb) {
-    console.warn('TODO accessGame', variant, gameName);
-
     setTimeout(() => {
+      console.warn('TODO accessGame', variant, gameName);
       return cb(null, new Error('accessGame not implemented'));
     }, 2000);
   }
