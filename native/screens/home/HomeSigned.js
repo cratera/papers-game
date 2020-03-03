@@ -16,6 +16,7 @@ import Button from '@components/button';
 import TheText from '@components/typography/TheText.js';
 import danceGif from '@assets/images/dance.gif';
 
+import usePickAvatar from './utils/usePickAvatar.js';
 import AccessGameModal from './AccessGameModal.js';
 
 const AvatarMeme = ({ avatar, onChange }) => (
@@ -39,13 +40,14 @@ export default function HomeSigned({ navigation }) {
   const Papers = useContext(PapersContext);
   const profile = Papers.state.profile;
   const [modalState, setModalState] = useState({ isOpen: false, variant: null });
+  const pickAvatar = usePickAvatar();
 
   return (
     <Fragment>
       <Page>
         <Page.Header></Page.Header>
         <Page.Main style={Styles.main}>
-          <AvatarMeme avatar={profile.avatar} onChange={handleUpdateAvatar} />
+          <AvatarMeme avatar={profile.avatar} onChange={handleChangeAvatar} />
           <TheText style={Theme.u.center}>
             Welcome
             {'\n'}
@@ -82,32 +84,11 @@ export default function HomeSigned({ navigation }) {
     setModalState({ isOpen: false, variant: null });
   }
 
-  async function handleUpdateAvatar() {
-    // OPTIMIZE - Same as HomeSignup. Isolate in a customHook?
-    // Get permission first on iOS.
-    if (Constants.platform.ios) {
-      const response = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-      if (!response.granted) {
-        alert('Sorry, we need camera roll permissions to make this work!');
-        return;
-      }
-    }
+  async function handleChangeAvatar() {
+    const url = await pickAvatar();
 
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.5,
-      base64: true,
-      exif: false,
-    });
-
-    console.log('image result::', result);
-
-    if (result.uri) {
-      Papers.updateProfile({
-        avatar: result.uri,
-      });
+    if (url) {
+      Papers.updateProfile({ avatar: url });
     }
   }
 }

@@ -347,13 +347,12 @@ export class PapersContextProvider extends Component {
     const id = profile.id || createUniqueId(`player_${profile.name}`);
     console.log('profile', profile);
     try {
+      if (id && typeof typeof profile.name === 'string')
       await AsyncStorage.setItem('profile_id', id);
+      if (profile.name && typeof profile.name === 'string')
       await AsyncStorage.setItem('profile_name', profile.name);
-      if (profile.avatar) {
+      if (profile.avatar && typeof profile.avatar === 'string')
         await AsyncStorage.setItem('profile_avatar', profile.avatar);
-      } else {
-        await AsyncStorage.removeItem('profile_avatar');
-      }
     } catch (e) {
       // TODO - report this to an external Error log service
       console.error('PapersContext.js updateProfile error!', e);

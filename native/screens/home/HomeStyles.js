@@ -1,5 +1,7 @@
-import { StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 import * as Theme from '@theme';
+
+const vh = Dimensions.get('window').height / 100;
 
 export default StyleSheet.create({
   main: {
@@ -10,7 +12,9 @@ export default StyleSheet.create({
     alignItems: 'center',
   },
   logo: {
-    fontSize: 80,
+    // TODO / REVIEW This is how we do @media. Abstract this.
+    marginTop: vh > 6 ? vh * 20 : vh * 5,
+    fontSize: 100,
   },
   paragraph: {
     marginVertical: 16,
@@ -44,7 +48,6 @@ export default StyleSheet.create({
     height: 256,
     borderRadius: 140,
     backgroundColor: Theme.colors.primaryLight,
-    marginVertical: 24,
     alignSelf: 'center',
   },
   avatarPlaceContent: {
@@ -96,6 +99,6 @@ export default StyleSheet.create({
     width: 200,
     height: 200,
     opacity: 0.8,
-    marginTop: -35,
+    marginTop: -60,
   },
 });
