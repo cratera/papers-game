@@ -51,9 +51,7 @@ export default function SettingsModal({ isOpen, onClose }) {
   };
 
   const handleResetProfile = () => {
-    console.warn('TODO reset profile');
-    // localStorage.clear();
-    // window.location.reload();
+    Papers.resetProfile();
   };
 
   return (

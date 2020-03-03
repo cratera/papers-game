@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
 import * as Theme from '@theme';
 
-const statusBarH = 16;
+const statusBarH = 24;
 const gutter = 16;
 const fadeH = 40;
 const headerH = statusBarH + 64;

@@ -9,13 +9,14 @@ import { createStackNavigator } from '@react-navigation/stack';
 import BottomTabNavigator from './navigation/BottomTabNavigator';
 import useLinking from './navigation/useLinking';
 
-import { PapersContextProvider } from './store/PapersContext.js';
+import { PapersContextProvider, loadProfile } from './store/PapersContext.js';
 import Home from './screens/home';
 import Room from './screens/room';
 
 const Stack = createStackNavigator();
 
 export default function App(props) {
+  const [initialProfile, setInitialProfile] = React.useState({});
   const [isLoadingComplete, setLoadingComplete] = React.useState(false);
   const [initialNavigationState, setInitialNavigationState] = React.useState();
   const containerRef = React.useRef();
@@ -30,14 +31,15 @@ export default function App(props) {
         // Load our initial navigation state
         setInitialNavigationState(await getInitialState());
 
-        // Load fonts
-        await Font.loadAsync({
-          ...Ionicons.font,
-          'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf'),
-        });
+        setInitialProfile(await loadProfile());
+        // // Load fonts REVIEW @mmbotelho
+        // await Font.loadAsync({
+        //   ...Ionicons.font,
+        //   'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf'),
+        // });
       } catch (e) {
-        // We might want to provide this error information to an error reporting service
-        console.warn(e);
+        // TODO - report this to an external Error log service
+        console.error('App.js loadResourcesAndDataAsync error!', e);
       } finally {
         setLoadingComplete(true);
         SplashScreen.hide();
@@ -51,7 +53,7 @@ export default function App(props) {
     return null;
   } else {
     return (
-      <PapersContextProvider>
+      <PapersContextProvider initialProfile={initialProfile}>
         <View style={styles.container}>
           {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
           <NavigationContainer ref={containerRef} initialState={initialNavigationState}>

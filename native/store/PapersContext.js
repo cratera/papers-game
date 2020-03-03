@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { AsyncStorage } from 'react-native';
 // import io from 'socket.io-client';
 
 import { createUniqueId } from '@constants/utils.js';
@@ -7,24 +8,26 @@ import { createUniqueId } from '@constants/utils.js';
 
 const PapersContext = React.createContext({});
 
-class PapersContextComp extends Component {
+export const loadProfile = async () => {
+  const id = await AsyncStorage.getItem('profile_id');
+  const name = await AsyncStorage.getItem('profile_name');
+  const avatar = await AsyncStorage.getItem('profile_avatar');
+  const gameId = await AsyncStorage.getItem('profile_gameId');
+
+  return { id, name, avatar, gameId };
+};
+
+export class PapersContextProvider extends Component {
   constructor(props) {
     super(props);
-    const isDev = process.env.NODE_ENV !== 'production';
-    // TIL: 🤯🐛🤬 (AFTER 1 DAY trying to make this work..)
-    // - on dev: https://github.com/socketio/socket.io/issues/1942#issuecomment-71443823
-    // - on Heroku:  https://github.com/socketio/socket.io-website/issues/139
-    // - Heroku still not working: https://stackoverflow.com/questions/59455178/heroku-websockets-issue-getting-connected-clients-always-empty
-    this.URL = ''; // isDev ? `${window.location.hostname}:5000` : window.location.host;
-
     this.state = {
       socket: null,
       profile: {
-        id: undefined, // window.localStorage.getItem('profile_id') || null,
-        name: undefined, // window.localStorage.getItem('profile_name') || null,
-        avatar: undefined, // window.localStorage.getItem('profile_avatar') || null,
-        // the last game this player tryed to access
-        gameId: undefined, // window.localStorage.getItem('profile_gameId') || null,
+        id: props.initialProfile.id,
+        name: props.initialProfile.name,
+        avatar: props.initialProfile.avatar,
+        // the last game this player tried to access
+        gameId: props.initialProfile.gameId,
       },
       game: undefined,
       /* {
@@ -43,6 +46,7 @@ class PapersContextComp extends Component {
       recoverPlayer: this.recoverPlayer.bind(this),
 
       updateProfile: this.updateProfile.bind(this),
+      resetProfile: this.resetProfile.bind(this),
 
       accessGame: this.accessGame.bind(this),
       recoverGame: this.recoverGame.bind(this),
@@ -65,7 +69,7 @@ class PapersContextComp extends Component {
   // because it might want to retrieve different stuff...
   // ex: on room/:id, i don't care about profile.gameId,
   // instead I want the room/:id
-  componentDidMount() {
+  ___componentDidMount() {
     const { id, gameId } = this.state.profile;
     // const { location } = this.props;
     const GameRoom =
@@ -341,18 +345,21 @@ class PapersContextComp extends Component {
     socket.emit('recover-player');
   }
 
-  updateProfile(profile) {
+  async updateProfile(profile) {
     const id = profile.id || createUniqueId(`player_${profile.name}`);
-
-    // TOODO - Save this on storage
-
-    // window.localStorage.setItem('profile_id', id);
-    // window.localStorage.setItem('profile_name', profile.name);
-
-    // if (profile.avatar) {
-    //   // its optional
-    //   window.localStorage.setItem('profile_avatar', profile.avatar);
-    // }
+    console.log('profile', profile);
+    try {
+      await AsyncStorage.setItem('profile_id', id);
+      await AsyncStorage.setItem('profile_name', profile.name);
+      if (profile.avatar) {
+        await AsyncStorage.setItem('profile_avatar', profile.avatar);
+      } else {
+        await AsyncStorage.removeItem('profile_avatar');
+      }
+    } catch (e) {
+      // TODO - report this to an external Error log service
+      console.error('PapersContext.js updateProfile error!', e);
+    }
 
     this.setState(state => ({
       profile: {
@@ -360,6 +367,19 @@ class PapersContextComp extends Component {
         ...profile,
         id,
       },
+    }));
+  }
+
+  async resetProfile(profile) {
+    try {
+      await AsyncStorage.clear();
+    } catch (e) {
+      // TODO - report this to an external Error log service
+      console.error('PapersContext.js resetProfile error!', e);
+    }
+
+    this.setState(state => ({
+      profile: {},
     }));
   }
 
@@ -522,8 +542,6 @@ class PapersContextComp extends Component {
     );
   }
 }
-
-export const PapersContextProvider = PapersContextComp;
 
 export default PapersContext;
 
