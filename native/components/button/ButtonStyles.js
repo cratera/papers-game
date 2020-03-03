@@ -84,9 +84,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
   },
+
+  // --------- place
+  edgeKeyboard: {
+    marginBottom: 16,
+  },
 });
 
-export const button = ({ variant, size }) => {
+export const button = ({ variant, size, place }) => {
   return [
     styles.base,
     {
@@ -95,5 +100,10 @@ export const button = ({ variant, size }) => {
     },
     styles[variant],
     styles[size],
+    styles[place],
   ];
+};
+
+export const loading = {
+  // TODO
 };

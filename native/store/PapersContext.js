@@ -129,20 +129,19 @@ export class PapersContextProvider extends Component {
   }
 
   accessGame(variant, gameName, cb) {
+    console.warn('TODO accessGame', variant, gameName);
+
+    setTimeout(() => {
+      return cb(null, new Error('accessGame not implemented'));
+    }, 2000);
+  }
+
+  __accessGame(variant, gameName, cb) {
     let socket = this.state.socket;
 
     if (!socket) {
       socket = this.PapersAPI.open(gameName);
     }
-
-    // This can happen when the user left the chat.
-    // Maybe
-    // if(!socket.opened) {
-    //   socket.open();
-    //   socket.on('reopen', () => {
-    //     accessGame(variant, gameName, cb)
-    //   });
-    // }
 
     console.log('accessGame', variant, gameName);
 

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { Fragment, useState, useContext } from 'react';
 import { Image, View, StyleSheet, Text, TouchableHighlight } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 
@@ -14,7 +14,9 @@ import * as Permissions from 'expo-permissions';
 import Page from '@components/page';
 import Button from '@components/button';
 import TheText from '@components/typography/TheText.js';
-import danceGif from '../../assets/images/dance.gif';
+import danceGif from '@assets/images/dance.gif';
+
+import AccessGameModal from './AccessGameModal.js';
 
 const AvatarMeme = ({ avatar, onChange }) => (
   <View style={Styles.memeContainer}>
@@ -39,40 +41,49 @@ const AvatarMeme = ({ avatar, onChange }) => (
 
 export default function HomeSigned({ navigation }) {
   const Papers = useContext(PapersContext);
-  const { setModal } = { setModal: () => true }; // useContext(CoreContext);
   const profile = Papers.state.profile;
+  const [modalState, setModalState] = useState({ isOpen: false, variant: null });
 
   return (
-    <Page>
-      <Page.Header></Page.Header>
-      <Page.Main style={Styles.main}>
-        <AvatarMeme avatar={profile.avatar} onChange={handleUpdateAvatar} />
-        <TheText style={Theme.u.center}>
-          Welcome
-          {'\n'}
-          <Text style={Theme.typography.h1}>{profile.name}</Text>
-        </TheText>
-      </Page.Main>
-      <Page.CTAs>
-        <Button onPress={() => openAccessGameModal('join')}>Join Game</Button>
-        <Button
-          variant="light"
-          style={{ marginTop: 16 }}
-          onPress={() => openAccessGameModal('create')}
-        >
-          Create Game
-        </Button>
-      </Page.CTAs>
-    </Page>
+    <Fragment>
+      <Page>
+        <Page.Header></Page.Header>
+        <Page.Main style={Styles.main}>
+          <AvatarMeme avatar={profile.avatar} onChange={handleUpdateAvatar} />
+          <TheText style={Theme.u.center}>
+            Welcome
+            {'\n'}
+            <Text style={Theme.typography.h1}>{profile.name}</Text>
+          </TheText>
+        </Page.Main>
+        <Page.CTAs>
+          <Button onPress={() => openAccessGameModal('join')}>Join Game</Button>
+          <Button
+            variant="light"
+            style={{ marginTop: 16 }}
+            onPress={() => openAccessGameModal('create')}
+          >
+            Create Game
+          </Button>
+        </Page.CTAs>
+      </Page>
+      <AccessGameModal
+        isOpen={modalState.isOpen}
+        variant={modalState.variant}
+        onClose={closeAccessModalClose}
+      />
+    </Fragment>
   );
 
   function openAccessGameModal(variant) {
-    setModal({
-      component: AccessGameModal,
-      props: {
-        variant,
-      },
+    setModalState({
+      isOpen: true,
+      variant,
     });
+  }
+
+  function closeAccessModalClose() {
+    setModalState({ isOpen: false, variant: null });
   }
 
   async function handleUpdateAvatar() {
@@ -99,7 +110,6 @@ export default function HomeSigned({ navigation }) {
 
     if (result.uri) {
       Papers.updateProfile({
-        name: profile.name,
         avatar: result.uri,
       });
     }

@@ -1,0 +1,129 @@
+import React, { Fragment, useState, useContext, useEffect } from 'react';
+import { KeyboardAvoidingView, ScrollView, View, Text, TextInput } from 'react-native';
+
+import * as Theme from '@theme';
+import PapersContext from '@store/PapersContext.js';
+import Button from '@components/button';
+import TheText from '@components/typography/TheText';
+import Modal from '@components/modal';
+
+import Styles from './AccessGameModalStyles.js';
+
+export default function AccessGameModal({ isOpen, variant, onClose }) {
+  const Papers = useContext(PapersContext);
+  const [isAccessing, setAccessing] = useState(false);
+  const [state, setState] = useState({
+    gameName: null,
+    // gameToRedirect: null,
+    errorMsg: null,
+  });
+  const copy = {
+    join: {
+      title: "What's the party name?",
+      description: 'Ask your friend for it!',
+      cta: "Let's go!",
+    },
+    create: {
+      title: 'Give this party a name!',
+      description: 'Pick a short and sweet name.',
+      cta: 'Next: Add Players',
+    },
+  }[variant];
+
+  useEffect(() => {
+    if (isOpen === false) {
+      setState({}); // Reset state.
+    }
+  }, [isOpen]);
+
+  // if (state.gameToRedirect) {
+  //   alert(`TODO: redirect to game ${state.gameToRedirect}!`);
+  //   // return <Redirect to={`/game/${state.gameToRedirect}`} />;
+  // }
+
+  return (
+    <Modal visible={isOpen} onClose={onClose}>
+      {!variant ? (
+        // I hope this never happens
+        <Button onPress={onClose}>Hum... Weird. Close modal</Button>
+      ) : (
+        <KeyboardAvoidingView
+          behavior={'padding'}
+          keyboardShouldPersistTaps="always"
+          style={{ flex: 1, alignSelf: 'stretch' }}
+        >
+          <ScrollView>
+            <Text style={[Styles.title, Theme.typography.h3]}>{copy.title}</Text>
+            <TheText nativeID="inputNameLabel" style={[Styles.tip, Theme.typography.secondary]}>
+              {copy.description}
+            </TheText>
+
+            {/* TODO - detect emojis and ignore them */}
+            <TextInput
+              style={[Theme.typography.h1, Styles.input]}
+              inputAccessoryViewID="name"
+              autoFocus
+              autoCompleteType="off"
+              autoCorrect="false"
+              nativeID="inputNameLabel"
+              value={state.gameName}
+              onChangeText={handleInputChange}
+            />
+            {state.errorMsg && (
+              <Text style={[Theme.typography.small, Styles.errorMsg]}>{state.errorMsg}</Text>
+            )}
+          </ScrollView>
+          {state.gameName && state.gameName.length >= 3 ? (
+            <Button onPress={handleBtnClick} place="edgeKeyboard" isLoading={isAccessing}>
+              {copy.cta}
+            </Button>
+          ) : (
+            undefined
+          )}
+        </KeyboardAvoidingView>
+      )}
+    </Modal>
+  );
+
+  function handleInputChange(gameName) {
+    setState(state => ({
+      ...state,
+      gameName,
+    }));
+  }
+
+  function handleBtnClick() {
+    if (isAccessing) {
+      return;
+    }
+
+    setAccessing(true);
+    setState(state => ({ ...state, errorMsg: null }));
+
+    Papers.accessGame(variant, state.gameName, (response, err) => {
+      if (err) {
+        // TODO - Move this out of here - redux(mapstatetoprops?)/context/wtv...
+        const errorMsgMap = {
+          exists: () => 'Choose other name.',
+          notFound: () => 'This game does not exist.',
+          alreadyStarted: () => 'The game already started.',
+          ups: () => `Ups! Error: ${err.message}`,
+        };
+
+        const errorMsg = (errorMsgMap[err] || errorMsgMap.ups)();
+
+        console.warn('accessGame() err:', state.gameName, errorMsg);
+        setAccessing(false);
+        return setState(state => ({ ...state, errorMsg }));
+      } else {
+        onClose();
+        // The App Routing will detect the new gameId and redirect the page.
+      }
+    });
+  }
+}
+
+AccessGameModal.defaultProps = {
+  /** required: String - 'join' | 'create' */
+  variant: undefined,
+};

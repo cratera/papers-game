@@ -1,12 +1,13 @@
 import React, { useState, useCallback, useContext } from 'react';
 
 import * as Theme from '@theme';
-import { StyleSheet, RefreshControl, Modal, ScrollView, View, Text } from 'react-native';
+import { StyleSheet, RefreshControl, ScrollView, View, Text } from 'react-native';
 
 import PapersContext from '@store/PapersContext.js';
 
 import Button from '@components/button';
 import TheText from '@components/typography/TheText.js';
+import Modal from '@components/modal';
 
 function Item({ title, btn, onPress, description }) {
   return (
@@ -55,21 +56,8 @@ export default function SettingsModal({ isOpen, onClose }) {
   };
 
   return (
-    <Modal
-      animationType="slide"
-      transparent={false}
-      presentationStyle="fullScreen"
-      visible={isOpen}
-    >
-      <View style={Styles.close}>
-        <Button variant="icon" onPress={onClose}>
-          [X]
-        </Button>
-      </View>
-      <ScrollView
-        style={Styles.content}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-      >
+    <Modal visible={isOpen} onClose={onClose}>
+      <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         <Text style={Theme.typography.h2} accessibilityRole="header">
           Game Settings
         </Text>
