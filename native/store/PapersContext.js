@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { AsyncStorage } from 'react-native';
-// import io from 'socket.io-client';
 
 import { createUniqueId } from '@constants/utils.js';
-// import { withRouter, matchPath } from 'react-router';
 // import wordsForEveryone from './wordsForEveryone.js';
+
+// OPTIMIZE - Pass this as prop, so it's agnostic to any type of server / API.
+import serverInit, { onMsg } from './Firebase.js';
 
 const PapersContext = React.createContext({});
 
@@ -21,7 +22,8 @@ export class PapersContextProvider extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      socket: null,
+      socket: null, // rename to serverAPI?
+      isConnected: false,
       profile: {
         id: props.initialProfile.id,
         name: props.initialProfile.name,
@@ -128,11 +130,69 @@ export class PapersContextProvider extends Component {
     return socket;
   }
 
+  init(gameName, doAfterInit) {
+    console.log('P_ init()', gameName);
+    let socket = this.state.socket;
+
+    if (socket) {
+      console.error('init: Already connected.');
+      return;
+    }
+
+    const { id, name, avatar } = this.state.profile;
+
+    if (!id || !name) {
+      console.log(`profile incomplete! id: ${id} || name: ${name}`);
+      return false;
+    }
+
+    socket = serverInit();
+
+    socket.on('signed', (topic, data) => {
+      console.log('Signed!', topic, data);
+      doAfterInit();
+    });
+
+    const gameId = `id_${gameName}`; // TODO slug this
+
+    socket.signIn({ id, name, avatar, gameId }, (res, error) => {
+      if (error) {
+        return cb(null, error);
+      }
+    });
+
+    this.setState({ socket });
+  }
+
   accessGame(variant, gameName, cb) {
-    setTimeout(() => {
-      console.warn('TODO accessGame', variant, gameName);
-      return cb(null, new Error('accessGame not implemented'));
-    }, 2000);
+    if (!this.state.socket) {
+      console.log('P_ accessGame() - init needed');
+
+      this.init(gameName, (res, error) => {
+        if (error) return cb(null, error);
+        this.accessGame(variant, gameName, cb);
+      });
+
+      return;
+    }
+
+    console.log('P_ accessGame() - accessing...');
+
+    if (!gameName) {
+      return cb(null, new Error('Missing gameName'));
+    }
+
+    if (!variant || ['join', 'create'].indexOf(variant) < 0) {
+      return cb(null, new Error(`variant incorrect - ${variant}`));
+    }
+
+    const { id, name, avatar } = this.state.profile;
+    const gameId = `id_${gameName}`; // TODO slug this
+
+    console.log('id');
+    this.state.socket.updateProfile({ id, name, avatar, gameId });
+
+    this.state.socket[`${variant}Game`](gameId, cb);
   }
 
   __accessGame(variant, gameName, cb) {
@@ -344,13 +404,12 @@ export class PapersContextProvider extends Component {
   }
 
   async updateProfile(profile) {
-    const id = profile.id || createUniqueId(`player_${profile.name}`);
-    console.log('profile', profile);
+    console.log('updateProfile');
+    const id = profile.id || this.state.profile.id || createUniqueId(`player_${profile.name}`);
     try {
-      if (id && typeof typeof profile.name === 'string')
-      await AsyncStorage.setItem('profile_id', id);
+      if (!this.state.profile.id) await AsyncStorage.setItem('profile_id', id);
       if (profile.name && typeof profile.name === 'string')
-      await AsyncStorage.setItem('profile_name', profile.name);
+        await AsyncStorage.setItem('profile_name', profile.name);
       if (profile.avatar && typeof profile.avatar === 'string')
         await AsyncStorage.setItem('profile_avatar', profile.avatar);
     } catch (e) {
@@ -370,8 +429,10 @@ export class PapersContextProvider extends Component {
   async resetProfile(profile) {
     try {
       await AsyncStorage.clear();
+      if (this.state.socket) {
+        this.state.socket.resetProfile(); // user or profile? hum...
+      }
     } catch (e) {
-      // TODO - report this to an external Error log service
       console.error('PapersContext.js resetProfile error!', e);
     }
 

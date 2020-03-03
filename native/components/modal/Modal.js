@@ -10,7 +10,18 @@ const ModalWeb = ({ children, visible, ...otherProps }) => {
     return null;
   }
   return (
-    <View {...otherProps} style={Styles.modalWeb}>
+    <View
+      {...otherProps}
+      style={{
+        position: 'fixed',
+        top: '0',
+        left: '0',
+        width: '100%',
+        height: '100%',
+        backgroundColor: '#ffffff',
+        zIndex: 4,
+      }}
+    >
       {children}
     </View>
   );
@@ -38,15 +49,6 @@ export default function TheModal({ children, visible, onClose, ...otherProps }) 
 }
 
 const Styles = StyleSheet.create({
-  modalWeb: {
-    position: 'fixed',
-    top: '0',
-    left: '0',
-    width: '100%',
-    height: '100%',
-    backgroundColor: '#ffffff',
-    zIndex: 4,
-  },
   content: {
     flex: 1,
     paddingTop: 32,

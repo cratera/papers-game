@@ -19,7 +19,7 @@ export default function HomeScreen({ navigation }) {
   }
 
   function handleUpdateProfile(profile) {
-    console.log('hum...', profile);
+    // Do this here instead of at HomeSignup, because of hooks!
     Papers.updateProfile(profile);
   }
 

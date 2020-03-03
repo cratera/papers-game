@@ -31,8 +31,8 @@ export default function AccessGameModal({ isOpen, variant, onClose }) {
   }[variant];
 
   useEffect(() => {
-    if (isOpen === false) {
-      setState({}); // Reset state.
+    if (isOpen === true) {
+      setState({}); // Reset state each time the modal is opened.
     }
   }, [isOpen]);
 
@@ -63,10 +63,8 @@ export default function AccessGameModal({ isOpen, variant, onClose }) {
               style={[Theme.typography.h1, Styles.input]}
               inputAccessoryViewID="name"
               autoFocus
-              autoCompleteType="off"
               autoCorrect={false}
               nativeID="inputNameLabel"
-              value={state.gameName}
               onChangeText={handleInputChange}
             />
             {state.errorMsg && (
@@ -100,7 +98,7 @@ export default function AccessGameModal({ isOpen, variant, onClose }) {
     setAccessing(true);
     setState(state => ({ ...state, errorMsg: null }));
 
-    Papers.accessGame(variant, state.gameName, (response, err) => {
+    Papers.accessGame(variant, state.gameName, (res, err) => {
       if (err) {
         // TODO - Move this out of here - redux(mapstatetoprops?)/context/wtv...
         const errorMsgMap = {
@@ -116,8 +114,8 @@ export default function AccessGameModal({ isOpen, variant, onClose }) {
         setAccessing(false);
         return setState(state => ({ ...state, errorMsg }));
       } else {
+        // The App Routing will detect the PapersContext state and redirect the page.
         onClose();
-        // The App Routing will detect the new gameId and redirect the page.
       }
     });
   }

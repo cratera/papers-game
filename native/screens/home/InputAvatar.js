@@ -51,7 +51,8 @@ export default function InputAvatar({ avatar, onChange }) {
   async function handleUpdateAvatar() {
     setStatus('loading');
     const url = await pickAvatar();
-    setStatus('loaded');
+
+    setStatus(url ? 'loaded' : '');
     onChange(url);
   }
 }
