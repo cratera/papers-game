@@ -8,7 +8,7 @@ export function createUniqueId(name) {
 
 export function slugString(str) {
   // from https://gist.github.com/codeguy/6684588#gistcomment-2624012
-  str = str.replace(/^\s+|\s+$/g, ''); // trim
+  str = str.replace(/^\s+|\s+$/g, '-'); // replace space by -
   str = str.toLowerCase();
 
   // remove accents, swap ñ for n, etc

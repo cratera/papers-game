@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Button, View, StyleSheet, Text } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import * as WebBrowser from 'expo-web-browser';
@@ -9,17 +9,16 @@ import HomeSigned from './HomeSigned.js';
 import HomeSignup from './HomeSignup.js';
 
 export default function HomeScreen({ navigation }) {
-  const Papers = React.useContext(PapersContext);
+  const Papers = useContext(PapersContext);
   const { profile } = Papers.state;
-  const storedGameId = Papers.state.game && Papers.state.game.name;
+  const game = Papers.state.game?.id;
 
-  if (storedGameId) {
-    console.warn('TODO: Redirect to game room');
-    // return <Redirect push to={`/game/${storedGameId}`} />;
-  }
+  useEffect(() => {
+    navigation.navigate(game ? 'Room' : 'Home');
+  }, [game]);
 
   function handleUpdateProfile(profile) {
-    // Do this here instead of at HomeSignup, because of hooks!
+    // Do this here to take advatanges hooks!
     Papers.updateProfile(profile);
   }
 

@@ -23,7 +23,6 @@ export class PapersContextProvider extends Component {
     super(props);
     this.state = {
       socket: null, // rename to serverAPI?
-      isConnected: false,
       profile: {
         id: props.initialProfile.id,
         name: props.initialProfile.name,
@@ -40,7 +39,7 @@ export class PapersContextProvider extends Component {
     };
 
     this._removeGameFromState = this._removeGameFromState.bind(this);
-    this._subscribeToGame = this._subscribeToGame.bind(this);
+    this._subscribeGame = this._subscribeGame.bind(this);
 
     this.PapersAPI = {
       open: this.open.bind(this),
@@ -85,7 +84,7 @@ export class PapersContextProvider extends Component {
   }
 
   init() {
-    console.log('P_ init()');
+    console.log('📌 init()');
     let socket = this.state.socket;
 
     if (socket) {
@@ -99,30 +98,28 @@ export class PapersContextProvider extends Component {
   }
 
   async tryToReconnect() {
-    console.log('P_ tryToReconnect()');
+    console.log('📌tryToReconnect()');
     let socket = this.state.socket;
 
     if (socket) {
-      console.error('tryToReconnect(): Already connected.');
+      console.error(':: Already connected. Should not happen!');
       return;
     } else {
       const { id, name, gameId } = this.state.profile;
-      const response = await serverReconnect({ id, name, gameId });
 
-      if (!response.socket) {
+      if (!gameId) {
+        console.log(':: no gameId');
         return;
       }
 
-      this.setState({ socket: response.socket });
-
-      if (response.game) {
-        console.log('P_ rejoin game! TODO');
-      }
+      this.accessGame('join', gameId, () => {
+        console.log(`Joined to ${gameId} completed!`);
+      });
     }
   }
 
   initAndSign(doAfterSignIn) {
-    console.log('P_ initAndSign()');
+    console.log('📌 initAndSign()');
     const socket = this.init();
 
     const { name, avatar } = this.state.profile;
@@ -133,7 +130,7 @@ export class PapersContextProvider extends Component {
     }
 
     socket.on('signed', async (topic, id) => {
-      console.log('P_ on.signed', id);
+      console.log('📌 on.signed', id);
       await this.PapersAPI.updateProfile({ id });
       doAfterSignIn();
     });
@@ -145,9 +142,9 @@ export class PapersContextProvider extends Component {
     });
   }
 
-  accessGame(variant, gameName, cb) {
+  async accessGame(variant, gameName, cb) {
     if (!this.state.socket) {
-      console.log('P_ accessGame() - init needed first');
+      console.log('📌 accessGame() - init needed first');
 
       this.initAndSign((res, error) => {
         if (error) return cb(null, error);
@@ -159,7 +156,7 @@ export class PapersContextProvider extends Component {
 
     // TODO/OPTMIZE - Verify the profile is updated.
 
-    console.log('P_ accessGame() - accessing...');
+    console.log('📌 accessGame()', variant, gameName);
 
     if (!gameName) {
       return cb(null, new Error('Missing game name'));
@@ -170,227 +167,38 @@ export class PapersContextProvider extends Component {
     }
 
     // createGame | joinGame
-    this.state.socket[`${variant}Game`](gameName, async (gameData, err) => {
-      if (err) {
-        const errorMsgMap = {
-          exists: () => 'Choose other name.',
-          notFound: () => 'This game does not exist.',
-          alreadyStarted: () => 'The game already started.',
-          ups: () => `Ups! Error: ${err.message}`,
-        };
-
-        const errorMsg = (errorMsgMap[err.message] || errorMsgMap.ups)();
-
-        console.warn('P_ accessGame() err:', errorMsg);
-        return cb(null, errorMsg);
-      }
-
-      await this._subscribeToGame(gameData);
-      cb();
-    });
-  }
-
-  async _subscribeToGame(game) {
-    console.log('P_ _subscribeToGame', game.id);
-
-    this.setState({ game });
-
-    await this.PapersAPI.updateProfile({ gameId: game.id });
-  }
-
-  __accessGame(variant, gameName, cb) {
-    let socket = this.state.socket;
-
-    if (!socket) {
-      socket = this.PapersAPI.open(gameName);
-    }
-
-    console.log('accessGame', variant, gameName);
-
-    if (!gameName) {
-      return cb(new Error('Missing gameId'));
-    }
-
-    socket.emit(
-      `${variant}-game`,
-      {
-        gameId: gameName,
-        player: this.state.profile,
-      },
-      cb
-    );
-
-    socket.on('set-game', game => {
-      console.log('on set-game', game.name);
-      window.localStorage.setItem('profile_gameId', game.name);
-
-      this.setState(state => ({
-        profile: {
-          ...state.profile,
-          gameId: game.name,
-        },
-        game,
-      }));
-    });
-
-    socket.on('kickouted', () => {
-      // TODO - global status
-      console.log('Global Status: You were quickedout! 😭');
-      this._removeGameFromState();
-    });
-
-    socket.on('leave-game', () => {
-      // TODO - global status
-      console.log('on leave-game');
-      this._removeGameFromState();
-    });
-
-    socket.on('game-update', (actionType, payload) => {
-      console.log('game-update:', actionType, { payload });
-
-      // Maybe actionType should be in past?
-      // player-added, player-paused, etc...
-      const reaction = {
-        'new-player': game => {
-          const player = payload;
-          return {
-            ...game,
-            players: {
-              ...game.players,
-              [player.id]: player,
-            },
-          };
-        },
-        'pause-player': game => {
-          const playerId = payload;
-
-          return {
-            ...game,
-            players: {
-              ...game.players,
-              [playerId]: {
-                ...game.players[playerId],
-                isAfk: true,
-              },
-            },
-          };
-        },
-        'recover-player': game => {
-          const playerId = payload;
-          return {
-            ...game,
-            players: {
-              ...game.players,
-              [playerId]: {
-                ...game.players[playerId],
-                isAfk: false,
-              },
-            },
-          };
-        },
-        'remove-player': game => {
-          const { playerId, creatorId } = payload;
-
-          const otherPlayers = Object.keys(game.players).reduce((acc, p) => {
-            return p === playerId ? acc : { ...acc, [p]: game.players[p] };
-          }, {});
-
-          let newPlayers;
-
-          if (!game.hasStarted) {
-            newPlayers = otherPlayers;
-          } else {
-            newPlayers = {
-              ...game.players,
-              [playerId]: {
-                ...game.players[playerId],
-                hasLeft: true,
-              },
-            };
-          }
-
-          return {
-            ...game,
-            creatorId,
-            players: newPlayers,
-          };
-        },
-        'set-words': game => {
-          const { words, playerId } = payload;
-
-          return {
-            ...game,
-            words: {
-              ...game.words,
-              [playerId]: words,
-            },
-          };
-        },
-        'set-words-for-everyone': game => {
-          const everyonesWords = payload;
-
-          return {
-            ...game,
-            words: everyonesWords,
-          };
-        },
-        'set-teams': game => {
-          const teams = payload;
-
-          return {
-            ...game,
-            teams,
-          };
-        },
-        'start-game': game => {
-          const { round, hasStarted } = payload;
-
-          return {
-            ...game,
-            hasStarted,
-            round,
-          };
-        },
-        'start-turn': game => {
-          const roundStatus = payload;
-
-          return {
-            ...game,
-            round: {
-              ...game.round,
-              ...roundStatus,
-            },
-          };
-        },
-        'finish-turn': game => {
-          window.localStorage.removeItem('turn'); // OPTIMIZE - maybe it shouldnt be here?
-          const { round, score } = payload;
-
-          return {
-            ...game,
-            round,
-            score,
-          };
-        },
-        'start-next-round': game => {
-          const round = payload;
-
-          return {
-            ...game,
-            round,
-          };
-        },
-        ups: game => {
-          console.log('Ups! game-update', payload);
-          return game;
-        },
+    try {
+      const gameId = await this.state.socket[`${variant}Game`](gameName);
+      this._subscribeGame(gameId);
+      this.PapersAPI.updateProfile({ gameId });
+      cb(gameId);
+    } catch (e) {
+      const errorMsgMap = {
+        exists: () => 'Choose other name.',
+        notFound: () => 'This game does not exist.',
+        alreadyStarted: () => 'The game already started.',
+        ups: () => `Ups! Error: ${e.message}`,
       };
 
-      const updateGame = reaction[actionType] || reaction.ups;
+      const errorMsg = (errorMsgMap[e.message] || errorMsgMap.ups)();
+      console.warn(':: accessGame error!:', errorMsg);
+      return cb(null, errorMsg);
+    }
+  }
 
-      this.setState(state => ({
-        game: updateGame(state.game),
-      }));
+  _subscribeGame(gameId) {
+    console.log('📌 _subscribeGame', gameId);
+
+    const socket = this.state.socket;
+
+    socket.on('set-game', (topic, data) => {
+      console.log(':: on.set-game');
+      this.setState({ game: data.val() });
+    });
+
+    socket.on('leave-game', (topic, data) => {
+      console.log(':: on.leave-game');
+      this._removeGameFromState();
     });
   }
 
@@ -401,34 +209,39 @@ export class PapersContextProvider extends Component {
   // }
 
   recoverPlayer() {
-    console.log('P_ recoverPlayer');
+    console.log('📌 recoverPlayer');
     const socket = this.state.socket.open();
     socket.emit('recover-player');
   }
 
   // { id, name, avatar, gameId }
   async updateProfile(profile) {
-    console.log('P_ updateProfile()', Object.keys(profile));
+    console.log('📌 updateProfile()', profile);
+    const mapKeys = {
+      id: 'profile_id',
+      name: 'profile_name',
+      avatar: 'profile_avatar',
+      gameId: 'profile_gameId',
+    };
 
     try {
-      if (profile.id && typeof profile.id === 'string')
-        await AsyncStorage.setItem('profile_id', profile.id);
-      if (profile.name && typeof profile.name === 'string')
-        await AsyncStorage.setItem('profile_name', profile.name);
-      if (profile.avatar && typeof profile.avatar === 'string')
-        await AsyncStorage.setItem('profile_avatar', profile.avatar);
-      if (profile.gameId && typeof profile.gameId === 'string')
-        await AsyncStorage.setItem('profile_gameId', profile.gameId);
+      for (const key in profile) {
+        if (typeof profile[key] === 'string') {
+          await AsyncStorage.setItem(mapKeys[key], profile[key]);
+        } else {
+          await AsyncStorage.removeItem(mapKeys[key]);
+        }
+      }
     } catch (e) {
       // TODO - report this to an external Error log service
-      console.error('PapersContext.js updateProfile error!', e);
+      console.error(':: error!', e);
     }
 
     if (this.state.socket) {
-      console.log('P_ update to socket');
+      console.log(':: update to socket too.');
       this.state.socket.updateProfile(profile);
     } else {
-      console.log('P_ not yet connected to socket');
+      console.log(':: not connected to socket yet.');
     }
 
     this.setState(state => ({
@@ -437,13 +250,19 @@ export class PapersContextProvider extends Component {
         ...profile,
       },
     }));
+
+    return;
   }
 
   async resetProfile(profile) {
     try {
-      await AsyncStorage.clear();
+      await AsyncStorage.removeItem('id');
+      await AsyncStorage.removeItem('name');
+      await AsyncStorage.removeItem('avatar');
+      await AsyncStorage.removeItem('groupId');
+
       if (this.state.socket) {
-        this.state.socket.resetProfile(); // user or profile? hum...
+        this.state.socket.resetProfile();
       }
     } catch (e) {
       console.error('PapersContext.js resetProfile error!', e);
@@ -526,21 +345,17 @@ export class PapersContextProvider extends Component {
     });
   }
 
-  _removeGameFromState() {
-    console.log('removing game');
-    window.localStorage.removeItem('profile_gameId');
-    window.localStorage.removeItem('turn');
+  async _removeGameFromState() {
+    console.log('📌 _removeGameFromState()');
+
+    await this.PapersAPI.updateProfile({ gameId: null });
+    // window.localStorage.removeItem('turn'); // TODO / REVIEW
 
     // Leaving room, there is no point in being connected
-    this.state.socket && this.state.socket.close();
+    // this.state.socket && this.state.socket.close();
 
     this.setState(state => ({
-      profile: {
-        ...state.profile,
-        gameId: null,
-      },
       game: null,
-      socket: null,
     }));
   }
 
@@ -568,19 +383,15 @@ export class PapersContextProvider extends Component {
     });
   }
 
-  leaveGame(playerId) {
-    console.log('leaveGame()');
-    this.state.socket.emit(
-      'leave-game',
-      {
-        gameId: this.state.game.name,
-        playerId: this.state.profile.id,
-      },
-      err => {
-        if (err) return true;
-        this._removeGameFromState();
-      }
-    );
+  async leaveGame(playerId) {
+    console.log('📌 leaveGame()');
+
+    try {
+      await this.state.socket.leaveGame();
+      // this._removeGameFromState();
+    } catch (err) {
+      console.warn('error!', err);
+    }
   }
 
   kickoutOfGame(playerId) {

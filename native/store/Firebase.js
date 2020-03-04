@@ -15,7 +15,7 @@ const firebaseConfig = {
   measurementId: 'G-BFBZ4MNDX4',
 };
 
-let LOCAL_PROFILE = {};
+let LOCAL_PROFILE = {}; // not sure if this is good.
 
 const PUBLIC_API = {
   on,
@@ -25,43 +25,38 @@ const PUBLIC_API = {
   getUser,
   createGame,
   joinGame,
+  leaveGame,
 };
 
 export function serverReconnect({ id, name, gameId }) {
   if (firebase.apps.length > 0) {
     // Let's REVIEW this odd scenario later...
-    console.log('FB_ serverReconnect(), reconnected!');
+    console.log('⚙️ serverReconnect(), already connected!');
     return { socket: PUBLIC_API };
   }
 
-  console.log('FB_ serverReconnect(), dont exist!', LOCAL_PROFILE.id, id);
+  console.log('⚙️ serverReconnect() - doesnt exist!', LOCAL_PROFILE.id, id);
 
-  if (gameId) {
-    console.log('TODO Look fo gameId and rejoin!', gameId);
-  }
+  const API = init();
 
-  return {};
+  return API;
 }
 
-export default function init(options, done) {
-  console.log('FB_ init()');
+export default function init(options) {
+  console.log('⚙️ init()');
 
   if (firebase.apps.length > 0) {
     console.warn('Already initialized!');
-  } else {
-    firebase.initializeApp(firebaseConfig);
+    return PUBLIC_API;
   }
 
-  subscribeToAuthState();
+  firebase.initializeApp(firebaseConfig);
 
-  return PUBLIC_API;
-}
-
-function subscribeToAuthState() {
   firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
       LOCAL_PROFILE.id = user.uid;
-      console.log('FB_ Signed!', LOCAL_PROFILE.id);
+      console.log('⚙️ Signed!', LOCAL_PROFILE.id);
+
       updateProfile(LOCAL_PROFILE);
       PubSub.publish('signed', LOCAL_PROFILE.id);
     } else {
@@ -69,6 +64,8 @@ function subscribeToAuthState() {
       // ...
     }
   });
+
+  return PUBLIC_API;
 }
 
 /**
@@ -84,12 +81,13 @@ function on(topic, cb) {
   PubSub.subscribe(topic, cb);
 }
 
+// ============== AUTH / PROFILE
+
 /**
  * Do Auth. Needed before accessing to a game
  */
 function signIn({ name, avatar }, cb) {
-  const id = LOCAL_PROFILE.id;
-  LOCAL_PROFILE = { id, name, avatar };
+  LOCAL_PROFILE = { name, avatar };
 
   firebase
     .auth()
@@ -109,7 +107,7 @@ function signIn({ name, avatar }, cb) {
  * @param {Object} profile.gameId - The last gameid they tried to access
  */
 function updateProfile(profile) {
-  console.log('FB_ updateProfile()', LOCAL_PROFILE.id, LOCAL_PROFILE.name);
+  console.log('⚙️ updateProfile()', profile);
   firebase
     .database()
     .ref('users/' + LOCAL_PROFILE.id)
@@ -132,7 +130,7 @@ function resetProfile(id) {
  * TBD
  */
 function getUser(userId) {
-  console.log('FB_ getUser()', LOCAL_PROFILE.id, userId);
+  console.log('⚙️ getUser()', LOCAL_PROFILE.id, userId);
 
   // var userId = firebase.auth().currentUser.uid;
   // return firebase
@@ -143,6 +141,8 @@ function getUser(userId) {
   //     console.log('GET USER!', snapshot.val());
   //   });
 }
+
+// ============== GAME
 
 const gameInitialState = ({ id, name, creatorId }) => ({
   id,
@@ -183,21 +183,17 @@ const gameInitialState = ({ id, name, creatorId }) => ({
   },
 });
 
-async function createGame(gameName, cb) {
-  if (!LOCAL_PROFILE.id) {
-    cb(null, new Error('ProfileDoesntExit'));
-    return;
-  }
+async function createGame(gameName) {
+  console.log(`⚙️ createGame: ${gameName}`);
 
   const gameId = slugString(gameName); // REVIEW this with @mmbotelho
 
   // Verify if game exists...
   const gameRef = firebase.database().ref(`games/${gameId}`);
-  const snapshot1 = await gameRef.once('value');
+  const game = await gameRef.once('value');
 
-  if (snapshot1.exists()) {
-    cb(null, new Error('exists'));
-    return;
+  if (game.exists()) {
+    throw new Error('exists');
   }
 
   // Create the game!
@@ -211,16 +207,104 @@ async function createGame(gameName, cb) {
     .database()
     .ref(`games/${gameId}`)
     .set(initialState);
-  // Wait for game to be setted!
-  await gameRef.once('value');
-  cb(initialState, null);
+
+  setTimeout(() => {
+    _pubGame(gameId);
+  }, 0);
+
+  return gameId;
 }
 
-/**
- * Join an existing game
- */
-function joinGame(gameName, cb) {
-  console.log(`TODO join game ${gameName}`);
+async function joinGame(gameName) {
+  console.log(`⚙️ joinGame: ${gameName}`);
 
-  cb(null, new Error(`TODO join game ${gameName}`));
+  const gameId = slugString(gameName); // REVIEW this with @mmbotelho
+
+  // Verify if game exists...
+  const gameRef = firebase.database().ref(`games/${gameId}`);
+  const game = await gameRef.once('value');
+
+  if (!game.exists()) {
+    throw new Error('notFound');
+  }
+
+  // Verify if we can access the game...
+  const id = LOCAL_PROFILE.id;
+  const alreadyStarted = game.child('alreadyStarted').val();
+
+  const gamePlayers = game.child('players');
+  const ImInTheGame = gamePlayers.child(id).val();
+
+  if (alreadyStarted && !ImInTheGame) {
+    // After the game starts, new players cannot join unless
+    // they are already part of the game (were afk)
+    throw new Error('alreadyStarted');
+  }
+
+  firebase
+    .database()
+    .ref(`games/${gameId}/players`)
+    .update({
+      [LOCAL_PROFILE.ui]: { type: 'user' },
+    });
+
+  setTimeout(() => {
+    _pubGame(gameId);
+  }, 0);
+
+  return gameId;
+}
+
+function _pubGame(gameId) {
+  console.log('⚙️ _pubGame', gameId);
+  LOCAL_PROFILE.gameId = gameId;
+
+  // Subscribe to game!
+  firebase
+    .database()
+    .ref(`games/${LOCAL_PROFILE.gameId}`)
+    .once('value', function(data) {
+      PubSub.publish('set-game', data);
+    });
+
+  // Prepare in case we get offline.
+  const afkRef = firebase
+    .database()
+    .ref(`games/${LOCAL_PROFILE.gameId}/players/${LOCAL_PROFILE.id}/afk`);
+  afkRef.onDisconnect().set(true);
+}
+
+async function leaveGame() {
+  console.log('⚙️ leaveGame()');
+  // Verify if game exists...
+  const gameId = LOCAL_PROFILE.gameId;
+
+  if (!gameId) {
+    throw new Error('gameIdMissing');
+  }
+  const gameRef = firebase.database().ref(`games/${gameId}`);
+  const game = await gameRef.once('value');
+
+  if (!game.exists()) {
+    throw new Error('notFound');
+  }
+
+  await firebase
+    .database()
+    .ref(`games/${gameId}/players`)
+    .update({
+      [LOCAL_PROFILE.ui]: {},
+    });
+
+  PubSub.publish('leave-game');
+
+  setTimeout(() => {
+    console.log('⚙️ Unsubscribe game');
+    PubSub.unsubscribe('set-game');
+    PubSub.unsubscribe('leave-game');
+  }, 0);
+
+  // Disconnect from group
+  // firebase.database().ref(`games/${gameId}`).off('value');
+  // firebase.database().ref(`games/${gameId}`).off('value');
 }
