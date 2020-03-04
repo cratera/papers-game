@@ -24,16 +24,16 @@ export default function AccessGameModal({ isOpen, variant, onClose }) {
       cta: "Let's go!",
     },
     create: {
-      title: 'Give this party a name!',
-      description: 'Pick a short and sweet name.',
+      title: 'Give this party an original name!',
+      description: 'Your friends will use it to join the game.',
       cta: 'Next: Add Players',
     },
   }[variant];
 
   useEffect(() => {
-    if (isOpen === true) {
-      setState({}); // Reset state each time the modal is opened.
-    }
+    // Reset state each time the modal is toggled
+    setAccessing(false);
+    setState({});
   }, [isOpen]);
 
   // if (state.gameToRedirect) {
@@ -100,19 +100,8 @@ export default function AccessGameModal({ isOpen, variant, onClose }) {
 
     Papers.accessGame(variant, state.gameName, (res, err) => {
       if (err) {
-        // TODO - Move this out of here - redux(mapstatetoprops?)/context/wtv...
-        const errorMsgMap = {
-          exists: () => 'Choose other name.',
-          notFound: () => 'This game does not exist.',
-          alreadyStarted: () => 'The game already started.',
-          ups: () => `Ups! Error: ${err.message}`,
-        };
-
-        const errorMsg = (errorMsgMap[err] || errorMsgMap.ups)();
-
-        console.warn('accessGame() err:', state.gameName, errorMsg);
         setAccessing(false);
-        return setState(state => ({ ...state, errorMsg }));
+        setState(state => ({ ...state, errorMsg: err }));
       } else {
         // The App Routing will detect the PapersContext state and redirect the page.
         onClose();

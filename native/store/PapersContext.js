@@ -5,15 +5,15 @@ import { createUniqueId } from '@constants/utils.js';
 // import wordsForEveryone from './wordsForEveryone.js';
 
 // OPTIMIZE - Pass this as prop, so it's agnostic to any type of server / API.
-import serverInit, { onMsg } from './Firebase.js';
+import serverInit, { serverReconnect } from './Firebase.js';
 
 const PapersContext = React.createContext({});
 
 export const loadProfile = async () => {
-  const id = await AsyncStorage.getItem('profile_id');
-  const name = await AsyncStorage.getItem('profile_name');
-  const avatar = await AsyncStorage.getItem('profile_avatar');
-  const gameId = await AsyncStorage.getItem('profile_gameId');
+  const id = (await AsyncStorage.getItem('profile_id')) || null;
+  const name = (await AsyncStorage.getItem('profile_name')) || null;
+  const avatar = (await AsyncStorage.getItem('profile_avatar')) || null;
+  const gameId = (await AsyncStorage.getItem('profile_gameId')) || null;
 
   return { id, name, avatar, gameId };
 };
@@ -40,6 +40,7 @@ export class PapersContextProvider extends Component {
     };
 
     this._removeGameFromState = this._removeGameFromState.bind(this);
+    this._subscribeToGame = this._subscribeToGame.bind(this);
 
     this.PapersAPI = {
       open: this.open.bind(this),
@@ -71,104 +72,84 @@ export class PapersContextProvider extends Component {
   // because it might want to retrieve different stuff...
   // ex: on room/:id, i don't care about profile.gameId,
   // instead I want the room/:id
-  ___componentDidMount() {
-    const { id, gameId } = this.state.profile;
-    // const { location } = this.props;
-    const GameRoom =
-      false &&
-      matchPath(location.pathname, {
-        path: '/game/:id',
-      });
-
-    console.log('PapersContext Mounted:', { playedId: id, gameId });
-
-    if (GameRoom) {
-      console.log('PapersContext - on a GameRoom');
-      // do nothing... GameRoom will do it.
-    } else {
-      console.log('PapersContext - on Home');
-      // somewhere else, handle it!
-      // Update: why not at Home.js?? Cant remember...
-      if (id && gameId) {
-        const socket = this.PapersAPI.open();
-        this.PapersAPI.recoverGame(socket);
-      }
-    }
+  async componentDidMount() {
+    const { id, name, gameId } = this.state.profile;
+    console.log('PapersContext Mounted:', { name, gameId, id });
+    await this.tryToReconnect();
   }
 
   // =========== Papers API
 
-  open(passedGameId) {
+  open() {
+    // Legacy...
+  }
+
+  init() {
+    console.log('P_ init()');
     let socket = this.state.socket;
-    const { id: playerId, gameId: gameIdStored } = this.state.profile;
-    const gameId = passedGameId || gameIdStored;
 
     if (socket) {
-      if (socket.connected) {
-        console.warn('socket already opened!', playerId);
-      } else {
-        console.warn('reconnecting socket...', playerId);
-        socket.open();
-      }
-      return socket;
+      console.error('init(): Already connected.');
+    } else {
+      socket = serverInit();
+      this.setState({ socket });
     }
-    console.log('creating a socket!', playerId);
-
-    socket = io(this.URL, {
-      query: { playerId, gameId },
-      // TIL: https://stackoverflow.com/a/57459569/4737729
-      transports: ['websocket'],
-    });
-
-    socket.on('connect', () => {
-      console.log('connected!', playerId);
-      // Q: Maybe all socket.on() should be added here ?
-    });
-
-    this.setState({ socket });
 
     return socket;
   }
 
-  init(gameName, doAfterInit) {
-    console.log('P_ init()', gameName);
+  async tryToReconnect() {
+    console.log('P_ tryToReconnect()');
     let socket = this.state.socket;
 
     if (socket) {
-      console.error('init: Already connected.');
+      console.error('tryToReconnect(): Already connected.');
       return;
+    } else {
+      const { id, name, gameId } = this.state.profile;
+      const response = await serverReconnect({ id, name, gameId });
+
+      if (!response.socket) {
+        return;
+      }
+
+      this.setState({ socket: response.socket });
+
+      if (response.game) {
+        console.log('P_ rejoin game! TODO');
+      }
     }
+  }
 
-    const { id, name, avatar } = this.state.profile;
+  initAndSign(doAfterSignIn) {
+    console.log('P_ initAndSign()');
+    const socket = this.init();
 
-    if (!id || !name) {
-      console.log(`profile incomplete! id: ${id} || name: ${name}`);
+    const { name, avatar } = this.state.profile;
+
+    if (!name) {
+      console.log(`Missing name! ${name}`);
       return false;
     }
 
-    socket = serverInit();
-
-    socket.on('signed', (topic, data) => {
-      console.log('Signed!', topic, data);
-      doAfterInit();
+    socket.on('signed', async (topic, id) => {
+      console.log('P_ on.signed', id);
+      await this.PapersAPI.updateProfile({ id });
+      doAfterSignIn();
     });
 
-    const gameId = `id_${gameName}`; // TODO slug this
-
-    socket.signIn({ id, name, avatar, gameId }, (res, error) => {
+    socket.signIn({ name, avatar }, (res, error) => {
       if (error) {
         return cb(null, error);
       }
     });
-
-    this.setState({ socket });
   }
 
   accessGame(variant, gameName, cb) {
     if (!this.state.socket) {
-      console.log('P_ accessGame() - init needed');
+      console.log('P_ accessGame() - init needed first');
 
-      this.init(gameName, (res, error) => {
+      this.initAndSign((res, error) => {
         if (error) return cb(null, error);
         this.accessGame(variant, gameName, cb);
       });
@@ -176,23 +157,45 @@ export class PapersContextProvider extends Component {
       return;
     }
 
+    // TODO/OPTMIZE - Verify the profile is updated.
+
     console.log('P_ accessGame() - accessing...');
 
     if (!gameName) {
-      return cb(null, new Error('Missing gameName'));
+      return cb(null, new Error('Missing game name'));
     }
 
     if (!variant || ['join', 'create'].indexOf(variant) < 0) {
       return cb(null, new Error(`variant incorrect - ${variant}`));
     }
 
-    const { id, name, avatar } = this.state.profile;
-    const gameId = `id_${gameName}`; // TODO slug this
+    // createGame | joinGame
+    this.state.socket[`${variant}Game`](gameName, async (gameData, err) => {
+      if (err) {
+        const errorMsgMap = {
+          exists: () => 'Choose other name.',
+          notFound: () => 'This game does not exist.',
+          alreadyStarted: () => 'The game already started.',
+          ups: () => `Ups! Error: ${err.message}`,
+        };
 
-    console.log('id');
-    this.state.socket.updateProfile({ id, name, avatar, gameId });
+        const errorMsg = (errorMsgMap[err.message] || errorMsgMap.ups)();
 
-    this.state.socket[`${variant}Game`](gameId, cb);
+        console.warn('P_ accessGame() err:', errorMsg);
+        return cb(null, errorMsg);
+      }
+
+      await this._subscribeToGame(gameData);
+      cb();
+    });
+  }
+
+  async _subscribeToGame(game) {
+    console.log('P_ _subscribeToGame', game.id);
+
+    this.setState({ game });
+
+    await this.PapersAPI.updateProfile({ gameId: game.id });
   }
 
   __accessGame(variant, gameName, cb) {
@@ -398,30 +401,40 @@ export class PapersContextProvider extends Component {
   // }
 
   recoverPlayer() {
-    console.log('recoverPlayer');
+    console.log('P_ recoverPlayer');
     const socket = this.state.socket.open();
     socket.emit('recover-player');
   }
 
+  // { id, name, avatar, gameId }
   async updateProfile(profile) {
-    console.log('updateProfile');
-    const id = profile.id || this.state.profile.id || createUniqueId(`player_${profile.name}`);
+    console.log('P_ updateProfile()', Object.keys(profile));
+
     try {
-      if (!this.state.profile.id) await AsyncStorage.setItem('profile_id', id);
+      if (profile.id && typeof profile.id === 'string')
+        await AsyncStorage.setItem('profile_id', profile.id);
       if (profile.name && typeof profile.name === 'string')
         await AsyncStorage.setItem('profile_name', profile.name);
       if (profile.avatar && typeof profile.avatar === 'string')
         await AsyncStorage.setItem('profile_avatar', profile.avatar);
+      if (profile.gameId && typeof profile.gameId === 'string')
+        await AsyncStorage.setItem('profile_gameId', profile.gameId);
     } catch (e) {
       // TODO - report this to an external Error log service
       console.error('PapersContext.js updateProfile error!', e);
+    }
+
+    if (this.state.socket) {
+      console.log('P_ update to socket');
+      this.state.socket.updateProfile(profile);
+    } else {
+      console.log('P_ not yet connected to socket');
     }
 
     this.setState(state => ({
       profile: {
         ...state.profile,
         ...profile,
-        id,
       },
     }));
   }

@@ -1,20 +1,30 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 
-// based on https://stackoverflow.com/a/23669825/4737729
-export function encodeImgToBase64(fileToLoad, callback) {
-  const fileReader = new FileReader();
-
-  fileReader.onload = function(fileLoadedEvent) {
-    return callback(fileLoadedEvent.target.result);
-  };
-
-  fileReader.readAsDataURL(fileToLoad);
-}
-
 export function createUniqueId(name) {
   // Q: maybe this should be created on server instead.
   // prettier-ignore
   return `${name}_${Math.random().toString(36).substr(2, 9)}_${new Date().getTime()}`;
+}
+
+export function slugString(str) {
+  // from https://gist.github.com/codeguy/6684588#gistcomment-2624012
+  str = str.replace(/^\s+|\s+$/g, ''); // trim
+  str = str.toLowerCase();
+
+  // remove accents, swap ñ for n, etc
+  var from = 'àáãäâèéëêìíïîòóöôùúüûñç·/_,:;';
+  var to = 'aaaaaeeeeiiiioooouuuunc------';
+
+  for (var i = 0, l = from.length; i < l; i++) {
+    str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+  }
+
+  str = str
+    .replace(/[^a-z0-9 -]/g, '-') // remove invalid chars
+    .replace(/\s+/g, '-') // collapse whitespace and replace by -
+    .replace(/-+/g, '-'); // collapse dashes
+
+  return str;
 }
 
 export function getRandomInt(max) {
