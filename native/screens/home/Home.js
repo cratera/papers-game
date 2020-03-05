@@ -10,17 +10,17 @@ import HomeSignup from './HomeSignup.js';
 
 export default function HomeScreen({ navigation }) {
   const Papers = useContext(PapersContext);
-  const { profile } = Papers.state;
-  const game = Papers.state.game?.id;
+  const { profile, profiles, game } = Papers.state;
+  const gameId = game?.id;
 
   useEffect(() => {
-    navigation.navigate(game ? 'Room' : 'Home');
-  }, [game]);
+    navigation.navigate(gameId ? 'Room' : 'Home');
+  }, [gameId]);
 
   function handleUpdateProfile(profile) {
-    // Do this here to take advatanges hooks!
+    // Do this here to take advatange of hooks!
     Papers.updateProfile(profile);
   }
 
-  return Papers.state.profile.name ? <HomeSigned /> : <HomeSignup onSubmit={handleUpdateProfile} />;
+  return profile.name ? <HomeSigned /> : <HomeSignup onSubmit={handleUpdateProfile} />;
 }

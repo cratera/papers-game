@@ -24,6 +24,7 @@ export class PapersContextProvider extends Component {
     this.state = {
       socket: null, // rename to serverAPI?
       profile: {
+        // Our profile
         id: props.initialProfile.id,
         name: props.initialProfile.name,
         avatar: props.initialProfile.avatar,
@@ -36,6 +37,7 @@ export class PapersContextProvider extends Component {
         state: {},
         settings: {},
       } */
+      profiles: {}, // List of game players' profiles.
     };
 
     this._removeGameFromState = this._removeGameFromState.bind(this);
@@ -45,7 +47,7 @@ export class PapersContextProvider extends Component {
       open: this.open.bind(this),
 
       // pausePlayer: this.pausePlayer.bind(this),
-      recoverPlayer: this.recoverPlayer.bind(this),
+      // recoverPlayer: this.recoverPlayer.bind(this),
 
       updateProfile: this.updateProfile.bind(this),
       resetProfile: this.resetProfile.bind(this),
@@ -75,6 +77,24 @@ export class PapersContextProvider extends Component {
     const { id, name, gameId } = this.state.profile;
     console.log('PapersContext Mounted:', { name, gameId, id });
     await this.tryToReconnect();
+  }
+
+  render() {
+    return (
+      <PapersContext.Provider
+        value={{
+          status: this.state.status,
+          state: {
+            profile: this.state.profile,
+            game: this.state.game,
+            profiles: this.state.profiles,
+          },
+          ...this.PapersAPI,
+        }}
+      >
+        {this.props.children}
+      </PapersContext.Provider>
+    );
   }
 
   // =========== Papers API
@@ -112,6 +132,8 @@ export class PapersContextProvider extends Component {
         return;
       }
 
+      // TODO - Add Global Status accessing game.
+
       this.accessGame('join', gameId, () => {
         console.log(`Joined to ${gameId} completed!`);
       });
@@ -129,8 +151,8 @@ export class PapersContextProvider extends Component {
       return false;
     }
 
-    socket.on('signed', async (topic, id) => {
-      console.log('📌 on.signed', id);
+    socket.on('profile.signed', async (topic, id) => {
+      console.log('📌 on.profile.signed', id);
       await this.PapersAPI.updateProfile({ id });
       doAfterSignIn();
     });
@@ -191,13 +213,74 @@ export class PapersContextProvider extends Component {
 
     const socket = this.state.socket;
 
-    socket.on('set-game', (topic, data) => {
-      console.log(':: on.set-game');
-      this.setState({ game: data.val() });
+    const setGame = cb => {
+      this.setState(state => {
+        if (!state.game) return {};
+        return {
+          game: {
+            ...state.game,
+            ...cb(state.game),
+          },
+        };
+      });
+    };
+
+    socket.on('game.set', (topic, data) => {
+      console.log(`:: on.${topic}`);
+      const { game, profiles } = data;
+      this.setState({ game, profiles });
     });
 
-    socket.on('leave-game', (topic, data) => {
-      console.log(':: on.leave-game');
+    // Players Subscription
+    socket.on('game.players.added', (topic, data) => {
+      console.log(`:: on.${topic}`, data);
+      const { id, info, profile } = data;
+
+      setGame(game => ({
+        players: {
+          ...game.players,
+          [id]: info,
+        },
+      }));
+
+      this.setState(state => ({
+        profiles: {
+          ...state.profiles,
+          [id]: profile,
+        },
+      }));
+    });
+
+    socket.on('game.players.removed', (topic, data) => {
+      console.log(`:: on.${topic}`, data);
+      const { id: playerId, newAdmin } = data;
+
+      setGame(game => {
+        const otherPlayers = Object.keys(game.players).reduce((acc, p) => {
+          return p === playerId ? acc : { ...acc, [p]: game.players[p] };
+        }, {});
+
+        return {
+          // admin: newAdmin // TODO
+          players: otherPlayers,
+        };
+      });
+    });
+
+    socket.on('game.players.changed', (topic, data) => {
+      console.log(`:: on.${topic}`, data);
+      const { id, info } = data;
+
+      setGame(game => ({
+        players: {
+          ...game.players,
+          [id]: info,
+        },
+      }));
+    });
+
+    socket.on('game.leave', topic => {
+      console.log(`:: on.${topic}`);
       this._removeGameFromState();
     });
   }
@@ -208,11 +291,11 @@ export class PapersContextProvider extends Component {
   //   this.state.socket.emit('pause-player');
   // }
 
-  recoverPlayer() {
-    console.log('📌 recoverPlayer');
-    const socket = this.state.socket.open();
-    socket.emit('recover-player');
-  }
+  // recoverPlayer() {
+  //   console.log('📌 recoverPlayer');
+  //   const socket = this.state.socket.open();
+  //   socket.emit('recover-player');
+  // }
 
   // { id, name, avatar, gameId }
   async updateProfile(profile) {
@@ -237,11 +320,18 @@ export class PapersContextProvider extends Component {
       console.error(':: error!', e);
     }
 
+    const { id, gameId, ...serverProfile } = profile;
+
+    if (Object.keys(serverProfile).length === 0) {
+      console.log(':: no need to update socket');
+      return;
+    }
+
     if (this.state.socket) {
-      console.log(':: update to socket too.');
-      this.state.socket.updateProfile(profile);
+      console.log(':: update socket too.');
+      this.state.socket.updateProfile(serverProfile);
     } else {
-      console.log(':: not connected to socket yet.');
+      console.log(':: not connected to socket');
     }
 
     this.setState(state => ({
@@ -388,9 +478,9 @@ export class PapersContextProvider extends Component {
 
     try {
       await this.state.socket.leaveGame();
-      // this._removeGameFromState();
     } catch (err) {
-      console.warn('error!', err);
+      console.error(':: error!', err);
+      this._removeGameFromState();
     }
   }
 
@@ -404,23 +494,6 @@ export class PapersContextProvider extends Component {
       err => {
         if (err) return true;
       }
-    );
-  }
-
-  render() {
-    return (
-      <PapersContext.Provider
-        value={{
-          status: this.state.status,
-          state: {
-            profile: this.state.profile,
-            game: this.state.game,
-          },
-          ...this.PapersAPI,
-        }}
-      >
-        {this.props.children}
-      </PapersContext.Provider>
     );
   }
 }

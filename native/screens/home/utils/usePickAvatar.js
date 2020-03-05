@@ -27,6 +27,8 @@ export default function usePickAvatar() {
       exif: false,
     });
 
+    // TODO - Optimize the image!
+
     if (result.uri || result.base64) {
       return result.uri || `data:image/png;base64,${result.base64}`;
     }

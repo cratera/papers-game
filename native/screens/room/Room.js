@@ -7,8 +7,8 @@ import PapersContext from '@store/PapersContext.js';
 
 export default function Room({ navigation }) {
   const Papers = React.useContext(PapersContext);
-  const { profile } = Papers.state;
-  const { name, id: gameId } = Papers.state.game || {};
+  const { profile, profiles, game } = Papers.state;
+  const { name, id: gameId } = game || {};
 
   useEffect(() => {
     navigation.navigate(gameId ? 'Room' : 'Home');
@@ -25,14 +25,17 @@ export default function Room({ navigation }) {
           {'\n'}
           {'\n'}
           {'\n'}
-          You are in the game "{name}", id {gameId}
+          Game Name: {name}
+          {'\n'}
+          Game id: {gameId}
+          {'\n'}
         </Text>
+        <Text>Players:</Text>
         {Object.keys(Papers.state.game.players).map(playerId => (
-          <Text key={profileId}>{playerId}</Text>
-          // REVIEW THIS... it's undefined
+          <Text key={playerId}>- {(profiles && profiles[playerId]?.name) || playerId}</Text>
         ))}
 
-        <Button title="Go back to Home" onPress={Papers.leaveGame} />
+        <Button title="Leave Game" onPress={Papers.leaveGame} />
       </ScrollView>
     </View>
   );
