@@ -14,7 +14,9 @@ export default function HomeScreen({ navigation }) {
   const gameId = game?.id;
 
   useEffect(() => {
-    navigation.navigate(gameId ? 'Room' : 'Home');
+    if (gameId) {
+      navigation.navigate('room');
+    }
   }, [gameId]);
 
   function handleUpdateProfile(profile) {

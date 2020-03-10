@@ -11,7 +11,7 @@ import useLinking from './navigation/useLinking';
 
 import { PapersContextProvider, loadProfile } from './store/PapersContext.js';
 import Home from './screens/home';
-import Room from './screens/room';
+import GameRoom from './screens/game-room';
 
 const Stack = createStackNavigator();
 
@@ -59,8 +59,8 @@ export default function App(props) {
           <NavigationContainer ref={containerRef} initialState={initialNavigationState}>
             <Stack.Navigator headerMode="none">
               {/* <Stack.Screen name="Root" component={BottomTabNavigator} /> */}
-              <Stack.Screen name="Home" component={Home} />
-              <Stack.Screen name="Room" component={Room} />
+              <Stack.Screen name="home" component={Home} />
+              <Stack.Screen name="room" component={GameRoom} />
             </Stack.Navigator>
           </NavigationContainer>
         </View>

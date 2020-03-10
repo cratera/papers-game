@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useContext } from 'react';
 
 import * as Theme from '@theme';
-import { StyleSheet, RefreshControl, ScrollView, View, Text } from 'react-native';
+import { Platform, Alert, StyleSheet, RefreshControl, ScrollView, View, Text } from 'react-native';
 
 import PapersContext from '@store/PapersContext.js';
 
@@ -45,10 +45,29 @@ export default function SettingsModal({ isOpen, onClose }) {
   }, [refreshing]);
 
   const handleLeaveGame = () => {
-    console.warn('TODO R U SURE - LEAVE');
-    // if (window.confirm('Are you sure you wanna leave the game?')) {
-    //   Papers.leaveGame();
-    // }
+    if (Platform.OS === 'web') {
+      if (window.confirm('Are you sure you wanna leave the game?')) {
+        Papers.leaveGame();
+      }
+    } else {
+      Alert.alert(
+        'Leaving the Game',
+        'Are you sure you wanna leave the game?',
+        [
+          {
+            text: 'Leave Game',
+            onPress: Papers.leaveGame,
+            style: 'destructive',
+          },
+          {
+            text: 'Cancel',
+            onPress: () => console.log('Cancel Leave Game'),
+            style: 'cancel',
+          },
+        ],
+        { cancelable: false }
+      );
+    }
   };
 
   const handleResetProfile = () => {

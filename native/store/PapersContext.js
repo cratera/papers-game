@@ -279,6 +279,16 @@ export class PapersContextProvider extends Component {
       }));
     });
 
+    // Teams subscription
+    socket.on('game.teams.set', (topic, data) => {
+      console.log(`:: on.${topic}`, data);
+      const teams = data;
+
+      setGame(game => ({
+        teams,
+      }));
+    });
+
     socket.on('game.leave', topic => {
       console.log(`:: on.${topic}`);
       this._removeGameFromState();
@@ -322,16 +332,13 @@ export class PapersContextProvider extends Component {
 
     const { id, gameId, ...serverProfile } = profile;
 
-    if (Object.keys(serverProfile).length === 0) {
-      console.log(':: no need to update socket');
-      return;
-    }
-
-    if (this.state.socket) {
-      console.log(':: update socket too.');
-      this.state.socket.updateProfile(serverProfile);
-    } else {
-      console.log(':: not connected to socket');
+    if (Object.keys(serverProfile).length > 0) {
+      if (this.state.socket) {
+        console.log(':: update socket too.');
+        this.state.socket.updateProfile(serverProfile);
+      } else {
+        console.log(':: not connected to socket');
+      }
     }
 
     this.setState(state => ({
@@ -390,16 +397,7 @@ export class PapersContextProvider extends Component {
   }
 
   setTeams(teams) {
-    console.log('setTeams()');
-    this.state.socket.emit(
-      'set-teams',
-      {
-        gameId: this.state.game.name,
-        playerId: this.state.profile.id,
-        teams,
-      },
-      e => console.warn('TODO HANDLE ERROR', e)
-    );
+    this.state.socket.setTeams(teams, (res, e) => console.warn('TODO HANDLE ERROR', e));
   }
 
   startGame() {

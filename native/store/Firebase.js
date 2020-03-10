@@ -27,6 +27,7 @@ const PUBLIC_API = {
   createGame,
   joinGame,
   leaveGame,
+  setTeams,
 };
 
 export function serverReconnect({ id, name, gameId }) {
@@ -126,7 +127,7 @@ function resetProfile(id) {
 }
 
 /**
- * TBD
+ *
  */
 function getUser(userId) {
   console.log('⚙️ getUser()', LOCAL_PROFILE.id, userId);
@@ -146,10 +147,10 @@ function getUser(userId) {
 const gameInitialState = ({ id, name, creatorId }) => ({
   id,
   name: name,
-  admin: creatorId, // the one that will decide the flow
+  creatorId: creatorId, // the one that will decide the flow
   players: {
     [creatorId]: {
-      afk: false,
+      isAfk: false,
     },
   },
   words: {
@@ -182,6 +183,10 @@ const gameInitialState = ({ id, name, creatorId }) => ({
   },
 });
 
+/**
+ *
+ * @param {*} gameName
+ */
 async function createGame(gameName) {
   console.log(`⚙️ createGame: ${gameName}`);
   const gameId = slugString(gameName); // REVIEW this with @mmbotelho
@@ -215,6 +220,9 @@ async function createGame(gameName) {
   return gameId;
 }
 
+/**
+ *
+ */
 async function joinGame(gameName) {
   console.log(`⚙️ joinGame: ${gameName}`);
   const gameId = slugString(gameName); // REVIEW this with @mmbotelho
@@ -239,12 +247,12 @@ async function joinGame(gameName) {
 
   if (alreadyStarted && !ImInTheGame) {
     // After the game starts, new players cannot join unless
-    // they are already part of the game (were afk)
+    // they are already part of the game (were isAfk)
     throw new Error('alreadyStarted');
   }
 
   await DB.ref(`games/${gameId}/players/${id}`).set({
-    [id]: { afk: false },
+    [id]: { isAfk: false },
   });
 
   setTimeout(() => {
@@ -254,11 +262,15 @@ async function joinGame(gameName) {
   return gameId;
 }
 
+/**
+ *
+ * @param {String} gameId
+ */
 function _pubGame(gameId) {
   console.log('⚙️ _pubGame', gameId);
   LOCAL_PROFILE.gameId = gameId;
 
-  // Subscribe  to initial game set!
+  // Subscribe to initial game set!
   DB.ref(`games/${gameId}`).once('value', async function(data) {
     const game = data.val();
 
@@ -306,10 +318,13 @@ function _pubGame(gameId) {
   });
 
   // Prepare in case we get offline.
-  const afkRef = firebase.database().ref(`games/${gameId}/players/${LOCAL_PROFILE.id}/afk`);
-  afkRef.onDisconnect().set(true);
+  const isAfkRef = firebase.database().ref(`games/${gameId}/players/${LOCAL_PROFILE.id}/isAfk`);
+  isAfkRef.onDisconnect().set(true);
 }
 
+/**
+ *
+ */
 async function leaveGame() {
   console.log('⚙️ leaveGame()', LOCAL_PROFILE.id);
   const gameId = LOCAL_PROFILE.gameId;
@@ -340,4 +355,19 @@ async function leaveGame() {
     console.log('⚙️ Unsubscribe game');
     PubSub.unsubscribe('game');
   }, 0);
+}
+
+/**
+ *
+ */
+async function setTeams(teams) {
+  console.log('⚙️ setTeams()');
+  const gameId = LOCAL_PROFILE.gameId;
+
+  await DB.ref(`games/${gameId}/teams`).set(teams);
+
+  DB.ref(`games/${gameId}/teams`).once('value', async function(data) {
+    const teams = data.val();
+    PubSub.publish('game.teams.set', teams);
+  });
 }
