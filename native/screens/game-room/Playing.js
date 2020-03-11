@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import { ScrollView, View, StyleSheet, Text } from 'react-native';
 
 import { useCountdown, usePrevious, getRandomInt, msToSecPretty } from '@constants/utils';
 import PapersContext from '@store/PapersContext.js';
@@ -13,7 +13,16 @@ const Avatar = () => null;
 const Styles = {
   tos: {},
   inst: {},
-  tscore: {},
+  tscore: {
+    btn: () => null,
+    item: {
+      display: 'flex',
+      flexWrap: 'nowrap',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+  },
   go: {},
   to: {},
 };
@@ -247,11 +256,11 @@ export default function Playing(props) {
           <View style={Styles.header}>
             <Text style={Styles.headerTitle}>It's your turn!</Text>
             <View style={Styles.inst.container}>
-              <Text style={Styles.inst.first}>Click here if your team guesses the paper</Text>
+              {/* <Text style={Styles.inst.first}>Click here if your team guesses the paper</Text> */}
               {/* <img style={Styles.inst.img} src="/images/instructions.png" alt="instructions" /> */}
-              <Text style={Styles.inst.second}>
+              {/* <Text style={Styles.inst.second}>
                 Click here to go to the next paper. Don’t worry, you can always go back!
-              </Text>
+              </Text> */}
             </View>
           </View>
           {isOdd && <Text>Your team has one player less, so it's you again.</Text>}
@@ -275,52 +284,59 @@ export default function Playing(props) {
               Your team got <Text>{papersTurn.guessed.length}</Text> papers right!
             </Text>
           </View>
-          {papersTurn.guessed.length ? (
-            <View style={Styles.tscore.list}>
-              {papersTurn.guessed.map((paper, i) => (
-                <View style={Styles.tscore.item} key={`${i}_${paper}`}>
-                  <Text>{paper}</Text>
-                  <Button
-                    style={Styles.tscore.btn('remove')}
-                    variant="icon"
-                    aria-label="mark as not guessed"
-                    onPress={() => togglePaper(paper, false)}
-                  />
+          <View>
+            {/* review height */}
+            <ScrollView style={{ height: 245 }}>
+              {papersTurn.guessed.length ? (
+                <View style={Styles.tscore.list}>
+                  {papersTurn.guessed.map((paper, i) => (
+                    <View style={[Styles.tscore.item]} key={`${i}_${paper}`}>
+                      <Text>{paper}</Text>
+                      <Button
+                        style={Styles.tscore.btn('remove')}
+                        variant="icon"
+                        aria-label="mark as not guessed"
+                        onPress={() => togglePaper(paper, false)}
+                      >
+                        X
+                      </Button>
+                    </View>
+                  ))}
                 </View>
-              ))}
-            </View>
-          ) : (
-            <p style={{ marginTop: '4rem' }}>More luck next time...</p>
-          )}
-          {!!papersTurn.passed.length && (
-            <Button
-              style={Styles.tscore.btnToggle}
-              onPress={() => togglePassedPapers(bool => !bool)}
-              variant="flat"
-            >
-              {isVisiblePassedPapers ? 'Hide' : 'Show'} the papers you didn't get
-            </Button>
-          )}
-          {isVisiblePassedPapers && !!papersTurn.passed.length && (
-            <ul style={Styles.tscore.list}>
-              {papersTurn.passed.map((paper, i) => (
-                <li style={Styles.tscore.item} key={`${i}_${paper}`}>
-                  {paper}
-                  <Button
-                    style={Styles.tscore.btn('add')}
-                    variant="icon"
-                    aria-label="mark as guessed"
-                    onPress={() => togglePaper(paper, true)}
-                  />
-                </li>
-              ))}
-            </ul>
-          )}
+              ) : (
+                <Text style={{ marginTop: '4rem' }}>More luck next time...</Text>
+              )}
+              {!!papersTurn.passed.length && (
+                <Button
+                  style={Styles.tscore.btnToggle}
+                  onPress={() => togglePassedPapers(bool => !bool)}
+                  variant="flat"
+                >
+                  {isVisiblePassedPapers ? 'Hide' : 'Show'} the papers you didn't get
+                </Button>
+              )}
+              {isVisiblePassedPapers && !!papersTurn.passed.length && (
+                <View style={Styles.tscore.list}>
+                  {papersTurn.passed.map((paper, i) => (
+                    <View style={Styles.tscore.item} key={`${i}_${paper}`}>
+                      <Text>{paper}</Text>
+                      <Button
+                        style={Styles.tscore.btn('add')}
+                        variant="icon"
+                        aria-label="mark as guessed"
+                        onPress={() => togglePaper(paper, true)}
+                      >
+                        +
+                      </Button>
+                    </View>
+                  ))}
+                </View>
+              )}
+            </ScrollView>
+          </View>
         </Page.Main>
         <Page.CTAs>
-          <Button hasBlock onPress={handleFinishTurnClick}>
-            Finish my turn
-          </Button>
+          <Button onPress={handleFinishTurnClick}>Finish my turn</Button>
         </Page.CTAs>
       </Fragment>
     );
@@ -356,7 +372,7 @@ export default function Playing(props) {
             )}
           </Text>
           <View>
-            Scores:
+            <Text>Scores:</Text>
             {Object.keys(teamsScore).map(teamId => (
               <Text key={teamId}>
                 {game.teams[teamId].name}: {teamsScore[teamId]}
@@ -366,11 +382,9 @@ export default function Playing(props) {
         </Page.Main>
         <Page.CTAs>
           {round.current + 1 === game.settings.roundsCount ? (
-            <Button hasBlock onPress={handleFinalWinnerClick}>
-              Show final winner!
-            </Button>
+            <Button onPress={handleFinalWinnerClick}>Show final winner!</Button>
           ) : profileIsAdmin ? (
-            <Button hasBlock onPress={handleStartNextRoundClick}>
+            <Button onPress={handleStartNextRoundClick}>
               Start Round {round.current + 1 + 1} of {game.settings.roundsCount}
             </Button>
           ) : (
@@ -409,9 +423,8 @@ export default function Playing(props) {
       <Fragment>
         <Page.Main>
           <Button
-            hasBlock
             variant="success"
-            style={isPaperChanging && Styles.go.ctaDim}
+            style={[isPaperChanging && Styles.go.ctaDim]}
             onPress={() => handlePaperClick(true)}
           >
             Got it!
@@ -447,7 +460,14 @@ export default function Playing(props) {
               </Text>
             </View>
           </View>
-          <View hidden style={Theme.typography.small}>
+          <View
+            hidden
+            style={
+              [
+                /*Theme.typography.small*/
+              ]
+            }
+          >
             <Text>
               {' '}
               {'\n'} - passed: {papersTurn.passed.join(', ')}{' '}
@@ -467,9 +487,8 @@ export default function Playing(props) {
             <Text style={{ textAlign: 'center', color: Theme.colors.grayMedium }}>Last paper!</Text>
           ) : (
             <Button
-              hasBlock
               variant="light"
-              style={isPaperChanging && Styles.go.ctaDim}
+              style={[isPaperChanging && Styles.go.ctaDim]}
               onPress={() => handlePaperClick(false)}
             >
               Next paper
@@ -588,9 +607,9 @@ export default function Playing(props) {
       return (
         <Text style={[Theme.typography.h1, { textAlign: 'center' }]}>
           {myTeamWon ? (
-            <Text style={{ color: Theme.colors.success }}>Your team won!</Text>
+            <Text style={{ color: Theme.colors.success }}>You won! 🎉</Text>
           ) : (
-            <Text style={{ color: Theme.colors.danger }}>Your team lost!</Text>
+            <Text style={{ color: Theme.colors.danger }}>You lost... 💩</Text>
           )}
         </Text>
       );
@@ -613,7 +632,8 @@ export default function Playing(props) {
                   ))}
                 </View>
                 <Text>
-                  Best Player: {game.players[round.bestPlayer.id].name} ({round.bestPlayer.score})
+                  {/* REVIEW - Show name even after member leaves game. */}
+                  Best Player: {profiles[round.bestPlayer.id]?.name} ({round.bestPlayer.score})
                 </Text>
                 <Text>{'\n'}</Text>
               </Fragment>

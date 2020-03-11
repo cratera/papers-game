@@ -31,12 +31,7 @@ export class PapersContextProvider extends Component {
         // the last game this player tried to access
         gameId: props.initialProfile.gameId,
       },
-      game: undefined,
-      /* {
-        players: {},
-        state: {},
-        settings: {},
-      } */
+      game: null, // see Firebase.js to see structure.
       profiles: {}, // List of game players' profiles.
     };
 
@@ -325,6 +320,16 @@ export class PapersContextProvider extends Component {
       }));
     });
 
+    // Sub to score status - OPTIMIZE!!
+    socket.on('game.score', (topic, data) => {
+      console.log(`:: on.${topic}`);
+      const score = data;
+
+      setGame(game => ({
+        score,
+      }));
+    });
+
     socket.on('game.leave', topic => {
       console.log(`:: on.${topic}`);
       this._removeGameFromState();
@@ -435,27 +440,29 @@ export class PapersContextProvider extends Component {
   }
 
   startTurn() {
-    console.log('startTurn()');
-    this.state.socket.emit('start-turn', {
-      gameId: this.state.game.name,
-      playerId: this.state.profile.id,
-    });
+    console.log('📌 startTurn()');
+    this.state.socket.startTurn();
   }
 
   finishTurn(papersTurn) {
-    console.log('finishTurn()');
-    this.state.socket.emit('finish-turn', {
-      gameId: this.state.game.name,
-      playerId: this.state.profile.id,
+    const game = this.state.game;
+    console.log('📌 finishTurn()');
+    this.state.socket.finishTurn({
       papersTurn,
+      round: game.round,
+      teams: game.teams,
+      score: game.score,
     });
   }
 
   startNextRound() {
-    console.log('startNextRound()');
-    this.state.socket.emit('start-next-round', {
-      gameId: this.state.game.name,
-      playerId: this.state.profile.id,
+    console.log('📌 startNextRound()');
+    const game = this.state.game;
+
+    this.state.socket.startNextRound({
+      round: game.round,
+      teams: game.teams,
+      words: game.words,
     });
   }
 

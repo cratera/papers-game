@@ -16,8 +16,9 @@ const firebaseConfig = {
 };
 
 let LOCAL_PROFILE = {}; // not sure if this is good.
-
 let DB; // firebase database
+let ALL_WORDS_TOGETHER = null;
+
 const PUBLIC_API = {
   on,
   signIn,
@@ -32,6 +33,9 @@ const PUBLIC_API = {
   setWordsForEveryone,
 
   startGame,
+  startTurn,
+  finishTurn,
+  startNextRound,
 };
 
 export function serverReconnect({ id, name, gameId }) {
@@ -262,7 +266,7 @@ async function joinGame(gameName) {
   }
 
   await DB.ref(`games/${gameId}/players/${id}`).set({
-    [id]: { isAfk: false },
+    isAfk: false,
   });
 
   // Prevent duplicate subs
@@ -313,9 +317,12 @@ function _pubGame(gameId) {
       const id = data.key;
       const val = data.val();
       const profile = await DB.ref(`users/${id}`).once('value');
+
+      // https://stackoverflow.com/questions/18270995/how-to-retrieve-only-new-data
+      // OPTMIZE - Throttle this and send only 1 big publish.
       PubSub.publish('game.players.added', {
         id,
-        info: val[id] || val, // REVIEW / QUESTION. Why sometimes has key?
+        info: val,
         profile: profile.val(),
       });
 
@@ -377,6 +384,11 @@ function _pubGame(gameId) {
     DB.ref(`games/${gameId}/round`).on('value', async function(data) {
       PubSub.publish('game.round', data.val());
     });
+
+    // Sub to round status - OPTIMIZE?
+    DB.ref(`games/${gameId}/score`).on('value', async function(data) {
+      PubSub.publish('game.score', data.val());
+    });
   });
 
   // Prepare in case we get offline.
@@ -402,7 +414,14 @@ async function leaveGame() {
     throw new Error('notFound');
   }
 
-  await DB.ref(`games/${gameId}/players/${LOCAL_PROFILE.id}`).remove();
+  // If is last player, remove game.
+  if (Object.keys(game.val().players).length === 1) {
+    console.log(':: last player - remove game');
+    await DB.ref(`games/${gameId}`).remove();
+  } else {
+    console.log(':: remove player');
+    await DB.ref(`games/${gameId}/players/${LOCAL_PROFILE.id}`).remove();
+  }
 
   PubSub.publish('game.leave');
 
@@ -431,11 +450,11 @@ async function _unsubGame(gameId) {
 
   DB.ref(`games/${gameId}/hasStarted`).off('value');
   DB.ref(`games/${gameId}/round`).off('value');
+  DB.ref(`games/${gameId}/score`).off('value');
 
   const players = await DB.ref(`games/${gameId}/players`).once('value');
 
   for (const playerId in players.val()) {
-    console.log(':: off', playerId);
     DB.ref(`users/${playerId}/isAfk`).off('value');
   }
 }
@@ -485,13 +504,123 @@ async function startGame(words) {
   console.log('⚙️ startGame()');
   const gameId = LOCAL_PROFILE.gameId;
 
-  await DB.ref(`games/${gameId}/hasStarted`).set(true);
   await DB.ref(`games/${gameId}/round`).set({
     current: 0,
     // { 0: turnTeamIndex, 1: turnPlayerIndex, 2: isOdd }
     turnWho: { 0: 0, 1: 0, 2: false },
     turnCount: 0,
     status: 'getReady',
-    wordsLeft: _allWordsTogether(words), // OPTMIZE!
+    wordsLeft: _allWordsTogether(words),
   });
+  await DB.ref(`games/${gameId}/hasStarted`).set(true);
+}
+
+/**
+ *
+ */
+async function startTurn(words) {
+  console.log('⚙️ startTurn()');
+  const gameId = LOCAL_PROFILE.gameId;
+
+  // The client is responsible for the countdown and then
+  // it sends 'finishTurn()' with score. It saves on IO events for each second.
+  await DB.ref(`games/${gameId}/round/status`).set(Date.now());
+}
+
+function _getNextTurn({ turnWho, teams }) {
+  const [teamIndex, playerIndex] = turnWho;
+  const totalTeams = Object.keys(teams).length;
+
+  // BUG / TODO - Handle correctly when teams are not even!
+  if (teamIndex < totalTeams - 1) {
+    const nextTeamIndex = teamIndex + 1;
+    const totalTeamPlayers = teams[nextTeamIndex].players.length;
+
+    if (playerIndex < totalTeamPlayers) {
+      return [nextTeamIndex, playerIndex];
+    } else {
+      return [nextTeamIndex, playerIndex, 'isOdd'];
+    }
+  } else {
+    const totalTeamPlayers = teams[0].players.length;
+    const nextPlayer = playerIndex + 1;
+
+    if (nextPlayer < totalTeamPlayers) {
+      return [0, nextPlayer];
+    } else {
+      return [0, 0];
+    }
+  }
+
+  // if (player < totalPlayers) {
+  //   return [team, player + 1];
+  // } else {
+  //   if (team < totalTeams) {
+  //     return [team + 1, 0];
+  //   } else {
+  //     return [0, 0];
+  //   }
+  // }
+}
+
+/**
+ *
+ * @param {Object} papersTurn - papers involved in this turn.
+ * @param {String} papersTurn.current - current paper on the screen
+ * @param {[String]} papersTurn.passed - papers passed
+ * @param {[String]} papersTurn.guessed - papers guessed
+ * @param {[String]} papersTurn.wordsLeft - papers left
+ */
+async function finishTurn({ round, teams, score, papersTurn }) {
+  console.log('⚙️ finishTurn()', papersTurn);
+  const gameId = LOCAL_PROFILE.gameId;
+  const playerId = LOCAL_PROFILE.id;
+
+  const roundCurrent = round.current;
+  const current = papersTurn.current ? [papersTurn.current] : [];
+  const wordsLeft = [...papersTurn.wordsLeft, ...papersTurn.passed, ...current];
+  let newRound;
+
+  // ---
+  // Q: Should this logic be done here or at PapersContext?.
+  if (wordsLeft.length > 0) {
+    newRound = {
+      current: roundCurrent,
+      turnWho: _getNextTurn({ turnWho: round.turnWho, teams }),
+      turnCount: round.turnCount + 1,
+      status: 'getReady',
+      wordsLeft,
+    };
+  } else {
+    newRound = {
+      status: 'finished',
+      wordsLeft: [],
+    };
+  }
+  // ----
+
+  await DB.ref(`games/${gameId}/score/${roundCurrent}/${playerId}`).update(papersTurn.guessed);
+  await DB.ref(`games/${gameId}/round`).update(newRound);
+}
+
+/**
+ *
+ * @param {Object} round - game round status
+ * @param {Object} teams - game teams
+ * @param {Object} words - game words by player
+ */
+async function startNextRound({ round, teams, words }) {
+  console.log('⚙️ startNextRound()');
+  const gameId = LOCAL_PROFILE.gameId;
+
+  // TODO - Do validations - if wordsLeft is 0, if round is last, etc...
+  const newRound = {
+    current: round.current + 1,
+    turnWho: _getNextTurn({ turnWho: round.turnWho, teams }),
+    turnCount: 0,
+    status: 'getReady',
+    wordsLeft: _allWordsTogether(words),
+  };
+
+  await DB.ref(`games/${gameId}/round`).update(newRound);
 }

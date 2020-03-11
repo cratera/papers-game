@@ -46,7 +46,8 @@ export default function Room({ navigation }) {
 
   React.useEffect(() => {
     if (gameHasStarted) {
-      navigation.navigate('playing');
+      console.log('TODO - Navigating to playing...');
+      // navigation.navigate('playing');
     }
   }, [gameHasStarted]);
 

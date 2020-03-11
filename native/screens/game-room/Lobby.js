@@ -26,6 +26,7 @@ export default function Lobby({ navigation }) {
   const profileId = profile.id;
   const profileIsAdmin = game.creatorId === profileId;
   const hasTeams = !!game.teams;
+  const gameHasStarted = !!game && game.hasStarted;
 
   const didSubmitAllWords = plId => {
     return game.words && game.words[plId] && game.words[plId].length === game.settings.words;
@@ -37,6 +38,13 @@ export default function Lobby({ navigation }) {
       !didSubmitAllWords(profileId) && openWords();
     }
   });
+
+  React.useEffect(() => {
+    if (gameHasStarted) {
+      console.log('Navigating to playing...');
+      navigation.navigate('playing');
+    }
+  }, [gameHasStarted]);
 
   /* REVIEW - Hum... maybe create 2 routes? */
   return !game.teams ? renderLobbyStarting() : renderLobbyWritting();
