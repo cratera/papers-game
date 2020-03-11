@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { AsyncStorage } from 'react-native';
 
 import { createUniqueId } from '@constants/utils.js';
-// import wordsForEveryone from './wordsForEveryone.js';
+import wordsForEveryone from './wordsForEveryone.js';
 
 // OPTIMIZE - Pass this as prop, so it's agnostic to any type of server / API.
 import serverInit, { serverReconnect } from './Firebase.js';
@@ -274,7 +274,10 @@ export class PapersContextProvider extends Component {
       setGame(game => ({
         players: {
           ...game.players,
-          [id]: info,
+          [id]: {
+            ...(game.players[id] || {}),
+            ...info,
+          },
         },
       }));
     });
@@ -286,6 +289,39 @@ export class PapersContextProvider extends Component {
 
       setGame(game => ({
         teams,
+      }));
+    });
+
+    // Words subscription
+    socket.on('game.words.set', (topic, data) => {
+      console.log(`:: on.${topic}`, data);
+      const { pId, words } = data;
+
+      setGame(game => ({
+        words: {
+          ...game.words,
+          [pId]: words,
+        },
+      }));
+    });
+
+    // Sub to game starting
+    socket.on('game.hasStarted', (topic, data) => {
+      console.log(`:: on.${topic}`, data);
+      const hasStarted = data;
+
+      setGame(game => ({
+        hasStarted,
+      }));
+    });
+
+    // Sub to round status - OPTIMIZE!!
+    socket.on('game.round', (topic, data) => {
+      console.log(`:: on.${topic}`);
+      const round = data;
+
+      setGame(game => ({
+        round,
       }));
     });
 
@@ -352,6 +388,7 @@ export class PapersContextProvider extends Component {
   }
 
   async resetProfile(profile) {
+    console.log('📌 resetProfile()');
     try {
       await AsyncStorage.removeItem('id');
       await AsyncStorage.removeItem('name');
@@ -370,30 +407,21 @@ export class PapersContextProvider extends Component {
     }));
   }
 
-  setWordsForEveyone() {
-    console.log('setWordsForEveyone()');
+  async setWords(words, cb) {
+    console.log('📌 setWords()');
+    await this.state.socket.setWords(words, cb);
+    cb();
+  }
+
+  async setWordsForEveyone(cb) {
+    console.log('📌 setWordsForEveyone()');
     const allWords = Object.keys(this.state.game.players).reduce((acc, playerId, i) => {
       return { ...acc, [playerId]: wordsForEveryone[i] };
     }, {});
 
-    this.state.socket.emit('set-words-for-everyone', {
-      gameId: this.state.game.name,
-      playerId: this.state.profile.id,
-      allWords,
-    });
-  }
+    await this.state.socket.setWordsForEveryone(allWords);
 
-  setWords(words, cb) {
-    console.log('setWords()');
-    this.state.socket.emit(
-      'set-words',
-      {
-        gameId: this.state.game.name,
-        playerId: this.state.profile.id,
-        words,
-      },
-      cb
-    );
+    cb();
   }
 
   setTeams(teams) {
@@ -401,11 +429,9 @@ export class PapersContextProvider extends Component {
   }
 
   startGame() {
-    console.log('startGame()');
-    this.state.socket.emit('start-game', {
-      gameId: this.state.game.name,
-      playerId: this.state.profile.id,
-    });
+    console.log('📌 startGame()');
+    const words = this.state.game.words;
+    this.state.socket.startGame(words);
   }
 
   startTurn() {

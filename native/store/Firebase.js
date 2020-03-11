@@ -28,6 +28,10 @@ const PUBLIC_API = {
   joinGame,
   leaveGame,
   setTeams,
+  setWords,
+  setWordsForEveryone,
+
+  startGame,
 };
 
 export function serverReconnect({ id, name, gameId }) {
@@ -58,6 +62,7 @@ export default function init(options) {
   firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
       LOCAL_PROFILE.id = user.uid;
+      LOCAL_PROFILE.isAfk = false;
       console.log('⚙️ Signed!', LOCAL_PROFILE.id);
 
       updateProfile(LOCAL_PROFILE);
@@ -148,6 +153,7 @@ const gameInitialState = ({ id, name, creatorId }) => ({
   id,
   name: name,
   creatorId: creatorId, // the one that will decide the flow
+  hasStarted: false,
   players: {
     [creatorId]: {
       isAfk: false,
@@ -213,6 +219,10 @@ async function createGame(gameName) {
     })
   );
 
+  // Prevent duplicate subs
+  PubSub.unsubscribe('game');
+  await _unsubGame(gameId);
+
   setTimeout(() => {
     _pubGame(gameId);
   }, 0);
@@ -255,6 +265,10 @@ async function joinGame(gameName) {
     [id]: { isAfk: false },
   });
 
+  // Prevent duplicate subs
+  PubSub.unsubscribe('game');
+  await _unsubGame(gameId);
+
   setTimeout(() => {
     _pubGame(gameId);
   }, 0);
@@ -267,8 +281,8 @@ async function joinGame(gameName) {
  * @param {String} gameId
  */
 function _pubGame(gameId) {
-  console.log('⚙️ _pubGame', gameId);
   LOCAL_PROFILE.gameId = gameId;
+  console.log('⚙️ _pubGame', gameId);
 
   // Subscribe to initial game set!
   DB.ref(`games/${gameId}`).once('value', async function(data) {
@@ -289,22 +303,39 @@ function _pubGame(gameId) {
     }
 
     // Set the initial state of the game.
+    console.log('⚙️ pub.game.set');
     PubSub.publish('game.set', { game, profiles });
 
     const DB_PLAYERS = DB.ref(`games/${gameId}/players`);
+
     // Sub to players status
     DB_PLAYERS.on('child_added', async function(data) {
       const id = data.key;
+      const val = data.val();
       const profile = await DB.ref(`users/${id}`).once('value');
       PubSub.publish('game.players.added', {
         id,
-        info: data.val()[id],
+        info: val[id] || val, // REVIEW / QUESTION. Why sometimes has key?
         profile: profile.val(),
+      });
+
+      DB.ref(`users/${id}/isAfk`).on('value', data => {
+        console.log('⚙️ player is afk!', id, data.val());
+        PubSub.publish('game.players.changed', {
+          id,
+          info: {
+            isAfk: data.val(),
+          },
+        });
       });
     });
     DB_PLAYERS.on('child_removed', function(data) {
+      const id = data.key;
+
+      DB.ref(`users/${id}/isAfk`).off('value');
+
       PubSub.publish('game.players.removed', {
-        id: data.key,
+        id,
         newAdmin: null, // TODO
       });
     });
@@ -315,11 +346,42 @@ function _pubGame(gameId) {
         info: data.val()[id],
       });
     });
+
+    // Sub to teams status
+    DB.ref(`games/${gameId}/teams`).on('value', async function(data) {
+      const teams = data.val();
+      PubSub.publish('game.teams.set', teams);
+    });
+
+    // Sub to words added
+    DB.ref(`games/${gameId}/words`).on('child_added', async function(data) {
+      PubSub.publish('game.words.set', {
+        pId: data.key,
+        words: data.val(),
+      });
+    });
+
+    DB.ref(`games/${gameId}/words`).on('child_changed', async function(data) {
+      PubSub.publish('game.words.set', {
+        pId: data.key,
+        words: data.val(),
+      });
+    });
+
+    // Sub to game starting
+    DB.ref(`games/${gameId}/hasStarted`).on('value', async function(data) {
+      PubSub.publish('game.hasStarted', data.val());
+    });
+
+    // Sub to round status - OPTIMIZE?
+    DB.ref(`games/${gameId}/round`).on('value', async function(data) {
+      PubSub.publish('game.round', data.val());
+    });
   });
 
   // Prepare in case we get offline.
-  const isAfkRef = firebase.database().ref(`games/${gameId}/players/${LOCAL_PROFILE.id}/isAfk`);
-  isAfkRef.onDisconnect().set(true);
+  const isAfkRef = firebase.database().ref(`users/${LOCAL_PROFILE.id}/isAfk`);
+  isAfkRef.onDisconnect().set(true); // TODO subscribe
 }
 
 /**
@@ -344,6 +406,17 @@ async function leaveGame() {
 
   PubSub.publish('game.leave');
 
+  await _unsubGame(gameId);
+
+  setTimeout(() => {
+    console.log('⚙️ Unsubscribe game');
+    PubSub.unsubscribe('game');
+  }, 0);
+}
+
+async function _unsubGame(gameId) {
+  console.log('⚙️ _unsubGame()', gameId);
+
   // Disconnect from group
   const DB_PLAYERS = DB.ref(`games/${gameId}/players`);
 
@@ -351,10 +424,20 @@ async function leaveGame() {
   DB_PLAYERS.off('child_removed');
   DB_PLAYERS.off('child_changed');
 
-  setTimeout(() => {
-    console.log('⚙️ Unsubscribe game');
-    PubSub.unsubscribe('game');
-  }, 0);
+  DB.ref(`games/${gameId}/teams`).off('value');
+
+  DB.ref(`games/${gameId}/words`).off('child_added');
+  DB.ref(`games/${gameId}/words`).off('child_changed');
+
+  DB.ref(`games/${gameId}/hasStarted`).off('value');
+  DB.ref(`games/${gameId}/round`).off('value');
+
+  const players = await DB.ref(`games/${gameId}/players`).once('value');
+
+  for (const playerId in players.val()) {
+    console.log(':: off', playerId);
+    DB.ref(`users/${playerId}/isAfk`).off('value');
+  }
 }
 
 /**
@@ -365,9 +448,50 @@ async function setTeams(teams) {
   const gameId = LOCAL_PROFILE.gameId;
 
   await DB.ref(`games/${gameId}/teams`).set(teams);
+}
 
-  DB.ref(`games/${gameId}/teams`).once('value', async function(data) {
-    const teams = data.val();
-    PubSub.publish('game.teams.set', teams);
+/**
+ *
+ */
+async function setWords(words) {
+  console.log('⚙️ setWords()');
+  const gameId = LOCAL_PROFILE.gameId;
+  const playerId = LOCAL_PROFILE.id;
+
+  await DB.ref(`games/${gameId}/words/${playerId}`).set(words);
+}
+
+/**
+ * a shortcut for dev only.
+ */
+async function setWordsForEveryone(allWords) {
+  console.log('⚙️ setWordsForEveyone()');
+  const gameId = LOCAL_PROFILE.gameId;
+
+  await DB.ref(`games/${gameId}/words`).set(allWords);
+}
+
+/**
+ *
+ */
+function _allWordsTogether(words) {
+  return Object.keys(words).reduce((acc, pId) => [...acc, ...words[pId]], []);
+}
+
+/**
+ *
+ */
+async function startGame(words) {
+  console.log('⚙️ startGame()');
+  const gameId = LOCAL_PROFILE.gameId;
+
+  await DB.ref(`games/${gameId}/hasStarted`).set(true);
+  await DB.ref(`games/${gameId}/round`).set({
+    current: 0,
+    // { 0: turnTeamIndex, 1: turnPlayerIndex, 2: isOdd }
+    turnWho: { 0: 0, 1: 0, 2: false },
+    turnCount: 0,
+    status: 'getReady',
+    wordsLeft: _allWordsTogether(words), // OPTMIZE!
   });
 }

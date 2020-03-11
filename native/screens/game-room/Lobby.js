@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { Image, View, StyleSheet, Text, TouchableHighlight } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 
 import PapersContext from '@store/PapersContext.js';
 import { usePrevious } from '@constants/utils.js';
+
+import WritePapersModal from './WritePapersModal.js';
 
 import * as Theme from '@theme';
 // import Styles from './HomeStyles.js';
@@ -19,10 +21,11 @@ import ListPlayers from '@components/list-players';
 export default function Lobby({ navigation }) {
   const Papers = React.useContext(PapersContext);
   const { profile, profiles, game } = Papers.state;
+  const prevHasTeams = usePrevious(!!game.teams);
+  const [isModalOpen, setModalOpen] = React.useState(false);
   const profileId = profile.id;
   const profileIsAdmin = game.creatorId === profileId;
   const hasTeams = !!game.teams;
-  const prevHasTeams = usePrevious(!!game.teams);
 
   const didSubmitAllWords = plId => {
     return game.words && game.words[plId] && game.words[plId].length === game.settings.words;
@@ -39,14 +42,15 @@ export default function Lobby({ navigation }) {
   return !game.teams ? renderLobbyStarting() : renderLobbyWritting();
 
   function openWords() {
-    // TODO - Continue here!
-    // setModal({
-    //   component: WritePapersModal,
-    // });
+    setModalOpen(true);
   }
 
   function setWordsForEveyone() {
-    Papers.setWordsForEveyone();
+    // add loading state
+    Papers.setWordsForEveyone((res, err) => {
+      // remove loading state.
+      console.log('setwords done!', err);
+    });
   }
 
   function handleStartClick() {
@@ -102,46 +106,51 @@ export default function Lobby({ navigation }) {
     const writeAllShortCut = profileIsAdmin && !didEveryoneSubmittedTheirWords;
 
     return (
-      <Page>
-        <Page.Header />
-        <Page.Main>
-          <View style={Styles.header}>
-            <Text>{game.name}</Text>
-            <Text style={Theme.typography.secondary}>
-              {!didEveryoneSubmittedTheirWords ? 'Waiting for other players' : 'Everyone finished!'}
-            </Text>
-            {/* <Image
+      <Fragment>
+        <Page>
+          <Page.Header />
+          <Page.Main>
+            <View style={Styles.header}>
+              <Text>{game.name}</Text>
+              <Text style={Theme.typography.secondary}>
+                {!didEveryoneSubmittedTheirWords
+                  ? 'Waiting for other players'
+                  : 'Everyone finished!'}
+              </Text>
+              {/* <Image
               style={Styles.headerImg}
               src={`/images/${!didEveryoneSubmittedTheirWords ? 'waiting' : 'done'}.gif`}
               alt=""
             /> */}
-          </View>
-          <View>
-            {Object.keys(game.teams).map(teamId => {
-              const { id, name, players } = game.teams[teamId];
-              return (
-                <View key={id} style={Styles.team}>
-                  <Text style={Theme.typography.h3}>{name}</Text>
-                  <Text>Players:</Text>
-                  <ListPlayers players={players} />
-                </View>
-              );
-            })}
-          </View>
-        </Page.Main>
-        <Page.CTAs>
-          {!didSubmitWords && <Button onPress={openWords}>Write your papers</Button>}
-          {didEveryoneSubmittedTheirWords && profileIsAdmin && (
-            <Button onPress={handleStartClick}>Start Game!</Button>
-          )}
-          {writeAllShortCut && (
-            <Button variant="danger" onPress={setWordsForEveyone}>
-              {/* eslint-disable-next-line */}
-              Write everyone's papers 💥
-            </Button>
-          )}
-        </Page.CTAs>
-      </Page>
+            </View>
+            <View>
+              {Object.keys(game.teams).map(teamId => {
+                const { id, name, players } = game.teams[teamId];
+                return (
+                  <View key={id} style={Styles.team}>
+                    <Text style={Theme.typography.h3}>{name}</Text>
+                    <Text>Players:</Text>
+                    <ListPlayers players={players} />
+                  </View>
+                );
+              })}
+            </View>
+          </Page.Main>
+          <Page.CTAs>
+            {!didSubmitWords && <Button onPress={openWords}>Write your papers</Button>}
+            {didEveryoneSubmittedTheirWords && profileIsAdmin && (
+              <Button onPress={handleStartClick}>Start Game!</Button>
+            )}
+            {writeAllShortCut && (
+              <Button variant="danger" onPress={setWordsForEveyone}>
+                {/* eslint-disable-next-line */}
+                Write everyone's papers 💥
+              </Button>
+            )}
+          </Page.CTAs>
+        </Page>
+        <WritePapersModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
+      </Fragment>
     );
   }
 }

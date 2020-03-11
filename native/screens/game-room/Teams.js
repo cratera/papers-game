@@ -22,8 +22,9 @@ export default function GameRoom({ navigation }) {
   const [tempTeams, setTeams] = React.useState(PaperTeams);
 
   function backToLobby() {
-    console.error('Back to lobby!');
+    navigation.navigate('lobby');
   }
+
   function generateTeams() {
     const players = Object.keys(game.players);
     const teamsNr = 2; // LATER - game setting

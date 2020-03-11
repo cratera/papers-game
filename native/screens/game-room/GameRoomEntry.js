@@ -25,6 +25,7 @@ export default function Room({ navigation }) {
   const urlGameId = null;
   // const { id: urlGameId } = useParams();
   const profileId = profile && profile.id;
+  const gameHasStarted = !!game && game.hasStarted;
   const profileIsAfk = game && game.players[profileId]?.isAfk;
   const [status, setStatus] = React.useState(gameId ? 'ready' : 'loading'); // needProfile || ready  || notFound
   // const prevGameId = React.usePrevious(gameId);
@@ -42,6 +43,12 @@ export default function Room({ navigation }) {
       navigation.navigate('home');
     }
   }, [gameId, profileId]);
+
+  React.useEffect(() => {
+    if (gameHasStarted) {
+      navigation.navigate('playing');
+    }
+  }, [gameHasStarted]);
 
   const Template = ({ children }) => (
     <Page>
@@ -100,8 +107,8 @@ export default function Room({ navigation }) {
   return (
     <Stack.Navigator headerMode="none">
       <Stack.Screen name="lobby" component={GameLobby} />
-      <Stack.Screen name="teams" component={GameTeams} />
       <Stack.Screen name="playing" component={GamePlaying} />
+      {!game.teams ? <Stack.Screen name="teams" component={GameTeams} /> : null}
     </Stack.Navigator>
   );
 
