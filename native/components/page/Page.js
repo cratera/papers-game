@@ -38,17 +38,19 @@ const Main = ({ children, style, ...otherProps }) => {
   );
 };
 
-const CTAs = ({ children, ...otherProps }) => {
+const CTAs = ({ children, hasOffset, ...otherProps }) => {
   return (
     <View
       style={[
         Styles.ctas,
         {
-          paddingBottom: !!children ? 56 : 0,
+          paddingBottom: !!children ? 40 : 0,
         },
       ]}
       {...otherProps}
     >
+      {/* a blank element to push buttons up. */}
+      {hasOffset && <View style={{ marginTop: -22 }}></View>}
       {children}
     </View>
   );

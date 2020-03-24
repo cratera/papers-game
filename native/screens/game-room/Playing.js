@@ -59,12 +59,13 @@ export default function Playing(props) {
   const isMyTurn = turnPlayerId === profile.id;
 
   const [papersTurn, setPapersTurn] = React.useState(
-    JSON.parse(window.localStorage.getItem('turn')) || {
-      current: null, // String - current paper on the screen
-      passed: [], // [String] - papers passed
-      guessed: [], // [String] - papers guessed
-      wordsLeft: round.wordsLeft, // [String] - words left
-    }
+    {}
+    // JSON.parse(window.localStorage.getItem('turn')) || {
+    //   current: null, // String - current paper on the screen
+    //   passed: [], // [String] - papers passed
+    //   guessed: [], // [String] - papers guessed
+    //   wordsLeft: round.wordsLeft, // [String] - words left
+    // }
   );
   const [isFinalScore, setFinalScore] = React.useState(null);
 
@@ -94,7 +95,7 @@ export default function Playing(props) {
 
       if (round.wordsLeft.length === 0) {
         // words ended
-        window.localStorage.setItem('turn', JSON.stringify(state));
+        // window.localStorage.setItem('turn', JSON.stringify(state));
         return state;
       }
 
@@ -108,7 +109,7 @@ export default function Playing(props) {
       state.current = nextPaper;
       state.wordsLeft = wordsToPick;
 
-      window.localStorage.setItem('turn', JSON.stringify(state));
+      // window.localStorage.setItem('turn', JSON.stringify(state));
       return state;
     });
     setPaperBlur(false);
@@ -170,7 +171,7 @@ export default function Playing(props) {
         current: nextPaper,
       };
 
-      window.localStorage.setItem('turn', JSON.stringify(newState));
+      // window.localStorage.setItem('turn', JSON.stringify(newState));
       return newState;
     });
     setPaperBlur(false);
@@ -219,7 +220,7 @@ export default function Playing(props) {
         ...wordsModified,
       };
 
-      window.localStorage.setItem('turn', JSON.stringify(newState));
+      // window.localStorage.setItem('turn', JSON.stringify(newState));
       return newState;
     });
   }
@@ -501,7 +502,8 @@ export default function Playing(props) {
 
   const renderOthersTurn = () => {
     const teamName = game.teams[turnTeamIndex].name;
-    const player = profiles[turnPlayerId];
+    const player = profiles[turnPlayerId] || { avatar: null, name: `? ${turnPlayerId} ?` };
+
     return (
       <Fragment>
         <Page.Main>

@@ -4,12 +4,12 @@ import { StyleSheet, Text, TouchableHighlight } from 'react-native';
 import * as Theme from '@theme';
 import * as Styles from './ButtonStyles.js';
 
-function Button({ variant, size, place, isLoading, children, style, ...otherProps }) {
+function Button({ variant, size, place, isLoading, children, style, styleTouch, ...otherProps }) {
   if (otherProps.hasBlock) {
     console.error('hasblock is deprecated!');
   }
   return (
-    <TouchableHighlight {...otherProps} underlayColor={Theme.colors.bg}>
+    <TouchableHighlight {...otherProps} style={styleTouch} underlayColor={Theme.colors.bg}>
       <Text style={[Styles.button({ variant, size, place }), style]}>
         <Text>{children}</Text>
         {isLoading ? <Text style={Styles.loading}> ⏳</Text> : ''}

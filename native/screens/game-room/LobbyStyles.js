@@ -6,14 +6,16 @@ export default StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    marginBottom: 40,
+    paddingBottom: 8,
     // ${Theme.bp.xs} {
     //   margin-bottom: 2rem;
     // }
   },
+  header_title: {},
   headerImg: {
-    marginTop: 80,
-    maxHeight: 140.7,
+    marginTop: 8,
+    width: 140,
+    height: 140,
   },
   cap: {
     paddingBottom: 8,
@@ -22,6 +24,10 @@ export default StyleSheet.create({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'baseline',
+  },
+  list: {
+    paddingTop: 24,
+    paddingBottom: 32,
   },
   // same as TeamsStyles
   headerTeam: {
@@ -34,5 +40,10 @@ export default StyleSheet.create({
   team: {
     marginTop: 8,
     marginBottom: 40,
+  },
+  status: {
+    paddingTop: 16,
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
 });

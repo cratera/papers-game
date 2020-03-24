@@ -19,6 +19,7 @@ export default StyleSheet.create({
     alignItems: 'center',
   },
   itemStatus: {
-    maxHeight: 56,
+    width: 56,
+    height: 56,
   },
 });

@@ -14,7 +14,12 @@ export default function Avatar({ src, alt, hasMargin, size = 'md', ...otherProps
             accessibilityLabel: '',
           }
         : {})}
-      style={[Styles.avatar, hasMargin && Styles.margin, Styles[`size_${size}`]]}
+      style={[
+        Styles.avatar,
+        src && { resizeMode: 'cover' },
+        hasMargin && Styles.margin,
+        Styles[`size_${size}`],
+      ]}
       {...otherProps}
     />
   );
@@ -22,7 +27,6 @@ export default function Avatar({ src, alt, hasMargin, size = 'md', ...otherProps
 
 const Styles = StyleSheet.create({
   avatar: {
-    resizeMode: 'cover',
     backgroundColor: Theme.colors.primaryLight,
   },
   margin: {

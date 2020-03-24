@@ -24,7 +24,7 @@ export default StyleSheet.create({
     backgroundColor: Theme.colors.bg,
     paddingTop: statusBarH,
     paddingBottom: 8,
-    paddingHorizontal: 40,
+    paddingHorizontal: 16,
     flexDirection: 'row',
     alignItems: 'center',
     zIndex: 1,
@@ -32,10 +32,12 @@ export default StyleSheet.create({
   main: {
     paddingTop: headerH,
     flexGrow: 1,
+    flexShrink: 1 /* so it scrolls */,
     paddingHorizontal: gutter,
     alignSelf: 'stretch',
   },
   ctas: {
+    backgroundColor: Theme.colors.bg,
     paddingHorizontal: gutter,
   },
 

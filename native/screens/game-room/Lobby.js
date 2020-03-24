@@ -5,6 +5,9 @@ import { ScrollView } from 'react-native-gesture-handler';
 import PapersContext from '@store/PapersContext.js';
 import { usePrevious } from '@constants/utils.js';
 
+import imgWaiting from '@assets/images/waiting.gif';
+import imgDone from '@assets/images/done.gif';
+
 import WritePapersModal from './WritePapersModal.js';
 
 import * as Theme from '@theme';
@@ -71,13 +74,13 @@ export default function Lobby({ navigation }) {
         return profileIsAdmin ? (
           <Button onPress={handleCreateTeams}>Create teams!</Button>
         ) : (
-          <Text style={Theme.typography.body}>
+          <Text style={[Theme.typography.small, Styles.status]}>
             Wait for {profiles[game.creatorId].name} to create the teams.
           </Text>
         );
       } else {
         return (
-          <Text style={Theme.typography.italic}>
+          <Text style={[Theme.typography.small, Styles.status]}>
             Waiting for your friends to join the game (Minimum 4).
           </Text>
         );
@@ -94,15 +97,15 @@ export default function Lobby({ navigation }) {
             )}
             <View style={Styles.title}>
               <Text style={Theme.typography.h1}>{game.name}</Text>
-              {/* Later - Sahre game. */}
+              {/* Later - ShAre game. */}
             </View>
           </View>
-          <View>
+          <ScrollView style={[Theme.u.scrollSideOffset, Styles.list]}>
             <Text style={Theme.typography.h3}>Lobby</Text>
             <ListPlayers players={Object.keys(game.players)} enableKickout />
-          </View>
+          </ScrollView>
         </Page.Main>
-        <Page.CTAs>{CTAs()}</Page.CTAs>
+        <Page.CTAs hasOffset={profileIsAdmin}>{CTAs()}</Page.CTAs>
       </Page>
     );
   }
@@ -117,34 +120,42 @@ export default function Lobby({ navigation }) {
         <Page>
           <Page.Header />
           <Page.Main>
-            <View style={Styles.header}>
-              <Text>{game.name}</Text>
-              <Text style={Theme.typography.secondary}>
-                {!didEveryoneSubmittedTheirWords
-                  ? 'Waiting for other players'
-                  : 'Everyone finished!'}
-              </Text>
-              {/* <Image
-              style={Styles.headerImg}
-              src={`/images/${!didEveryoneSubmittedTheirWords ? 'waiting' : 'done'}.gif`}
-              alt=""
-            /> */}
-            </View>
-            <View>
-              {Object.keys(game.teams).map(teamId => {
-                const { id, name, players } = game.teams[teamId];
-                return (
-                  <View key={id} style={Styles.team}>
-                    <Text style={Theme.typography.h3}>{name}</Text>
-                    <Text>Players:</Text>
-                    <ListPlayers players={players} />
-                  </View>
-                );
-              })}
-            </View>
+            <ScrollView>
+              <View style={Styles.header}>
+                {!didEveryoneSubmittedTheirWords && (
+                  <Text style={Theme.typography.h1}>{game.name}</Text>
+                )}
+                <Text style={Theme.typography.secondary}>
+                  {!didEveryoneSubmittedTheirWords
+                    ? 'Waiting for other players'
+                    : 'Everyone finished!'}
+                </Text>
+                <Image
+                  style={Styles.headerImg}
+                  source={{ uri: didEveryoneSubmittedTheirWords ? imgDone : imgWaiting }}
+                  alt=""
+                />
+              </View>
+              <View>
+                {Object.keys(game.teams).map(teamId => {
+                  const { id, name, players } = game.teams[teamId];
+                  return (
+                    <View key={id} style={Styles.team}>
+                      <Text style={Theme.typography.h3}>{name}</Text>
+                      <Text>Players:</Text>
+                      <ListPlayers players={players} />
+                    </View>
+                  );
+                })}
+              </View>
+            </ScrollView>
           </Page.Main>
           <Page.CTAs>
-            {!didSubmitWords && <Button onPress={openWords}>Write your papers</Button>}
+            {!didSubmitWords && (
+              <Button onPress={openWords} styleTouch={{ marginBottom: 16 }}>
+                Write your papers
+              </Button>
+            )}
             {didEveryoneSubmittedTheirWords && profileIsAdmin && (
               <Button onPress={handleStartClick}>Start Game!</Button>
             )}

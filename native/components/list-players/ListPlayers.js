@@ -1,5 +1,8 @@
 import React from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import { View, StyleSheet, Text, Image } from 'react-native';
+
+import imgWritting from '@assets/images/writting.gif';
+import imgDone from '@assets/images/done.gif';
 
 import PapersContext from '@store/PapersContext.js';
 import Button from '@components/button';
@@ -44,7 +47,7 @@ export default function ListPlayers({ players, enableKickout = false, ...otherPr
         const { avatar, name } = profiles[playerId] || {};
         const { isAfk } = game.players[playerId];
         const wordsSubmitted = game.words && game.words[playerId];
-        const writtingStatus = game.teams && (!wordsSubmitted ? 'writting' : 'done');
+        const writtingStatus = game.teams && (!wordsSubmitted ? imgWritting : imgDone);
         return (
           <View key={playerId} style={Styles.item}>
             <View style={Styles.who}>
@@ -60,12 +63,11 @@ export default function ListPlayers({ players, enableKickout = false, ...otherPr
             </View>
             <View>
               {writtingStatus && (
-                <Text>[IMG_{writtingStatus}]</Text>
-                // <img
-                //   style={Styles.itemStatus}
-                //   src={`/images/${writtingStatus}.gif`}
-                //   alt={`status: ${writtingStatus}`}
-                // />
+                <Image
+                  style={Styles.itemStatus}
+                  source={{ uri: writtingStatus }}
+                  alt={`status: [TODO]`}
+                />
               )}
               {enableKickout && profileIsAdmin && playerId !== profileId && (
                 <Button variant="light" size="sm" onPress={() => handleKickOut(playerId)}>

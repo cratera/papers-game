@@ -52,4 +52,9 @@ export const u = StyleSheet.create({
   center: {
     textAlign: 'center',
   },
+  scrollSideOffset: {
+    // move scrollbar to the edge.
+    marginLeft: -16,
+    paddingLeft: 16,
+  },
 });

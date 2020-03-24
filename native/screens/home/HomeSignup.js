@@ -10,8 +10,6 @@ import {
 } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 
-import { Svg, Path } from 'react-native-svg';
-
 import * as ImagePicker from 'expo-image-picker';
 import Constants from 'expo-constants';
 import * as Permissions from 'expo-permissions';
