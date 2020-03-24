@@ -15,7 +15,6 @@ import GamePlaying from './Playing.js';
 
 import Page from '@components/page';
 import Button from '@components/button';
-import TheText from '@components/typography/TheText.js';
 
 export default function Room({ navigation }) {
   const Papers = React.useContext(PapersContext);

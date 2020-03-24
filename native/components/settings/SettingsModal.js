@@ -6,7 +6,6 @@ import { Platform, Alert, StyleSheet, RefreshControl, ScrollView, View, Text } f
 import PapersContext from '@store/PapersContext.js';
 
 import Button from '@components/button';
-import TheText from '@components/typography/TheText.js';
 import Modal from '@components/modal';
 
 function Item({ title, btn, onPress, description }) {
@@ -89,7 +88,7 @@ export default function SettingsModal({ isOpen, onClose }) {
             description=" You'll leave the group. If the game starts meanwhile, you won't be able to join again."
           />
         ) : (
-          <TheText style={Theme.typography.secondary}>No game on going. Come back later.</TheText>
+          <Text style={Theme.typography.secondary}>No game on going. Come back later.</Text>
         )}
 
         <Text>{'\n'}</Text>

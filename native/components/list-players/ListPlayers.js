@@ -3,10 +3,10 @@ import { View, StyleSheet, Text } from 'react-native';
 
 import PapersContext from '@store/PapersContext.js';
 import Button from '@components/button';
-// import Avatar from '@components/avatar';
-const Avatar = () => null;
-// import * as Styles from './ListPlayersStyles';
-const Styles = {};
+import Avatar from '@components/avatar';
+
+import Styles from './ListPlayersStyles';
+import * as Theme from '@theme';
 
 export default function ListPlayers({ players, enableKickout = false, ...otherProps }) {
   const Papers = React.useContext(PapersContext);
@@ -45,17 +45,13 @@ export default function ListPlayers({ players, enableKickout = false, ...otherPr
         const { isAfk } = game.players[playerId];
         const wordsSubmitted = game.words && game.words[playerId];
         const writtingStatus = game.teams && (!wordsSubmitted ? 'writting' : 'done');
-
         return (
-          <View
-            key={playerId}
-            style={[{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap' }, Styles.item]}
-          >
-            <View>
+          <View key={playerId} style={Styles.item}>
+            <View style={Styles.who}>
               <Avatar src={avatar} hasMargin />
-              <Text>
-                - {name}
-                <Text>
+              <Text style={Theme.typography.body}>
+                {name}
+                <Text style={Theme.typography.secondary}>
                   {playerId === game.creatorId ? ' (Admin)' : ''}
                   {playerId === profileId ? ' (you)' : ''}
                   {isAfk ? ' ⚠️ ' : ''}

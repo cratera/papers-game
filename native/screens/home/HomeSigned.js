@@ -13,7 +13,6 @@ import * as Permissions from 'expo-permissions';
 
 import Page from '@components/page';
 import Button from '@components/button';
-import TheText from '@components/typography/TheText.js';
 import danceGif from '@assets/images/dance.gif';
 
 import usePickAvatar from './utils/usePickAvatar.js';
@@ -48,11 +47,11 @@ export default function HomeSigned({ navigation }) {
         <Page.Header></Page.Header>
         <Page.Main style={Styles.main}>
           <AvatarMeme avatar={profile.avatar} onChange={handleChangeAvatar} />
-          <TheText style={Theme.u.center}>
+          <Text style={[Theme.typography.body, Theme.u.center]}>
             Welcome
             {'\n'}
             <Text style={Theme.typography.h1}>{profile.name}</Text>
-          </TheText>
+          </Text>
         </Page.Main>
         <Page.CTAs>
           <Button onPress={() => openAccessGameModal('join')}>Join Game</Button>

@@ -8,15 +8,11 @@ import { usePrevious } from '@constants/utils.js';
 import WritePapersModal from './WritePapersModal.js';
 
 import * as Theme from '@theme';
-// import Styles from './HomeStyles.js';
-const Styles = {
-  title: () => null,
-};
+import Styles from './LobbyStyles.js';
 
 import Page from '@components/page';
 import Button from '@components/button';
 import ListPlayers from '@components/list-players';
-// import TheText from '@components/typography/TheText.js';
 
 export default function Lobby({ navigation }) {
   const Papers = React.useContext(PapersContext);
@@ -75,7 +71,9 @@ export default function Lobby({ navigation }) {
         return profileIsAdmin ? (
           <Button onPress={handleCreateTeams}>Create teams!</Button>
         ) : (
-          <Text>Wait for {profiles[game.creatorId].name} to create the teams.</Text>
+          <Text style={Theme.typography.body}>
+            Wait for {profiles[game.creatorId].name} to create the teams.
+          </Text>
         );
       } else {
         return (
@@ -94,8 +92,9 @@ export default function Lobby({ navigation }) {
             {profileIsAdmin && (
               <Text style={[Theme.typography.small, Styles.cap]}>Ask your friends to join!</Text>
             )}
-            <View style={Styles.title(profileIsAdmin)}>
+            <View style={Styles.title}>
               <Text style={Theme.typography.h1}>{game.name}</Text>
+              {/* Later - Sahre game. */}
             </View>
           </View>
           <View>

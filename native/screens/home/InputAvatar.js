@@ -6,8 +6,6 @@ import { Svg, Path } from 'react-native-svg';
 import * as Theme from '@theme';
 import Styles from './HomeStyles.js';
 
-import TheText from '@components/typography/TheText.js';
-
 import usePickAvatar from './utils/usePickAvatar.js';
 
 export default function InputAvatar({ avatar, onChange }) {
@@ -16,9 +14,9 @@ export default function InputAvatar({ avatar, onChange }) {
 
   return (
     <Fragment>
-      <TheText nativeID="inputAvatar" style={Styles.label}>
+      <Text nativeID="inputAvatar" style={[Theme.typography.body, Styles.label]}>
         Add your avatar
-      </TheText>
+      </Text>
       <TouchableHighlight
         style={[Styles.avatarPlace, { marginVertical: 24 }]}
         underlayColor={Theme.colors.primary}
@@ -41,10 +39,10 @@ export default function InputAvatar({ avatar, onChange }) {
           </View>
         )}
       </TouchableHighlight>
-      <TheText style={Styles.feedback}>
+      <Text style={[Theme.typography.body, Styles.feedback]}>
         {status === 'loading' ? 'Loading...' : ''}
         {status === 'loaded' ? 'Looking good!' : ''}
-      </TheText>
+      </Text>
     </Fragment>
   );
 

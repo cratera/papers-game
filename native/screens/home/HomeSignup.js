@@ -21,7 +21,6 @@ import Styles from './HomeStyles.js';
 
 import Page from '@components/page';
 import Button from '@components/button';
-import TheText from '@components/typography/TheText.js';
 
 import InputAvatar from './InputAvatar.js';
 
@@ -85,16 +84,14 @@ export default class HomeSignup extends React.Component {
           🎲
         </Text>
         <Text style={[Theme.typography.h1, Theme.u.center]}>Welcome!</Text>
-        <TheText style={[Theme.typography.secondary, Styles.paragraph]}>
+        <Text style={[Theme.typography.secondary, Styles.paragraph]}>
           Papers is the perfect game for your{' '}
-          <TheText style={Theme.typography.secondary} numberOfLines={1}>
+          <Text style={Theme.typography.secondary} numberOfLines={1}>
             dinner party.
-          </TheText>
+          </Text>
           {'\n'}
-          <TheText style={Theme.typography.secondary}>
-            Made with love by Maggie and Sandy 😎
-          </TheText>
-        </TheText>
+          <Text style={Theme.typography.secondary}>Made with love by Maggie and Sandy 😎</Text>
+        </Text>
       </View>
     );
   }
@@ -107,9 +104,9 @@ export default class HomeSignup extends React.Component {
         style={{ flex: 1, alignSelf: 'stretch' }}
       >
         <ScrollView>
-          <TheText nativeID="inputNameLabel" style={Styles.label}>
+          <Text nativeID="inputNameLabel" style={[Styles.label, Theme.typography.body]}>
             How should we call you?
-          </TheText>
+          </Text>
           <TextInput
             style={[Theme.typography.h1, Styles.input]}
             inputAccessoryViewID="name"

@@ -4,7 +4,6 @@ import { KeyboardAvoidingView, ScrollView, View, Text, TextInput } from 'react-n
 import * as Theme from '@theme';
 import PapersContext from '@store/PapersContext.js';
 import Button from '@components/button';
-import TheText from '@components/typography/TheText';
 import Modal from '@components/modal';
 
 import Styles from './AccessGameModalStyles.js';
@@ -54,9 +53,9 @@ export default function AccessGameModal({ isOpen, variant, onClose }) {
         >
           <ScrollView>
             <Text style={[Styles.title, Theme.typography.h3]}>{copy.title}</Text>
-            <TheText nativeID="inputNameLabel" style={[Styles.tip, Theme.typography.secondary]}>
+            <Text nativeID="inputNameLabel" style={[Styles.tip, Theme.typography.secondary]}>
               {copy.description}
-            </TheText>
+            </Text>
 
             {/* TODO - detect emojis and ignore them */}
             <TextInput

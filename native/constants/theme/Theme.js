@@ -17,24 +17,29 @@ export const typography = StyleSheet.create({
     fontSize: 40,
     fontWeight: 'bold',
     lineHeight: 48,
-    // display: 'block',
+    color: colors.grayDark,
   },
   h2: {
     fontSize: 32,
     fontWeight: 'bold',
+    color: colors.grayDark,
   },
   h3: {
     fontSize: 16,
     fontWeight: 'bold',
+    color: colors.grayDark,
   },
-  default: {
+  body: {
     fontSize: 16,
+    color: colors.grayDark,
   },
   secondary: {
+    fontSize: 16,
     color: colors.grayMedium,
   },
   small: {
     fontSize: 14,
+    color: colors.grayMedium,
   },
   italic: {
     color: colors.grayMedium,
@@ -48,53 +53,3 @@ export const u = StyleSheet.create({
     textAlign: 'center',
   },
 });
-
-// export const base = StyleSheet.create({
-//   backgroundColor: colors.bg,
-//   color: colors.grayDark,
-//   lineHeight: 22,
-//   fontSize: 16, // typography.default
-// });
-
-// export const bp = {
-//   xs: '@media',
-//   // xs: `@media (max-height: 35.5em)}, // 568px; - iphone5
-// };
-
-// export function ThemeGlobal() {
-//   return (
-//     <Global
-//       styles={css`
-//         html {
-//           fontSize: 62.5%;
-//           letter-spacing: -0.5px;
-//           font-family: -apple-system, BlinkMacSystemFont, 'Roboto', 'Helvetica Neue', sans-serif;
-//           -webkit-font-smoothing: antialiased;
-//           -moz-osx-font-smoothing: grayscale;
-//           color: ${colors.grayDark};
-//         }
-
-//         body {
-//           box-sizing: border-box;
-//           fontSize: 1.6rem;
-//           line-height: 1.4;
-//         }
-
-//         body * {
-//           box-sizing: inherit;
-//         }
-
-//         .sr-only {
-//           position: absolute;
-//           width: 1px;
-//           height: 1px;
-//           padding: 0;
-//           margin: -1px;
-//           overflow: hidden;
-//           clip: rect(0, 0, 0, 0);
-//           border: 0;
-//         }
-//       `}
-//     />
-//   );
-// }

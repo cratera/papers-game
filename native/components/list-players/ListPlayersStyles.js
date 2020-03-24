@@ -1,22 +1,24 @@
-import { css } from '@emotion/core';
-// import * as Theme from 'Theme.js';
+import { StyleSheet } from 'react-native';
+import * as Theme from '@theme';
 
-export const list = css`
-  margin-top: 1.6rem;
-`;
-
-export const item = css`
-  display: flex;
-  align-items: center;
-  margin-bottom: 1.6rem; /* 2.4 too big */
-  justify-content: space-between;
-
-  span {
-    display: flex;
-    align-items: center;
-  }
-`;
-
-export const itemStatus = css`
-  max-height: 5.6rem;
-`;
+export default StyleSheet.create({
+  list: {
+    marginTop: 16,
+  },
+  item: {
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'nowrap',
+    alignItems: 'center',
+    marginBottom: 16 /* 2.4 too big */,
+    justifyContent: 'space-between',
+  },
+  who: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  itemStatus: {
+    maxHeight: 56,
+  },
+});
