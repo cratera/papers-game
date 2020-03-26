@@ -17,6 +17,10 @@ export default StyleSheet.create({
   header_txt: {
     paddingRight: 60,
   },
+  scrollKAV: {
+    flexGrow: 1,
+    flexShrink: 1, // secret to make it scroll
+  },
   slides: {
     marginTop: 8,
     paddingTop: 8,

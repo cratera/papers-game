@@ -120,7 +120,7 @@ export default function Lobby({ navigation }) {
         <Page>
           <Page.Header />
           <Page.Main>
-            <ScrollView>
+            <ScrollView style={Theme.u.scrollSideOffset}>
               <View style={Styles.header}>
                 {!didEveryoneSubmittedTheirWords && (
                   <Text style={Theme.typography.h1}>{game.name}</Text>
@@ -131,9 +131,12 @@ export default function Lobby({ navigation }) {
                     : 'Everyone finished!'}
                 </Text>
                 <Image
-                  style={Styles.headerImg}
-                  source={{ uri: didEveryoneSubmittedTheirWords ? imgDone : imgWaiting }}
-                  alt=""
+                  style={[
+                    Styles.header_img,
+                    didEveryoneSubmittedTheirWords && Styles.header_img_done,
+                  ]}
+                  source={didEveryoneSubmittedTheirWords ? imgDone : imgWaiting}
+                  accessibilityLabel=""
                 />
               </View>
               <View>
@@ -150,17 +153,18 @@ export default function Lobby({ navigation }) {
               </View>
             </ScrollView>
           </Page.Main>
-          <Page.CTAs>
-            {!didSubmitWords && (
-              <Button onPress={openWords} styleTouch={{ marginBottom: 16 }}>
-                Write your papers
-              </Button>
+          <Page.CTAs hasOffset={!(didSubmitWords && !profileIsAdmin)}>
+            {!didSubmitWords && <Button onPress={openWords}>Write your papers</Button>}
+            {didSubmitWords && !profileIsAdmin && (
+              <Text style={[Theme.typography.small, Styles.status]}>
+                Waiting for everyone to be ready!
+              </Text>
             )}
             {didEveryoneSubmittedTheirWords && profileIsAdmin && (
               <Button onPress={handleStartClick}>Start Game!</Button>
             )}
             {writeAllShortCut && (
-              <Button variant="danger" onPress={setWordsForEveyone}>
+              <Button variant="danger" onPress={setWordsForEveyone} styleTouch={{ marginTop: 16 }}>
                 {/* eslint-disable-next-line */}
                 Write everyone's papers 💥
               </Button>

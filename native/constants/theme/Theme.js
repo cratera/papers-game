@@ -54,7 +54,10 @@ export const u = StyleSheet.create({
   },
   scrollSideOffset: {
     // move scrollbar to the edge.
-    marginLeft: -16,
-    paddingLeft: 16,
+    marginRight: -16,
+    paddingRight: 16,
   },
+  text_danger: { color: colors.danger },
+  text_success: { color: colors.success },
+  text_primary: { color: colors.primary },
 });

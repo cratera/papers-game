@@ -4,13 +4,14 @@ import { ScrollView, View, StyleSheet, Text } from 'react-native';
 import { useCountdown, usePrevious, getRandomInt, msToSecPretty } from '@constants/utils';
 import PapersContext from '@store/PapersContext.js';
 
-import * as Theme from '@theme';
 import Button from '@components/button';
 import Page from '@components/page';
-// import Avatar from '@components/avatar';
-const Avatar = () => null;
-// import * as Styles from './PlayingStyles.js';
-const Styles = {
+import Avatar from '@components/avatar';
+
+import * as Theme from '@theme';
+import Styles from './PlayingStyles.js';
+
+const OldStyles = {
   tos: {},
   inst: {},
   tscore: {
@@ -27,6 +28,8 @@ const Styles = {
   to: {},
 };
 
+const ANIM_PAPER_NEXT = 999;
+
 const DESCRIPTIONS = [
   'Use as many words as you need!',
   'Use only 3 words to describe the paper!',
@@ -42,14 +45,14 @@ export default function Playing(props) {
   const hasCountdownStarted = !['getReady', 'finished'].includes(round.status);
   const prevHasCountdownStarted = usePrevious(hasCountdownStarted);
   const profileIsAdmin = game.creatorId === profile.id;
-  const initialTimer = 60000; // TODO - from Papers.settings?
+  const initialTimer = 60000000; // TODO - from Papers.settings?
   const timerReady = 3400;
   const [countdown, startCountdown] = useCountdown(hasCountdownStarted ? round.status : null, {
     timer: initialTimer + timerReady, // 400 - threshold for io connection.
   }); // 3,2,1... go!
   const initialTimerSec = Math.round(initialTimer / 1000);
   const countdownSec = Math.round(countdown / 1000);
-  const blurTime = 1500;
+  const blurTime = 1500; // TODO - game individual setting
   // const prevCountdownSec = usePrevious(countdownSec);
   // const [timesUp, setTimesup] = React.useState(false);
 
@@ -58,21 +61,22 @@ export default function Playing(props) {
   const turnPlayerId = game.teams[turnTeamIndex].players[isOdd ? 0 : turnPlayerIndex];
   const isMyTurn = turnPlayerId === profile.id;
 
-  const [papersTurn, setPapersTurn] = React.useState(
-    {}
-    // JSON.parse(window.localStorage.getItem('turn')) || {
-    //   current: null, // String - current paper on the screen
-    //   passed: [], // [String] - papers passed
-    //   guessed: [], // [String] - papers guessed
-    //   wordsLeft: round.wordsLeft, // [String] - words left
-    // }
-  );
+  const [papersTurn, setPapersTurn] = React.useState(null);
   const [isFinalScore, setFinalScore] = React.useState(null);
 
   const [isVisiblePassedPapers, togglePassedPapers] = React.useState(false);
-  const [paperAnim, setPaperAnimation] = React.useState(null);
+  const [paperAnim, setPaperAnimation] = React.useState(null); // gotcha || nope
   const [isPaperBlur, setPaperBlur] = React.useState(hasCountdownStarted);
   const [isPaperChanging, setIsPaperChanging] = React.useState(false);
+
+  React.useEffect(() => {
+    async function getTurnState() {
+      // Turn this into a custom hook.
+      const turnState = await Papers.getTurnLocalState();
+      setPapersTurn(turnState);
+    }
+    getTurnState();
+  }, []);
 
   React.useEffect(() => {
     // use false to avoid undefined on first render.
@@ -95,7 +99,7 @@ export default function Playing(props) {
 
       if (round.wordsLeft.length === 0) {
         // words ended
-        // window.localStorage.setItem('turn', JSON.stringify(state));
+        Papers.setTurnLocalState(state);
         return state;
       }
 
@@ -109,7 +113,7 @@ export default function Playing(props) {
       state.current = nextPaper;
       state.wordsLeft = wordsToPick;
 
-      // window.localStorage.setItem('turn', JSON.stringify(state));
+      Papers.setTurnLocalState(state);
       return state;
     });
     setPaperBlur(false);
@@ -171,27 +175,10 @@ export default function Playing(props) {
         current: nextPaper,
       };
 
-      // window.localStorage.setItem('turn', JSON.stringify(newState));
+      Papers.setTurnLocalState(newState);
       return newState;
     });
     setPaperBlur(false);
-  }
-
-  function handlePaperClick(hasGuessed) {
-    if (isPaperChanging) {
-      return;
-    }
-    // TODO / BUG clear all timeouts around...
-    setPaperBlur(false);
-    setIsPaperChanging(true);
-    setPaperAnimation(hasGuessed ? 'gotcha' : 'nop');
-
-    setTimeout(() => {
-      setPaperAnimation(null);
-      pickNextPaper(hasGuessed);
-      setTimeout(() => setIsPaperChanging(false), 500);
-      setTimeout(() => setPaperBlur(true), blurTime);
-    }, 1000);
   }
 
   function togglePaper(paper, hasGuessed) {
@@ -220,9 +207,27 @@ export default function Playing(props) {
         ...wordsModified,
       };
 
-      // window.localStorage.setItem('turn', JSON.stringify(newState));
+      Papers.setTurnLocalState(newState);
       return newState;
     });
+  }
+
+  function handlePaperClick(hasGuessed) {
+    if (isPaperChanging) {
+      return;
+    }
+    // TODO / BUG clear all timeouts around...
+    setPaperBlur(false);
+    setIsPaperChanging(true);
+    setPaperAnimation(hasGuessed ? 'gotcha' : 'nope');
+
+    setTimeout(() => {
+      setPaperAnimation(null);
+      pickNextPaper(hasGuessed);
+      // TODO - animations in react native?
+      setTimeout(() => setIsPaperChanging(false), ANIM_PAPER_NEXT / 2);
+      setTimeout(() => setPaperBlur(true), blurTime);
+    }, ANIM_PAPER_NEXT);
   }
 
   function handleStartClick() {
@@ -248,100 +253,15 @@ export default function Playing(props) {
     setFinalScore(true);
   }
 
+  if (!papersTurn) {
+    return (
+      <Text style={[Theme.typography.h3, Theme.u.center, { marginTop: 200 }]}>
+        Hold on... it's loading!
+      </Text>
+    );
+  }
+
   // ----------------
-
-  const renderMyTurnGetReady = () => {
-    return (
-      <Fragment>
-        <Page.Main>
-          <View style={Styles.header}>
-            <Text style={Styles.headerTitle}>It's your turn!</Text>
-            <View style={Styles.inst.container}>
-              {/* <Text style={Styles.inst.first}>Click here if your team guesses the paper</Text> */}
-              {/* <img style={Styles.inst.img} src="/images/instructions.png" alt="instructions" /> */}
-              {/* <Text style={Styles.inst.second}>
-                Click here to go to the next paper. Don’t worry, you can always go back!
-              </Text> */}
-            </View>
-          </View>
-          {isOdd && <Text>Your team has one player less, so it's you again.</Text>}
-        </Page.Main>
-        <Page.CTAs>
-          <Button onPress={handleStartClick}>Start now!</Button>
-        </Page.CTAs>
-      </Fragment>
-    );
-  };
-
-  const renderTurnScore = type => {
-    return (
-      <Fragment>
-        <Page.Main style={Styles.tscore.main}>
-          <View style={Styles.tscore.header}>
-            <Text style={[Styles.tscore.headerKicker]}>
-              {type === 'timesup' ? "Time's Up!" : 'All papers done!'}
-            </Text>
-            <Text style={Theme.typography.h1}>
-              Your team got <Text>{papersTurn.guessed.length}</Text> papers right!
-            </Text>
-          </View>
-          <View>
-            {/* review height */}
-            <ScrollView style={{ height: 245 }}>
-              {papersTurn.guessed.length ? (
-                <View style={Styles.tscore.list}>
-                  {papersTurn.guessed.map((paper, i) => (
-                    <View style={[Styles.tscore.item]} key={`${i}_${paper}`}>
-                      <Text>{paper}</Text>
-                      <Button
-                        style={Styles.tscore.btn('remove')}
-                        variant="icon"
-                        aria-label="mark as not guessed"
-                        onPress={() => togglePaper(paper, false)}
-                      >
-                        X
-                      </Button>
-                    </View>
-                  ))}
-                </View>
-              ) : (
-                <Text style={{ marginTop: '4rem' }}>More luck next time...</Text>
-              )}
-              {!!papersTurn.passed.length && (
-                <Button
-                  style={Styles.tscore.btnToggle}
-                  onPress={() => togglePassedPapers(bool => !bool)}
-                  variant="flat"
-                >
-                  {isVisiblePassedPapers ? 'Hide' : 'Show'} the papers you didn't get
-                </Button>
-              )}
-              {isVisiblePassedPapers && !!papersTurn.passed.length && (
-                <View style={Styles.tscore.list}>
-                  {papersTurn.passed.map((paper, i) => (
-                    <View style={Styles.tscore.item} key={`${i}_${paper}`}>
-                      <Text>{paper}</Text>
-                      <Button
-                        style={Styles.tscore.btn('add')}
-                        variant="icon"
-                        aria-label="mark as guessed"
-                        onPress={() => togglePaper(paper, true)}
-                      >
-                        +
-                      </Button>
-                    </View>
-                  ))}
-                </View>
-              )}
-            </ScrollView>
-          </View>
-        </Page.Main>
-        <Page.CTAs>
-          <Button onPress={handleFinishTurnClick}>Finish my turn</Button>
-        </Page.CTAs>
-      </Fragment>
-    );
-  };
 
   const renderRoundScore = () => {
     const teamsScore = {};
@@ -363,22 +283,26 @@ export default function Playing(props) {
     const myTeamWon = myTeamId === winnerId;
     return (
       <Fragment>
-        <Page.Main style={Styles.tscore.main}>
-          <Text style={Styles.tscore.headerKicker}>Round {roundIndex + 1} finished!</Text>
-          <Text style={Theme.typography.h1}>
-            {myTeamWon ? (
-              <Text style={{ color: Theme.colors.success }}>Your team won!</Text>
-            ) : (
-              <Text style={{ color: Theme.colors.danger }}>Your team lost!</Text>
-            )}
-          </Text>
-          <View>
-            <Text>Scores:</Text>
-            {Object.keys(teamsScore).map(teamId => (
-              <Text key={teamId}>
-                {game.teams[teamId].name}: {teamsScore[teamId]}
+        <Page.Main>
+          <View style={Styles.header}>
+            <Text style={Theme.typography.h3}>End of round {roundIndex + 1}</Text>
+            <Text style={Theme.typography.h2}>
+              {myTeamWon ? (
+                <Text style={{ color: Theme.colors.success }}>Your team won!</Text>
+              ) : (
+                <Text style={{ color: Theme.colors.danger }}>Your team lost!</Text>
+              )}
+            </Text>
+
+            <View>
+              <Text>
+                {Object.keys(teamsScore).map(teamId => (
+                  <Text key={teamId}>
+                    {game.teams[teamId].name}: {teamsScore[teamId]};
+                  </Text>
+                ))}
               </Text>
-            ))}
+            </View>
           </View>
         </Page.Main>
         <Page.CTAs>
@@ -386,11 +310,11 @@ export default function Playing(props) {
             <Button onPress={handleFinalWinnerClick}>Show final winner!</Button>
           ) : profileIsAdmin ? (
             <Button onPress={handleStartNextRoundClick}>
-              Start Round {round.current + 1 + 1} of {game.settings.roundsCount}
+              Start Round {round.current + 1 + 1} of {game.settings.roundsCount}!
             </Button>
           ) : (
-            <Text style={{ textAlign: 'center' }}>
-              Wait for admin ({game.players[game.creatorId].name}) to start next round.
+            <Text style={[Theme.typography.italic, Theme.u.center]}>
+              Wait for {game.players[game.creatorId].name} (admin) to start next round.
             </Text>
           )}
         </Page.CTAs>
@@ -401,19 +325,30 @@ export default function Playing(props) {
   const renderGo = () => {
     const stillHasWords =
       papersTurn.current || papersTurn.passed.length > 0 || papersTurn.wordsLeft.length > 0;
+    const turnScoreProps = {
+      onFinish: handleFinishTurnClick,
+    };
 
-    if (!stillHasWords) {
-      return renderTurnScore('nowords');
+    if (!stillHasWords || countdownSec === 0) {
+      const type = !stillHasWords ? 'nowords' : 'timesup';
+      return (
+        <TurnScore
+          papersTurn={papersTurn}
+          onTogglePaper={togglePaper}
+          type={type}
+          onFinish={handleFinishTurnClick}
+        />
+      );
     }
 
-    if (countdownSec === 0) {
-      return renderTurnScore('timesup');
-    }
+    // if (countdownSec === 0) {
+    //   return <TurnScore type='timesup' { ...turnScoreProps } />;
+    // }
 
     if (countdownSec > initialTimerSec) {
       return (
         <Page.Main>
-          <Text style={[Styles.count321, { marginTop: 100 /*20vh*/ }]}>
+          <Text style={[Styles.go_count321, Theme.typography.h1]}>
             {countdownSec - initialTimerSec}...
           </Text>
         </Page.Main>
@@ -423,25 +358,18 @@ export default function Playing(props) {
     return (
       <Fragment>
         <Page.Main>
-          <Button
-            variant="success"
-            style={[isPaperChanging && Styles.go.ctaDim]}
-            onPress={() => handlePaperClick(true)}
-          >
-            Got it!
-          </Button>
-          <View style={Styles.go.main}>
+          <View>
             <Text
               style={[
-                Styles.count321,
-                Styles.go.count,
-                { marginTop: '3.2rem', color: countdown <= 10500 && Theme.colors.danger },
+                Theme.typography.h1,
+                Styles.go_count321,
+                countdown <= 10500 && { color: Theme.colors.danger },
               ]}
             >
               {msToSecPretty(countdown)}
             </Text>
             <View
-              style={[Styles.go.paper, Styles.go[paperAnim]]}
+              style={[Styles.go_paper, Styles[`go_paper_${paperAnim}`]]}
               onMouseDown={() => setPaperBlur(false)}
               onTouchStart={() => setPaperBlur(false)}
               onMouseUp={() => setPaperBlur(true)}
@@ -449,110 +377,53 @@ export default function Playing(props) {
             >
               <Text
                 style={[
-                  Styles.go.paperWord,
-                  isPaperBlur && Styles.go.blur,
-                  paperAnim === 'gotcha' && Styles.go.paperWordInsideGotch,
+                  Theme.typography.h2,
+                  Styles.go_paper_word,
+                  isPaperBlur && Styles.go_paper_blur,
+                  Styles[`go_paper_word_${paperAnim}`],
                 ]}
               >
-                {papersTurn.current}
+                {/* this will happen until local storage is fixed */}
+                {!isPaperBlur ? papersTurn.current || '😱 LOST PAPER 😱 (Click pass)' : '*****'}
               </Text>
-              <Text style={Styles.go.tipBlur} aria-hidden="true">
-                {isPaperBlur && !isPaperChanging && 'Press to reveal'}
-              </Text>
+              {isPaperBlur && !isPaperChanging && (
+                <Text style={Theme.typography.small}>Press to reveal</Text>
+              )}
             </View>
           </View>
-          <View
-            hidden
-            style={
-              [
-                /*Theme.typography.small*/
-              ]
-            }
-          >
-            <Text>
-              {' '}
-              {'\n'} - passed: {papersTurn.passed.join(', ')}{' '}
-            </Text>
-            <Text>
-              {' '}
-              {'\n'} - guessed: {papersTurn.guessed.join(', ')}{' '}
-            </Text>
-            <Text>
-              {' '}
-              {'\n'} - wordsLeft: {papersTurn.wordsLeft.join(', ')}{' '}
+          <View style={{ display: 'block' }}>
+            <Text style={{ fontSize: 10, lineHeight: 10 }}>
+              {'\n'} - passed: {papersTurn.passed.join(', ')} {'\n'} - guessed:{' '}
+              {papersTurn.guessed.join(', ')} {'\n'} - wordsLeft: {papersTurn.wordsLeft.join(', ')}{' '}
             </Text>
           </View>
         </Page.Main>
-        <Page.CTAs>
+        <Page.CTAs style={Styles.go_ctas}>
+          <Button
+            variant="success"
+            disabled={isPaperChanging}
+            styleTouch={[{ flex: 1 }, isPaperChanging && Styles.go_cta_dim]}
+            onPress={() => handlePaperClick(true)}
+          >
+            Got it!
+          </Button>
+          <Text style={{ width: 24 }}>{/* lazyness lvl 99 */}</Text>
           {papersTurn.current && !papersTurn.wordsLeft.length && !papersTurn.passed.length ? (
-            <Text style={{ textAlign: 'center', color: Theme.colors.grayMedium }}>Last paper!</Text>
+            <Text
+              style={[{ flex: 1, textAlign: 'center' }, Theme.typography.secondary, Theme.u.center]}
+            >
+              Last paper!
+            </Text>
           ) : (
             <Button
               variant="light"
-              style={[isPaperChanging && Styles.go.ctaDim]}
+              disabled={isPaperChanging}
+              styleTouch={[{ flex: 1 }, isPaperChanging && Styles.go_cta_dim]}
               onPress={() => handlePaperClick(false)}
             >
-              Next paper
+              Pass paper
             </Button>
           )}
-        </Page.CTAs>
-      </Fragment>
-    );
-  };
-
-  const renderOthersTurn = () => {
-    const teamName = game.teams[turnTeamIndex].name;
-    const player = profiles[turnPlayerId] || { avatar: null, name: `? ${turnPlayerId} ?` };
-
-    return (
-      <Fragment>
-        <Page.Main>
-          <View style={Styles.to.wrapper}>
-            <View style={Styles.header}>
-              <Text style={Styles.headerTitle}>Round {roundIndex + 1}</Text>
-              <Text style={Theme.typography.secondary}>
-                Try to guess as many papers as possible in 1 minute. {DESCRIPTIONS[roundIndex]}
-              </Text>
-            </View>
-            <View style={Styles.to.main}>
-              <Text style={Theme.typography.secondary}>
-                {!hasCountdownStarted
-                  ? 'Not started yet'
-                  : countdownSec
-                  ? 'The pressure is on!'
-                  : 'Times up!'}
-              </Text>
-              <Text
-                style={[
-                  Theme.typography.h1,
-                  {
-                    color:
-                      hasCountdownStarted && countdown <= 10500
-                        ? Theme.colors.danger
-                        : Theme.colors.primary,
-                  },
-                ]}
-              >
-                {hasCountdownStarted
-                  ? countdownSec > initialTimerSec
-                    ? countdownSec - initialTimerSec + '...' // 3, 2, 1...
-                    : countdownSec
-                    ? msToSecPretty(countdown) // counting...
-                    : '00:00' // timeout
-                  : msToSecPretty(initialTimer) // waiting to start
-                }
-              </Text>
-            </View>
-          </View>
-        </Page.Main>
-        <Page.CTAs>
-          <View style={Styles.tos.container}>
-            <Text style={[Styles.tos.title, Theme.typography.h3]}>Playing now</Text>
-            <Avatar style={Styles.tos.avatar} hasMargin size="lg" src={player.avatar}></Avatar>
-            <Text>Turn {round.turnCount + 1}</Text>
-            <Text style={[Styles.tos.name, Theme.typography.h3]}>{player.name}</Text>
-            <Text style={[Styles.tos.team, Theme.typography.secondary]}>Team "{teamName}"</Text>
-          </View>
         </Page.CTAs>
       </Fragment>
     );
@@ -654,13 +525,209 @@ export default function Playing(props) {
   return (
     <Page>
       <Page.Header></Page.Header>
-      {hasStatusFinished
-        ? renderRoundScore()
-        : isMyTurn
-        ? !hasCountdownStarted
-          ? renderMyTurnGetReady()
-          : renderGo()
-        : renderOthersTurn()}
+      {hasStatusFinished ? (
+        renderRoundScore()
+      ) : isMyTurn ? (
+        !hasCountdownStarted ? (
+          <MyTurnGetReady
+            description={DESCRIPTIONS[roundIndex]}
+            onStartClick={handleStartClick}
+            isOdd
+          />
+        ) : (
+          renderGo()
+        )
+      ) : (
+        <OthersTurn
+          description={DESCRIPTIONS[roundIndex]}
+          teamName={game.teams[turnTeamIndex].name}
+          player={profiles[turnPlayerId] || { avatar: null, name: `? ${turnPlayerId} ?` }}
+          hasCountdownStarted={hasCountdownStarted}
+          countdownSec={countdownSec}
+          countdown={countdown}
+          initialTimerSec={initialTimerSec}
+          initialTimer={initialTimer}
+          roundIndex={roundIndex}
+        />
+      )}
     </Page>
   );
 }
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * *\
+|*                    COMPONENTS                       *|
+|*       All in the same file because I say it.        *|
+\* * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+const MyTurnGetReady = ({ description, onStartClick, isOdd }) => (
+  <Fragment>
+    <Page.Main>
+      <View style={Styles.header}>
+        <Text style={Theme.typography.h1}>It's your turn!</Text>
+        <Text style={Theme.typography.secondary}>
+          {'\n'}
+          Try to guess as many papers as possible in 1 minute. {description}
+        </Text>
+
+        <Text style={Theme.typography.primary}>
+          Click <Text style={{ color: Theme.colors.primary, fontWeight: 'bold' }}>"PASS"</Text> to
+          go to the next paper. Don’t worry, you can always go back!
+          {'\n'}
+          {'\n'}
+          Click <Text style={{ color: Theme.colors.success, fontWeight: 'bold' }}>
+            "GOT IT"{' '}
+          </Text>{' '}
+          if your team guesses the paper.
+        </Text>
+      </View>
+      {isOdd && (
+        <Text style={{ color: Theme.colors.danger }}>
+          {'\n'}Your team has one player less, so it's you again.
+        </Text>
+      )}
+    </Page.Main>
+    <Page.CTAs>
+      <Button onPress={onStartClick}>Start now!</Button>
+    </Page.CTAs>
+  </Fragment>
+);
+
+const OthersTurn = ({
+  teamName,
+  player,
+  description,
+  hasCountdownStarted,
+  roundIndex,
+  countdownSec,
+  countdown,
+  initialTimerSec,
+  initialTimer,
+}) => {
+  return (
+    <Fragment>
+      <Page.Main>
+        <View>
+          <View style={Styles.header}>
+            <Text style={Theme.typography.h3}>Round {roundIndex + 1}</Text>
+            <Text style={[Theme.typography.secondary, Theme.u.center]}>
+              {'\n'}
+              Try to guess as many papers as possible in 1 minute. {description}
+            </Text>
+          </View>
+          <View style={Styles.main}>
+            {!hasCountdownStarted ? (
+              <Text style={Theme.typography.small}>Not started yet</Text>
+            ) : !!countdownSec ? (
+              <Text style={Theme.typography.small}>The pressure is on!</Text>
+            ) : (
+              <Text style={[Theme.typography.small, Theme.u.text_danger]}>Times up!</Text>
+            )}
+            <Text
+              style={[
+                Theme.typography.h1,
+                {
+                  color: hasCountdownStarted
+                    ? countdown <= 10500
+                      ? Theme.colors.danger
+                      : Theme.colors.primary
+                    : Theme.colors.grayDark,
+                },
+              ]}
+            >
+              {hasCountdownStarted
+                ? countdownSec > initialTimerSec
+                  ? countdownSec - initialTimerSec + '...' // 3, 2, 1...
+                  : countdownSec
+                  ? msToSecPretty(countdown) // 59, 58, counting...
+                  : '00:00' // timeout
+                : msToSecPretty(initialTimer) // waiting to start
+              }
+            </Text>
+          </View>
+        </View>
+      </Page.Main>
+      <Page.CTAs>
+        <View style={Styles.tst}>
+          <Text style={Theme.typography.h3}>Playing now</Text>
+          <View style={Styles.tst_flex}>
+            <Avatar hasMargin size="lg" src={player.avatar} />
+            <View>
+              <Text style={Theme.typography.h3}>{player.name}</Text>
+              <Text style={[Theme.typography.secondary, Styles.tst_team]}>Team "{teamName}"</Text>
+            </View>
+          </View>
+        </View>
+      </Page.CTAs>
+    </Fragment>
+  );
+};
+
+const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish }) => {
+  return (
+    <Fragment>
+      <Page.Main>
+        <View style={Styles.header}>
+          <Text style={Theme.typography.secondary}>
+            {type === 'timesup' ? "Time's Up!" : 'All papers done!'}
+          </Text>
+          <Text style={[Theme.typography.h2, Theme.u.center]}>
+            Your team got <Text>{papersTurn.guessed.length}</Text> papers right!
+          </Text>
+        </View>
+
+        <ScrollView style={Theme.u.scrollSideOffset}>
+          {papersTurn.guessed.length ? (
+            <View style={Styles.tscore_list}>
+              {papersTurn.guessed.map((paper, i) => (
+                <View style={[Styles.tscore_item]} key={`${i}_${paper}`}>
+                  <Text style={Theme.typography.body}>{paper}</Text>
+                  <Button
+                    style={Styles.tscore_btnRemove}
+                    variant="flat"
+                    onPress={() => onTogglePaper(paper, false)}
+                  >
+                    Remove
+                  </Button>
+                </View>
+              ))}
+            </View>
+          ) : (
+            <Text style={[Theme.ypography.italic, { marginTop: '4rem' }]}>
+              More luck next time...
+            </Text>
+          )}
+          {/* {!!papersTurn.passed.length && (
+            <Button
+              style={Styles.tscore_btnToggle}
+              onPress={() => togglePassedPapers(bool => !bool)}
+              variant="flat"
+            >
+              {isVisiblePassedPapers ? 'Hide' : 'Show'} the papers you didn't get
+            </Button>
+          )} */}
+          {/*isVisiblePassedPapers && */}
+          {!!papersTurn.passed.length && (
+            <View style={Styles.tscore_list}>
+              <Text style={Theme.typography.h2}>Papers you didn't get:</Text>
+              {papersTurn.passed.map((paper, i) => (
+                <View style={Styles.tscore_item} key={`${i}_${paper}`}>
+                  <Text>{paper}</Text>
+                  <Button
+                    style={Styles.tscore_btnAdd}
+                    variant="flat"
+                    onPress={() => onTogglePaper(paper, true)}
+                  >
+                    Add
+                  </Button>
+                </View>
+              ))}
+            </View>
+          )}
+        </ScrollView>
+      </Page.Main>
+      <Page.CTAs hasOffset>
+        <Button onPress={onFinish}>Finish my turn</Button>
+      </Page.CTAs>
+    </Fragment>
+  );
+};

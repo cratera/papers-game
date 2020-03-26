@@ -9,7 +9,11 @@ function Button({ variant, size, place, isLoading, children, style, styleTouch, 
     console.error('hasblock is deprecated!');
   }
   return (
-    <TouchableHighlight {...otherProps} style={styleTouch} underlayColor={Theme.colors.bg}>
+    <TouchableHighlight
+      {...otherProps}
+      style={[Styles.touch, styleTouch]}
+      underlayColor={Theme.colors.bg}
+    >
       <Text style={[Styles.button({ variant, size, place }), style]}>
         <Text>{children}</Text>
         {isLoading ? <Text style={Styles.loading}> ⏳</Text> : ''}

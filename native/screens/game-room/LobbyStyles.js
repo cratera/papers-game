@@ -12,10 +12,13 @@ export default StyleSheet.create({
     // }
   },
   header_title: {},
-  headerImg: {
+  header_img: {
     marginTop: 8,
     width: 140,
     height: 140,
+  },
+  header_img_done: {
+    width: 196,
   },
   cap: {
     paddingBottom: 8,

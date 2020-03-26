@@ -38,7 +38,7 @@ const Main = ({ children, style, ...otherProps }) => {
   );
 };
 
-const CTAs = ({ children, hasOffset, ...otherProps }) => {
+const CTAs = ({ children, hasOffset, style, ...otherProps }) => {
   return (
     <View
       style={[
@@ -46,6 +46,7 @@ const CTAs = ({ children, hasOffset, ...otherProps }) => {
         {
           paddingBottom: !!children ? 40 : 0,
         },
+        style,
       ]}
       {...otherProps}
     >

@@ -116,11 +116,11 @@ export default function WritePapersModal({ isOpen, onClose }) {
           filled
         </Text>
       </View>
-      <KeyboardAvoidingView behavior="padding">
-        <ScrollView style={Styles.slides}>{renderSliders()}</ScrollView>
+      <KeyboardAvoidingView behavior="padding" style={Styles.scrollKAV}>
+        <ScrollView style={[Styles.slides, Theme.u.scrollSideOffset]}>{renderSliders()}</ScrollView>
         {errorMsg && <Text style={Styles.sliderLabels}>{errorMsg}</Text>}
 
-        <View style={Styles.ctas}>
+        <Page.CTAs style={Styles.ctas} hasOffset>
           {wordsCount !== 10 ? (
             <Button variant="light" onPress={handleClickNext}>
               Next paper
@@ -130,7 +130,7 @@ export default function WritePapersModal({ isOpen, onClose }) {
               All done!! Eheheheh
             </Button>
           )}
-        </View>
+        </Page.CTAs>
       </KeyboardAvoidingView>
     </Modal>
   );

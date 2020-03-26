@@ -29,6 +29,9 @@ const variants = {
 };
 
 const styles = StyleSheet.create({
+  touch: {
+    flexShrink: 0,
+  },
   base: {
     paddingVertical: 16,
     paddingHorizontal: 24,
@@ -37,7 +40,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden', // so borderRadius works.
     fontSize: 16,
     lineHeight: 16,
-    flexShrink: 0,
     textAlign: 'center',
 
     // BUG IOS: Shadow doesn't work on safari 🤦‍♀️
@@ -109,3 +111,5 @@ export const button = ({ variant, size, place }) => {
 export const loading = {
   // TODO
 };
+
+export const touch = styles.touch;

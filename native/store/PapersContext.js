@@ -60,6 +60,9 @@ export class PapersContextProvider extends Component {
       startTurn: this.startTurn.bind(this),
       finishTurn: this.finishTurn.bind(this),
 
+      getTurnLocalState: this.getTurnLocalState.bind(this),
+      setTurnLocalState: this.setTurnLocalState.bind(this),
+
       startNextRound: this.startNextRound.bind(this),
     };
   }
@@ -464,6 +467,24 @@ export class PapersContextProvider extends Component {
       teams: game.teams,
       words: game.words,
     });
+  }
+
+  async getTurnLocalState() {
+    console.log('📌 getPaperTurnState()');
+    const storedTurn = await AsyncStorage.getItem('turn');
+    const turnState = JSON.parse(storedTurn) || {
+      current: null, // String - current paper on the screen
+      passed: [], // [String] - papers passed
+      guessed: [], // [String] - papers guessed
+      wordsLeft: this.state.game.round.wordsLeft, // [String] - words left
+    };
+    return turnState;
+  }
+
+  async setTurnLocalState(state) {
+    console.log('📌 setPaperTurnState()');
+    // TODO / OPTIMIZE this very much needed.
+    await AsyncStorage.setItem('turn', JSON.stringify(state));
   }
 
   async _removeGameFromState() {
