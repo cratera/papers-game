@@ -58,6 +58,7 @@ export class PapersContextProvider extends Component {
 
       startGame: this.startGame.bind(this),
       startTurn: this.startTurn.bind(this),
+      getNextTurn: this.getNextTurn.bind(this),
       finishTurn: this.finishTurn.bind(this),
 
       getTurnLocalState: this.getTurnLocalState.bind(this),
@@ -447,14 +448,78 @@ export class PapersContextProvider extends Component {
     this.state.socket.startTurn();
   }
 
+  getNextTurn() {
+    const { teams, round } = this.state.game;
+    const { 0: teamIndex, 1: playerIndex } = round.turnWho;
+    const totalTeams = Object.keys(teams).length;
+
+    // BUG / TODO - Handle correctly when teams are not even! [1]
+    if (teamIndex < totalTeams - 1) {
+      const nextTeamIndex = teamIndex + 1;
+      const totalTeamPlayers = teams[nextTeamIndex].players.length;
+
+      if (playerIndex < totalTeamPlayers) {
+        return { 0: nextTeamIndex, 1: playerIndex };
+      } else {
+        return { 0: nextTeamIndex, 1: playerIndex, 2: true }; // [1]
+      }
+    } else {
+      const totalTeamPlayers = teams[0].players.length;
+      const nextPlayer = playerIndex + 1;
+
+      if (nextPlayer < totalTeamPlayers) {
+        return { 0: 0, 1: nextPlayer };
+      } else {
+        return { 0: 0, 1: 0 };
+      }
+    }
+
+    // if (player < totalPlayers) {
+    //   return [team, player + 1];
+    // } else {
+    //   if (team < totalTeams) {
+    //     return [team + 1, 0];
+    //   } else {
+    //     return [0, 0];
+    //   }
+    // }
+  }
+
   finishTurn(papersTurn) {
-    const game = this.state.game;
     console.log('📌 finishTurn()');
+    const game = this.state.game;
+    const profileId = this.state.profile.id;
+    const { round, teams, score } = game;
+
+    const roundCurrent = round.current;
+    const current = papersTurn.current ? [papersTurn.current] : [];
+    const wordsLeft = [...papersTurn.wordsLeft, ...papersTurn.passed, ...current];
+    const roundStatus =
+      wordsLeft.length > 0
+        ? {
+            current: roundCurrent,
+            turnWho: this.getNextTurn(),
+            turnCount: round.turnCount + 1,
+            status: 'getReady',
+            wordsLeft,
+          }
+        : {
+            current: roundCurrent,
+            status: 'finished',
+            wordsLeft: [],
+          };
+
+    if (!game.score[roundCurrent]) {
+      game.score[roundCurrent] = {};
+    }
+
+    const wordsSoFar = game.score[roundCurrent][profileId] || [];
+
     this.state.socket.finishTurn({
-      papersTurn,
-      round: game.round,
-      teams: game.teams,
-      score: game.score,
+      playerScore: {
+        [profileId]: [...wordsSoFar, ...papersTurn.guessed],
+      },
+      roundStatus,
     });
   }
 

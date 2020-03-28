@@ -50,7 +50,7 @@ const CTAs = ({ children, hasOffset, style, ...otherProps }) => {
       ]}
       {...otherProps}
     >
-      {/* a blank element to push buttons up. */}
+      {/* a blank element to pull buttons up. */}
       {hasOffset && <View style={{ marginTop: -22 }}></View>}
       {children}
     </View>

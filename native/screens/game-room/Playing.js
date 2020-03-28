@@ -45,7 +45,7 @@ export default function Playing(props) {
   const hasCountdownStarted = !['getReady', 'finished'].includes(round.status);
   const prevHasCountdownStarted = usePrevious(hasCountdownStarted);
   const profileIsAdmin = game.creatorId === profile.id;
-  const initialTimer = 60000000; // TODO - from Papers.settings?
+  const initialTimer = 60000; // TODO - from Papers.settings?
   const timerReady = 3400;
   const [countdown, startCountdown] = useCountdown(hasCountdownStarted ? round.status : null, {
     timer: initialTimer + timerReady, // 400 - threshold for io connection.
@@ -346,6 +346,9 @@ export default function Playing(props) {
     // }
 
     if (countdownSec > initialTimerSec) {
+      {
+        /* 3, 2, 1... */
+      }
       return (
         <Page.Main>
           <Text style={[Styles.go_count321, Theme.typography.h1]}>
@@ -384,7 +387,7 @@ export default function Playing(props) {
                 ]}
               >
                 {/* this will happen until local storage is fixed */}
-                {!isPaperBlur ? papersTurn.current || '😱 LOST PAPER 😱 (Click pass)' : '*****'}
+                {!isPaperBlur ? papersTurn.current || '😱 BUG PAPER 😱 (Click pass)' : '*****'}
               </Text>
               {isPaperBlur && !isPaperChanging && (
                 <Text style={Theme.typography.small}>Press to reveal</Text>
@@ -398,7 +401,7 @@ export default function Playing(props) {
             </Text>
           </View>
         </Page.Main>
-        <Page.CTAs style={Styles.go_ctas}>
+        <Page.CTAs hasOffset style={Styles.go_ctas}>
           <Button
             variant="success"
             disabled={isPaperChanging}
@@ -407,7 +410,7 @@ export default function Playing(props) {
           >
             Got it!
           </Button>
-          <Text style={{ width: 24 }}>{/* lazyness lvl 99 */}</Text>
+          <Text style={{ width: 16 }}>{/* lazyness lvl 99 */}</Text>
           {papersTurn.current && !papersTurn.wordsLeft.length && !papersTurn.passed.length ? (
             <Text
               style={[{ flex: 1, textAlign: 'center' }, Theme.typography.secondary, Theme.u.center]}
@@ -466,61 +469,115 @@ export default function Playing(props) {
       };
     };
 
-    // REVIEW this DESCRIPTIONS
+    // REVIEW this DESCRIPTIONS usage...
     const scores = DESCRIPTIONS.map((desc, index) => getRoundScore(index));
-
-    const getFinalWinner = () => {
-      const arrayOfScores = Object.values(teamsTotalScore);
-      const arrayOfTeamsId = Object.keys(teamsTotalScore);
-      const winnerScore = Math.max(...arrayOfScores);
-      const winnerIndex = arrayOfScores.indexOf(winnerScore);
-      const winnerId = arrayOfTeamsId[winnerIndex];
-      const myTeamWon = myTeamId === winnerId;
-
-      return (
-        <Text style={[Theme.typography.h1, { textAlign: 'center' }]}>
-          {myTeamWon ? (
-            <Text style={{ color: Theme.colors.success }}>You won! 🎉</Text>
-          ) : (
-            <Text style={{ color: Theme.colors.danger }}>You lost... 💩</Text>
-          )}
-        </Text>
-      );
+    const placeMap = {
+      0: '1st place',
+      1: '2nd place',
+      3: '3rd place', // REVIEW - Maximum 3 teams
     };
+
+    const arrayOfScores = Object.values(teamsTotalScore);
+    const arrayOfTeamsId = Object.keys(teamsTotalScore);
+    const winnerScore = Math.max(...arrayOfScores);
+    const winnerIndex = arrayOfScores.indexOf(winnerScore);
+    const winnerId = arrayOfTeamsId[winnerIndex];
+    const myTeamWon = myTeamId === winnerId;
+
+    const title = myTeamWon ? 'You won! 🎉' : 'You lost 💩';
+    const description = myTeamWon ? 'They never stood a change' : 'Yikes.';
+
+    const sortTeamIdByScore = (teamAId, teamBId) => arrayOfScores[teamBId] - arrayOfScores[teamAId];
 
     return (
       <Page>
         <Page.Main>
-          {getFinalWinner()}
-          <Text>{'\n'}</Text>
-          {scores.map((round, index) => {
-            return (
-              <Fragment key={index}>
-                <Text>Round {index}:</Text>
-                <View>
-                  {Object.keys(round.arrayOfTeamsId).map((teamId, index) => (
-                    <Text key={teamId}>
-                      {game.teams[teamId].name}: {round.arrayOfScores[index]}
+          <View style={[Styles.header, { marginBottom: 16 }]}>
+            <Text style={Theme.typography.h1}>{title}</Text>
+            <Text style={Theme.typography.body}>{description}</Text>
+          </View>
+
+          {/* TODO extract this to a component to use on turn score */}
+          <ScrollView style={[Theme.u.scrollSideOffset, { paddingBottom: 40 }]}>
+            <View style={Styles.fscore_list}>
+              {arrayOfTeamsId.sort(sortTeamIdByScore).map((teamId, index) => (
+                <View style={Styles.fscore_item} key={index}>
+                  <View>
+                    <Text
+                      style={[
+                        Styles.fscore_tag,
+                        {
+                          backgroundColor:
+                            index === 0 ? Theme.colors.primary : Theme.colors.grayDark,
+                          marginBottom: 8,
+                        },
+                      ]}
+                    >
+                      {placeMap[index]}
                     </Text>
-                  ))}
+                    <Text style={Theme.typography.h3}>{game.teams[teamId].name}</Text>
+                    {/* <Text>???[TODO] was the best player!</Text> */}
+                  </View>
+                  <View>
+                    <Text style={Theme.typography.small}>Papers</Text>
+                    <Text style={Theme.typography.h1}>{teamsTotalScore[teamId]}</Text>
+                  </View>
                 </View>
-                <Text>
-                  {/* REVIEW - Show name even after member leaves game. */}
-                  Best Player: {profiles[round.bestPlayer.id]?.name} ({round.bestPlayer.score})
-                </Text>
-                <Text>{'\n'}</Text>
-              </Fragment>
-            );
-          })}
+              ))}
+            </View>
+
+            <Text style={Theme.typography.h2}>Statistics</Text>
+            <Text>{'\n'}</Text>
+
+            {scores.map((round, index) => {
+              return (
+                <Fragment key={index}>
+                  <Text style={Theme.typography.h3}>Round {index + 1}:</Text>
+                  <View>
+                    {Object.keys(round.arrayOfTeamsId).map((teamId, index) => (
+                      <Text style={Theme.typography.body} key={teamId}>
+                        {game.teams[teamId].name}: {round.arrayOfScores[index]}
+                      </Text>
+                    ))}
+                  </View>
+                  <Text style={Theme.typography.body}>
+                    {/* REVIEW - Show name even after member leaves game. */}
+                    Best Player: {profiles[round.bestPlayer.id]?.name} ({round.bestPlayer.score})
+                  </Text>
+                  <Text>{'\n'}</Text>
+                </Fragment>
+              );
+            })}
+          </ScrollView>
         </Page.Main>
-        <Page.CTAs>
-          <Button onPress={Papers.leaveGame}>Leave game</Button>
+        <Page.CTAs hasOffset>
+          {/* UX - leave game when clicking "show final score". Not here */}
+          <Button onPress={Papers.leaveGame}>Go to homepage</Button>
         </Page.CTAs>
       </Page>
     );
   }
 
   // -------- other stuff
+
+  // Some memo here would be nice.
+  const turnStatus = (() => {
+    const isTurnOn = !hasCountdownStarted || !!countdownSec; // aka: it isn't times up
+    // Ai jasus...
+    const { 0: teamIx, 1: tPlayerIx, 2: tisOdd } = isTurnOn
+      ? { 0: turnTeamIndex, 1: turnPlayerIndex }
+      : Papers.getNextTurn();
+    const tPlayerId = game.teams[teamIx].players[tisOdd ? 0 : tPlayerIx];
+
+    return {
+      title: isTurnOn ? 'Playing now' : 'Next up!',
+      player: {
+        name: tPlayerId === profile.id ? 'You!' : profiles[tPlayerId]?.name || `? ${tPlayerId} ?`,
+        avatar: profiles[tPlayerId]?.avatar,
+      },
+      teamName: game.teams[teamIx].name,
+    };
+  })();
 
   return (
     <Page>
@@ -532,7 +589,7 @@ export default function Playing(props) {
           <MyTurnGetReady
             description={DESCRIPTIONS[roundIndex]}
             onStartClick={handleStartClick}
-            isOdd
+            isOdd={isOdd}
           />
         ) : (
           renderGo()
@@ -540,8 +597,7 @@ export default function Playing(props) {
       ) : (
         <OthersTurn
           description={DESCRIPTIONS[roundIndex]}
-          teamName={game.teams[turnTeamIndex].name}
-          player={profiles[turnPlayerId] || { avatar: null, name: `? ${turnPlayerId} ?` }}
+          turnStatus={turnStatus}
           hasCountdownStarted={hasCountdownStarted}
           countdownSec={countdownSec}
           countdown={countdown}
@@ -564,12 +620,13 @@ const MyTurnGetReady = ({ description, onStartClick, isOdd }) => (
     <Page.Main>
       <View style={Styles.header}>
         <Text style={Theme.typography.h1}>It's your turn!</Text>
-        <Text style={Theme.typography.secondary}>
+        <Text style={[Theme.typography.secondary, Theme.u.center]}>
           {'\n'}
           Try to guess as many papers as possible in 1 minute. {description}
         </Text>
 
         <Text style={Theme.typography.primary}>
+          {'\n'}
           Click <Text style={{ color: Theme.colors.primary, fontWeight: 'bold' }}>"PASS"</Text> to
           go to the next paper. Don’t worry, you can always go back!
           {'\n'}
@@ -593,8 +650,6 @@ const MyTurnGetReady = ({ description, onStartClick, isOdd }) => (
 );
 
 const OthersTurn = ({
-  teamName,
-  player,
   description,
   hasCountdownStarted,
   roundIndex,
@@ -602,6 +657,9 @@ const OthersTurn = ({
   countdown,
   initialTimerSec,
   initialTimer,
+  turnStatus,
+  // teamName,
+  // player,
 }) => {
   return (
     <Fragment>
@@ -618,9 +676,14 @@ const OthersTurn = ({
             {!hasCountdownStarted ? (
               <Text style={Theme.typography.small}>Not started yet</Text>
             ) : !!countdownSec ? (
-              <Text style={Theme.typography.small}>The pressure is on!</Text>
+              <Text style={Theme.typography.small}>[X] papers guessed</Text>
             ) : (
-              <Text style={[Theme.typography.small, Theme.u.text_danger]}>Times up!</Text>
+              <Fragment>
+                <Text style={[Theme.typography.small, Theme.u.text_danger]}>Time's up!</Text>
+                <Text style={Theme.typography.h1}>
+                  {turnStatus.player.name} got [X] papers right!
+                </Text>
+              </Fragment>
             )}
             <Text
               style={[
@@ -647,20 +710,28 @@ const OthersTurn = ({
         </View>
       </Page.Main>
       <Page.CTAs>
-        <View style={Styles.tst}>
-          <Text style={Theme.typography.h3}>Playing now</Text>
-          <View style={Styles.tst_flex}>
-            <Avatar hasMargin size="lg" src={player.avatar} />
-            <View>
-              <Text style={Theme.typography.h3}>{player.name}</Text>
-              <Text style={[Theme.typography.secondary, Styles.tst_team]}>Team "{teamName}"</Text>
-            </View>
-          </View>
-        </View>
+        <TurnStatus
+          title={turnStatus.title}
+          player={turnStatus.player}
+          teamName={turnStatus.teamName}
+        />
       </Page.CTAs>
     </Fragment>
   );
 };
+
+const TurnStatus = ({ title, player, teamName }) => (
+  <View style={Styles.tst}>
+    <Text style={Theme.typography.h3}>{title}</Text>
+    <View style={Styles.tst_flex}>
+      <Avatar hasMargin size="lg" src={player.avatar} />
+      <View>
+        <Text style={Theme.typography.h3}>{player.name}</Text>
+        <Text style={[Theme.typography.secondary, Styles.tst_team]}>Team "{teamName}"</Text>
+      </View>
+    </View>
+  </View>
+);
 
 const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish }) => {
   return (
@@ -692,7 +763,7 @@ const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish }) => {
               ))}
             </View>
           ) : (
-            <Text style={[Theme.ypography.italic, { marginTop: '4rem' }]}>
+            <Text style={[Theme.typography.italic, Theme.u.center, { marginTop: 40 }]}>
               More luck next time...
             </Text>
           )}
@@ -708,7 +779,7 @@ const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish }) => {
           {/*isVisiblePassedPapers && */}
           {!!papersTurn.passed.length && (
             <View style={Styles.tscore_list}>
-              <Text style={Theme.typography.h2}>Papers you didn't get:</Text>
+              <Text style={Theme.typography.h3}>Papers you didn't get:</Text>
               {papersTurn.passed.map((paper, i) => (
                 <View style={Styles.tscore_item} key={`${i}_${paper}`}>
                   <Text>{paper}</Text>

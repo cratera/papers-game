@@ -54,6 +54,7 @@ export default StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
   go_cta_dim: {
     opacity: 0.5,
@@ -88,5 +89,28 @@ export default StyleSheet.create({
   },
   tscore_btnRemove: {
     color: Theme.colors.danger,
+  },
+
+  // Final score:
+  fscore_list: {
+    marginBottom: 16,
+  },
+  fscore_item: {
+    backgroundColor: Theme.colors.grayLight,
+    borderRadius: 4,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    marginVertical: 8,
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  fscore_tag: {
+    fontSize: 14,
+    color: Theme.colors.bg,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
   },
 });

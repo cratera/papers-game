@@ -176,7 +176,7 @@ const gameInitialState = ({ id, name, creatorId }) => ({
   },
   round: {
     current: null, // Number - Round index
-    turnWho: null, // [Number, Number] - [teamIndex, playerIndex]
+    turnWho: null, // { Number, Number, Bool } - { 0: teamIndex, 1: playerIndex, 2: isOdd }
     turnCount: 0, // Number - Turn index
     status: null, // String - 'getReady' | Date.now() | 'timesup'
     wordsLeft: null, // Array - words left to guess.
@@ -506,7 +506,6 @@ async function startGame(words) {
 
   await DB.ref(`games/${gameId}/round`).set({
     current: 0,
-    // { 0: turnTeamIndex, 1: turnPlayerIndex, 2: isOdd }
     turnWho: { 0: 0, 1: 0, 2: false },
     turnCount: 0,
     status: 'getReady',
@@ -531,24 +530,24 @@ function _getNextTurn({ turnWho, teams }) {
   const [teamIndex, playerIndex] = turnWho;
   const totalTeams = Object.keys(teams).length;
 
-  // BUG / TODO - Handle correctly when teams are not even!
+  // BUG / TODO - Handle correctly when teams are not even! [1]
   if (teamIndex < totalTeams - 1) {
     const nextTeamIndex = teamIndex + 1;
     const totalTeamPlayers = teams[nextTeamIndex].players.length;
 
     if (playerIndex < totalTeamPlayers) {
-      return [nextTeamIndex, playerIndex];
+      return { 0: nextTeamIndex, 1: playerIndex, 2: false };
     } else {
-      return [nextTeamIndex, playerIndex, 'isOdd'];
+      return { 0: nextTeamIndex, 1: playerIndex, 2: true }; // [1]
     }
   } else {
     const totalTeamPlayers = teams[0].players.length;
     const nextPlayer = playerIndex + 1;
 
     if (nextPlayer < totalTeamPlayers) {
-      return [0, nextPlayer];
+      return { 0: 0, 1: nextPlayer, 2: false };
     } else {
-      return [0, 0];
+      return { 0: 0, 1: 0, 2: false };
     }
   }
 
@@ -571,36 +570,12 @@ function _getNextTurn({ turnWho, teams }) {
  * @param {[String]} papersTurn.guessed - papers guessed
  * @param {[String]} papersTurn.wordsLeft - papers left
  */
-async function finishTurn({ round, teams, score, papersTurn }) {
-  console.log('⚙️ finishTurn()', papersTurn);
+async function finishTurn({ playerScore, roundStatus }) {
+  console.log('⚙️ finishTurn()');
   const gameId = LOCAL_PROFILE.gameId;
-  const playerId = LOCAL_PROFILE.id;
 
-  const roundCurrent = round.current;
-  const current = papersTurn.current ? [papersTurn.current] : [];
-  const wordsLeft = [...papersTurn.wordsLeft, ...papersTurn.passed, ...current];
-  let newRound;
-
-  // ---
-  // Q: Should this logic be done here or at PapersContext?.
-  if (wordsLeft.length > 0) {
-    newRound = {
-      current: roundCurrent,
-      turnWho: _getNextTurn({ turnWho: round.turnWho, teams }),
-      turnCount: round.turnCount + 1,
-      status: 'getReady',
-      wordsLeft,
-    };
-  } else {
-    newRound = {
-      status: 'finished',
-      wordsLeft: [],
-    };
-  }
-  // ----
-
-  await DB.ref(`games/${gameId}/score/${roundCurrent}/${playerId}`).update(papersTurn.guessed);
-  await DB.ref(`games/${gameId}/round`).update(newRound);
+  await DB.ref(`games/${gameId}/score/${roundStatus.current}`).update(playerScore);
+  await DB.ref(`games/${gameId}/round`).update(roundStatus);
 }
 
 /**
