@@ -119,11 +119,10 @@ export class PapersContextProvider extends Component {
 
   async tryToReconnect() {
     console.log('📌tryToReconnect()');
-    let socket = this.state.socket;
+    const socket = this.state.socket;
 
     if (socket) {
       console.error(':: Already connected. Should not happen!');
-      return;
     } else {
       const { id, name, gameId } = this.state.profile;
 
@@ -400,8 +399,6 @@ export class PapersContextProvider extends Component {
         ...profile,
       },
     }));
-
-    return;
   }
 
   async resetProfile(profile) {
@@ -516,6 +513,10 @@ export class PapersContextProvider extends Component {
             status: 'finished',
             wordsLeft: [],
           };
+
+    if (!game.score) {
+      game.score = [];
+    }
 
     if (!game.score[roundCurrent]) {
       game.score[roundCurrent] = {};

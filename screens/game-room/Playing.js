@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { ScrollView, View, StyleSheet, Text } from 'react-native';
+import { Dimensions, ScrollView, View, StyleSheet, Animated, Text } from 'react-native';
 
 import { useCountdown, usePrevious, getRandomInt, msToSecPretty } from '@constants/utils';
 import PapersContext from '@store/PapersContext.js';
@@ -7,34 +7,38 @@ import PapersContext from '@store/PapersContext.js';
 import Button from '@components/button';
 import Page from '@components/page';
 import Avatar from '@components/avatar';
+import i18n from '@constants/i18n';
 
 import * as Theme from '@theme';
 import Styles from './PlayingStyles.js';
 
-const OldStyles = {
-  tos: {},
-  inst: {},
-  tscore: {
-    btn: () => null,
-    item: {
-      display: 'flex',
-      flexWrap: 'nowrap',
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-    },
-  },
-  go: {},
-  to: {},
-};
-
 const ANIM_PAPER_NEXT = 999;
 
-const DESCRIPTIONS = [
-  'Use as many words as you need!',
-  'Use only 3 words to describe the paper!',
-  'Mimicry time, No talking!',
-];
+const DESCRIPTIONS = [i18n.round_0_desc, i18n.round_1_desc, i18n.round_2_desc];
+
+const CardScore = ({ index, teamName, teamScore }) => (
+  <View style={Styles.fscore_item} key={index}>
+    <View>
+      <Text
+        style={[
+          Styles.fscore_tag,
+          {
+            backgroundColor: index === 0 ? Theme.colors.primary : Theme.colors.grayDark,
+            marginBottom: 8,
+          },
+        ]}
+      >
+        {placeMap[index]}
+      </Text>
+      <Text style={Theme.typography.h3}>{teamName}</Text>
+      {/* <Text>???[TODO] was the best player!</Text> */}
+    </View>
+    <View style={Styles.fscore_score}>
+      <Text style={Theme.typography.small}>Papers</Text>
+      <Text style={Theme.typography.h1}>{teamScore}</Text>
+    </View>
+  </View>
+);
 
 export default function Playing(props) {
   const Papers = React.useContext(PapersContext);
@@ -64,7 +68,7 @@ export default function Playing(props) {
   const [papersTurn, setPapersTurn] = React.useState(null);
   const [isFinalScore, setFinalScore] = React.useState(null);
 
-  const [isVisiblePassedPapers, togglePassedPapers] = React.useState(false);
+  // const [isVisiblePassedPapers, togglePassedPapers] = React.useState(false);
   const [paperAnim, setPaperAnimation] = React.useState(null); // gotcha || nope
   const [isPaperBlur, setPaperBlur] = React.useState(hasCountdownStarted);
   const [isPaperChanging, setIsPaperChanging] = React.useState(false);
@@ -238,6 +242,7 @@ export default function Playing(props) {
   }
 
   function handleFinishTurnClick() {
+    // TODO - add loading state.
     // setPapersTurn({}); should it be done here?
     Papers.finishTurn(papersTurn);
     /* just to double check... */
@@ -265,7 +270,7 @@ export default function Playing(props) {
 
   const renderRoundScore = () => {
     const teamsScore = {};
-    const scorePlayers = game.score[round.current];
+    const scorePlayers = game.score ? game.score[round.current] : [];
     let myTeamId = null;
 
     Object.keys(game.teams).forEach(teamId => {
@@ -281,6 +286,9 @@ export default function Playing(props) {
     const winnerIndex = arrayOfScores.indexOf(Math.max(...arrayOfScores));
     const winnerId = arrayOfTeamsId[winnerIndex];
     const myTeamWon = myTeamId === winnerId;
+
+    const sortTeamIdByScore = (teamAId, teamBId) => arrayOfScores[teamBId] - arrayOfScores[teamAId];
+
     return (
       <Fragment>
         <Page.Main>
@@ -293,16 +301,18 @@ export default function Playing(props) {
                 <Text style={{ color: Theme.colors.danger }}>Your team lost!</Text>
               )}
             </Text>
-
-            <View>
-              <Text>
-                {Object.keys(teamsScore).map(teamId => (
-                  <Text key={teamId}>
-                    {game.teams[teamId].name}: {teamsScore[teamId]};
-                  </Text>
-                ))}
-              </Text>
-            </View>
+          </View>
+          <View>
+            {Object.keys(teamsScore)
+              .sort(sortTeamIdByScore)
+              .map((teamId, index) => (
+                <CardScore
+                  key={teamId}
+                  index={index}
+                  teamName={game.teams[teamId].name}
+                  teamScore={teamsScore[teamId]}
+                />
+              ))}
           </View>
         </Page.Main>
         <Page.CTAs>
@@ -419,7 +429,7 @@ export default function Playing(props) {
             </Text>
           ) : (
             <Button
-              variant="light"
+              variant="primary"
               disabled={isPaperChanging}
               styleTouch={[{ flex: 1 }, isPaperChanging && Styles.go_cta_dim]}
               onPress={() => handlePaperClick(false)}
@@ -440,7 +450,7 @@ export default function Playing(props) {
 
     const getRoundScore = roundIndex => {
       const scorePlayers = game.score[roundIndex];
-      let teamsScore = {};
+      const teamsScore = {};
       let bestPlayer = {};
 
       Object.keys(game.teams).forEach(teamId => {
@@ -471,11 +481,6 @@ export default function Playing(props) {
 
     // REVIEW this DESCRIPTIONS usage...
     const scores = DESCRIPTIONS.map((desc, index) => getRoundScore(index));
-    const placeMap = {
-      0: '1st place',
-      1: '2nd place',
-      3: '3rd place', // REVIEW - Maximum 3 teams
-    };
 
     const arrayOfScores = Object.values(teamsTotalScore);
     const arrayOfTeamsId = Object.keys(teamsTotalScore);
@@ -491,38 +496,22 @@ export default function Playing(props) {
 
     return (
       <Page>
+        <EmojiRain type={myTeamWon ? 'winner' : 'loser'} />
         <Page.Main>
           <View style={[Styles.header, { marginBottom: 16 }]}>
             <Text style={Theme.typography.h1}>{title}</Text>
             <Text style={Theme.typography.body}>{description}</Text>
           </View>
 
-          {/* TODO extract this to a component to use on turn score */}
           <ScrollView style={[Theme.u.scrollSideOffset, { paddingBottom: 40 }]}>
             <View style={Styles.fscore_list}>
               {arrayOfTeamsId.sort(sortTeamIdByScore).map((teamId, index) => (
-                <View style={Styles.fscore_item} key={index}>
-                  <View>
-                    <Text
-                      style={[
-                        Styles.fscore_tag,
-                        {
-                          backgroundColor:
-                            index === 0 ? Theme.colors.primary : Theme.colors.grayDark,
-                          marginBottom: 8,
-                        },
-                      ]}
-                    >
-                      {placeMap[index]}
-                    </Text>
-                    <Text style={Theme.typography.h3}>{game.teams[teamId].name}</Text>
-                    {/* <Text>???[TODO] was the best player!</Text> */}
-                  </View>
-                  <View>
-                    <Text style={Theme.typography.small}>Papers</Text>
-                    <Text style={Theme.typography.h1}>{teamsTotalScore[teamId]}</Text>
-                  </View>
-                </View>
+                <CardScore
+                  index={index}
+                  key={index}
+                  teamName={game.teams[teamId].name}
+                  teamScore={teamsTotalScore[teamId]}
+                />
               ))}
             </View>
 
@@ -532,7 +521,7 @@ export default function Playing(props) {
             {scores.map((round, index) => {
               return (
                 <Fragment key={index}>
-                  <Text style={Theme.typography.h3}>Round {index + 1}:</Text>
+                  <Text style={Theme.typography.h3}>Round {index + 1}</Text>
                   <View>
                     {Object.keys(round.arrayOfTeamsId).map((teamId, index) => (
                       <Text style={Theme.typography.body} key={teamId}>
@@ -565,7 +554,7 @@ export default function Playing(props) {
     const isTurnOn = !hasCountdownStarted || !!countdownSec; // aka: it isn't times up
     // Ai jasus...
     const { 0: teamIx, 1: tPlayerIx, 2: tisOdd } = isTurnOn
-      ? { 0: turnTeamIndex, 1: turnPlayerIndex }
+      ? { 0: turnTeamIndex, 1: turnPlayerIndex, 2: isOdd }
       : Papers.getNextTurn();
     const tPlayerId = game.teams[teamIx].players[tisOdd ? 0 : tPlayerIx];
 
@@ -597,6 +586,7 @@ export default function Playing(props) {
       ) : (
         <OthersTurn
           description={DESCRIPTIONS[roundIndex]}
+          thisTurnPlayer={profiles[game.teams[turnTeamIndex].players[isOdd ? 0 : turnPlayerIndex]]}
           turnStatus={turnStatus}
           hasCountdownStarted={hasCountdownStarted}
           countdownSec={countdownSec}
@@ -657,6 +647,7 @@ const OthersTurn = ({
   countdown,
   initialTimerSec,
   initialTimer,
+  thisTurnPlayer,
   turnStatus,
   // teamName,
   // player,
@@ -675,13 +666,13 @@ const OthersTurn = ({
           <View style={Styles.main}>
             {!hasCountdownStarted ? (
               <Text style={Theme.typography.small}>Not started yet</Text>
-            ) : !!countdownSec ? (
+            ) : countdownSec ? (
               <Text style={Theme.typography.small}>[X] papers guessed</Text>
             ) : (
               <Fragment>
-                <Text style={[Theme.typography.small, Theme.u.text_danger]}>Time's up!</Text>
-                <Text style={Theme.typography.h1}>
-                  {turnStatus.player.name} got [X] papers right!
+                <Text style={[Theme.typography.small]}>Time's up!</Text>
+                <Text style={[Theme.typography.h1, Theme.u.center]}>
+                  {thisTurnPlayer.name} got [X] papers right!
                 </Text>
               </Fragment>
             )}
@@ -702,7 +693,7 @@ const OthersTurn = ({
                   ? countdownSec - initialTimerSec + '...' // 3, 2, 1...
                   : countdownSec
                   ? msToSecPretty(countdown) // 59, 58, counting...
-                  : '00:00' // timeout
+                  : '' // timeout
                 : msToSecPretty(initialTimer) // waiting to start
               }
             </Text>
@@ -776,7 +767,7 @@ const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish }) => {
               {isVisiblePassedPapers ? 'Hide' : 'Show'} the papers you didn't get
             </Button>
           )} */}
-          {/*isVisiblePassedPapers && */}
+          {/* isVisiblePassedPapers && */}
           {!!papersTurn.passed.length && (
             <View style={Styles.tscore_list}>
               <Text style={Theme.typography.h3}>Papers you didn't get:</Text>
@@ -797,8 +788,70 @@ const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish }) => {
         </ScrollView>
       </Page.Main>
       <Page.CTAs hasOffset>
+        {/* TODO add loading */}
         <Button onPress={onFinish}>Finish my turn</Button>
       </Page.CTAs>
     </Fragment>
+  );
+};
+
+const placeMap = {
+  0: '1st place',
+  1: '2nd place',
+  3: '3rd place', // REVIEW - Maximum 3 teams
+};
+
+const EmojiRain = ({ type }) => {
+  const emojis = type === 'winner' ? ['🎉', '🔥', '💖', '😃'] : ['🤡', '💩', '👎', '😓'];
+  const count = Array.from(Array(15), () => 1);
+  const [fadeAnim] = React.useState(new Animated.Value(0)); // Initial value for opacity: 0
+  const [rainAnim] = React.useState(new Animated.Value(0)); // Initial value for opacity: 0
+
+  const vw = Dimensions.get('window').width / 100;
+  const vh = Dimensions.get('window').height / 100;
+
+  React.useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 400,
+    }).start();
+
+    Animated.timing(rainAnim, {
+      toValue: vh * 100,
+      duration: 5000,
+    }).start();
+  }, []);
+
+  return (
+    <View pointerEvents="none" style={{ zIndex: 2 }}>
+      <Animated.View
+        style={{
+          opacity: fadeAnim,
+        }}
+      >
+        {count.map((x, index) => (
+          <Text
+            key={index}
+            style={{
+              fontSize: 16,
+              position: 'absolute',
+              top: Math.floor(Math.random() * 100) * vh,
+              left: Math.floor(Math.random() * 100) * vw,
+              transform: [
+                { perspective: 1000 },
+                { translateX: 1 },
+                { translateY: 1 },
+                // translateY: rainAnim.interpolate({
+                //   inputRange: [0, 1],
+                //   outputRange: [0, 200], // 0 : 150, 0.5 : 75, 1 : 0
+                // }),
+              ],
+            }}
+          >
+            {emojis[index % 4]}
+          </Text>
+        ))}
+      </Animated.View>
+    </View>
   );
 };

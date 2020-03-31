@@ -106,6 +106,11 @@ export default StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
+  fscore_score: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-end',
+  },
   fscore_tag: {
     fontSize: 14,
     color: Theme.colors.bg,
