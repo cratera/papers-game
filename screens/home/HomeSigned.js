@@ -41,6 +41,16 @@ export default function HomeSigned({ navigation }) {
   const [modalState, setModalState] = useState({ isOpen: false, variant: null });
   const pickAvatar = usePickAvatar();
 
+  if (Papers.status === 'isJoining') {
+    return (
+      <Page>
+        <Page.Main style={Styles.main}>
+          <Text style={Theme.typography.h2}>Joining "{profile.gameId}" ⏳</Text>
+        </Page.Main>
+      </Page>
+    );
+  }
+
   return (
     <Fragment>
       <Page>

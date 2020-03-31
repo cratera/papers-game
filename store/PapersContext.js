@@ -84,6 +84,7 @@ export class PapersContextProvider extends Component {
         value={{
           status: this.state.status,
           state: {
+            status: this.state.status,
             profile: this.state.profile,
             game: this.state.game,
             profiles: this.state.profiles,
@@ -131,11 +132,18 @@ export class PapersContextProvider extends Component {
         return;
       }
 
+      this.setState({
+        status: 'isJoining',
+      });
+
       // TODO - Add Global Status accessing game.
 
-      this.accessGame('join', gameId, () => {
+      const hum = await this.accessGame('join', gameId, () => {
         console.log(`Joined to ${gameId} completed!`);
+        this.setState({ status: 'inGame' });
       });
+
+      console.log('joined log', hum);
     }
   }
 
