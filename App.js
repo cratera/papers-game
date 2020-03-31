@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import BottomTabNavigator from './navigation/BottomTabNavigator';
+// import BottomTabNavigator from './navigation/BottomTabNavigator';
 import useLinking from './navigation/useLinking';
 
 import { PapersContextProvider, loadProfile } from './store/PapersContext.js';
