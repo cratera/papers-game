@@ -36,6 +36,8 @@ const DESCRIPTIONS = [
   'Mimicry time, No talking!',
 ];
 
+const foo = ass;
+
 export default function Playing(props) {
   const Papers = React.useContext(PapersContext);
   const { profile, profiles, game } = Papers.state;
