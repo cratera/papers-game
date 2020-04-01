@@ -87,9 +87,6 @@ export default StyleSheet.create({
   tscore_btnRemove: {
     color: Theme.colors.danger,
   },
-  tscore_btnRemove: {
-    color: Theme.colors.danger,
-  },
 
   // Final score:
   fscore_list: {
@@ -105,6 +102,13 @@ export default StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+  fscore_info: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    flexShrink: 1,
+    marginRight: 8,
   },
   fscore_score: {
     display: 'flex',

@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { Dimensions, ScrollView, View, StyleSheet, Animated, Text } from 'react-native';
+import { Dimensions, ScrollView, View, TouchableHighlight, Animated, Text } from 'react-native';
 
 import { useCountdown, usePrevious, getRandomInt, msToSecPretty } from '@constants/utils';
 import PapersContext from '@store/PapersContext.js';
@@ -12,13 +12,13 @@ import i18n from '@constants/i18n';
 import * as Theme from '@theme';
 import Styles from './PlayingStyles.js';
 
-const ANIM_PAPER_NEXT = 999;
+const ANIM_PAPER_NEXT = 500;
 
 const DESCRIPTIONS = [i18n.round_0_desc, i18n.round_1_desc, i18n.round_2_desc];
 
-const CardScore = ({ index, teamName, teamScore }) => (
+const CardScore = ({ index, teamName, scoreTotal, scoreRound, bestPlayer }) => (
   <View style={Styles.fscore_item} key={index}>
-    <View>
+    <View style={Styles.fscore_info}>
       <Text
         style={[
           Styles.fscore_tag,
@@ -31,11 +31,15 @@ const CardScore = ({ index, teamName, teamScore }) => (
         {placeMap[index]}
       </Text>
       <Text style={Theme.typography.h3}>{teamName}</Text>
-      {/* <Text>???[TODO] was the best player!</Text> */}
+      <Text style={Theme.typography.small}>
+        {bestPlayer.name} was the best player! ({bestPlayer.score})
+      </Text>
     </View>
     <View style={Styles.fscore_score}>
       <Text style={Theme.typography.small}>Papers</Text>
-      <Text style={Theme.typography.h1}>{teamScore}</Text>
+      <Text style={Theme.typography.h1}>{scoreTotal}</Text>
+      {/* TODO this... */}
+      {/* <Text style={Theme.typography.small}>+{scoreRound} this round</Text> */}
     </View>
   </View>
 );
@@ -49,7 +53,7 @@ export default function Playing(props) {
   const hasCountdownStarted = !['getReady', 'finished'].includes(round.status);
   const prevHasCountdownStarted = usePrevious(hasCountdownStarted);
   const profileIsAdmin = game.creatorId === profile.id;
-  const initialTimer = 60000; // TODO - from Papers.settings?
+  const initialTimer = 6000000; // TODO - from Papers.settings?
   const timerReady = 3400;
   const [countdown, startCountdown] = useCountdown(hasCountdownStarted ? round.status : null, {
     timer: initialTimer + timerReady, // 400 - threshold for io connection.
@@ -70,8 +74,10 @@ export default function Playing(props) {
 
   // const [isVisiblePassedPapers, togglePassedPapers] = React.useState(false);
   const [paperAnim, setPaperAnimation] = React.useState(null); // gotcha || nope
-  const [isPaperBlur, setPaperBlur] = React.useState(hasCountdownStarted);
+  const [isPaperBlur, setPaperBlur] = React.useState(false);
   const [isPaperChanging, setIsPaperChanging] = React.useState(false);
+  const blurTimeout = React.useRef();
+  const papersTurnCurrent = papersTurn?.current;
 
   React.useEffect(() => {
     async function getTurnState() {
@@ -83,7 +89,16 @@ export default function Playing(props) {
   }, []);
 
   React.useEffect(() => {
-    // use false to avoid undefined on first render.
+    if (papersTurnCurrent) {
+      console.log('useEffect:: timeout blur paper');
+      setPaperBlur(false);
+      clearTimeout(blurTimeout.current);
+      blurTimeout.current = setTimeout(() => setPaperBlur(true), blurTime);
+    }
+  }, [papersTurnCurrent]);
+
+  React.useEffect(() => {
+    // use false to avoid undefined on first render
     if (prevHasCountdownStarted === false && hasCountdownStarted) {
       console.log('useEffect:: hasCountdownStarted');
       pickFirstPaper();
@@ -120,7 +135,6 @@ export default function Playing(props) {
       Papers.setTurnLocalState(state);
       return state;
     });
-    setPaperBlur(false);
   }
 
   function pickNextPaper(hasGuessed = false) {
@@ -202,8 +216,14 @@ export default function Playing(props) {
         const wordIndex = wordsToPick.indexOf(paper);
         wordsToPick.splice(wordIndex, 1);
 
+        // It means all papers were guessed before and
+        // now there's a new paper to guess!
+        if (!state.passed.length) {
+          wordsModified.current = paper;
+        } else {
+          wordsModified.passed = [...state.passed, paper];
+        }
         wordsModified.guessed = wordsToPick;
-        wordsModified.passed = [...state.passed, paper];
       }
 
       const newState = {
@@ -220,32 +240,28 @@ export default function Playing(props) {
     if (isPaperChanging) {
       return;
     }
-    // TODO / BUG clear all timeouts around...
-    setPaperBlur(false);
+
     setIsPaperChanging(true);
     setPaperAnimation(hasGuessed ? 'gotcha' : 'nope');
+    setPaperBlur(false);
+    clearTimeout(blurTimeout.current);
 
     setTimeout(() => {
       setPaperAnimation(null);
+      setIsPaperChanging(false);
       pickNextPaper(hasGuessed);
-      // TODO - animations in react native?
-      setTimeout(() => setIsPaperChanging(false), ANIM_PAPER_NEXT / 2);
-      setTimeout(() => setPaperBlur(true), blurTime);
     }, ANIM_PAPER_NEXT);
   }
 
   function handleStartClick() {
     Papers.startTurn();
-    // pickNextPaper();
-    // setFakeHasCountdownStarted(true);
-    // startCountdown(Date.now());
   }
 
   function handleFinishTurnClick() {
     // TODO - add loading state.
     // setPapersTurn({}); should it be done here?
     Papers.finishTurn(papersTurn);
-    /* just to double check... */
+    // just to double check...
     setPaperBlur(false);
     setIsPaperChanging(false);
   }
@@ -261,7 +277,7 @@ export default function Playing(props) {
   if (!papersTurn) {
     return (
       <Text style={[Theme.typography.h3, Theme.u.center, { marginTop: 200 }]}>
-        Hold on... it's loading!
+        Loading... hold on! ⏳
       </Text>
     );
   }
@@ -272,11 +288,20 @@ export default function Playing(props) {
     const teamsScore = {};
     const scorePlayers = game.score ? game.score[round.current] : [];
     let myTeamId = null;
+    const teamsPlayersScore = {};
 
     Object.keys(game.teams).forEach(teamId => {
       game.teams[teamId].players.forEach(playerId => {
-        const playerScore = scorePlayers[playerId] ? scorePlayers[playerId].length : 0;
+        const playerScore = scorePlayers[playerId]?.length || 0;
         teamsScore[teamId] = (teamsScore[teamId] || 0) + playerScore;
+        if (!teamsPlayersScore[teamId]) {
+          teamsPlayersScore[teamId] = [];
+        }
+        teamsPlayersScore[teamId].push({
+          id: playerId,
+          name: profiles[playerId].name,
+          score: playerScore,
+        });
         myTeamId = myTeamId || (playerId === profile.id ? teamId : null);
       });
     });
@@ -305,14 +330,20 @@ export default function Playing(props) {
           <View>
             {Object.keys(teamsScore)
               .sort(sortTeamIdByScore)
-              .map((teamId, index) => (
-                <CardScore
-                  key={teamId}
-                  index={index}
-                  teamName={game.teams[teamId].name}
-                  teamScore={teamsScore[teamId]}
-                />
-              ))}
+              .map((teamId, index) => {
+                const thisTeam = teamsPlayersScore[teamId];
+                const highestScore = Math.max(...thisTeam.map(p => p.score));
+                return (
+                  <CardScore
+                    key={teamId}
+                    index={index}
+                    teamName={game.teams[teamId].name}
+                    bestPlayer={thisTeam.find(p => p.score === highestScore)}
+                    scoreTotal={teamsScore[teamId]}
+                    // scoreRound={}
+                  />
+                );
+              })}
           </View>
         </Page.Main>
         <Page.CTAs>
@@ -381,28 +412,26 @@ export default function Playing(props) {
             >
               {msToSecPretty(countdown)}
             </Text>
-            <View
-              style={[Styles.go_paper, Styles[`go_paper_${paperAnim}`]]}
-              onMouseDown={() => setPaperBlur(false)}
-              onTouchStart={() => setPaperBlur(false)}
-              onMouseUp={() => setPaperBlur(true)}
-              onTouchEnd={() => setPaperBlur(true)}
+            <TouchableHighlight
+              onPressIn={() => setPaperBlur(false)}
+              onPressOut={() => setPaperBlur(true)}
             >
-              <Text
-                style={[
-                  Theme.typography.h2,
-                  Styles.go_paper_word,
-                  isPaperBlur && Styles.go_paper_blur,
-                  Styles[`go_paper_word_${paperAnim}`],
-                ]}
-              >
-                {/* this will happen until local storage is fixed */}
-                {!isPaperBlur ? papersTurn.current || '😱 BUG PAPER 😱 (Click pass)' : '*****'}
-              </Text>
-              {isPaperBlur && !isPaperChanging && (
-                <Text style={Theme.typography.small}>Press to reveal</Text>
-              )}
-            </View>
+              <View style={[Styles.go_paper, Styles[`go_paper_${paperAnim}`]]}>
+                <Text
+                  style={[
+                    Theme.typography.h2,
+                    Styles.go_paper_word,
+                    isPaperBlur && Styles.go_paper_blur,
+                    Styles[`go_paper_word_${paperAnim}`],
+                  ]}
+                >
+                  {!isPaperBlur ? papersTurnCurrent || '😱 BUG PAPER 😱 (Click pass)' : '*****'}
+                </Text>
+                {isPaperBlur && !isPaperChanging && (
+                  <Text style={Theme.typography.small}>Press to reveal</Text>
+                )}
+              </View>
+            </TouchableHighlight>
           </View>
           <View style={{ display: 'block' }}>
             <Text style={{ fontSize: 10, lineHeight: 10 }}>
@@ -412,30 +441,39 @@ export default function Playing(props) {
           </View>
         </Page.Main>
         <Page.CTAs hasOffset style={Styles.go_ctas}>
-          <Button
-            variant="success"
-            disabled={isPaperChanging}
-            styleTouch={[{ flex: 1 }, isPaperChanging && Styles.go_cta_dim]}
-            onPress={() => handlePaperClick(true)}
-          >
-            Got it!
-          </Button>
-          <Text style={{ width: 16 }}>{/* lazyness lvl 99 */}</Text>
-          {papersTurn.current && !papersTurn.wordsLeft.length && !papersTurn.passed.length ? (
-            <Text
-              style={[{ flex: 1, textAlign: 'center' }, Theme.typography.secondary, Theme.u.center]}
-            >
-              Last paper!
-            </Text>
+          {!isPaperChanging ? (
+            <Fragment>
+              <Button
+                variant="success"
+                styleTouch={{ flex: 1 }}
+                onPress={() => handlePaperClick(true)}
+              >
+                Got it!
+              </Button>
+              <Text style={{ width: 16 }}>{/* lazyness lvl 99 */}</Text>
+
+              {papersTurn.current && !papersTurn.wordsLeft.length && !papersTurn.passed.length ? (
+                <Text
+                  style={[
+                    { flex: 1, textAlign: 'center' },
+                    Theme.typography.secondary,
+                    Theme.u.center,
+                  ]}
+                >
+                  Last paper!
+                </Text>
+              ) : (
+                <Button
+                  variant="primary"
+                  styleTouch={{ flex: 1 }}
+                  onPress={() => handlePaperClick(false)}
+                >
+                  Pass paper
+                </Button>
+              )}
+            </Fragment>
           ) : (
-            <Button
-              variant="primary"
-              disabled={isPaperChanging}
-              styleTouch={[{ flex: 1 }, isPaperChanging && Styles.go_cta_dim]}
-              onPress={() => handlePaperClick(false)}
-            >
-              Pass paper
-            </Button>
+            <Text style={[Theme.u.center, { flex: 1 }]}>⏳</Text>
           )}
         </Page.CTAs>
       </Fragment>
@@ -510,7 +548,7 @@ export default function Playing(props) {
                   index={index}
                   key={index}
                   teamName={game.teams[teamId].name}
-                  teamScore={teamsTotalScore[teamId]}
+                  scoreTotal={teamsTotalScore[teamId]}
                 />
               ))}
             </View>

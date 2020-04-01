@@ -64,12 +64,10 @@ export default function HomeSigned({ navigation }) {
           </Text>
         </Page.Main>
         <Page.CTAs>
-          <Button onPress={() => openAccessGameModal('join')}>Join Game</Button>
-          <Button
-            variant="light"
-            style={{ marginTop: 16 }}
-            onPress={() => openAccessGameModal('create')}
-          >
+          <Button variant="light" onPress={() => openAccessGameModal('join')}>
+            Join Game
+          </Button>
+          <Button style={{ marginTop: 16 }} onPress={() => openAccessGameModal('create')}>
             Create Game
           </Button>
         </Page.CTAs>
