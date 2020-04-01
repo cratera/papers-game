@@ -22,12 +22,11 @@ export default StyleSheet.create({
     flexShrink: 1, // secret to make it scroll
   },
   slides: {
-    marginTop: 8,
-    paddingTop: 8,
-    paddingBottom: 32,
+    marginTop: 16,
+    paddingBottom: 40,
   },
   slide: {
-    marginVertical: 8,
+    marginBottom: 16,
   },
   input: {
     borderColor: Theme.colors.grayLight,
@@ -41,6 +40,7 @@ export default StyleSheet.create({
     borderColor: Theme.colors.primary,
   },
   ctas: {
+    paddingHorizontal: 0,
     paddingTop: 4,
     paddingBottom: 8,
   },

@@ -25,14 +25,16 @@ const imgMap = {
 export default function ListPlayers({ players, enableKickout = false, ...otherProps }) {
   const Papers = React.useContext(PapersContext);
   const { profile, profiles, game } = Papers.state;
-
   const profileId = profile.id;
   const profileIsAdmin = game.creatorId === profileId;
+  const [isKicking, setIsKicking] = React.useState(null); // playerId
 
-  function handleKickOut(playerId) {
-    const playerName = game.players[playerId].name;
-    if (window.confirm(`You are about to kick ${playerName}. Are you sure?`)) {
-      Papers.kickoutOfGame(playerId);
+  async function handleKickOut(playerId) {
+    const playerName = profiles[playerId].name;
+    if (window.confirm(`You are about to kick "${playerName}". Are you sure?`)) {
+      setIsKicking(playerId);
+      await Papers.removePlayer(playerId);
+      setIsKicking(null);
     }
   }
 
@@ -83,7 +85,12 @@ export default function ListPlayers({ players, enableKickout = false, ...otherPr
                 />
               )}
               {enableKickout && profileIsAdmin && playerId !== profileId && (
-                <Button variant="light" size="sm" onPress={() => handleKickOut(playerId)}>
+                <Button
+                  variant="light"
+                  size="sm"
+                  isLoading={isKicking === playerId}
+                  onPress={() => handleKickOut(playerId)}
+                >
                   Kick out
                 </Button>
               )}

@@ -50,7 +50,7 @@ export class PapersContextProvider extends Component {
       accessGame: this.accessGame.bind(this),
       recoverGame: this.recoverGame.bind(this),
       leaveGame: this.leaveGame.bind(this),
-      kickoutOfGame: this.kickoutOfGame.bind(this),
+      removePlayer: this.removePlayer.bind(this),
 
       setTeams: this.setTeams.bind(this),
       setWords: this.setWords.bind(this),
@@ -257,9 +257,15 @@ export class PapersContextProvider extends Component {
       }));
     });
 
-    socket.on('game.players.removed', (topic, data) => {
+    socket.on('game.players.removed', async (topic, data) => {
       console.log(`:: on.${topic}`, data);
       const { id: playerId, newAdmin } = data;
+
+      if (playerId === this.state.profile.id) {
+        console.log(':: we are the player being removed! A.k.a we were quicked out');
+        await this.leaveGame();
+        return;
+      }
 
       setGame(game => {
         const otherPlayers = Object.keys(game.players).reduce((acc, p) => {
@@ -610,17 +616,11 @@ export class PapersContextProvider extends Component {
     }
   }
 
-  kickoutOfGame(playerId) {
-    this.state.socket.emit(
-      'kickout-of-game',
-      {
-        gameId: this.state.game.name,
-        playerId,
-      },
-      err => {
-        if (err) return true;
-      }
-    );
+  async removePlayer(playerId) {
+    console.log('📌 removePlayer()');
+    await this.state.socket.removePlayer(playerId);
+    // eventually pub on 'players.removed' will be called
+    return true;
   }
 }
 

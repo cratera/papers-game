@@ -157,7 +157,9 @@ export default function Lobby({ navigation }) {
             {!didSubmitWords && <Button onPress={openWords}>Write your papers</Button>}
             {didSubmitWords && !profileIsAdmin && (
               <Text style={[Theme.typography.small, Styles.status]}>
-                Waiting for everyone to be ready!
+                {didEveryoneSubmittedTheirWords
+                  ? `Waiting for ${profiles[game.creatorId].name} to start the game.`
+                  : 'Waiting for everyone to be ready!'}
               </Text>
             )}
             {didEveryoneSubmittedTheirWords && profileIsAdmin && (

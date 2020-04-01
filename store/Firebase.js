@@ -17,7 +17,6 @@ const firebaseConfig = {
 
 let LOCAL_PROFILE = {}; // not sure if this is good.
 let DB; // firebase database
-let ALL_WORDS_TOGETHER = null;
 
 const PUBLIC_API = {
   on,
@@ -25,9 +24,13 @@ const PUBLIC_API = {
   updateProfile, // setUser?
   resetProfile,
   getUser,
+
   createGame,
   joinGame,
   leaveGame,
+
+  removePlayer,
+
   setTeams,
   setWords,
   setWordsForEveryone,
@@ -63,7 +66,7 @@ export default function init(options) {
 
   DB = firebase.database();
 
-  firebase.auth().onAuthStateChanged(function(user) {
+  firebase.auth().onAuthStateChanged(function (user) {
     if (user) {
       LOCAL_PROFILE.id = user.uid;
       LOCAL_PROFILE.isAfk = false;
@@ -104,7 +107,7 @@ function signIn({ name, avatar }, cb) {
   firebase
     .auth()
     .signInAnonymously()
-    .catch(function(error) {
+    .catch(function (error) {
       console.error('signInAnonymously error:', error);
       cb(null, error);
     });
@@ -289,7 +292,7 @@ function _pubGame(gameId) {
   console.log('⚙️ _pubGame', gameId);
 
   // Subscribe to initial game set!
-  DB.ref(`games/${gameId}`).once('value', async function(data) {
+  DB.ref(`games/${gameId}`).once('value', async function (data) {
     const game = data.val();
 
     // Retrieve game players' profiles!
@@ -313,7 +316,7 @@ function _pubGame(gameId) {
     const DB_PLAYERS = DB.ref(`games/${gameId}/players`);
 
     // Sub to players status
-    DB_PLAYERS.on('child_added', async function(data) {
+    DB_PLAYERS.on('child_added', async function (data) {
       const id = data.key;
       const val = data.val();
       const profile = await DB.ref(`users/${id}`).once('value');
@@ -336,7 +339,7 @@ function _pubGame(gameId) {
         });
       });
     });
-    DB_PLAYERS.on('child_removed', function(data) {
+    DB_PLAYERS.on('child_removed', function (data) {
       const id = data.key;
 
       DB.ref(`users/${id}/isAfk`).off('value');
@@ -346,7 +349,7 @@ function _pubGame(gameId) {
         newAdmin: null, // TODO
       });
     });
-    DB_PLAYERS.on('child_changed', function(data) {
+    DB_PLAYERS.on('child_changed', function (data) {
       const id = data.key;
       PubSub.publish('game.players.changed', {
         id,
@@ -355,20 +358,20 @@ function _pubGame(gameId) {
     });
 
     // Sub to teams status
-    DB.ref(`games/${gameId}/teams`).on('value', async function(data) {
+    DB.ref(`games/${gameId}/teams`).on('value', async function (data) {
       const teams = data.val();
       PubSub.publish('game.teams.set', teams);
     });
 
     // Sub to words added
-    DB.ref(`games/${gameId}/words`).on('child_added', async function(data) {
+    DB.ref(`games/${gameId}/words`).on('child_added', async function (data) {
       PubSub.publish('game.words.set', {
         pId: data.key,
         words: data.val(),
       });
     });
 
-    DB.ref(`games/${gameId}/words`).on('child_changed', async function(data) {
+    DB.ref(`games/${gameId}/words`).on('child_changed', async function (data) {
       PubSub.publish('game.words.set', {
         pId: data.key,
         words: data.val(),
@@ -376,17 +379,17 @@ function _pubGame(gameId) {
     });
 
     // Sub to game starting
-    DB.ref(`games/${gameId}/hasStarted`).on('value', async function(data) {
+    DB.ref(`games/${gameId}/hasStarted`).on('value', async function (data) {
       PubSub.publish('game.hasStarted', data.val());
     });
 
     // Sub to round status - OPTIMIZE?
-    DB.ref(`games/${gameId}/round`).on('value', async function(data) {
+    DB.ref(`games/${gameId}/round`).on('value', async function (data) {
       PubSub.publish('game.round', data.val());
     });
 
     // Sub to round status - OPTIMIZE?
-    DB.ref(`games/${gameId}/score`).on('value', async function(data) {
+    DB.ref(`games/${gameId}/score`).on('value', async function (data) {
       PubSub.publish('game.score', data.val());
     });
   });
@@ -462,6 +465,27 @@ async function _unsubGame(gameId) {
 /**
  *
  */
+async function removePlayer(playerId) {
+  const gameId = LOCAL_PROFILE.gameId;
+  console.log('⚙️ removePlayer()', gameId, playerId);
+
+  if (!gameId) {
+    throw new Error('gameIdMissing');
+  }
+
+  const gameRef = DB.ref(`games/${gameId}`);
+  const game = await gameRef.once('value');
+
+  if (!game.exists()) {
+    throw new Error('notFound');
+  }
+
+  console.log(':: removing player');
+  await DB.ref(`games/${gameId}/players/${playerId}`).remove();
+}
+/**
+ *
+ */
 async function setTeams(teams) {
   console.log('⚙️ setTeams()');
   const gameId = LOCAL_PROFILE.gameId;
@@ -477,6 +501,8 @@ async function setWords(words) {
   const gameId = LOCAL_PROFILE.gameId;
   const playerId = LOCAL_PROFILE.id;
 
+  // - 16:05 BUG - Can't replicate this error! 🐛👀
+  // [Unhandled promise rejection: Error: Reference.set failed: First argument contains a function in property 'games.ggg.words.dHwRWKyBdlSNGvKczyyI9coIoRD2.0._targetInst.stateNode._children.0.viewConfig.validAttributes.style.shadowColor.process' with contents = function processColor(color) {]
   await DB.ref(`games/${gameId}/words/${playerId}`).set(words);
 }
 

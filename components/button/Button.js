@@ -13,6 +13,7 @@ function Button({ variant, size, place, isLoading, children, style, styleTouch, 
       {...otherProps}
       style={[Styles.touch, styleTouch]}
       underlayColor={Theme.colors.bg}
+      {...(isLoading ? { disabled: true } : {})}
     >
       <Text style={[Styles.button({ variant, size, place }), style]}>
         <Text>{children}</Text>
