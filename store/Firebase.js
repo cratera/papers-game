@@ -192,7 +192,7 @@ const gameInitialState = ({ id, name, creatorId }) => ({
   settings: {
     roundsCount: 3,
     words: 10,
-    time_ms: 6000, // 60s
+    time_ms: 60000, // 60s
   },
 });
 
@@ -402,8 +402,8 @@ function _pubGame(gameId) {
 /**
  *
  */
-async function leaveGame() {
-  console.log('⚙️ leaveGame()', LOCAL_PROFILE.id);
+async function leaveGame({ wasKicked = false } = {}) {
+  console.log('⚙️ leaveGame()', { wasKicked }, LOCAL_PROFILE.id);
   const gameId = LOCAL_PROFILE.gameId;
 
   if (!gameId) {
@@ -417,14 +417,7 @@ async function leaveGame() {
     throw new Error('notFound');
   }
 
-  // If is last player, remove game.
-  if (Object.keys(game.val().players).length === 1) {
-    console.log(':: last player - remove game');
-    await DB.ref(`games/${gameId}`).remove();
-  } else {
-    console.log(':: remove player');
-    await DB.ref(`games/${gameId}/players/${LOCAL_PROFILE.id}`).remove();
-  }
+  await DB.ref(`games/${gameId}/players/${LOCAL_PROFILE.id}`).remove();
 
   PubSub.publish('game.leave');
 
@@ -433,7 +426,14 @@ async function leaveGame() {
   setTimeout(() => {
     console.log('⚙️ Unsubscribe game');
     PubSub.unsubscribe('game');
-  }, 0);
+
+    // A kickedout player cannot remove the game.
+    // It means there's still someone left.
+    if (!wasKicked && Object.keys(game.val().players).length === 1) {
+      console.log(':: last player - remove game');
+      DB.ref(`games/${gameId}`).remove();
+    }
+  }, 0); // Q: Why did I use timeout here?
 }
 
 async function _unsubGame(gameId) {

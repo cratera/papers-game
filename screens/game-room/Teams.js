@@ -70,16 +70,19 @@ export default function Teams({ navigation }) {
   }
 
   function handleRenameOf(teamId) {
-    var name = prompt('Choose a sweet name.', tempTeams[teamId].name);
-
-    if (name !== null) {
-      setTeams(teams => ({
-        ...teams,
-        [teamId]: {
-          ...teams[teamId],
-          name,
-        },
-      }));
+    try {
+      var name = prompt('Choose a sweet name.', tempTeams[teamId].name);
+      if (name !== null) {
+        setTeams(teams => ({
+          ...teams,
+          [teamId]: {
+            ...teams[teamId],
+            name,
+          },
+        }));
+      }
+    } catch {
+      console.warn('TODO rename teams on IOS');
     }
   }
 

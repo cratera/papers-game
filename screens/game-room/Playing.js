@@ -38,8 +38,7 @@ const CardScore = ({ index, teamName, scoreTotal, scoreRound, bestPlayer }) => (
     <View style={Styles.fscore_score}>
       <Text style={Theme.typography.small}>Papers</Text>
       <Text style={Theme.typography.h1}>{scoreTotal}</Text>
-      {/* TODO this... */}
-      {/* <Text style={Theme.typography.small}>+{scoreRound} this round</Text> */}
+      <Text style={Theme.typography.small}>+{scoreRound} this round</Text>
     </View>
   </View>
 );
@@ -53,7 +52,7 @@ export default function Playing(props) {
   const hasCountdownStarted = !['getReady', 'finished'].includes(round.status);
   const prevHasCountdownStarted = usePrevious(hasCountdownStarted);
   const profileIsAdmin = game.creatorId === profile.id;
-  const initialTimer = 6000000; // TODO - from Papers.settings?
+  const initialTimer = 60000; // game.settings.time_ms;
   const timerReady = 3400;
   const [countdown, startCountdown] = useCountdown(hasCountdownStarted ? round.status : null, {
     timer: initialTimer + timerReady, // 400 - threshold for io connection.
@@ -70,7 +69,6 @@ export default function Playing(props) {
   const isMyTurn = turnPlayerId === profile.id;
 
   const [papersTurn, setPapersTurn] = React.useState(null);
-  const [isFinalScore, setFinalScore] = React.useState(null);
 
   // const [isVisiblePassedPapers, togglePassedPapers] = React.useState(false);
   const [paperAnim, setPaperAnimation] = React.useState(null); // gotcha || nope
@@ -270,10 +268,6 @@ export default function Playing(props) {
     Papers.startNextRound();
   }
 
-  function handleFinalWinnerClick() {
-    setFinalScore(true);
-  }
-
   if (!papersTurn) {
     return (
       <Text style={[Theme.typography.h3, Theme.u.center, { marginTop: 200 }]}>
@@ -285,70 +279,143 @@ export default function Playing(props) {
   // ----------------
 
   const renderRoundScore = () => {
-    const teamsScore = {};
-    const scorePlayers = game.score ? game.score[round.current] : [];
+    const teamsTotalScore = {};
     let myTeamId = null;
-    const teamsPlayersScore = {};
 
-    Object.keys(game.teams).forEach(teamId => {
-      game.teams[teamId].players.forEach(playerId => {
-        const playerScore = scorePlayers[playerId]?.length || 0;
-        teamsScore[teamId] = (teamsScore[teamId] || 0) + playerScore;
-        if (!teamsPlayersScore[teamId]) {
-          teamsPlayersScore[teamId] = [];
-        }
-        teamsPlayersScore[teamId].push({
-          id: playerId,
-          name: profiles[playerId].name,
-          score: playerScore,
+    // TODO URGENT . Make this prettier...
+    // This is the perfect definition of 🍝 code.
+    const getRoundScore = roundIndex => {
+      const teamsPlayersScore = {};
+      const scorePlayers = game.score[roundIndex];
+      const teamsScore = {};
+      let bestPlayer = {};
+
+      if (scorePlayers) {
+        Object.keys(game.teams).forEach(teamId => {
+          game.teams[teamId].players.forEach(playerId => {
+            myTeamId = myTeamId || (playerId === profile.id ? teamId : null);
+            const playerScore = scorePlayers[playerId] ? scorePlayers[playerId].length : 0;
+            if (playerScore > (bestPlayer.score || 0)) {
+              bestPlayer = {
+                id: playerId,
+                name: profiles[playerId].name,
+                score: playerScore,
+              };
+            }
+            teamsScore[teamId] = (teamsScore[teamId] || 0) + playerScore;
+
+            if (!teamsPlayersScore[teamId]) {
+              teamsPlayersScore[teamId] = [];
+            }
+
+            teamsPlayersScore[teamId].push({
+              id: playerId,
+              name: profiles[playerId].name,
+              score: playerScore,
+            });
+          });
+
+          teamsTotalScore[teamId] = (teamsTotalScore[teamId] || 0) + teamsScore[teamId];
         });
-        myTeamId = myTeamId || (playerId === profile.id ? teamId : null);
-      });
-    });
+      }
 
-    const arrayOfScores = Object.values(teamsScore);
-    const arrayOfTeamsId = Object.keys(teamsScore);
-    const winnerIndex = arrayOfScores.indexOf(Math.max(...arrayOfScores));
+      const arrayOfScores = Object.values(teamsScore);
+      const arrayOfTeamsId = Object.keys(teamsScore);
+      // const winnerIndex = arrayOfScores.indexOf(Math.max(...arrayOfScores));
+      // const winnerId = arrayOfTeamsId[winnerIndex];
+
+      return {
+        arrayOfScores,
+        arrayOfTeamsId,
+        bestPlayer,
+        teamsScore,
+        teamsPlayersScore,
+      };
+    };
+
+    // REVIEW this DESCRIPTIONS usage...
+    const scores = DESCRIPTIONS.map((desc, index) => getRoundScore(index));
+
+    const arrayOfScores = Object.values(teamsTotalScore);
+    const arrayOfTeamsId = Object.keys(teamsTotalScore);
+    const winnerScore = Math.max(...arrayOfScores);
+    const winnerIndex = arrayOfScores.indexOf(winnerScore);
     const winnerId = arrayOfTeamsId[winnerIndex];
     const myTeamWon = myTeamId === winnerId;
+
+    const title = myTeamWon ? 'You won! 🎉' : 'You lost 💩';
+    const description = myTeamWon ? 'They never stood a change' : 'Yikes.';
+    const isFinalRound = roundIndex === game.settings.roundsCount - 1;
 
     const sortTeamIdByScore = (teamAId, teamBId) => arrayOfScores[teamBId] - arrayOfScores[teamAId];
 
     return (
       <Fragment>
+        {isFinalRound && <EmojiRain type={myTeamWon ? 'winner' : 'loser'} />}
         <Page.Main>
-          <View style={Styles.header}>
-            <Text style={Theme.typography.h3}>End of round {roundIndex + 1}</Text>
-            <Text style={Theme.typography.h2}>
-              {myTeamWon ? (
-                <Text style={{ color: Theme.colors.success }}>Your team won!</Text>
-              ) : (
-                <Text style={{ color: Theme.colors.danger }}>Your team lost!</Text>
-              )}
-            </Text>
+          <View style={[Styles.header, { marginBottom: 16 }]}>
+            {!isFinalRound ? (
+              <Fragment>
+                <Text style={Theme.typography.h3}>End of round {roundIndex + 1}</Text>
+                <Text style={Theme.typography.h2}>
+                  {myTeamWon ? (
+                    <Text style={{ color: Theme.colors.success }}>Your team won!</Text>
+                  ) : (
+                    <Text style={{ color: Theme.colors.danger }}>Your team lost!</Text>
+                  )}
+                </Text>
+              </Fragment>
+            ) : (
+              <Fragment>
+                <Text style={Theme.typography.h1}>{title}</Text>
+                <Text style={Theme.typography.body}>{description}</Text>
+              </Fragment>
+            )}
           </View>
           <View>
-            {Object.keys(teamsScore)
-              .sort(sortTeamIdByScore)
-              .map((teamId, index) => {
-                const thisTeam = teamsPlayersScore[teamId];
-                const highestScore = Math.max(...thisTeam.map(p => p.score));
-                return (
-                  <CardScore
-                    key={teamId}
-                    index={index}
-                    teamName={game.teams[teamId].name}
-                    bestPlayer={thisTeam.find(p => p.score === highestScore)}
-                    scoreTotal={teamsScore[teamId]}
-                    // scoreRound={}
-                  />
+            {scores[roundIndex].arrayOfTeamsId.sort(sortTeamIdByScore).map((teamId, index) => {
+              let bestPlayer;
+              // it hurts omgosh...
+              if (isFinalRound) {
+                // Join all scores for each round in the team.
+                // Memo is welcome!
+                const thisTeamPlayersTotalScore = {};
+                scores.forEach(round => {
+                  round.teamsPlayersScore[teamId].forEach(player => {
+                    if (!thisTeamPlayersTotalScore[player.id]) {
+                      thisTeamPlayersTotalScore[player.id] = 0;
+                    }
+                    thisTeamPlayersTotalScore[player.id] += player.score;
+                  });
+                });
+                const highestScore = Math.max(
+                  ...Object.keys(thisTeamPlayersTotalScore).map(id => thisTeamPlayersTotalScore[id])
                 );
-              })}
+                const bestPlayerId = Object.keys(thisTeamPlayersTotalScore).find(
+                  id => thisTeamPlayersTotalScore[id] === highestScore
+                );
+                bestPlayer = { name: profiles[bestPlayerId].name, score: highestScore };
+              } else {
+                const thisTeamPlayersScore = scores[roundIndex].teamsPlayersScore[teamId];
+                const highestScore = Math.max(...thisTeamPlayersScore.map(p => p.score));
+                bestPlayer = thisTeamPlayersScore.find(p => p.score === highestScore);
+              }
+              return (
+                <CardScore
+                  key={teamId}
+                  index={index}
+                  teamName={game.teams[teamId].name}
+                  bestPlayer={bestPlayer}
+                  scoreTotal={teamsTotalScore[teamId]}
+                  scoreRound={scores[roundIndex].teamsScore[teamId]}
+                />
+              );
+            })}
           </View>
         </Page.Main>
         <Page.CTAs>
-          {round.current + 1 === game.settings.roundsCount ? (
-            <Button onPress={handleFinalWinnerClick}>Show final winner!</Button>
+          {isFinalRound ? (
+            <Button onPress={Papers.leaveGame}>Go to homepage</Button>
           ) : profileIsAdmin ? (
             <Button onPress={handleStartNextRoundClick}>
               Start Round {round.current + 1 + 1} of {game.settings.roundsCount}!
@@ -473,117 +540,12 @@ export default function Playing(props) {
               )}
             </Fragment>
           ) : (
-            <Text style={[Theme.u.center, { flex: 1 }]}>⏳</Text>
+            <Text style={[Theme.u.center, { flex: 1, lineHeight: 44 }]}>⏳</Text>
           )}
         </Page.CTAs>
       </Fragment>
     );
   };
-
-  // ------- isFinalScore
-
-  if (isFinalScore) {
-    const teamsTotalScore = {};
-    let myTeamId = null;
-
-    const getRoundScore = roundIndex => {
-      const scorePlayers = game.score[roundIndex];
-      const teamsScore = {};
-      let bestPlayer = {};
-
-      Object.keys(game.teams).forEach(teamId => {
-        game.teams[teamId].players.forEach(playerId => {
-          myTeamId = myTeamId || (playerId === profile.id ? teamId : null);
-          const playerScore = scorePlayers[playerId] ? scorePlayers[playerId].length : 0;
-          if (playerScore > (bestPlayer.score || 0)) {
-            bestPlayer = { score: playerScore, id: playerId };
-          }
-          teamsScore[teamId] = (teamsScore[teamId] || 0) + playerScore;
-        });
-
-        teamsTotalScore[teamId] = (teamsTotalScore[teamId] || 0) + teamsScore[teamId];
-      });
-
-      const arrayOfScores = Object.values(teamsScore);
-      const arrayOfTeamsId = Object.keys(teamsScore);
-
-      // const winnerIndex = arrayOfScores.indexOf(Math.max(...arrayOfScores));
-      // const winnerId = arrayOfTeamsId[winnerIndex];
-
-      return {
-        arrayOfScores,
-        arrayOfTeamsId,
-        bestPlayer,
-      };
-    };
-
-    // REVIEW this DESCRIPTIONS usage...
-    const scores = DESCRIPTIONS.map((desc, index) => getRoundScore(index));
-
-    const arrayOfScores = Object.values(teamsTotalScore);
-    const arrayOfTeamsId = Object.keys(teamsTotalScore);
-    const winnerScore = Math.max(...arrayOfScores);
-    const winnerIndex = arrayOfScores.indexOf(winnerScore);
-    const winnerId = arrayOfTeamsId[winnerIndex];
-    const myTeamWon = myTeamId === winnerId;
-
-    const title = myTeamWon ? 'You won! 🎉' : 'You lost 💩';
-    const description = myTeamWon ? 'They never stood a change' : 'Yikes.';
-
-    const sortTeamIdByScore = (teamAId, teamBId) => arrayOfScores[teamBId] - arrayOfScores[teamAId];
-
-    return (
-      <Page>
-        <EmojiRain type={myTeamWon ? 'winner' : 'loser'} />
-        <Page.Main>
-          <View style={[Styles.header, { marginBottom: 16 }]}>
-            <Text style={Theme.typography.h1}>{title}</Text>
-            <Text style={Theme.typography.body}>{description}</Text>
-          </View>
-
-          <ScrollView style={[Theme.u.scrollSideOffset, { paddingBottom: 40 }]}>
-            <View style={Styles.fscore_list}>
-              {arrayOfTeamsId.sort(sortTeamIdByScore).map((teamId, index) => (
-                <CardScore
-                  index={index}
-                  key={index}
-                  teamName={game.teams[teamId].name}
-                  scoreTotal={teamsTotalScore[teamId]}
-                />
-              ))}
-            </View>
-
-            <Text style={Theme.typography.h2}>Statistics</Text>
-            <Text>{'\n'}</Text>
-
-            {scores.map((round, index) => {
-              return (
-                <Fragment key={index}>
-                  <Text style={Theme.typography.h3}>Round {index + 1}</Text>
-                  <View>
-                    {Object.keys(round.arrayOfTeamsId).map((teamId, index) => (
-                      <Text style={Theme.typography.body} key={teamId}>
-                        {game.teams[teamId].name}: {round.arrayOfScores[index]}
-                      </Text>
-                    ))}
-                  </View>
-                  <Text style={Theme.typography.body}>
-                    {/* REVIEW - Show name even after member leaves game. */}
-                    Best Player: {profiles[round.bestPlayer.id]?.name} ({round.bestPlayer.score})
-                  </Text>
-                  <Text>{'\n'}</Text>
-                </Fragment>
-              );
-            })}
-          </ScrollView>
-        </Page.Main>
-        <Page.CTAs hasOffset>
-          {/* UX - leave game when clicking "show final score". Not here */}
-          <Button onPress={Papers.leaveGame}>Go to homepage</Button>
-        </Page.CTAs>
-      </Page>
-    );
-  }
 
   // -------- other stuff
 
@@ -841,49 +803,43 @@ const placeMap = {
 
 const EmojiRain = ({ type }) => {
   const emojis = type === 'winner' ? ['🎉', '🔥', '💖', '😃'] : ['🤡', '💩', '👎', '😓'];
-  const count = Array.from(Array(15), () => 1);
-  const [fadeAnim] = React.useState(new Animated.Value(0)); // Initial value for opacity: 0
-  const [rainAnim] = React.useState(new Animated.Value(0)); // Initial value for opacity: 0
+  const count = Array.from(Array(20), () => 1);
+  // const [fadeAnim] = React.useState(new Animated.Value(0)); // Initial value for opacity: 0
+  // const [rainAnim] = React.useState(new Animated.Value(0)); // Initial value for opacity: 0
 
   const vw = Dimensions.get('window').width / 100;
   const vh = Dimensions.get('window').height / 100;
+  const col = 5;
 
-  React.useEffect(() => {
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 400,
-    }).start();
+  // TODO animations.
+  // React.useEffect(() => {
+  //   Animated.timing(fadeAnim, {
+  //     toValue: 1,
+  //     duration: 1000,
+  //   }).start();
 
-    Animated.timing(rainAnim, {
-      toValue: vh * 100,
-      duration: 5000,
-    }).start();
-  }, []);
+  //   Animated.timing(rainAnim, {
+  //     toValue: vh * 100,
+  //     duration: 5000,
+  //   }).start();
+  // }, []);
 
   return (
     <View pointerEvents="none" style={{ zIndex: 2 }}>
       <Animated.View
         style={{
-          opacity: fadeAnim,
+          position: 'relative',
+          // opacity: fadeAnim,
         }}
       >
         {count.map((x, index) => (
           <Text
             key={index}
             style={{
-              fontSize: 16,
+              fontSize: 18,
               position: 'absolute',
-              top: Math.floor(Math.random() * 100) * vh,
-              left: Math.floor(Math.random() * 100) * vw,
-              transform: [
-                { perspective: 1000 },
-                { translateX: 1 },
-                { translateY: 1 },
-                // translateY: rainAnim.interpolate({
-                //   inputRange: [0, 1],
-                //   outputRange: [0, 200], // 0 : 150, 0.5 : 75, 1 : 0
-                // }),
-              ],
+              left: ((index % col) * 20 + (Math.floor(index / col) % 2 ? 10 : 0)) * vh,
+              top: (Math.floor(index / col) * 15 + index * 1.5 + 70) * vh,
             }}
           >
             {emojis[index % 4]}

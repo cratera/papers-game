@@ -263,7 +263,10 @@ export class PapersContextProvider extends Component {
 
       if (playerId === this.state.profile.id) {
         console.log(':: we are the player being removed! A.k.a we were quicked out');
-        await this.leaveGame();
+        // OPTIMIZE/BUG - avoid ping pong with firebase the 2nd time is removed.
+        // (When being the last to leave the game)
+        // this.kickedFromGame() is a better name.
+        await this.leaveGame({ wasKicked: true });
         return;
       }
 
@@ -605,11 +608,11 @@ export class PapersContextProvider extends Component {
     });
   }
 
-  async leaveGame(playerId) {
+  async leaveGame(opts) {
     console.log('📌 leaveGame()');
 
     try {
-      await this.state.socket.leaveGame();
+      await this.state.socket.leaveGame(opts);
     } catch (err) {
       console.error(':: error!', err);
       this._removeGameFromState();

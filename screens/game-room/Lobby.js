@@ -75,7 +75,7 @@ export default function Lobby({ navigation }) {
           <Button onPress={handleCreateTeams}>Create teams!</Button>
         ) : (
           <Text style={[Theme.typography.small, Styles.status]}>
-            Wait for {profiles[game.creatorId].name} to create the teams.
+            Wait for {profiles[game.creatorId]?.name || '???'} to create the teams.
           </Text>
         );
       } else {
@@ -96,7 +96,12 @@ export default function Lobby({ navigation }) {
               <Text style={[Theme.typography.small, Styles.cap]}>Ask your friends to join!</Text>
             )}
             <View style={Styles.title}>
-              <Text style={Theme.typography.h1}>{game.name}</Text>
+              <Text style={[Theme.u.center, Theme.typography.h1]}>{game.name}</Text>
+              {game.name.toLowerCase() !== game.id && (
+                <Text style={[Theme.u.center, Theme.typography.body]}>
+                  Join id: <Text style={Theme.typography.h3}>{game.id}</Text>
+                </Text>
+              )}
               {/* Later - ShAre game. */}
             </View>
           </View>
@@ -158,7 +163,7 @@ export default function Lobby({ navigation }) {
             {didSubmitWords && !profileIsAdmin && (
               <Text style={[Theme.typography.small, Styles.status]}>
                 {didEveryoneSubmittedTheirWords
-                  ? `Waiting for ${profiles[game.creatorId].name} to start the game.`
+                  ? `Waiting for ${profiles[game.creatorId]?.name || '???'} to start the game.`
                   : 'Waiting for everyone to be ready!'}
               </Text>
             )}

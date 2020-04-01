@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Text, Image } from 'react-native';
+import { View, Text, Image } from 'react-native';
 
 import imgWritting from '@assets/images/writting.gif';
 import imgDone from '@assets/images/done.gif';
@@ -47,11 +47,10 @@ export default function ListPlayers({ players, enableKickout = false, ...otherPr
           const playerName = profiles[playerId]?.name || playerId;
           return (
             <View key={playerId} style={[Styles.item, isLastChild && Styles.item_isLast]}>
-              <View>
+              <View style={Styles.who}>
                 <Avatar hasMargin />
                 <Text>
-                  - {playerName}
-                  <Text>{' (Left) '}</Text>
+                  {playerName} <Text>{' (Left) '}</Text>
                 </Text>
               </View>
             </View>
