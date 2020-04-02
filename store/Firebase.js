@@ -37,8 +37,9 @@ const PUBLIC_API = {
 
   startGame,
   startTurn,
+  setPapersGuessed,
   finishTurn,
-  startNextRound,
+  setRound,
 };
 
 export function serverReconnect({ id, name, gameId }) {
@@ -177,6 +178,7 @@ const gameInitialState = ({ id, name, creatorId }) => ({
     //   }
     // }
   },
+  papersGuessed: 0, // Number - updated as the player guesses words.
   round: {
     current: null, // Number - Round index
     turnWho: null, // { Number, Number, Bool } - { 0: teamIndex, 1: playerIndex, 2: isOdd }
@@ -392,6 +394,10 @@ function _pubGame(gameId) {
     DB.ref(`games/${gameId}/score`).on('value', async function (data) {
       PubSub.publish('game.score', data.val());
     });
+
+    DB.ref(`games/${gameId}/papersGuessed`).on('value', async function (data) {
+      PubSub.publish('game.papersGuessed', data.val());
+    });
   });
 
   // Prepare in case we get offline.
@@ -497,13 +503,30 @@ async function setTeams(teams) {
  *
  */
 async function setWords(words) {
-  console.log('⚙️ setWords()');
+  console.log('⚙️ setWords()', words);
   const gameId = LOCAL_PROFILE.gameId;
   const playerId = LOCAL_PROFILE.id;
 
+  /*
+  To save memory in DB let's store the words as key:value. The simple key
+  is the word index in the array of all words. The final output will be
+  something like: (example has 3 words per player:)
+  words: {
+    _all: ['run', 'portugal', 'development', 'card', 'sea', 'cold'],
+    playerId1: [0, 1, 2], // run, portugal, development
+    playerId2: [3, 4, 5], // card, sea, cold.
+  }
+  */
+
+  const wordsOnce = await DB.ref(`games/${gameId}/words/_all`).once('value');
+  const wordsStored = wordsOnce.val() || [];
+  const wordsCount = wordsStored.length;
+  const wordsAsKeys = words.map((w, index) => index + wordsCount);
+
   // - 16:05 BUG - Can't replicate this error! 🐛👀
   // [Unhandled promise rejection: Error: Reference.set failed: First argument contains a function in property 'games.ggg.words.dHwRWKyBdlSNGvKczyyI9coIoRD2.0._targetInst.stateNode._children.0.viewConfig.validAttributes.style.shadowColor.process' with contents = function processColor(color) {]
-  await DB.ref(`games/${gameId}/words/${playerId}`).set(words);
+  await DB.ref(`games/${gameId}/words/_all`).set([...wordsStored, ...words]);
+  await DB.ref(`games/${gameId}/words/${playerId}`).set(wordsAsKeys);
 }
 
 /**
@@ -526,17 +549,11 @@ function _allWordsTogether(words) {
 /**
  *
  */
-async function startGame(words) {
+async function startGame(roundStatus) {
   console.log('⚙️ startGame()');
   const gameId = LOCAL_PROFILE.gameId;
 
-  await DB.ref(`games/${gameId}/round`).set({
-    current: 0,
-    turnWho: { 0: 0, 1: 0, 2: false },
-    turnCount: 0,
-    status: 'getReady',
-    wordsLeft: _allWordsTogether(words),
-  });
+  await DB.ref(`games/${gameId}/round`).set(roundStatus);
   await DB.ref(`games/${gameId}/hasStarted`).set(true);
 }
 
@@ -550,6 +567,13 @@ async function startTurn(words) {
   // The client is responsible for the countdown and then
   // it sends 'finishTurn()' with score. It saves on IO events for each second.
   await DB.ref(`games/${gameId}/round/status`).set(Date.now());
+}
+
+function setPapersGuessed(count) {
+  console.log('⚙️ setPapersGuessed()', count);
+  const gameId = LOCAL_PROFILE.gameId;
+
+  DB.ref(`games/${gameId}/papersGuessed`).set(count);
 }
 
 function _getNextTurn({ turnWho, teams }) {
@@ -576,25 +600,10 @@ function _getNextTurn({ turnWho, teams }) {
       return { 0: 0, 1: 0, 2: false };
     }
   }
-
-  // if (player < totalPlayers) {
-  //   return [team, player + 1];
-  // } else {
-  //   if (team < totalTeams) {
-  //     return [team + 1, 0];
-  //   } else {
-  //     return [0, 0];
-  //   }
-  // }
 }
 
 /**
  *
- * @param {Object} papersTurn - papers involved in this turn.
- * @param {String} papersTurn.current - current paper on the screen
- * @param {[String]} papersTurn.passed - papers passed
- * @param {[String]} papersTurn.guessed - papers guessed
- * @param {[String]} papersTurn.wordsLeft - papers left
  */
 async function finishTurn({ playerScore, roundStatus }) {
   console.log('⚙️ finishTurn()');
@@ -602,26 +611,15 @@ async function finishTurn({ playerScore, roundStatus }) {
 
   await DB.ref(`games/${gameId}/score/${roundStatus.current}`).update(playerScore);
   await DB.ref(`games/${gameId}/round`).update(roundStatus);
+  await DB.ref(`games/${gameId}/papersGuessed`).set(0);
 }
 
 /**
  *
- * @param {Object} round - game round status
- * @param {Object} teams - game teams
- * @param {Object} words - game words by player
  */
-async function startNextRound({ round, teams, words }) {
+async function setRound(roundStatus) {
   console.log('⚙️ startNextRound()');
   const gameId = LOCAL_PROFILE.gameId;
 
-  // TODO - Do validations - if wordsLeft is 0, if round is last, etc...
-  const newRound = {
-    current: round.current + 1,
-    turnWho: _getNextTurn({ turnWho: round.turnWho, teams }),
-    turnCount: 0,
-    status: 'getReady',
-    wordsLeft: _allWordsTogether(words),
-  };
-
-  await DB.ref(`games/${gameId}/round`).update(newRound);
+  await DB.ref(`games/${gameId}/round`).set(roundStatus);
 }

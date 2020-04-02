@@ -1,11 +1,8 @@
 import React from 'react';
 import { View, StyleSheet, Text } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
 import * as WebBrowser from 'expo-web-browser';
 
 import { createStackNavigator } from '@react-navigation/stack';
-
-const Stack = createStackNavigator();
 
 import PapersContext from '@store/PapersContext.js';
 
@@ -15,6 +12,8 @@ import GamePlaying from './Playing.js';
 
 import Page from '@components/page';
 import Button from '@components/button';
+
+const Stack = createStackNavigator();
 
 export default function Room({ navigation }) {
   const Papers = React.useContext(PapersContext);
@@ -107,7 +106,7 @@ export default function Room({ navigation }) {
   return (
     <Stack.Navigator headerMode="none">
       <Stack.Screen name="lobby" component={GameLobby} />
-      <Stack.Screen name="playing" component={GamePlaying} />
+      {game && <Stack.Screen name="playing" component={GamePlaying} />}
       {!game.teams ? <Stack.Screen name="teams" component={GameTeams} /> : null}
     </Stack.Navigator>
   );

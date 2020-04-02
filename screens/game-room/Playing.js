@@ -1,3 +1,6 @@
+/**
+ * This code is the perfect definition of "just make it work".
+ */
 import React, { Fragment } from 'react';
 import { Dimensions, ScrollView, View, TouchableHighlight, Animated, Text } from 'react-native';
 
@@ -15,33 +18,6 @@ import Styles from './PlayingStyles.js';
 const ANIM_PAPER_NEXT = 500;
 
 const DESCRIPTIONS = [i18n.round_0_desc, i18n.round_1_desc, i18n.round_2_desc];
-
-const CardScore = ({ index, teamName, scoreTotal, scoreRound, bestPlayer }) => (
-  <View style={Styles.fscore_item} key={index}>
-    <View style={Styles.fscore_info}>
-      <Text
-        style={[
-          Styles.fscore_tag,
-          {
-            backgroundColor: index === 0 ? Theme.colors.primary : Theme.colors.grayDark,
-            marginBottom: 8,
-          },
-        ]}
-      >
-        {placeMap[index]}
-      </Text>
-      <Text style={Theme.typography.h3}>{teamName}</Text>
-      <Text style={Theme.typography.small}>
-        {bestPlayer.name} was the best player! ({bestPlayer.score})
-      </Text>
-    </View>
-    <View style={Styles.fscore_score}>
-      <Text style={Theme.typography.small}>Papers</Text>
-      <Text style={Theme.typography.h1}>{scoreTotal}</Text>
-      <Text style={Theme.typography.small}>+{scoreRound} this round</Text>
-    </View>
-  </View>
-);
 
 export default function Playing(props) {
   const Papers = React.useContext(PapersContext);
@@ -64,7 +40,7 @@ export default function Playing(props) {
   // const [timesUp, setTimesup] = React.useState(false);
 
   const roundIndex = round.current;
-  const { 0: turnTeamIndex, 1: turnPlayerIndex, 2: isOdd } = round.turnWho;
+  const { 0: turnTeamIndex, 1: turnPlayerIndex, 2: isOdd } = round?.turnWho || {};
   const turnPlayerId = game.teams[turnTeamIndex].players[isOdd ? 0 : turnPlayerIndex];
   const isMyTurn = turnPlayerId === profile.id;
 
@@ -76,6 +52,7 @@ export default function Playing(props) {
   const [isPaperChanging, setIsPaperChanging] = React.useState(false);
   const blurTimeout = React.useRef();
   const papersTurnCurrent = papersTurn?.current;
+  const isCount321go = countdownSec > initialTimerSec;
 
   React.useEffect(() => {
     async function getTurnState() {
@@ -87,13 +64,22 @@ export default function Playing(props) {
   }, []);
 
   React.useEffect(() => {
-    if (papersTurnCurrent) {
+    if (!isCount321go) {
+      console.log('useEffect:: 1º blur paper');
+      setPaperBlur(false);
+      clearTimeout(blurTimeout.current);
+      blurTimeout.current = setTimeout(() => setPaperBlur(true), blurTime);
+    }
+  }, [isCount321go]);
+
+  React.useEffect(() => {
+    if (papersTurnCurrent !== null && !isCount321go) {
       console.log('useEffect:: timeout blur paper');
       setPaperBlur(false);
       clearTimeout(blurTimeout.current);
       blurTimeout.current = setTimeout(() => setPaperBlur(true), blurTime);
     }
-  }, [papersTurnCurrent]);
+  }, [papersTurnCurrent, isCount321go]);
 
   React.useEffect(() => {
     // use false to avoid undefined on first render
@@ -103,6 +89,14 @@ export default function Playing(props) {
       startCountdown(round.status);
     }
   }, [startCountdown, round.status, prevHasCountdownStarted, hasCountdownStarted]); // eslint-disable-line
+
+  function getPaperByKey(key) {
+    const paper = game.words._all[key];
+    if (!paper) {
+      console.warn(`key "${key}" does not match a paper!`);
+    }
+    return paper;
+  }
 
   // TODO/NOTE: pickFirstPaper, pickNextPaper and togglePaper should be on PapersContext
   function pickFirstPaper() {
@@ -154,8 +148,12 @@ export default function Playing(props) {
 
     setPapersTurn(state => {
       const wordsModified = {};
-      const wordIndex = !wordsEnded && getRandomInt(wordsToPick.length - 1);
+      const wordIndex = !wordsEnded ? getRandomInt(wordsToPick.length - 1) : 0;
       let nextPaper = wordsEnded ? null : wordsToPick[wordIndex];
+
+      if (!wordsEnded && nextPaper === null) {
+        console.error('Ups nextPaper!', wordIndex, wordsToPick);
+      }
 
       if (!wordsEnded) {
         wordsToPick.splice(wordIndex, 1);
@@ -179,7 +177,7 @@ export default function Playing(props) {
           } else {
             // When it's the last word,
             // but no stress because "next paper" button is disable
-            nextPaper = currentPaper;
+            nextPaper = currentPaper; // REVIEW: Why did I do this line?
             wordsModified.passed = [];
           }
         }
@@ -211,12 +209,13 @@ export default function Playing(props) {
         wordsModified.passed = wordsToPick;
       } else {
         const wordsToPick = [...state.guessed];
+        console.log('wordsToPick:', wordsToPick);
         const wordIndex = wordsToPick.indexOf(paper);
         wordsToPick.splice(wordIndex, 1);
 
-        // It means all papers were guessed before and
-        // now there's a new paper to guess!
-        if (!state.passed.length) {
+        // It means all papers were guessed before
+        // and now there's a new paper to guess!
+        if (countdown && !state.passed.length) {
           wordsModified.current = paper;
         } else {
           wordsModified.passed = [...state.passed, paper];
@@ -432,10 +431,9 @@ export default function Playing(props) {
 
   const renderGo = () => {
     const stillHasWords =
-      papersTurn.current || papersTurn.passed.length > 0 || papersTurn.wordsLeft.length > 0;
-    const turnScoreProps = {
-      onFinish: handleFinishTurnClick,
-    };
+      papersTurn.current !== null ||
+      papersTurn.passed.length > 0 ||
+      papersTurn.wordsLeft.length > 0;
 
     if (!stillHasWords || countdownSec === 0) {
       const type = !stillHasWords ? 'nowords' : 'timesup';
@@ -445,22 +443,16 @@ export default function Playing(props) {
           onTogglePaper={togglePaper}
           type={type}
           onFinish={handleFinishTurnClick}
+          getPaperByKey={getPaperByKey}
         />
       );
     }
 
-    // if (countdownSec === 0) {
-    //   return <TurnScore type='timesup' { ...turnScoreProps } />;
-    // }
-
-    if (countdownSec > initialTimerSec) {
-      {
-        /* 3, 2, 1... */
-      }
+    if (isCount321go) {
       return (
         <Page.Main>
           <Text style={[Styles.go_count321, Theme.typography.h1]}>
-            {countdownSec - initialTimerSec}...
+            {countdownSec - initialTimerSec}
           </Text>
         </Page.Main>
       );
@@ -492,8 +484,12 @@ export default function Playing(props) {
                     Styles[`go_paper_word_${paperAnim}`],
                   ]}
                 >
-                  {!isPaperBlur ? papersTurnCurrent || '😱 BUG PAPER 😱 (Click pass)' : '*****'}
+                  {!isPaperBlur
+                    ? getPaperByKey(papersTurnCurrent) ||
+                      `😱 BUG PAPER 😱 ${papersTurnCurrent} (Click pass)`
+                    : `*****`}
                 </Text>
+                <Text style={Styles.go_paper_key}>{String(papersTurnCurrent)}</Text>
                 {isPaperBlur && !isPaperChanging && (
                   <Text style={Theme.typography.small}>Press to reveal</Text>
                 )}
@@ -519,7 +515,9 @@ export default function Playing(props) {
               </Button>
               <Text style={{ width: 16 }}>{/* lazyness lvl 99 */}</Text>
 
-              {papersTurn.current && !papersTurn.wordsLeft.length && !papersTurn.passed.length ? (
+              {papersTurn.current !== null &&
+              !papersTurn.wordsLeft.length &&
+              !papersTurn.passed.length ? (
                 <Text
                   style={[
                     { flex: 1, textAlign: 'center' },
@@ -548,6 +546,8 @@ export default function Playing(props) {
   };
 
   // -------- other stuff
+
+  const isAllWordsGuessed = game.papersGuessed === game.round.wordsLeft?.length;
 
   // Some memo here would be nice.
   const turnStatus = (() => {
@@ -591,9 +591,11 @@ export default function Playing(props) {
           hasCountdownStarted={hasCountdownStarted}
           countdownSec={countdownSec}
           countdown={countdown}
+          isAllWordsGuessed={isAllWordsGuessed}
           initialTimerSec={initialTimerSec}
           initialTimer={initialTimer}
           roundIndex={roundIndex}
+          papersGuessed={game.papersGuessed}
         />
       )}
     </Page>
@@ -602,7 +604,7 @@ export default function Playing(props) {
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * *\
 |*                    COMPONENTS                       *|
-|*       All in the same file because I say it.        *|
+|*       All in the same file because I say so.        *|
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 const MyTurnGetReady = ({ description, onStartClick, isOdd }) => (
@@ -649,8 +651,8 @@ const OthersTurn = ({
   initialTimer,
   thisTurnPlayer,
   turnStatus,
-  // teamName,
-  // player,
+  papersGuessed,
+  isAllWordsGuessed,
 }) => {
   return (
     <Fragment>
@@ -666,13 +668,13 @@ const OthersTurn = ({
           <View style={Styles.main}>
             {!hasCountdownStarted ? (
               <Text style={Theme.typography.small}>Not started yet</Text>
-            ) : countdownSec ? (
-              <Text style={Theme.typography.small}>[X] papers guessed</Text>
-            ) : (
+            ) : countdownSec && !isAllWordsGuessed ? null : (
               <Fragment>
-                <Text style={[Theme.typography.small]}>Time's up!</Text>
+                <Text style={[Theme.typography.small]}>
+                  {isAllWordsGuessed ? 'All papers guessed!' : "Time's up!"}
+                </Text>
                 <Text style={[Theme.typography.h1, Theme.u.center]}>
-                  {thisTurnPlayer.name} got [X] papers right!
+                  {thisTurnPlayer.name} got {papersGuessed} papers right!
                 </Text>
               </Fragment>
             )}
@@ -680,6 +682,7 @@ const OthersTurn = ({
               style={[
                 Theme.typography.h1,
                 {
+                  marginVertical: 8,
                   color: hasCountdownStarted
                     ? countdown <= 10500
                       ? Theme.colors.danger
@@ -689,23 +692,33 @@ const OthersTurn = ({
               ]}
             >
               {hasCountdownStarted
-                ? countdownSec > initialTimerSec
-                  ? countdownSec - initialTimerSec + '...' // 3, 2, 1...
-                  : countdownSec
+                ? countdownSec > initialTimerSec // isCount321go
+                  ? countdownSec - initialTimerSec // 3, 2, 1...
+                  : countdownSec && !isAllWordsGuessed
                   ? msToSecPretty(countdown) // 59, 58, counting...
-                  : '' // timeout
+                  : '' // timeout or all words guessed
                 : msToSecPretty(initialTimer) // waiting to start
               }
             </Text>
+            <Text style={Theme.typography.small}>{papersGuessed} papers guessed</Text>
           </View>
         </View>
       </Page.Main>
       <Page.CTAs>
-        <TurnStatus
-          title={turnStatus.title}
-          player={turnStatus.player}
-          teamName={turnStatus.teamName}
-        />
+        {isAllWordsGuessed ? (
+          <View>
+            <Text style={Theme.typography.h3}>End of Round {roundIndex}</Text>
+            <Text style={[Theme.typography.body, { marginTop: 16 }]}>
+              Waiting for {thisTurnPlayer.name} to finish their turn.
+            </Text>
+          </View>
+        ) : (
+          <TurnStatus
+            title={turnStatus.title}
+            player={turnStatus.player}
+            teamName={turnStatus.teamName}
+          />
+        )}
       </Page.CTAs>
     </Fragment>
   );
@@ -724,13 +737,13 @@ const TurnStatus = ({ title, player, teamName }) => (
   </View>
 );
 
-const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish }) => {
+const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, getPaperByKey }) => {
   return (
     <Fragment>
       <Page.Main>
         <View style={Styles.header}>
           <Text style={Theme.typography.secondary}>
-            {type === 'timesup' ? "Time's Up!" : 'All papers done!'}
+            {type === 'timesup' ? "Time's Up!" : 'All papers guessed!'}
           </Text>
           <Text style={[Theme.typography.h2, Theme.u.center]}>
             Your team got <Text>{papersTurn.guessed.length}</Text> papers right!
@@ -742,7 +755,7 @@ const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish }) => {
             <View style={Styles.tscore_list}>
               {papersTurn.guessed.map((paper, i) => (
                 <View style={[Styles.tscore_item]} key={`${i}_${paper}`}>
-                  <Text style={Theme.typography.body}>{paper}</Text>
+                  <Text style={Theme.typography.body}>{getPaperByKey(paper)}</Text>
                   <Button
                     style={Styles.tscore_btnRemove}
                     variant="flat"
@@ -758,22 +771,12 @@ const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish }) => {
               More luck next time...
             </Text>
           )}
-          {/* {!!papersTurn.passed.length && (
-            <Button
-              style={Styles.tscore_btnToggle}
-              onPress={() => togglePassedPapers(bool => !bool)}
-              variant="flat"
-            >
-              {isVisiblePassedPapers ? 'Hide' : 'Show'} the papers you didn't get
-            </Button>
-          )} */}
-          {/* isVisiblePassedPapers && */}
           {!!papersTurn.passed.length && (
             <View style={Styles.tscore_list}>
               <Text style={Theme.typography.h3}>Papers you didn't get:</Text>
               {papersTurn.passed.map((paper, i) => (
                 <View style={Styles.tscore_item} key={`${i}_${paper}`}>
-                  <Text>{paper}</Text>
+                  <Text style={Theme.typography.body}>{getPaperByKey(paper)}</Text>
                   <Button
                     style={Styles.tscore_btnAdd}
                     variant="flat"
@@ -800,6 +803,33 @@ const placeMap = {
   1: '2nd place',
   3: '3rd place', // REVIEW - Maximum 3 teams
 };
+
+const CardScore = ({ index, teamName, scoreTotal, scoreRound, bestPlayer }) => (
+  <View style={Styles.fscore_item} key={index}>
+    <View style={Styles.fscore_info}>
+      <Text
+        style={[
+          Styles.fscore_tag,
+          {
+            backgroundColor: index === 0 ? Theme.colors.primary : Theme.colors.grayDark,
+            marginBottom: 8,
+          },
+        ]}
+      >
+        {placeMap[index]}
+      </Text>
+      <Text style={Theme.typography.h3}>{teamName}</Text>
+      <Text style={Theme.typography.small}>
+        {bestPlayer.name} was the best player! ({bestPlayer.score})
+      </Text>
+    </View>
+    <View style={Styles.fscore_score}>
+      <Text style={Theme.typography.small}>Papers</Text>
+      <Text style={Theme.typography.h1}>{scoreTotal}</Text>
+      <Text style={Theme.typography.small}>+{scoreRound} this round</Text>
+    </View>
+  </View>
+);
 
 const EmojiRain = ({ type }) => {
   const emojis = type === 'winner' ? ['🎉', '🔥', '💖', '😃'] : ['🤡', '💩', '👎', '😓'];
@@ -839,7 +869,7 @@ const EmojiRain = ({ type }) => {
               fontSize: 18,
               position: 'absolute',
               left: ((index % col) * 20 + (Math.floor(index / col) % 2 ? 10 : 0)) * vh,
-              top: (Math.floor(index / col) * 15 + index * 1.5 + 70) * vh,
+              top: (Math.floor(index / col) * 15 + (index * 1.5 + 70)) * vh,
             }}
           >
             {emojis[index % 4]}

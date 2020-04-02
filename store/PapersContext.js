@@ -310,7 +310,7 @@ export class PapersContextProvider extends Component {
     // Words subscription
     socket.on('game.words.set', (topic, data) => {
       console.log(`:: on.${topic}`, data);
-      const { pId, words } = data;
+      const { pId, words } = data; // pId can be '_all' too.
 
       setGame(game => ({
         words: {
@@ -347,6 +347,16 @@ export class PapersContextProvider extends Component {
 
       setGame(game => ({
         score,
+      }));
+    });
+
+    // Sub to papers guessed
+    socket.on('game.papersGuessed', (topic, data) => {
+      console.log(`:: on.${topic}`);
+      const papersGuessed = data; // Number
+
+      setGame(game => ({
+        papersGuessed,
       }));
     });
 
@@ -430,21 +440,21 @@ export class PapersContextProvider extends Component {
     }));
   }
 
-  async setWords(words, cb) {
-    console.log('📌 setWords()');
-    await this.state.socket.setWords(words, cb);
-    cb();
+  async setWords(words) {
+    console.log('📌 setWords()', words);
+    await this.state.socket.setWords(words);
   }
 
-  async setWordsForEveyone(cb) {
+  async setWordsForEveyone() {
     console.log('📌 setWordsForEveyone()');
-    const allWords = Object.keys(this.state.game.players).reduce((acc, playerId, i) => {
-      return { ...acc, [playerId]: wordsForEveryone[i] };
+    const allWords = Object.keys(this.state.game.players).reduce((acc, playerId, pIndex) => {
+      return {
+        ...acc,
+        [playerId]: wordsForEveryone[pIndex].map((w, windex) => windex + pIndex * 10),
+      };
     }, {});
-
+    allWords._all = wordsForEveryone.flat();
     await this.state.socket.setWordsForEveryone(allWords);
-
-    cb();
   }
 
   setTeams(teams) {
@@ -453,8 +463,15 @@ export class PapersContextProvider extends Component {
 
   startGame() {
     console.log('📌 startGame()');
-    const words = this.state.game.words;
-    this.state.socket.startGame(words);
+    const roundStatus = {
+      current: 0,
+      turnWho: { 0: 0, 1: 0, 2: false },
+      turnCount: 0,
+      status: 'getReady',
+      // all words by key to save space
+      wordsLeft: this.state.game.words._all.map((w, i) => i),
+    };
+    this.state.socket.startGame(roundStatus);
   }
 
   startTurn() {
@@ -545,10 +562,13 @@ export class PapersContextProvider extends Component {
     console.log('📌 startNextRound()');
     const game = this.state.game;
 
-    this.state.socket.startNextRound({
-      round: game.round,
-      teams: game.teams,
-      words: game.words,
+    this.state.socket.setRound({
+      current: game.round.current + 1,
+      status: 'getReady',
+      turnWho: this.getNextTurn(),
+      turnCount: 0,
+      // all words by key to save space // dry across file
+      wordsLeft: game.words._all.map((w, i) => i),
     });
   }
 
@@ -564,10 +584,17 @@ export class PapersContextProvider extends Component {
     return turnState;
   }
 
-  async setTurnLocalState(state) {
+  async setTurnLocalState(turnState) {
     console.log('📌 setPaperTurnState()');
     // TODO / OPTIMIZE this very much needed.
-    await AsyncStorage.setItem('turn', JSON.stringify(state));
+    await AsyncStorage.setItem('turn', JSON.stringify(turnState));
+
+    const papersGuessed = turnState.guessed.length;
+
+    if (papersGuessed !== this.state.game.papersGuessed) {
+      // Send this so all players know n papers were guessed so far.
+      this.state.socket.setPapersGuessed(papersGuessed);
+    }
   }
 
   async _removeGameFromState() {

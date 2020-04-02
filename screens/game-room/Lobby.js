@@ -52,12 +52,13 @@ export default function Lobby({ navigation }) {
     setModalOpen(true);
   }
 
-  function setWordsForEveyone() {
-    // add loading state
-    Papers.setWordsForEveyone((res, err) => {
-      // remove loading state.
-      console.log('setwords done!', err);
-    });
+  async function setWordsForEveyone() {
+    try {
+      await Papers.setWordsForEveyone();
+      console.log('setwords done!');
+    } catch (error) {
+      console.error('setWordsForEveyone failed!', error);
+    }
   }
 
   function handleStartClick() {
@@ -150,8 +151,7 @@ export default function Lobby({ navigation }) {
                   return (
                     <View key={id} style={Styles.team}>
                       <Text style={Theme.typography.h3}>{name}</Text>
-                      <Text>Players:</Text>
-                      <ListPlayers players={players} />
+                      <ListPlayers players={players} enableKickout />
                     </View>
                   );
                 })}

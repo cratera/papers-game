@@ -37,6 +37,12 @@ export default StyleSheet.create({
   go_paper_blur: {
     opacity: 0.8,
   },
+  go_paper_key: {
+    position: 'absolute',
+    bottom: 4,
+    right: 4,
+    opacity: 0.5,
+  },
   // go_paper_tipBlur: {},
   go_paper_gotcha: {
     backgroundColor: Theme.colors.successLight,
@@ -95,6 +101,7 @@ export default StyleSheet.create({
   fscore_item: {
     backgroundColor: Theme.colors.grayLight,
     borderRadius: 4,
+    overflow: 'hidden',
     paddingVertical: 16,
     paddingHorizontal: 16,
     marginVertical: 8,

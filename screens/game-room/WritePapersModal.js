@@ -11,7 +11,7 @@ import Page from '@components/page';
 import * as Theme from '@theme';
 import Styles from './WritePapersModalStyles.js';
 
-const SlidePaper = ({ onChange, isActive, onFocus, i }) => {
+const SlidePaper = ({ onChange, isActive, onFocus, onSubmit, i }) => {
   const elInput = React.createRef();
   const [isFocused, setIsFocused] = React.useState(false);
 
@@ -30,7 +30,7 @@ const SlidePaper = ({ onChange, isActive, onFocus, i }) => {
         blurOnSubmit={false} // onSubmitEnding will handle the focus on the next paper.
         onChangeText={text => onChange(text, i)}
         onBlur={() => setIsFocused(false)}
-        onSubmitEditing={text => onChange(text, i, true)}
+        onSubmitEditing={onSubmit}
         onFocus={() => {
           onFocus();
           setIsFocused(true);
@@ -76,8 +76,10 @@ export default function WritePapersModal({ isOpen, onClose }) {
         </Text>
       </View>
       <KeyboardAvoidingView behavior="padding" style={Styles.scrollKAV}>
-        <ScrollView style={[Styles.slides, Theme.u.scrollSideOffset]}>{renderSliders()}</ScrollView>
-        {errorMsg && <Text style={Styles.sliderLabels}>{errorMsg}</Text>}
+        <ScrollView style={[Styles.slides, Theme.u.scrollSideOffset]}>
+          {renderSliders()}
+          {errorMsg && <Text style={Styles.sliderLabels}>{errorMsg}</Text>}
+        </ScrollView>
 
         <Page.CTAs style={Styles.ctas} hasOffset>
           {wordsCount !== 10 ? (
@@ -107,6 +109,7 @@ export default function WritePapersModal({ isOpen, onClose }) {
           i={i}
           onFocus={() => setPaperIndex(i)}
           onChange={handleWordChange}
+          onSubmit={handleClickNext}
         />
       );
     }
@@ -114,17 +117,18 @@ export default function WritePapersModal({ isOpen, onClose }) {
     return papers;
   }
 
-  function handleWordChange(word, index, isEnd) {
+  function handleWordChange(word, index) {
+    if (typeof word !== 'string') {
+      console.warn('Wow, this is not a word!', word);
+      return;
+    }
+
     const wordsToEdit = [...words];
     wordsToEdit[index] = word;
 
     // OPTIMIZE - Maybe change state only on blur?
     // A: No, parent needs to know the value so "Next paper" works
     setLocalWords(wordsToEdit);
-
-    if (isEnd) {
-      handleClickNext();
-    }
   }
 
   function handleClickNext() {
@@ -143,13 +147,13 @@ export default function WritePapersModal({ isOpen, onClose }) {
 
     setIsSubmiting(true);
 
-    await Papers.setWords(words, (res, err) => {
-      setIsSubmiting(false);
-      if (err) {
-        return setErrorMsg(`Something went wrong. ${JSON.stringify(err)}`);
-      }
-      onClose();
-    });
+    try {
+      await Papers.setWords(words);
+    } catch (error) {
+      console.log('WritePapersModal submit error:', error);
+      setErrorMsg(`Ups, set papers failed! ${error.message}`);
+    }
+    setIsSubmiting(false);
   }
 }
 

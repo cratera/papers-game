@@ -49,9 +49,10 @@ export default function ListPlayers({ players, enableKickout = false, ...otherPr
             <View key={playerId} style={[Styles.item, isLastChild && Styles.item_isLast]}>
               <View style={Styles.who}>
                 <Avatar hasMargin />
-                <Text>
-                  {playerName} <Text>{' (Left) '}</Text>
-                </Text>
+                <View>
+                  <Text style={Theme.typography.body}>{playerName}</Text>
+                  <Text style={Theme.typography.seconday}>{' (Left) '}</Text>
+                </View>
               </View>
             </View>
           );
@@ -66,23 +67,16 @@ export default function ListPlayers({ players, enableKickout = false, ...otherPr
           <View key={playerId} style={[Styles.item, isLastChild && Styles.item_isLast]}>
             <View style={Styles.who}>
               <Avatar src={avatar} hasMargin />
-              <Text style={Theme.typography.body}>
-                {name}
-                <Text style={Theme.typography.secondary}>
-                  {playerId === game.creatorId ? ' (Admin)' : ''}
-                  {playerId === profileId ? ' (you)' : ''}
-                  {isAfk ? ' ⚠️ ' : ''}
+              <View>
+                <Text style={Theme.typography.body}>{name}</Text>
+                <Text style={Theme.typography.small}>
+                  {playerId === game.creatorId ? '(Admin) ' : ''}
+                  {playerId === profileId ? '(you) ' : ''}
+                  {isAfk ? '(⚠️) ' : ''}
                 </Text>
-              </Text>
+              </View>
             </View>
-            <View>
-              {imgInfo && (
-                <Image
-                  style={[Styles.itemStatus, Styles[`itemStatus_${status}`]]}
-                  source={imgInfo.src}
-                  accessibilityLabel={imgInfo.alt}
-                />
-              )}
+            <View style={Styles.ctas}>
               {enableKickout && profileIsAdmin && playerId !== profileId && (
                 <Button
                   variant="light"
@@ -92,6 +86,13 @@ export default function ListPlayers({ players, enableKickout = false, ...otherPr
                 >
                   Kick out
                 </Button>
+              )}
+              {imgInfo && (
+                <Image
+                  style={[Styles.itemStatus, Styles[`itemStatus_${status}`]]}
+                  source={imgInfo.src}
+                  accessibilityLabel={imgInfo.alt}
+                />
               )}
             </View>
           </View>

@@ -24,11 +24,18 @@ export default StyleSheet.create({
   itemStatus: {
     width: 56,
     height: 56,
+    marginLeft: 8,
   },
   itemStatus_writting: {
     paddingLeft: 75 - 56,
+    marginLeft: 8 + (75 - 56),
   },
   itemStatus_done: {
     width: 75,
+  },
+  ctas: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });
