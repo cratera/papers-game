@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from 'react';
+import React from 'react';
 
 export function createUniqueId(name) {
   // Q: maybe this should be created on server instead.
@@ -40,8 +40,8 @@ export function msToSecPretty(ms) {
 
 // React Hook
 export function usePrevious(value) {
-  const ref = useRef();
-  useEffect(() => {
+  const ref = React.useRef();
+  React.useEffect(() => {
     ref.current = value;
   });
   return ref.current;
@@ -53,11 +53,11 @@ export function useCountdown(initialDate, options = {}) {
     timer: 60000,
     ...options,
   };
-  const [dateStarted, resetDateStarted] = useState(initialDate);
-  const [timeLeft, setTimeLeft] = useState(getTimeLeft(dateStarted));
+  const [dateStarted, resetDateStarted] = React.useState(initialDate);
+  const [timeLeft, setTimeLeft] = React.useState(getTimeLeft(dateStarted));
   const intervalTime = opts.intervalTime;
 
-  const getTimeLeftCb = useCallback(datePivot => getTimeLeft(datePivot), []); // eslint-disable-line
+  const getTimeLeftCb = React.useCallback(datePivot => getTimeLeft(datePivot), []); // eslint-disable-line
 
   function getTimeLeft(datePivot) {
     const timeLeft = opts.timer - (Date.now() - datePivot);
@@ -69,7 +69,7 @@ export function useCountdown(initialDate, options = {}) {
     resetDateStarted(newDate);
   }
 
-  useEffect(() => {
+  React.useEffect(() => {
     console.log('useEffect - countdown');
     const startedTimeLeft = getTimeLeftCb(dateStarted);
     if (startedTimeLeft === 0) {

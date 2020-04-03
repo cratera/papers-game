@@ -23,7 +23,10 @@ export default StyleSheet.create({
     textAlign: 'center',
     marginBottom: 24,
   },
-
+  go_done_msg: {
+    textAlign: 'center',
+    marginTop: 25 * vh,
+  },
   go_paper: {
     height: 60 * vw,
     backgroundColor: Theme.colors.grayLight,
