@@ -1,24 +1,18 @@
 import React from 'react';
 import { Alert, Platform } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-// import { Camera } from 'expo-camera';
-import Constants from 'expo-constants';
 import * as Permissions from 'expo-permissions';
-
-// import PapersContext from '@store/PapersContext.js';
 
 export default function usePickAvatar() {
   const [isWeb] = React.useState(Platform.OS === 'web');
-  // const Papers = React.useContext(PapersContext);
 
   async function pickAvatar({ camera } = {}) {
-    // Get permission first on iOS. (No need on Android? REVIEW_SECURITY)
-    if (Constants.platform.ios) {
+    if (!isWeb) {
       const responseCamera = camera
         ? await Permissions.askAsync(Permissions.CAMERA)
         : { granted: true };
       const response = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-      if (!response.granted && responseCamera.granted) {
+      if (!response.granted || !responseCamera.granted) {
         if (!isWeb) {
           Alert.alert(
             'Camera denied',
@@ -43,7 +37,7 @@ export default function usePickAvatar() {
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         aspect: [1, 1],
-        quality: 0.5,
+        quality: 0.3,
         base64: false,
         exif: false,
       });
@@ -52,7 +46,7 @@ export default function usePickAvatar() {
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         aspect: [1, 1],
-        quality: 0.5,
+        quality: 0.3,
         base64: false,
         exif: false,
       });

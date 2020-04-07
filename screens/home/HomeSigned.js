@@ -37,6 +37,7 @@ const AvatarMeme = ({ avatar, onChange }) => {
       <Image style={Styles.memeBody} source={danceGif} accessible={false} />
       <PickAvatar
         visible={isPickerVisible}
+        onChange={() => null}
         onSubmit={onChange}
         onClose={() => setIsPickerVisible(false)}
       />

@@ -122,23 +122,25 @@ function signIn({ name, avatar }, cb) {
 async function _uploadAvatar({ path, fileName, avatar }) {
   console.log(':: _uploadAvatar', path, fileName);
 
-  const base64Match = avatar.match(/image\/(jpeg|jpg|gif|png)/);
-  const imgMatched = avatar.match(/\.(jpeg|jpg|gif|png)/);
-  let format;
-  if (base64Match) {
-    format = base64Match && base64Match[1]; // ex: look for "image/png"
-  } else {
-    format = imgMatched && imgMatched[1];
-  }
+  // const base64Match = avatar.match(/image\/(jpeg|jpg|gif|png)/);
+  // const imgMatched = avatar.match(/\.(jpeg|jpg|gif|png)/);
+  // let format;
+  // if (base64Match) {
+  //   format = base64Match && base64Match[1]; // ex: look for "image/png"
+  // } else {
+  //   format = imgMatched && imgMatched[1];
+  // }
+  // const metadata = { contentType: `image/${format}` };
 
   // Option 3:
+  // https://github.com/expo/expo/issues/2402#issuecomment-443726662
   // https://github.com/aaronksaunders/expo-rn-firebase-image-upload/blob/master/README.md
-  const metadata = { contentType: `image/${format}` };
+  // 🐛 Still not working properly: https://github.com/facebook/react-native/issues/22681
+  // It seems it failes "Network request failed" when the image is too big. Hum...
   const response = await fetch(avatar);
-  console.log(':: 1', format);
   const blob = await response.blob();
   const ref = await firebase.storage().ref(path).child(fileName);
-  const task = ref.put(blob, metadata);
+  const task = ref.put(blob); //, metadata);
 
   return new Promise((resolve, reject) => {
     task.on(
