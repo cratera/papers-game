@@ -2,10 +2,10 @@ import * as firebase from 'firebase';
 import PubSub from 'pubsub-js';
 import { slugString } from '@constants/utils.js';
 
-// Fixing a bug with firebase putString
+// Fixing a bug with firebase file upload put() _uploadAvatar()
 // https://forums.expo.io/t/imagepicker-base64-to-firebase-storage-problem/1415/11
-// import Base64 from 'base-64';
-// global.atob = Base64.encode;
+import Base64 from 'base-64';
+global.atob = Base64.encode;
 
 const firebaseConfig = {
   // TODO - remove this from source code
@@ -119,8 +119,8 @@ function signIn({ name, avatar }, cb) {
     });
 }
 
-async function _uploadDataURL64ToFirebase({ path, fileName, avatar }) {
-  console.log(':: _uploadDataURL64ToFirebase', path, fileName);
+async function _uploadAvatar({ path, fileName, avatar }) {
+  console.log(':: _uploadAvatar', path, fileName);
 
   const base64Match = avatar.match(/image\/(jpeg|jpg|gif|png)/);
   const imgMatched = avatar.match(/\/(jpeg|jpg|gif|png)/);
@@ -132,73 +132,6 @@ async function _uploadDataURL64ToFirebase({ path, fileName, avatar }) {
   }
 
   try {
-    // // Option 1. create blob
-    // // Doesn't work: [TypeError: Network request failed]
-    // // Why are we using XMLHttpRequest? See:
-    // // https://github.com/expo/expo/issues/2402#issuecomment-443726662
-    // const blob = await new Promise((resolve, reject) => {
-    //   const xhr = new XMLHttpRequest();
-    //   xhr.onload = function () {
-    //     resolve(xhr.response);
-    //   };
-    //   xhr.onerror = function (e) {
-    //     console.log(e);
-    //     reject(new TypeError('Network request failed'));
-    //   };
-    //   xhr.responseType = 'blob';
-    //   xhr.open('GET', avatar, true);
-    //   xhr.send(null);
-    // });
-
-    // fix this filename to add format.
-    // const ref = firebase.storage().ref(path).child(fileName);
-    // const snapshot = await ref.put(blob);
-
-    // // We're done with the blob, close and release it
-    // blob.close && blob.close();
-
-    // const downloadURL = await snapshot.ref.getDownloadURL();
-
-    // return { downloadURL };
-
-    // Option 2: base64
-    // Doesn't work neither...
-    // const uploadTask = await firebase
-    //   .storage()
-    //   .ref(path)
-    //   .child(`${fileName}.${format}`)
-    //   .putString(avatar, 'data_url', { contentType: `image/${format}` });
-
-    // const downloadURL = await uploadTask.ref.getDownloadURL();
-
-    // return { downloadURL };
-
-    // uploadTask.on(
-    //   'state_changed',
-    //   function (snapshot) {
-    //     // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-    //     var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-    //     console.log(':: :: Upload is ' + progress + '% done');
-    //     // switch (snapshot.state) {
-    //     //   case firebase.storage.TaskState.PAUSED: // or 'paused'
-    //     //     console.log('Upload is paused');
-    //     //     break;
-    //     //   case firebase.storage.TaskState.RUNNING: // or 'running'
-    //     //     console.log('Upload is running');
-    //     //     break;
-    //     // }
-    //   },
-    //   function (error) {
-    //     console.log(':: :: upload base64 failed!', error);
-    //     done(null, error);
-    //   },
-    //   async function () {
-    //     const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
-    //     console.log(':: :: upload done!', downloadURL);
-    //     done(downloadURL);
-    //   }
-    // );
-
     // Option 3:
     // https://github.com/aaronksaunders/expo-rn-firebase-image-upload/blob/master/README.md
     const metadata = { contentType: `image/${format}` };
@@ -211,32 +144,11 @@ async function _uploadDataURL64ToFirebase({ path, fileName, avatar }) {
     return new Promise((resolve, reject) => {
       task.on(
         'state_changed',
-        snapshot => {
-          // progressCallback && progressCallback(snapshot.bytesTransferred / snapshot.totalBytes);
-          // var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          // console.log('Upload is ' + progress + '% done');
-        },
-        error => reject(error) /* this is where you would put an error callback! */,
+        snapshot => {},
+        error => reject(error),
         () => {
-          // var downloadURL = task.snapshot.downloadURL;
           const downloadURL = task.snapshot.ref.getDownloadURL();
-          console.log('_uploadAsByteArray ', downloadURL);
           resolve(downloadURL);
-          // save a reference to the image for listing purposes
-          // var ref = firebase.database().ref('assets');
-          // ref
-          //   .push({
-          //     URL: downloadURL,
-          //     // 'thumb': _imageData['thumb'],
-          //     name: name,
-          //     // 'coords': _imageData['coords'],
-          //     owner: firebase.auth().currentUser && firebase.auth().currentUser.uid,
-          //     when: new Date().getTime(),
-          //   })
-          //   .then(
-          //     r => resolve(r),
-          //     e => reject(e)
-          //   );
         }
       );
     });
@@ -264,7 +176,7 @@ async function updateProfile(profile) {
     }
     if (avatar && !isHTTPLink) {
       try {
-        const downloadURL = await _uploadDataURL64ToFirebase({
+        const downloadURL = await _uploadAvatar({
           path: `users/${LOCAL_PROFILE.id}/`,
           fileName: 'avatar',
           avatar,
@@ -275,12 +187,12 @@ async function updateProfile(profile) {
         PubSub.publish('profile.avatarSet', downloadURL);
       } catch (error) {
         console.warn(':: avatar upload failed! Save on DB', error);
-        // fallback to store the avatar directly on DB.
         theProfile.avatar = avatar;
       }
     }
     if (avatar === null) {
-      theProfile.avatar = null; // delete avatar from DB.
+      theProfile.avatar = null; // so avatar can be deleted from DB
+      // TODO - delete avatar from storage.
     }
     DB.ref('users/' + LOCAL_PROFILE.id).update(theProfile);
   } catch (error) {
@@ -705,13 +617,6 @@ async function setWordsForEveryone(allWords) {
 /**
  *
  */
-function _allWordsTogether(words) {
-  return Object.keys(words).reduce((acc, pId) => [...acc, ...words[pId]], []);
-}
-
-/**
- *
- */
 async function startGame(roundStatus) {
   console.log('⚙️ startGame()');
   const gameId = LOCAL_PROFILE.gameId;
@@ -737,32 +642,6 @@ function setPapersGuessed(count) {
   const gameId = LOCAL_PROFILE.gameId;
 
   DB.ref(`games/${gameId}/papersGuessed`).set(count);
-}
-
-function _getNextTurn({ turnWho, teams }) {
-  const [teamIndex, playerIndex] = turnWho;
-  const totalTeams = Object.keys(teams).length;
-
-  // BUG / TODO - Handle correctly when teams are not even! [1]
-  if (teamIndex < totalTeams - 1) {
-    const nextTeamIndex = teamIndex + 1;
-    const totalTeamPlayers = teams[nextTeamIndex].players.length;
-
-    if (playerIndex < totalTeamPlayers) {
-      return { 0: nextTeamIndex, 1: playerIndex, 2: false };
-    } else {
-      return { 0: nextTeamIndex, 1: playerIndex, 2: true }; // [1]
-    }
-  } else {
-    const totalTeamPlayers = teams[0].players.length;
-    const nextPlayer = playerIndex + 1;
-
-    if (nextPlayer < totalTeamPlayers) {
-      return { 0: 0, 1: nextPlayer, 2: false };
-    } else {
-      return { 0: 0, 1: 0, 2: false };
-    }
-  }
 }
 
 /**
