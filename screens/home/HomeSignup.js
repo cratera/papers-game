@@ -63,9 +63,7 @@ export default class HomeSignup extends React.Component {
             <Button variant="flat" onPress={this.goBackStep} style={{ lineHeight: 44 }}>
               Back
             </Button>
-          ) : (
-            undefined
-          )}
+          ) : undefined}
         </Page.Header>
         <Page.Main styles={Styles.main}>
           <CurrentStep />
@@ -77,10 +75,10 @@ export default class HomeSignup extends React.Component {
 
   stepWelcome() {
     return (
-      <View>
-        <Text style={[Styles.logo, Theme.u.center]} accessibilityRole="none">
+      <View style={Styles.content}>
+        {/* <Text style={[Styles.logo, Theme.u.center]} accessibilityRole="none">
           🎲
-        </Text>
+        </Text> */}
         <Text style={[Theme.typography.h1, Theme.u.center]}>Welcome!</Text>
         <Text style={[Theme.typography.secondary, Styles.paragraph]}>
           Papers is the perfect game for your{' '}
@@ -118,9 +116,7 @@ export default class HomeSignup extends React.Component {
           <Button style={Styles.cta} onPress={this.goNextStep}>
             Next
           </Button>
-        ) : (
-          undefined
-        )}
+        ) : undefined}
       </KeyboardAvoidingView>
     );
   }

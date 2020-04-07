@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Image } from 'react-native';
+import { View, Text, Image, Platform } from 'react-native';
 
 import imgWritting from '@assets/images/writting.gif';
 import imgDone from '@assets/images/done.gif';
@@ -31,7 +31,10 @@ export default function ListPlayers({ players, enableKickout = false, ...otherPr
 
   async function handleKickOut(playerId) {
     const playerName = profiles[playerId].name;
-    if (window.confirm(`You are about to kick "${playerName}". Are you sure?`)) {
+    if (
+      Platform.OS !== 'web' ||
+      window.confirm(`You are about to kick "${playerName}". Are you sure?`)
+    ) {
       setIsKicking(playerId);
       await Papers.removePlayer(playerId);
       setIsKicking(null);

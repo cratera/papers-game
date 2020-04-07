@@ -70,8 +70,9 @@ export default function Lobby({ navigation }) {
   }
 
   function renderLobbyStarting() {
+    const hasEnoughPlayers = Object.keys(game.players).length >= 4;
     function CTAs() {
-      if (Object.keys(game.players).length >= 4) {
+      if (hasEnoughPlayers) {
         return profileIsAdmin ? (
           <Button onPress={handleCreateTeams}>Create teams!</Button>
         ) : (
@@ -111,7 +112,7 @@ export default function Lobby({ navigation }) {
             <ListPlayers players={Object.keys(game.players)} enableKickout />
           </ScrollView>
         </Page.Main>
-        <Page.CTAs hasOffset={profileIsAdmin}>{CTAs()}</Page.CTAs>
+        <Page.CTAs hasOffset={profileIsAdmin && hasEnoughPlayers}>{CTAs()}</Page.CTAs>
       </Page>
     );
   }

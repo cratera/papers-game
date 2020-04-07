@@ -35,7 +35,7 @@ const AvatarMeme = ({ avatar, onChange }) => (
   </View>
 );
 
-export default function HomeSigned({ navigation }) {
+export default function HomeSigned() {
   const Papers = useContext(PapersContext);
   const profile = Papers.state.profile;
   const [modalState, setModalState] = useState({ isOpen: false, variant: null });

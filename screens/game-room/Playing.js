@@ -1,5 +1,6 @@
 /**
- * This code is the perfect definition of "just make it work".
+ * I don't care about readability and never heard of useMemo or useCallback.
+ * Just kidding... Let's just make it work first, then make it (much) better.
  */
 import React, { Fragment } from 'react';
 import { Dimensions, ScrollView, View, TouchableHighlight, Animated, Text } from 'react-native';

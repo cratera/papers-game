@@ -11,11 +11,18 @@ export default StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
   },
-  logo: {
-    // TODO / REVIEW This is how we do @media. Abstract this.
-    marginTop: vh > 6 ? vh * 20 : vh * 5,
-    fontSize: 100,
+  content: {
+    display: 'flex',
+    flexGrow: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
+  // logo: {
+  //   // TODO / REVIEW This is how we do @media. Abstract this.
+  //   marginTop: vh > 6 ? vh * 20 : vh * 5,
+  //   fontSize: 100,
+  // },
   paragraph: {
     marginVertical: 16,
     textAlign: 'center',

@@ -11,7 +11,6 @@ const ModalWeb = ({ children, visible, ...otherProps }) => {
   }
   return (
     <View
-      {...otherProps}
       style={{
         position: 'fixed',
         top: '0',
@@ -21,13 +20,21 @@ const ModalWeb = ({ children, visible, ...otherProps }) => {
         backgroundColor: '#ffffff',
         zIndex: 4,
       }}
+      {...otherProps}
     >
       {children}
     </View>
   );
 };
 
-export default function TheModal({ children, visible, onClose, ...otherProps }) {
+export default function TheModal({
+  children,
+  visible,
+  onClose,
+  hiddenClose,
+  styleContent,
+  ...otherProps
+}) {
   const Component = Platform.OS === 'web' ? ModalWeb : Modal;
 
   return (
@@ -38,12 +45,14 @@ export default function TheModal({ children, visible, onClose, ...otherProps }) 
       visible={visible}
       {...otherProps}
     >
-      <View style={Styles.close}>
-        <Button variant="icon" onPress={onClose}>
-          [X]
-        </Button>
-      </View>
-      <View style={Styles.content}>{children}</View>
+      {!hiddenClose && (
+        <View style={Styles.close}>
+          <Button variant="icon" onPress={onClose}>
+            [X]
+          </Button>
+        </View>
+      )}
+      <View style={[Styles.content, styleContent]}>{children}</View>
     </Component>
   );
 }

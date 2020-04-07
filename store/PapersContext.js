@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import { AsyncStorage } from 'react-native';
+import { AsyncStorage, Platform } from 'react-native';
 
-import { createUniqueId } from '@constants/utils.js';
 import wordsForEveryone from './wordsForEveryone.js';
 
 // OPTIMIZE - Pass this as prop, so it's agnostic to any type of server / API.
@@ -73,8 +72,13 @@ export class PapersContextProvider extends Component {
   // ex: on room/:id, i don't care about profile.gameId,
   // instead I want the room/:id
   async componentDidMount() {
-    const { id, name, gameId } = this.state.profile;
-    console.log('PapersContext Mounted:', { name, gameId, id });
+    const { id, name, gameId, avatar } = this.state.profile;
+    console.log('PapersContext Mounted:', {
+      name,
+      gameId,
+      id,
+      avatar: avatar ? 'has avatar' : 'no avatar',
+    });
     await this.tryToReconnect();
   }
 
@@ -108,7 +112,7 @@ export class PapersContextProvider extends Component {
     let socket = this.state.socket;
 
     if (socket) {
-      console.error('init(): Already connected.');
+      console.warn('init(): Already connected. Please restart...');
     } else {
       socket = serverInit();
       this.setState({ socket });
@@ -159,8 +163,13 @@ export class PapersContextProvider extends Component {
 
     socket.on('profile.signed', async (topic, id) => {
       console.log('📌 on.profile.signed', id);
-      await this.PapersAPI.updateProfile({ id });
+      await this.PapersAPI.updateProfile({ id }, { ignoreSocket: true });
       doAfterSignIn();
+    });
+
+    socket.on('profile.avatarSet', async (topic, avatar) => {
+      console.log('📌 on.profile.avatarSet', avatar);
+      await this.PapersAPI.updateProfile({ avatar }, { ignoreSocket: true });
     });
 
     socket.signIn({ name, avatar }, (res, error) => {
@@ -209,7 +218,7 @@ export class PapersContextProvider extends Component {
       };
 
       const errorMsg = (errorMsgMap[e.message] || errorMsgMap.ups)();
-      console.warn(':: accessGame error!:', errorMsg);
+      console.warn(':: accessGame error!:', variant, gameName, errorMsg);
       return cb(null, errorMsg);
     }
   }
@@ -379,8 +388,8 @@ export class PapersContextProvider extends Component {
   // }
 
   // { id, name, avatar, gameId }
-  async updateProfile(profile) {
-    console.log('📌 updateProfile()', profile);
+  async updateProfile(profile, opts = {}) {
+    console.log('📌 updateProfile()', profile, opts);
     const mapKeys = {
       id: 'profile_id',
       name: 'profile_name',
@@ -403,7 +412,7 @@ export class PapersContextProvider extends Component {
 
     const { id, gameId, ...serverProfile } = profile;
 
-    if (Object.keys(serverProfile).length > 0) {
+    if (!opts.ignoreSocket && Object.keys(serverProfile).length > 0) {
       if (this.state.socket) {
         console.log(':: update socket too.');
         this.state.socket.updateProfile(serverProfile);
@@ -423,10 +432,10 @@ export class PapersContextProvider extends Component {
   async resetProfile(profile) {
     console.log('📌 resetProfile()');
     try {
-      await AsyncStorage.removeItem('id');
-      await AsyncStorage.removeItem('name');
-      await AsyncStorage.removeItem('avatar');
-      await AsyncStorage.removeItem('groupId');
+      await AsyncStorage.removeItem('profile_id');
+      await AsyncStorage.removeItem('profile_name');
+      await AsyncStorage.removeItem('profile_avatar');
+      await AsyncStorage.removeItem('profile_groupId');
 
       if (this.state.socket) {
         this.state.socket.resetProfile();

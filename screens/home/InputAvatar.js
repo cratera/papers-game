@@ -1,7 +1,17 @@
-import React, { Fragment, useState } from 'react';
-import { Image, TouchableHighlight, Text, View } from 'react-native';
-
+import React, { Fragment } from 'react';
+import {
+  Platform,
+  Image,
+  TouchableHighlight,
+  Text,
+  View,
+  TouchableWithoutFeedback,
+  StyleSheet,
+} from 'react-native';
 import { Svg, Path } from 'react-native-svg';
+
+import Modal from '@components/modal';
+import Button from '@components/button';
 
 import * as Theme from '@theme';
 import Styles from './HomeStyles.js';
@@ -9,8 +19,11 @@ import Styles from './HomeStyles.js';
 import usePickAvatar from './utils/usePickAvatar.js';
 
 export default function InputAvatar({ avatar, onChange }) {
-  const [status, setStatus] = useState(null); // loading || loaded || error?
+  const [status, setStatus] = React.useState(null); // loading || loaded || error?
+  const [isPickerVisible, setIsPickerVisible] = React.useState(false);
   const pickAvatar = usePickAvatar();
+  const isMissingCamera = true; // LATER - implement camera UI.
+  const [isWeb] = React.useState(Platform.OS === 'web');
 
   return (
     <Fragment>
@@ -20,7 +33,7 @@ export default function InputAvatar({ avatar, onChange }) {
       <TouchableHighlight
         style={[Styles.avatarPlace, { marginVertical: 24 }]}
         underlayColor={Theme.colors.primary}
-        onPress={handleUpdateAvatar}
+        onPress={() => (isWeb || isMissingCamera ? handleUpdateAvatar() : setIsPickerVisible(true))}
       >
         {avatar ? (
           <Image
@@ -43,14 +56,82 @@ export default function InputAvatar({ avatar, onChange }) {
         {status === 'loading' ? 'Loading...' : ''}
         {status === 'loaded' ? 'Looking good!' : ''}
       </Text>
+
+      <Modal
+        visible={isPickerVisible}
+        hiddenClose
+        animationType="fade"
+        transparent
+        presentationStyle="overFullScreen"
+        style={Styles2.modal}
+        styleContent={Styles2.modalContent}
+      >
+        <TouchableWithoutFeedback onPress={() => setIsPickerVisible(false)}>
+          <Text style={Styles2.options_outside} accessible={false}></Text>
+        </TouchableWithoutFeedback>
+        <View style={Styles2.options}>
+          <Button style={[Styles2.options_btn, Styles2.options_btnTop]} onPress={handleCamera}>
+            📷Camera
+          </Button>
+          <Button
+            style={[Styles2.options_btn, Styles2.options_btnBot]}
+            onPress={handleUpdateAvatar}
+          >
+            🖼 Library
+          </Button>
+        </View>
+
+        <Button onPress={() => setIsPickerVisible(false)}>Close</Button>
+      </Modal>
     </Fragment>
   );
 
   async function handleUpdateAvatar() {
     setStatus('loading');
     const url = await pickAvatar();
-
+    setIsPickerVisible(false);
     setStatus(url ? 'loaded' : '');
     onChange(url);
   }
+
+  async function handleCamera() {
+    console.warn('TODO implement native camera');
+  }
 }
+
+// const vh = Dimensions.get('window').height / 100;
+const Styles2 = StyleSheet.create({
+  options: {
+    backgroundColor: Theme.colors.bg,
+    marginBottom: 24,
+    paddingVertical: 8,
+    borderRadius: 16,
+  },
+  options_outside: {
+    flexGrow: 1,
+    // backgroundColor: Theme.colors.primary,
+  },
+  options_btn: {
+    backgroundColor: Theme.colors.bg,
+    color: Theme.colors.grayDark,
+    textAlign: 'left',
+  },
+  options_btnTop: {
+    // 🐛 Not working on IOS...
+    // borderBottomEndRadius: 0,
+    // borderBottomStartRadius: 0,
+  },
+  options_btnBot: {
+    // 🐛 Not working on IOS...
+    // borderTopLeftRadius: 0,
+    // borderTopRightRadius: 0,
+  },
+  modal: {},
+  modalContent: {
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
+    paddingBottom: 56,
+  },
+});

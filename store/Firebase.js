@@ -2,6 +2,11 @@ import * as firebase from 'firebase';
 import PubSub from 'pubsub-js';
 import { slugString } from '@constants/utils.js';
 
+// Fixing a bug with firebase putString
+// https://forums.expo.io/t/imagepicker-base64-to-firebase-storage-problem/1415/11
+// import Base64 from 'base-64';
+// global.atob = Base64.encode;
+
 const firebaseConfig = {
   // TODO - remove this from source code
   apiKey: 'AIzaSyBYB6fczaHoB-SKjMRM4VHradIyLtluBHM',
@@ -67,13 +72,13 @@ export default function init(options) {
 
   DB = firebase.database();
 
-  firebase.auth().onAuthStateChanged(function (user) {
+  firebase.auth().onAuthStateChanged(async function (user) {
     if (user) {
       LOCAL_PROFILE.id = user.uid;
       LOCAL_PROFILE.isAfk = false;
       console.log('⚙️ Signed!', LOCAL_PROFILE.id);
 
-      updateProfile(LOCAL_PROFILE);
+      await updateProfile(LOCAL_PROFILE);
       PubSub.publish('profile.signed', LOCAL_PROFILE.id);
     } else {
       // User is signed out.
@@ -114,6 +119,132 @@ function signIn({ name, avatar }, cb) {
     });
 }
 
+async function _uploadDataURL64ToFirebase({ path, fileName, avatar }) {
+  console.log(':: _uploadDataURL64ToFirebase', path, fileName);
+
+  const base64Match = avatar.match(/image\/(jpeg|jpg|gif|png)/);
+  const imgMatched = avatar.match(/\/(jpeg|jpg|gif|png)/);
+  let format;
+  if (base64Match) {
+    format = base64Match && base64Match[1]; // ex: look for "image/png"
+  } else {
+    format = imgMatched && imgMatched[0];
+  }
+
+  try {
+    // // Option 1. create blob
+    // // Doesn't work: [TypeError: Network request failed]
+    // // Why are we using XMLHttpRequest? See:
+    // // https://github.com/expo/expo/issues/2402#issuecomment-443726662
+    // const blob = await new Promise((resolve, reject) => {
+    //   const xhr = new XMLHttpRequest();
+    //   xhr.onload = function () {
+    //     resolve(xhr.response);
+    //   };
+    //   xhr.onerror = function (e) {
+    //     console.log(e);
+    //     reject(new TypeError('Network request failed'));
+    //   };
+    //   xhr.responseType = 'blob';
+    //   xhr.open('GET', avatar, true);
+    //   xhr.send(null);
+    // });
+
+    // fix this filename to add format.
+    // const ref = firebase.storage().ref(path).child(fileName);
+    // const snapshot = await ref.put(blob);
+
+    // // We're done with the blob, close and release it
+    // blob.close && blob.close();
+
+    // const downloadURL = await snapshot.ref.getDownloadURL();
+
+    // return { downloadURL };
+
+    // Option 2: base64
+    // Doesn't work neither...
+    // const uploadTask = await firebase
+    //   .storage()
+    //   .ref(path)
+    //   .child(`${fileName}.${format}`)
+    //   .putString(avatar, 'data_url', { contentType: `image/${format}` });
+
+    // const downloadURL = await uploadTask.ref.getDownloadURL();
+
+    // return { downloadURL };
+
+    // uploadTask.on(
+    //   'state_changed',
+    //   function (snapshot) {
+    //     // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+    //     var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+    //     console.log(':: :: Upload is ' + progress + '% done');
+    //     // switch (snapshot.state) {
+    //     //   case firebase.storage.TaskState.PAUSED: // or 'paused'
+    //     //     console.log('Upload is paused');
+    //     //     break;
+    //     //   case firebase.storage.TaskState.RUNNING: // or 'running'
+    //     //     console.log('Upload is running');
+    //     //     break;
+    //     // }
+    //   },
+    //   function (error) {
+    //     console.log(':: :: upload base64 failed!', error);
+    //     done(null, error);
+    //   },
+    //   async function () {
+    //     const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+    //     console.log(':: :: upload done!', downloadURL);
+    //     done(downloadURL);
+    //   }
+    // );
+
+    // Option 3:
+    // https://github.com/aaronksaunders/expo-rn-firebase-image-upload/blob/master/README.md
+    const metadata = { contentType: `image/${format}` };
+    const response = await fetch(avatar);
+    const blob = await response.blob();
+    const ref = await firebase.storage().ref(path).child(`${fileName}.${format}`);
+
+    const task = ref.put(blob, metadata);
+
+    return new Promise((resolve, reject) => {
+      task.on(
+        'state_changed',
+        snapshot => {
+          // progressCallback && progressCallback(snapshot.bytesTransferred / snapshot.totalBytes);
+          // var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          // console.log('Upload is ' + progress + '% done');
+        },
+        error => reject(error) /* this is where you would put an error callback! */,
+        () => {
+          // var downloadURL = task.snapshot.downloadURL;
+          const downloadURL = task.snapshot.ref.getDownloadURL();
+          console.log('_uploadAsByteArray ', downloadURL);
+          resolve(downloadURL);
+          // save a reference to the image for listing purposes
+          // var ref = firebase.database().ref('assets');
+          // ref
+          //   .push({
+          //     URL: downloadURL,
+          //     // 'thumb': _imageData['thumb'],
+          //     name: name,
+          //     // 'coords': _imageData['coords'],
+          //     owner: firebase.auth().currentUser && firebase.auth().currentUser.uid,
+          //     when: new Date().getTime(),
+          //   })
+          //   .then(
+          //     r => resolve(r),
+          //     e => reject(e)
+          //   );
+        }
+      );
+    });
+  } catch (error) {
+    return { error };
+  }
+}
+
 /**
  * Update profile
  * @param {Object} profile - The params to update the profile
@@ -122,19 +253,51 @@ function signIn({ name, avatar }, cb) {
  * @param {Object} profile.avatar - The params avatar - base64
  * @param {Object} profile.gameId - The last gameid they tried to access
  */
-function updateProfile(profile) {
+async function updateProfile(profile) {
   console.log('⚙️ updateProfile()', profile);
-  DB.ref('users/' + LOCAL_PROFILE.id).update(profile);
+  const { avatar, ...theProfile } = profile;
+
+  try {
+    const isHTTPLink = avatar && avatar.indexOf('https://') === 0;
+    if (avatar && isHTTPLink) {
+      console.log('avatar upload ignored because its a link');
+    }
+    if (avatar && !isHTTPLink) {
+      try {
+        const downloadURL = await _uploadDataURL64ToFirebase({
+          path: `users/${LOCAL_PROFILE.id}/`,
+          fileName: 'avatar',
+          avatar,
+        });
+        theProfile.avatar = downloadURL;
+        LOCAL_PROFILE.avatar = downloadURL;
+        console.log(':: avatar uploaded!', downloadURL);
+        PubSub.publish('profile.avatarSet', downloadURL);
+      } catch (error) {
+        console.warn(':: avatar upload failed! Save on DB', error);
+        // fallback to store the avatar directly on DB.
+        theProfile.avatar = avatar;
+      }
+    }
+    if (avatar === null) {
+      theProfile.avatar = null; // delete avatar from DB.
+    }
+    DB.ref('users/' + LOCAL_PROFILE.id).update(theProfile);
+  } catch (error) {
+    console.warn('⚙️ updateProfile failed!', error);
+  }
+
+  return theProfile;
 }
 
 /**
- * Reset profile - it deletes the profile from the db.
+ * Reset profile - delete the profile from the DB.
  */
 function resetProfile(id) {
   updateProfile({
     id: null,
     name: null,
-    avatar: null,
+    avatar: null, // TODO - delete avatar from storage
     gameId: null,
   });
 }
@@ -203,7 +366,7 @@ const gameInitialState = ({ id, name, creatorId }) => ({
  * @param {*} gameName
  */
 async function createGame(gameName) {
-  console.log(`⚙️ createGame: ${gameName}`);
+  console.log(`⚙️ createGame: ${gameName}`, { LOCAL_PROFILE });
   const gameId = slugString(gameName); // REVIEW this with @mmbotelho
   // Verify if game exists...
   const gameRef = DB.ref(`games/${gameId}`);
