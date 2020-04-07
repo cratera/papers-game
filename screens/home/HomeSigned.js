@@ -7,39 +7,47 @@ import PapersContext from '@store/PapersContext.js';
 import * as Theme from '@theme';
 import Styles from './HomeStyles.js';
 
-import * as ImagePicker from 'expo-image-picker';
-import Constants from 'expo-constants';
-import * as Permissions from 'expo-permissions';
-
 import Page from '@components/page';
 import Button from '@components/button';
 import danceGif from '@assets/images/dance.gif';
+import PickAvatar from './PickAvatarModal';
 
-import usePickAvatar from './utils/usePickAvatar.js';
 import AccessGameModal from './AccessGameModal.js';
 
-const AvatarMeme = ({ avatar, onChange }) => (
-  <View style={Styles.memeContainer}>
-    <TouchableHighlight underlayColor={Theme.colors.bg} style={Styles.memeHead} onPress={onChange}>
-      {avatar ? (
-        <Image
-          style={[Styles.avatarPlace, Styles.memeFace, Styles.avatarImg]}
-          source={{ uri: avatar }}
-          accessibilityLabel="Your uploaded avatar"
-        />
-      ) : (
-        <View style={[Styles.avatarPlace, Styles.memeFace]} />
-      )}
-    </TouchableHighlight>
-    <Image style={Styles.memeBody} source={danceGif} accessible={false} />
-  </View>
-);
+const AvatarMeme = ({ avatar, onChange }) => {
+  const [isPickerVisible, setIsPickerVisible] = React.useState(false);
+
+  return (
+    <View style={Styles.memeContainer}>
+      <TouchableHighlight
+        underlayColor={Theme.colors.bg}
+        style={Styles.memeHead}
+        onPress={() => setIsPickerVisible(true)}
+      >
+        {avatar ? (
+          <Image
+            style={[Styles.avatarPlace, Styles.memeFace, Styles.avatarImg]}
+            source={{ uri: avatar }}
+            accessibilityLabel="Your uploaded avatar"
+          />
+        ) : (
+          <View style={[Styles.avatarPlace, Styles.memeFace]} />
+        )}
+      </TouchableHighlight>
+      <Image style={Styles.memeBody} source={danceGif} accessible={false} />
+      <PickAvatar
+        visible={isPickerVisible}
+        onSubmit={onChange}
+        onClose={() => setIsPickerVisible(false)}
+      />
+    </View>
+  );
+};
 
 export default function HomeSigned() {
   const Papers = useContext(PapersContext);
   const profile = Papers.state.profile;
   const [modalState, setModalState] = useState({ isOpen: false, variant: null });
-  const pickAvatar = usePickAvatar();
 
   if (Papers.status === 'isJoining') {
     return (
@@ -93,11 +101,7 @@ export default function HomeSigned() {
     setModalState({ isOpen: false, variant: null });
   }
 
-  async function handleChangeAvatar() {
-    const url = await pickAvatar();
-
-    if (url) {
-      Papers.updateProfile({ avatar: url });
-    }
+  async function handleChangeAvatar(avatar) {
+    Papers.updateProfile({ avatar });
   }
 }

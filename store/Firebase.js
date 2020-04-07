@@ -137,7 +137,7 @@ async function _uploadAvatar({ path, fileName, avatar }) {
   const response = await fetch(avatar);
   console.log(':: 1', format);
   const blob = await response.blob();
-  const ref = await firebase.storage().ref(path).child(`${fileName}.${format}`);
+  const ref = await firebase.storage().ref(path).child(fileName);
   const task = ref.put(blob, metadata);
 
   return new Promise((resolve, reject) => {

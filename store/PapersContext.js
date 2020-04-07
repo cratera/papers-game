@@ -168,7 +168,7 @@ export class PapersContextProvider extends Component {
     });
 
     socket.on('profile.avatarSet', async (topic, avatar) => {
-      console.log('📌 on.profile.avatarSet', avatar);
+      console.log('📌 on.profile.avatarSet');
       await this.PapersAPI.updateProfile({ avatar }, { ignoreSocket: true });
     });
 

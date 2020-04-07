@@ -73,9 +73,9 @@ export default function ListPlayers({ players, enableKickout = false, ...otherPr
               <View>
                 <Text style={Theme.typography.body}>{name}</Text>
                 <Text style={Theme.typography.small}>
-                  {playerId === game.creatorId ? '(Admin) ' : ''}
-                  {playerId === profileId ? '(you) ' : ''}
-                  {isAfk ? '(⚠️) ' : ''}
+                  {playerId === game.creatorId ? 'Admin ' : ''}
+                  {playerId === profileId ? 'you ' : ''}
+                  {isAfk ? '⚠️' : ''}
                 </Text>
               </View>
             </View>

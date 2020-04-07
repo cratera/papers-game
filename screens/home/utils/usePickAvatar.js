@@ -11,11 +11,14 @@ export default function usePickAvatar() {
   const [isWeb] = React.useState(Platform.OS === 'web');
   // const Papers = React.useContext(PapersContext);
 
-  async function pickAvatar() {
+  async function pickAvatar({ camera } = {}) {
     // Get permission first on iOS. (No need on Android? REVIEW_SECURITY)
     if (Constants.platform.ios) {
+      const responseCamera = camera
+        ? await Permissions.askAsync(Permissions.CAMERA)
+        : { granted: true };
       const response = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-      if (!response.granted) {
+      if (!response.granted && responseCamera.granted) {
         if (!isWeb) {
           Alert.alert(
             'Camera denied',
@@ -33,16 +36,29 @@ export default function usePickAvatar() {
       }
     }
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.5,
-      base64: false,
-      exif: false,
-    });
+    let result;
 
-    console.log('usePickAvatar', result.cancelled ? 'cancelled' : 'done!');
+    if (camera) {
+      result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.5,
+        base64: false,
+        exif: false,
+      });
+    } else {
+      result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.5,
+        base64: false,
+        exif: false,
+      });
+    }
+
+    console.log('usePickAvatarModal', result.cancelled ? 'cancelled' : 'done!');
     return result.cancelled ? null : result.uri;
 
     // We'll go back to this again...
