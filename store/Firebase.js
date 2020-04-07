@@ -4,8 +4,8 @@ import { slugString } from '@constants/utils.js';
 
 // Fixing a bug with firebase file upload put() _uploadAvatar()
 // https://forums.expo.io/t/imagepicker-base64-to-firebase-storage-problem/1415/11
-import Base64 from 'base-64';
-global.atob = Base64.encode;
+// import Base64 from 'base-64';
+// global.atob = Base64.encode;
 
 const firebaseConfig = {
   // TODO - remove this from source code
@@ -123,38 +123,34 @@ async function _uploadAvatar({ path, fileName, avatar }) {
   console.log(':: _uploadAvatar', path, fileName);
 
   const base64Match = avatar.match(/image\/(jpeg|jpg|gif|png)/);
-  const imgMatched = avatar.match(/\/(jpeg|jpg|gif|png)/);
+  const imgMatched = avatar.match(/\.(jpeg|jpg|gif|png)/);
   let format;
   if (base64Match) {
     format = base64Match && base64Match[1]; // ex: look for "image/png"
   } else {
-    format = imgMatched && imgMatched[0];
+    format = imgMatched && imgMatched[1];
   }
 
-  try {
-    // Option 3:
-    // https://github.com/aaronksaunders/expo-rn-firebase-image-upload/blob/master/README.md
-    const metadata = { contentType: `image/${format}` };
-    const response = await fetch(avatar);
-    const blob = await response.blob();
-    const ref = await firebase.storage().ref(path).child(`${fileName}.${format}`);
+  // Option 3:
+  // https://github.com/aaronksaunders/expo-rn-firebase-image-upload/blob/master/README.md
+  const metadata = { contentType: `image/${format}` };
+  const response = await fetch(avatar);
+  console.log(':: 1', format);
+  const blob = await response.blob();
+  const ref = await firebase.storage().ref(path).child(`${fileName}.${format}`);
+  const task = ref.put(blob, metadata);
 
-    const task = ref.put(blob, metadata);
-
-    return new Promise((resolve, reject) => {
-      task.on(
-        'state_changed',
-        snapshot => {},
-        error => reject(error),
-        () => {
-          const downloadURL = task.snapshot.ref.getDownloadURL();
-          resolve(downloadURL);
-        }
-      );
-    });
-  } catch (error) {
-    return { error };
-  }
+  return new Promise((resolve, reject) => {
+    task.on(
+      'state_changed',
+      snapshot => {},
+      error => reject(error),
+      () => {
+        const downloadURL = task.snapshot.ref.getDownloadURL();
+        resolve(downloadURL);
+      }
+    );
+  });
 }
 
 /**
@@ -186,8 +182,8 @@ async function updateProfile(profile) {
         console.log(':: avatar uploaded!', downloadURL);
         PubSub.publish('profile.avatarSet', downloadURL);
       } catch (error) {
-        console.warn(':: avatar upload failed! Save on DB', error);
-        theProfile.avatar = avatar;
+        console.warn(':: avatar upload failed!', error);
+        theProfile.avatar = null; // delete. Maybe save base64 as fallback?
       }
     }
     if (avatar === null) {
