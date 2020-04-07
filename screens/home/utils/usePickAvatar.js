@@ -44,6 +44,18 @@ export default function usePickAvatar() {
 
     console.log('usePickAvatar', result.cancelled ? 'cancelled' : 'done!');
     return result.cancelled ? null : result.uri;
+
+    // We'll go back to this again...
+    // if (result.uri || result.base64) {
+    //   if (result.base64) {
+    //     const format = result.uri.match(/\.(jpeg|jpg|gif|png)$/)[1]; // hardcoded solution.
+    //     console.warn('Photo in base64!', format, result.base64.substring(0, 25));
+    //     return `data:image/${format};base64,${result.base64}`;
+    //   } else {
+    //     console.warn('Photo fallback to uri', result.uri.substring(0, 25));
+    //     return result.uri;
+    //   }
+    // }
   }
 
   return pickAvatar;
