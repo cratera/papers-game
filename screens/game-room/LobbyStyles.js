@@ -1,5 +1,5 @@
-import { StyleSheet } from 'react-native';
-import * as Theme from '@theme';
+import { StyleSheet } from 'react-native'
+// import * as Theme from '@theme'
 
 export default StyleSheet.create({
   header: {
@@ -49,4 +49,4 @@ export default StyleSheet.create({
     textAlign: 'center',
     fontStyle: 'italic',
   },
-});
+})

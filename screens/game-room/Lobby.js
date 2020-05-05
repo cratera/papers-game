@@ -21,11 +21,8 @@ import ListPlayers from '@components/list-players'
 export default function Lobby({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const { profile, profiles, game } = Papers.state
-  const prevHasTeams = usePrevious(!!game.teams)
-  const [isModalOpen, setModalOpen] = React.useState(false)
   const profileId = profile.id
   const profileIsAdmin = game.creatorId === profileId
-  const hasTeams = !!game.teams
   const gameHasStarted = !!game && game.hasStarted
   const nextPlayer = profiles[game.creatorId]?.name || '???'
 
@@ -37,22 +34,15 @@ export default function Lobby({ navigation }) {
   )
 
   React.useEffect(() => {
-    if (!prevHasTeams && hasTeams) {
-      // Teams were submited, force words!
-      !didSubmitAllWords(profileId) && openWords()
-    }
-  }, [prevHasTeams, hasTeams, didSubmitAllWords])
-
-  React.useEffect(() => {
     if (gameHasStarted) {
       console.log('Navigate to playing...')
       navigation.navigate('playing')
     }
   }, [gameHasStarted])
 
-  // TODO review all these props.
+  // TODO review all these props
   return !game.teams ? (
-    <LobbyStarting
+    <LobbyJoining
       game={game}
       nextPlayer={nextPlayer}
       onCreateTeams={handleCreateTeams}
@@ -65,18 +55,11 @@ export default function Lobby({ navigation }) {
       didSubmitAllWords={didSubmitAllWords}
       profileIsAdmin={profileIsAdmin}
       profileId={profileId}
-      openWords={openWords}
       profiles={profiles}
       handleStartClick={handleStartClick}
       setWordsForEveyone={setWordsForEveyone}
-      isModalOpen={isModalOpen}
-      setModalOpen={setModalOpen}
     />
   )
-
-  function openWords() {
-    setModalOpen(true)
-  }
 
   async function setWordsForEveyone() {
     try {
@@ -102,9 +85,9 @@ Lobby.propTypes = {
   }),
 }
 
-// ------- LobbyStarting ------- //
+// ------- LobbyJoining ------- //
 
-const LobbyStarting = ({ game, nextPlayer, onCreateTeams, profileIsAdmin }) => {
+const LobbyJoining = ({ game, nextPlayer, onCreateTeams, profileIsAdmin }) => {
   const { players, name, id: gameId } = game
   const hasEnoughPlayers = Object.keys(players).length >= 4
 
@@ -132,7 +115,7 @@ const LobbyStarting = ({ game, nextPlayer, onCreateTeams, profileIsAdmin }) => {
         </ScrollView>
       </Page.Main>
       <Page.CTAs hasOffset={profileIsAdmin && hasEnoughPlayers}>
-        <LobbyStartingCTAs
+        <LobbyJoiningCTAs
           hasEnoughPlayers={hasEnoughPlayers}
           profileIsAdmin={profileIsAdmin}
           onCreateTeams={onCreateTeams}
@@ -143,14 +126,14 @@ const LobbyStarting = ({ game, nextPlayer, onCreateTeams, profileIsAdmin }) => {
   )
 }
 
-LobbyStarting.propTypes = {
+LobbyJoining.propTypes = {
   game: PropTypes.object.isRequired, // TODO shape this
   profileIsAdmin: PropTypes.bool.isRequired,
   onCreateTeams: PropTypes.func.isRequired,
   nextPlayer: PropTypes.string.isRequired,
 }
 
-const LobbyStartingCTAsToMemo = ({
+const LobbyJoiningCTAsToMemo = ({
   hasEnoughPlayers,
   profileIsAdmin,
   onCreateTeams,
@@ -173,9 +156,9 @@ const LobbyStartingCTAsToMemo = ({
   )
 }
 
-const LobbyStartingCTAs = React.memo(LobbyStartingCTAsToMemo)
+const LobbyJoiningCTAs = React.memo(LobbyJoiningCTAsToMemo)
 
-LobbyStartingCTAsToMemo.propTypes = {
+LobbyJoiningCTAsToMemo.propTypes = {
   hasEnoughPlayers: PropTypes.bool.isRequired,
   profileIsAdmin: PropTypes.bool.isRequired,
   onCreateTeams: PropTypes.func.isRequired,
@@ -189,17 +172,28 @@ const LobbyWritting = ({
   didSubmitAllWords,
   profileIsAdmin,
   profileId,
-  openWords,
   profiles,
   handleStartClick,
   setWordsForEveyone,
-  isModalOpen,
-  setModalOpen,
   nextPlayer,
 }) => {
+  const [isModalOpen, setModalOpen] = React.useState(false)
   const didEveryoneSubmittedTheirWords = Object.keys(game.players).every(didSubmitAllWords)
   const didSubmitWords = didSubmitAllWords(profileId)
   const writeAllShortCut = profileIsAdmin && !didEveryoneSubmittedTheirWords
+  const prevHasTeams = usePrevious(!!game.teams)
+  const hasTeams = !!game.teams
+
+  React.useEffect(() => {
+    if (!prevHasTeams && hasTeams) {
+      // Teams were submited, force words!
+      !didSubmitAllWords(profileId) && openWords()
+    }
+  }, [prevHasTeams, hasTeams, didSubmitAllWords])
+
+  function openWords() {
+    setModalOpen(true)
+  }
 
   return (
     <Fragment>
@@ -268,11 +262,8 @@ LobbyWritting.propTypes = {
   didSubmitAllWords: PropTypes.func.isRequired,
   profileIsAdmin: PropTypes.bool.isRequired,
   profileId: PropTypes.string.isRequired,
-  openWords: PropTypes.func.isRequired,
-  profiles: PropTypes.object.isRequired, // TODO
+  profiles: PropTypes.object.isRequired, // TODO especify this
   handleStartClick: PropTypes.func.isRequired,
   setWordsForEveyone: PropTypes.func.isRequired,
-  isModalOpen: PropTypes.bool.isRequired,
-  setModalOpen: PropTypes.func.isRequired,
   nextPlayer: PropTypes.string.isRequired,
 }

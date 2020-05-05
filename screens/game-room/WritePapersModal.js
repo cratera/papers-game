@@ -1,65 +1,38 @@
-import React from 'react';
-import { KeyboardAvoidingView, ScrollView, View, TextInput, Text } from 'react-native';
-import { Svg, Path, Rect } from 'react-native-svg';
+import React from 'react'
+import PropTypes from 'prop-types'
 
-import PapersContext from '@store/PapersContext.js';
+import { KeyboardAvoidingView, View, TextInput, Text } from 'react-native'
+import { ScrollView } from 'react-native-gesture-handler'
+import { Svg, Path, Rect } from 'react-native-svg'
 
-import Button from '@components/button';
-import Modal from '@components/modal';
-import Page from '@components/page';
+import PapersContext from '@store/PapersContext.js'
 
-import * as Theme from '@theme';
-import Styles from './WritePapersModalStyles.js';
+import Button from '@components/button'
+import Modal from '@components/modal'
+import Page from '@components/page'
 
-const SlidePaper = ({ onChange, isActive, onFocus, onSubmit, i }) => {
-  const elInput = React.createRef();
-  const [isFocused, setIsFocused] = React.useState(false);
-
-  React.useEffect(() => {
-    if (isActive) {
-      elInput.current.focus();
-    }
-  }, [isActive]);
-
-  return (
-    <View style={[Styles.slide]} data-slide={i + 1}>
-      <TextInput
-        ref={elInput}
-        style={[Styles.input, (isActive || isFocused) && Styles.input_isActive]}
-        placeholderTextColor={Theme.colors.grayMedium}
-        blurOnSubmit={false} // onSubmitEnding will handle the focus on the next paper.
-        onChangeText={text => onChange(text, i)}
-        onBlur={() => setIsFocused(false)}
-        onSubmitEditing={onSubmit}
-        onFocus={() => {
-          onFocus();
-          setIsFocused(true);
-        }}
-        enablesReturnKeyAutomatically
-      ></TextInput>
-    </View>
-  );
-};
+import * as Theme from '@theme'
+import Styles from './WritePapersModalStyles.js'
 
 export default function WritePapersModal({ isOpen, onClose }) {
-  const Papers = React.useContext(PapersContext);
-  const { game, profile } = Papers.state;
-  const [words, setLocalWords] = React.useState([]);
+  const Papers = React.useContext(PapersContext)
+  const { game, profile } = Papers.state
+  const [words, setLocalWords] = React.useState([])
   // const [textareasHeight, setTextareasHeight] = React.useState({});
 
-  const [errorMsg, setErrorMsg] = React.useState(null);
-  const [isSubmiting, setIsSubmiting] = React.useState(false);
-  const [paperIndex, setPaperIndex] = React.useState(0);
+  const [errorMsg, setErrorMsg] = React.useState(null)
+  const [isSubmiting, setIsSubmiting] = React.useState(false)
+  const [paperIndex, setPaperIndex] = React.useState(0)
 
-  const wordsGoal = game.settings.words;
-  const wordsCount = words.filter(word => !!word).length;
-  const wordsAreStored = !!game.words && !!game.words[profile.id];
+  const wordsGoal = game.settings.words
+  const wordsCount = words.filter(word => !!word).length
+  const wordsAreStored = !!game.words && !!game.words[profile.id]
 
   React.useEffect(() => {
     if (wordsAreStored) {
-      onClose();
+      onClose()
     }
-  }, [wordsAreStored]);
+  }, [wordsAreStored])
 
   return (
     <Modal visible={isOpen} onClose={onClose}>
@@ -94,12 +67,12 @@ export default function WritePapersModal({ isOpen, onClose }) {
         </Page.CTAs>
       </KeyboardAvoidingView>
     </Modal>
-  );
+  )
 
   function renderSliders() {
-    const papers = [];
+    const papers = []
     for (let i = 0; i < wordsGoal; i++) {
-      const isActive = i === paperIndex;
+      const isActive = i === paperIndex
       // const height = textareasHeight[i] || '4rem';
 
       papers.push(
@@ -111,54 +84,97 @@ export default function WritePapersModal({ isOpen, onClose }) {
           onChange={handleWordChange}
           onSubmit={handleClickNext}
         />
-      );
+      )
     }
 
-    return papers;
+    return papers
   }
 
   function handleWordChange(word, index) {
     if (typeof word !== 'string') {
-      console.warn('Wow, this is not a word!', word);
-      return;
+      console.warn('Wow, this is not a word!', word)
+      return
     }
 
-    const wordsToEdit = [...words];
-    wordsToEdit[index] = word;
+    const wordsToEdit = [...words]
+    wordsToEdit[index] = word
 
     // OPTIMIZE - Maybe change state only on blur?
     // A: No, parent needs to know the value so "Next paper" works
-    setLocalWords(wordsToEdit);
+    setLocalWords(wordsToEdit)
   }
 
   function handleClickNext() {
     // Find if any submitted paper was left empty
-    const firstEmpty = words.findIndex(word => !word);
+    const firstEmpty = words.findIndex(word => !word)
     // Go to next paper even if current one is empty
-    const nextEmpty = firstEmpty === -1 || firstEmpty === paperIndex ? paperIndex + 1 : firstEmpty;
+    const nextEmpty = firstEmpty === -1 || firstEmpty === paperIndex ? paperIndex + 1 : firstEmpty
     // Watch out to go back to first paper when reaching the end
-    setPaperIndex(nextEmpty > wordsGoal - 1 ? 0 : nextEmpty);
+    setPaperIndex(nextEmpty > wordsGoal - 1 ? 0 : nextEmpty)
   }
 
   async function handleSubmitClick() {
     if (isSubmiting === true) {
-      return;
+      return
     }
 
-    setIsSubmiting(true);
+    setIsSubmiting(true)
 
     try {
-      await Papers.setWords(words);
+      await Papers.setWords(words)
     } catch (error) {
-      console.log('WritePapersModal submit error:', error);
-      setErrorMsg(`Ups, set papers failed! ${error.message}`);
+      console.log('WritePapersModal submit error:', error)
+      setErrorMsg(`Ups, set papers failed! ${error.message}`)
     }
-    setIsSubmiting(false);
+    setIsSubmiting(false)
   }
 }
 
+WritePapersModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+}
+
+const SlidePaper = ({ onChange, isActive, onFocus, onSubmit, i }) => {
+  const elInput = React.createRef()
+  const [isFocused, setIsFocused] = React.useState(false)
+
+  React.useEffect(() => {
+    if (isActive) {
+      elInput.current.focus()
+    }
+  }, [isActive])
+
+  return (
+    <View style={[Styles.slide]} data-slide={i + 1}>
+      <TextInput
+        ref={elInput}
+        style={[Styles.input, (isActive || isFocused) && Styles.input_isActive]}
+        placeholderTextColor={Theme.colors.grayMedium}
+        blurOnSubmit={false} // onSubmitEnding will handle the focus on the next paper.
+        onChangeText={text => onChange(text, i)}
+        onBlur={() => setIsFocused(false)}
+        onSubmitEditing={onSubmit}
+        onFocus={() => {
+          onFocus()
+          setIsFocused(true)
+        }}
+        enablesReturnKeyAutomatically
+      ></TextInput>
+    </View>
+  )
+}
+
+SlidePaper.propTypes = {
+  i: PropTypes.number.isRequired,
+  isActive: PropTypes.bool.isRequired,
+  onChange: PropTypes.func.isRequired,
+  onFocus: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+}
+
 const IconLamp = () => {
-  const color = Theme.colors.primary;
+  const color = Theme.colors.primary
   // prettier-ignore
   return (
   <Svg style={Styles.header_icon} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -178,4 +194,4 @@ const IconLamp = () => {
     <Path d="M13.3789 21.9905C13.3789 21.8033 13.2273 21.6517 13.04 21.6517H11.5698C11.3825 21.6517 11.231 21.8033 11.231 21.9905C11.231 22.1778 11.3825 22.3294 11.5698 22.3294H13.04C13.2273 22.3294 13.3789 22.1778 13.3789 21.9905Z" fill={color}/>
   </Svg>
   )
-};
+}
