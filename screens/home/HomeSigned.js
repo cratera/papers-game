@@ -1,21 +1,21 @@
-import React, { Fragment, useState, useContext } from 'react';
-import { Image, View, StyleSheet, Text, TouchableHighlight } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
+import React, { Fragment } from 'react'
+import PropTypes from 'prop-types'
+import { Image, View, Text, TouchableHighlight } from 'react-native'
 
-import PapersContext from '@store/PapersContext.js';
+import PapersContext from '@store/PapersContext.js'
 
-import * as Theme from '@theme';
-import Styles from './HomeStyles.js';
+import * as Theme from '@theme'
+import Styles from './HomeStyles.js'
 
-import Page from '@components/page';
-import Button from '@components/button';
-import danceGif from '@assets/images/dance.gif';
-import PickAvatar from './PickAvatarModal';
+import Page from '@components/page'
+import Button from '@components/button'
+import danceGif from '@assets/images/dance.gif'
+import PickAvatar from './PickAvatarModal'
 
-import AccessGameModal from './AccessGameModal.js';
+import AccessGameModal from './AccessGameModal.js'
 
 const AvatarMeme = ({ avatar, onChange }) => {
-  const [isPickerVisible, setIsPickerVisible] = React.useState(false);
+  const [isPickerVisible, setIsPickerVisible] = React.useState(false)
 
   return (
     <View style={Styles.memeContainer}>
@@ -42,22 +42,27 @@ const AvatarMeme = ({ avatar, onChange }) => {
         onClose={() => setIsPickerVisible(false)}
       />
     </View>
-  );
-};
+  )
+}
+
+AvatarMeme.propTypes = {
+  avatar: PropTypes.string,
+  onChange: PropTypes.func.isRequired, // (value: String)
+}
 
 export default function HomeSigned() {
-  const Papers = useContext(PapersContext);
-  const profile = Papers.state.profile;
-  const [modalState, setModalState] = useState({ isOpen: false, variant: null });
+  const Papers = React.useContext(PapersContext)
+  const profile = Papers.state.profile
+  const [modalState, setModalState] = React.useState({ isOpen: false, variant: null })
 
   if (Papers.status === 'isJoining') {
     return (
       <Page>
         <Page.Main style={Styles.main}>
-          <Text style={Theme.typography.h2}>Joining "{profile.gameId}" ⏳</Text>
+          <Text style={Theme.typography.h2}>Joining {`"${profile.gameId}"`} ⏳</Text>
         </Page.Main>
       </Page>
-    );
+    )
   }
 
   return (
@@ -89,20 +94,20 @@ export default function HomeSigned() {
         onClose={closeAccessModalClose}
       />
     </Fragment>
-  );
+  )
 
   function openAccessGameModal(variant) {
     setModalState({
       isOpen: true,
       variant,
-    });
+    })
   }
 
   function closeAccessModalClose() {
-    setModalState({ isOpen: false, variant: null });
+    setModalState({ isOpen: false, variant: null })
   }
 
   async function handleChangeAvatar(avatar) {
-    Papers.updateProfile({ avatar });
+    Papers.updateProfile({ avatar })
   }
 }

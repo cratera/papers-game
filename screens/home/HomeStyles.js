@@ -1,7 +1,7 @@
-import { Dimensions, StyleSheet } from 'react-native';
-import * as Theme from '@theme';
+import { StyleSheet } from 'react-native'
+import * as Theme from '@theme'
 
-const vh = Dimensions.get('window').height / 100;
+// const vh = Dimensions.get('window').height / 100
 
 export default StyleSheet.create({
   main: {
@@ -108,4 +108,4 @@ export default StyleSheet.create({
     opacity: 0.8,
     marginTop: -60,
   },
-});
+})

@@ -1,28 +1,32 @@
-import React, { useContext, useEffect } from 'react';
-import { Button, View, StyleSheet, Text } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
-import * as WebBrowser from 'expo-web-browser';
+import React from 'react'
+import PropTypes from 'prop-types'
 
-import PapersContext from '@store/PapersContext.js';
+import PapersContext from '@store/PapersContext.js'
 
-import HomeSigned from './HomeSigned.js';
-import HomeSignup from './HomeSignup.js';
+import HomeSigned from './HomeSigned.js'
+import HomeSignup from './HomeSignup.js'
 
 export default function HomeScreen({ navigation }) {
-  const Papers = useContext(PapersContext);
-  const { profile, profiles, game } = Papers.state;
-  const gameId = game?.id;
+  const Papers = React.useContext(PapersContext)
+  const { profile, game } = Papers.state
+  const gameId = game?.id
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (gameId) {
-      navigation.navigate('room');
+      navigation.navigate('room')
     }
-  }, [gameId]);
+  }, [gameId])
 
   function handleUpdateProfile(profile) {
     // Do this here to take advatange of hooks!
-    Papers.updateProfile(profile);
+    Papers.updateProfile(profile)
   }
 
-  return profile.name ? <HomeSigned /> : <HomeSignup onSubmit={handleUpdateProfile} />;
+  return !profile.name ? <HomeSignup onSubmit={handleUpdateProfile} /> : <HomeSigned />
+}
+
+HomeScreen.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func, // (componentName: String)
+  }),
 }

@@ -1,5 +1,5 @@
-import { StyleSheet } from 'react-native';
-import * as Theme from '@theme';
+import { StyleSheet } from 'react-native'
+import * as Theme from '@theme'
 
 export default StyleSheet.create({
   title: {
@@ -23,4 +23,4 @@ export default StyleSheet.create({
     marginVertical: 8,
     textAlign: 'center',
   },
-});
+})

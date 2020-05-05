@@ -1,15 +1,17 @@
-import React, { Fragment } from 'react';
-import { Image, TouchableHighlight, Text, View } from 'react-native';
-import { Svg, Path } from 'react-native-svg';
+import React, { Fragment } from 'react'
+import PropTypes from 'prop-types'
 
-import PickAvatar from './PickAvatarModal';
+import { Image, TouchableHighlight, Text, View } from 'react-native'
+import { Svg, Path } from 'react-native-svg'
 
-import * as Theme from '@theme';
-import Styles from './HomeStyles.js';
+import PickAvatar from './PickAvatarModal'
+
+import * as Theme from '@theme'
+import Styles from './HomeStyles.js'
 
 export default function InputAvatar({ avatar, onChange }) {
-  const [status, setStatus] = React.useState(null); // loading || loaded || error?
-  const [isPickerVisible, setIsPickerVisible] = React.useState(false);
+  const [status, setStatus] = React.useState(null) // loading || loaded || error?
+  const [isPickerVisible, setIsPickerVisible] = React.useState(false)
 
   return (
     <Fragment>
@@ -50,5 +52,10 @@ export default function InputAvatar({ avatar, onChange }) {
         onChange={setStatus}
       />
     </Fragment>
-  );
+  )
+}
+
+InputAvatar.PropTypes = {
+  avatar: PropTypes.string,
+  onChange: PropTypes.func.isRequired, // (value: String)
 }

@@ -1,1 +1,1 @@
-export { default } from './GameRoomEntry.js';
+export { default } from './GameRoomEntry.js'
