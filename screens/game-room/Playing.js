@@ -2,101 +2,101 @@
  * I don't care about readability and never heard of useMemo or useCallback.
  * Just kidding... Let's just make it work first, then make it (much) better.
  */
-import React, { Fragment } from 'react';
-import { Dimensions, ScrollView, View, TouchableHighlight, Animated, Text } from 'react-native';
+import React, { Fragment } from 'react'
+import { Dimensions, ScrollView, View, TouchableHighlight, Animated, Text } from 'react-native'
 
-import { useCountdown, usePrevious, getRandomInt, msToSecPretty } from '@constants/utils';
-import PapersContext from '@store/PapersContext.js';
+import { useCountdown, usePrevious, getRandomInt, msToSecPretty } from '@constants/utils'
+import PapersContext from '@store/PapersContext.js'
 
-import Button from '@components/button';
-import Page from '@components/page';
-import Avatar from '@components/avatar';
-import i18n from '@constants/i18n';
+import Button from '@components/button'
+import Page from '@components/page'
+import Avatar from '@components/avatar'
+import i18n from '@constants/i18n'
 
-import * as Theme from '@theme';
-import Styles from './PlayingStyles.js';
+import * as Theme from '@theme'
+import Styles from './PlayingStyles.js'
 
-const ANIM_PAPER_NEXT = 500;
+const ANIM_PAPER_NEXT = 500
 
-const DESCRIPTIONS = [i18n.round_0_desc, i18n.round_1_desc, i18n.round_2_desc];
+const DESCRIPTIONS = [i18n.round_0_desc, i18n.round_1_desc, i18n.round_2_desc]
 
 export default function Playing(props) {
-  const Papers = React.useContext(PapersContext);
-  const { profile, profiles, game } = Papers.state;
-  const round = game.round;
+  const Papers = React.useContext(PapersContext)
+  const { profile, profiles, game } = Papers.state
+  const round = game.round
   // const hasStatusGetReady = round.status === 'getReady';
-  const hasStatusFinished = round.status === 'finished';
-  const hasCountdownStarted = !['getReady', 'finished'].includes(round.status);
-  const prevHasCountdownStarted = usePrevious(hasCountdownStarted);
-  const profileIsAdmin = game.creatorId === profile.id;
-  const initialTimer = 60000; // game.settings.time_ms;
-  const timerReady = 3400;
+  const hasStatusFinished = round.status === 'finished'
+  const hasCountdownStarted = !['getReady', 'finished'].includes(round.status)
+  const prevHasCountdownStarted = usePrevious(hasCountdownStarted)
+  const profileIsAdmin = game.creatorId === profile.id
+  const initialTimer = 60000 // game.settings.time_ms;
+  const timerReady = 3400
   const [countdown, startCountdown] = useCountdown(hasCountdownStarted ? round.status : null, {
     timer: initialTimer + timerReady, // 400 - threshold for io connection.
-  }); // 3,2,1... go!
-  const initialTimerSec = Math.round(initialTimer / 1000);
-  const countdownSec = Math.round(countdown / 1000);
-  const blurTime = 1500; // TODO - game individual setting
+  }) // 3,2,1... go!
+  const initialTimerSec = Math.round(initialTimer / 1000)
+  const countdownSec = Math.round(countdown / 1000)
+  const blurTime = 1500 // TODO - game individual setting
   // const prevCountdownSec = usePrevious(countdownSec);
   // const [timesUp, setTimesup] = React.useState(false);
 
-  const roundIndex = round.current;
-  const { 0: turnTeamIndex, 1: turnPlayerIndex, 2: isOdd } = round?.turnWho || {};
-  const turnPlayerId = game.teams[turnTeamIndex].players[isOdd ? 0 : turnPlayerIndex];
-  const isMyTurn = turnPlayerId === profile.id;
+  const roundIndex = round.current
+  const { 0: turnTeamIndex, 1: turnPlayerIndex, 2: isOdd } = round?.turnWho || {}
+  const turnPlayerId = game.teams[turnTeamIndex].players[isOdd ? 0 : turnPlayerIndex]
+  const isMyTurn = turnPlayerId === profile.id
 
-  const [papersTurn, setPapersTurn] = React.useState(null);
+  const [papersTurn, setPapersTurn] = React.useState(null)
 
   // const [isVisiblePassedPapers, togglePassedPapers] = React.useState(false);
-  const [paperAnim, setPaperAnimation] = React.useState(null); // gotcha || nope
-  const [isPaperBlur, setPaperBlur] = React.useState(false);
-  const [isPaperChanging, setIsPaperChanging] = React.useState(false);
-  const blurTimeout = React.useRef();
-  const papersTurnCurrent = papersTurn?.current;
-  const isCount321go = countdownSec > initialTimerSec;
+  const [paperAnim, setPaperAnimation] = React.useState(null) // gotcha || nope
+  const [isPaperBlur, setPaperBlur] = React.useState(false)
+  const [isPaperChanging, setIsPaperChanging] = React.useState(false)
+  const blurTimeout = React.useRef()
+  const papersTurnCurrent = papersTurn?.current
+  const isCount321go = countdownSec > initialTimerSec
 
   React.useEffect(() => {
     async function getTurnState() {
       // Turn this into a custom hook.
-      const turnState = await Papers.getTurnLocalState();
-      setPapersTurn(turnState);
+      const turnState = await Papers.getTurnLocalState()
+      setPapersTurn(turnState)
     }
-    getTurnState();
-  }, []);
+    getTurnState()
+  }, [])
 
   React.useEffect(() => {
     if (!isCount321go) {
-      console.log('useEffect:: 1º blur paper');
-      setPaperBlur(false);
-      clearTimeout(blurTimeout.current);
-      blurTimeout.current = setTimeout(() => setPaperBlur(true), blurTime);
+      console.log('useEffect:: 1º blur paper')
+      setPaperBlur(false)
+      clearTimeout(blurTimeout.current)
+      blurTimeout.current = setTimeout(() => setPaperBlur(true), blurTime)
     }
-  }, [isCount321go]);
+  }, [isCount321go])
 
   React.useEffect(() => {
     if (papersTurnCurrent !== null && !isCount321go) {
-      console.log('useEffect:: timeout blur paper');
-      setPaperBlur(false);
-      clearTimeout(blurTimeout.current);
-      blurTimeout.current = setTimeout(() => setPaperBlur(true), blurTime);
+      console.log('useEffect:: timeout blur paper')
+      setPaperBlur(false)
+      clearTimeout(blurTimeout.current)
+      blurTimeout.current = setTimeout(() => setPaperBlur(true), blurTime)
     }
-  }, [papersTurnCurrent, isCount321go]);
+  }, [papersTurnCurrent, isCount321go])
 
   React.useEffect(() => {
     // use false to avoid undefined on first render
     if (prevHasCountdownStarted === false && hasCountdownStarted) {
-      console.log('useEffect:: hasCountdownStarted');
-      pickFirstPaper();
-      startCountdown(round.status);
+      console.log('useEffect:: hasCountdownStarted')
+      pickFirstPaper()
+      startCountdown(round.status)
     }
-  }, [startCountdown, round.status, prevHasCountdownStarted, hasCountdownStarted]); // eslint-disable-line
+  }, [startCountdown, round.status, prevHasCountdownStarted, hasCountdownStarted]) // eslint-disable-line
 
   function getPaperByKey(key) {
-    const paper = game.words._all[key];
+    const paper = game.words._all[key]
     if (!paper) {
-      console.warn(`key "${key}" does not match a paper!`);
+      console.warn(`key "${key}" does not match a paper!`)
     }
-    return paper;
+    return paper
   }
 
   // TODO/NOTE: pickFirstPaper, pickNextPaper and togglePaper should be on PapersContext
@@ -107,79 +107,79 @@ export default function Playing(props) {
         passed: [],
         guessed: [],
         wordsLeft: round.wordsLeft,
-      };
+      }
 
       if (round.wordsLeft.length === 0) {
         // words ended
-        Papers.setTurnLocalState(state);
-        return state;
+        Papers.setTurnLocalState(state)
+        return state
       }
 
-      const wordsToPick = [...state.wordsLeft];
+      const wordsToPick = [...state.wordsLeft]
 
-      const wordIndex = getRandomInt(wordsToPick.length - 1);
-      const nextPaper = wordsToPick[wordIndex];
+      const wordIndex = getRandomInt(wordsToPick.length - 1)
+      const nextPaper = wordsToPick[wordIndex]
 
-      wordsToPick.splice(wordIndex, 1);
+      wordsToPick.splice(wordIndex, 1)
 
-      state.current = nextPaper;
-      state.wordsLeft = wordsToPick;
+      state.current = nextPaper
+      state.wordsLeft = wordsToPick
 
-      Papers.setTurnLocalState(state);
-      return state;
-    });
+      Papers.setTurnLocalState(state)
+      return state
+    })
   }
 
   function pickNextPaper(hasGuessed = false) {
     // OPTIMIZE/NOTE : paper & word mean the same.
-    const currentPaper = papersTurn.current;
-    let wordsToPick = [];
-    let pickingFrom = null; // 'left' || 'passed'
-    let wordsEnded = false;
+    const currentPaper = papersTurn.current
+    let wordsToPick = []
+    let pickingFrom = null // 'left' || 'passed'
+    let wordsEnded = false
 
     if (papersTurn.wordsLeft.length > 0) {
-      pickingFrom = 'left';
-      wordsToPick = [...papersTurn.wordsLeft];
+      pickingFrom = 'left'
+      wordsToPick = [...papersTurn.wordsLeft]
     } else if (papersTurn.passed.length > 0) {
-      pickingFrom = 'passed';
-      wordsToPick = [...papersTurn.passed];
+      pickingFrom = 'passed'
+      wordsToPick = [...papersTurn.passed]
     } else {
-      wordsEnded = true;
+      wordsEnded = true
     }
 
     setPapersTurn(state => {
-      const wordsModified = {};
-      const wordIndex = !wordsEnded ? getRandomInt(wordsToPick.length - 1) : 0;
-      let nextPaper = wordsEnded ? null : wordsToPick[wordIndex];
+      const wordsModified = {}
+      const wordIndex = !wordsEnded ? getRandomInt(wordsToPick.length - 1) : 0
+      let nextPaper = wordsEnded ? null : wordsToPick[wordIndex]
 
       if (!wordsEnded && nextPaper === null) {
-        console.error('Ups nextPaper!', wordIndex, wordsToPick);
+        console.error('Ups nextPaper!', wordIndex, wordsToPick)
       }
 
       if (!wordsEnded) {
-        wordsToPick.splice(wordIndex, 1);
+        wordsToPick.splice(wordIndex, 1)
       }
 
       if (hasGuessed) {
-        wordsModified.guessed = [...state.guessed, currentPaper];
+        wordsModified.guessed = [...state.guessed, currentPaper]
 
         if (pickingFrom === 'left') {
-          wordsModified.wordsLeft = wordsToPick;
+          wordsModified.wordsLeft = wordsToPick
         } else if (pickingFrom === 'passed') {
-          wordsModified.passed = wordsToPick;
+          wordsModified.passed = wordsToPick
         }
       } else {
         if (pickingFrom === 'left') {
-          wordsModified.wordsLeft = wordsToPick;
-          wordsModified.passed = [...state.passed, currentPaper];
+          wordsModified.wordsLeft = wordsToPick
+          wordsModified.passed = [...state.passed, currentPaper]
         } else if (pickingFrom === 'passed') {
           if (wordsToPick.length > 0) {
-            wordsModified.passed = [...wordsToPick, currentPaper];
+            wordsModified.passed = [...wordsToPick, currentPaper]
           } else {
             // When it's the last word,
             // but no stress because "next paper" button is disable
-            nextPaper = currentPaper; // REVIEW: Why did I do this line?
-            wordsModified.passed = [];
+            nextPaper = currentPaper // REVIEW: Why did I do this line?
+            wordsModified.passed = []
           }
         }
       }
@@ -188,84 +188,84 @@ export default function Playing(props) {
         ...state,
         ...wordsModified,
         current: nextPaper,
-      };
+      }
 
-      Papers.setTurnLocalState(newState);
-      return newState;
-    });
-    setPaperBlur(false);
+      Papers.setTurnLocalState(newState)
+      return newState
+    })
+    setPaperBlur(false)
   }
 
   function togglePaper(paper, hasGuessed) {
     // TODO/BUG: When papers are all guessed and here I select one as not guessed.
     //  - The timer continues but the current word is empty.
     setPapersTurn(state => {
-      const wordsModified = {};
+      const wordsModified = {}
       if (hasGuessed) {
-        const wordsToPick = [...state.passed];
-        const wordIndex = wordsToPick.indexOf(paper);
-        wordsToPick.splice(wordIndex, 1);
+        const wordsToPick = [...state.passed]
+        const wordIndex = wordsToPick.indexOf(paper)
+        wordsToPick.splice(wordIndex, 1)
 
-        wordsModified.guessed = [...state.guessed, paper];
-        wordsModified.passed = wordsToPick;
+        wordsModified.guessed = [...state.guessed, paper]
+        wordsModified.passed = wordsToPick
       } else {
-        const wordsToPick = [...state.guessed];
-        console.log('wordsToPick:', wordsToPick);
-        const wordIndex = wordsToPick.indexOf(paper);
-        wordsToPick.splice(wordIndex, 1);
+        const wordsToPick = [...state.guessed]
+        console.log('wordsToPick:', wordsToPick)
+        const wordIndex = wordsToPick.indexOf(paper)
+        wordsToPick.splice(wordIndex, 1)
 
         // It means all papers were guessed before
         // and now there's a new paper to guess!
         if (countdown && !state.passed.length) {
-          wordsModified.current = paper;
+          wordsModified.current = paper
         } else {
-          wordsModified.passed = [...state.passed, paper];
+          wordsModified.passed = [...state.passed, paper]
         }
-        wordsModified.guessed = wordsToPick;
+        wordsModified.guessed = wordsToPick
       }
 
       const newState = {
         ...state,
         ...wordsModified,
-      };
+      }
 
-      Papers.setTurnLocalState(newState);
-      return newState;
-    });
+      Papers.setTurnLocalState(newState)
+      return newState
+    })
   }
 
   function handlePaperClick(hasGuessed) {
     if (isPaperChanging) {
-      return;
+      return
     }
 
-    setIsPaperChanging(true);
-    setPaperAnimation(hasGuessed ? 'gotcha' : 'nope');
-    setPaperBlur(false);
-    clearTimeout(blurTimeout.current);
+    setIsPaperChanging(true)
+    setPaperAnimation(hasGuessed ? 'gotcha' : 'nope')
+    setPaperBlur(false)
+    clearTimeout(blurTimeout.current)
 
     setTimeout(() => {
-      setPaperAnimation(null);
-      setIsPaperChanging(false);
-      pickNextPaper(hasGuessed);
-    }, ANIM_PAPER_NEXT);
+      setPaperAnimation(null)
+      setIsPaperChanging(false)
+      pickNextPaper(hasGuessed)
+    }, ANIM_PAPER_NEXT)
   }
 
   function handleStartClick() {
-    Papers.startTurn();
+    Papers.startTurn()
   }
 
   function handleFinishTurnClick() {
     // TODO - add loading state.
     // setPapersTurn({}); should it be done here?
-    Papers.finishTurn(papersTurn);
+    Papers.finishTurn(papersTurn)
     // just to double check...
-    setPaperBlur(false);
-    setIsPaperChanging(false);
+    setPaperBlur(false)
+    setIsPaperChanging(false)
   }
 
   function handleStartNextRoundClick() {
-    Papers.startNextRound();
+    Papers.startNextRound()
   }
 
   if (!papersTurn) {
@@ -273,54 +273,54 @@ export default function Playing(props) {
       <Text style={[Theme.typography.h3, Theme.u.center, { marginTop: 200 }]}>
         Loading... hold on! ⏳
       </Text>
-    );
+    )
   }
 
   // ----------------
 
   const renderRoundScore = () => {
-    const teamsTotalScore = {};
-    let myTeamId = null;
+    const teamsTotalScore = {}
+    let myTeamId = null
 
     // TODO URGENT . Make this prettier...
     // This is the perfect definition of 🍝 code.
     const getRoundScore = roundIndex => {
-      const teamsPlayersScore = {};
-      const scorePlayers = game.score[roundIndex];
-      const teamsScore = {};
-      let bestPlayer = {};
+      const teamsPlayersScore = {}
+      const scorePlayers = game.score[roundIndex]
+      const teamsScore = {}
+      let bestPlayer = {}
 
       if (scorePlayers) {
         Object.keys(game.teams).forEach(teamId => {
           game.teams[teamId].players.forEach(playerId => {
-            myTeamId = myTeamId || (playerId === profile.id ? teamId : null);
-            const playerScore = scorePlayers[playerId] ? scorePlayers[playerId].length : 0;
+            myTeamId = myTeamId || (playerId === profile.id ? teamId : null)
+            const playerScore = scorePlayers[playerId] ? scorePlayers[playerId].length : 0
             if (playerScore > (bestPlayer.score || 0)) {
               bestPlayer = {
                 id: playerId,
                 name: profiles[playerId].name,
                 score: playerScore,
-              };
+              }
             }
-            teamsScore[teamId] = (teamsScore[teamId] || 0) + playerScore;
+            teamsScore[teamId] = (teamsScore[teamId] || 0) + playerScore
 
             if (!teamsPlayersScore[teamId]) {
-              teamsPlayersScore[teamId] = [];
+              teamsPlayersScore[teamId] = []
             }
 
             teamsPlayersScore[teamId].push({
               id: playerId,
               name: profiles[playerId].name,
               score: playerScore,
-            });
-          });
+            })
+          })
 
-          teamsTotalScore[teamId] = (teamsTotalScore[teamId] || 0) + teamsScore[teamId];
-        });
+          teamsTotalScore[teamId] = (teamsTotalScore[teamId] || 0) + teamsScore[teamId]
+        })
       }
 
-      const arrayOfScores = Object.values(teamsScore);
-      const arrayOfTeamsId = Object.keys(teamsScore);
+      const arrayOfScores = Object.values(teamsScore)
+      const arrayOfTeamsId = Object.keys(teamsScore)
       // const winnerIndex = arrayOfScores.indexOf(Math.max(...arrayOfScores));
       // const winnerId = arrayOfTeamsId[winnerIndex];
 
@@ -330,24 +330,24 @@ export default function Playing(props) {
         bestPlayer,
         teamsScore,
         teamsPlayersScore,
-      };
-    };
+      }
+    }
 
     // REVIEW this DESCRIPTIONS usage...
-    const scores = DESCRIPTIONS.map((desc, index) => getRoundScore(index));
+    const scores = DESCRIPTIONS.map((desc, index) => getRoundScore(index))
 
-    const arrayOfScores = Object.values(teamsTotalScore);
-    const arrayOfTeamsId = Object.keys(teamsTotalScore);
-    const winnerScore = Math.max(...arrayOfScores);
-    const winnerIndex = arrayOfScores.indexOf(winnerScore);
-    const winnerId = arrayOfTeamsId[winnerIndex];
-    const myTeamWon = myTeamId === winnerId;
+    const arrayOfScores = Object.values(teamsTotalScore)
+    const arrayOfTeamsId = Object.keys(teamsTotalScore)
+    const winnerScore = Math.max(...arrayOfScores)
+    const winnerIndex = arrayOfScores.indexOf(winnerScore)
+    const winnerId = arrayOfTeamsId[winnerIndex]
+    const myTeamWon = myTeamId === winnerId
 
-    const title = myTeamWon ? 'You won! 🎉' : 'You lost 💩';
-    const description = myTeamWon ? 'They never stood a change' : 'Yikes.';
-    const isFinalRound = roundIndex === game.settings.roundsCount - 1;
+    const title = myTeamWon ? 'You won! 🎉' : 'You lost 💩'
+    const description = myTeamWon ? 'They never stood a change' : 'Yikes.'
+    const isFinalRound = roundIndex === game.settings.roundsCount - 1
 
-    const sortTeamIdByScore = (teamAId, teamBId) => arrayOfScores[teamBId] - arrayOfScores[teamAId];
+    const sortTeamIdByScore = (teamAId, teamBId) => arrayOfScores[teamBId] - arrayOfScores[teamAId]
 
     return (
       <Fragment>
@@ -374,31 +374,31 @@ export default function Playing(props) {
           </View>
           <View>
             {scores[roundIndex].arrayOfTeamsId.sort(sortTeamIdByScore).map((teamId, index) => {
-              let bestPlayer;
+              let bestPlayer
               // it hurts omgosh...
               if (isFinalRound) {
                 // Join all scores for each round in the team.
                 // Memo is welcome!
-                const thisTeamPlayersTotalScore = {};
+                const thisTeamPlayersTotalScore = {}
                 scores.forEach(round => {
                   round.teamsPlayersScore[teamId].forEach(player => {
                     if (!thisTeamPlayersTotalScore[player.id]) {
-                      thisTeamPlayersTotalScore[player.id] = 0;
+                      thisTeamPlayersTotalScore[player.id] = 0
                     }
-                    thisTeamPlayersTotalScore[player.id] += player.score;
-                  });
-                });
+                    thisTeamPlayersTotalScore[player.id] += player.score
+                  })
+                })
                 const highestScore = Math.max(
                   ...Object.keys(thisTeamPlayersTotalScore).map(id => thisTeamPlayersTotalScore[id])
-                );
+                )
                 const bestPlayerId = Object.keys(thisTeamPlayersTotalScore).find(
                   id => thisTeamPlayersTotalScore[id] === highestScore
-                );
-                bestPlayer = { name: profiles[bestPlayerId].name, score: highestScore };
+                )
+                bestPlayer = { name: profiles[bestPlayerId].name, score: highestScore }
               } else {
-                const thisTeamPlayersScore = scores[roundIndex].teamsPlayersScore[teamId];
-                const highestScore = Math.max(...thisTeamPlayersScore.map(p => p.score));
-                bestPlayer = thisTeamPlayersScore.find(p => p.score === highestScore);
+                const thisTeamPlayersScore = scores[roundIndex].teamsPlayersScore[teamId]
+                const highestScore = Math.max(...thisTeamPlayersScore.map(p => p.score))
+                bestPlayer = thisTeamPlayersScore.find(p => p.score === highestScore)
               }
               return (
                 <CardScore
@@ -409,7 +409,7 @@ export default function Playing(props) {
                   scoreTotal={teamsTotalScore[teamId]}
                   scoreRound={scores[roundIndex].teamsScore[teamId]}
                 />
-              );
+              )
             })}
           </View>
         </Page.Main>
@@ -427,21 +427,21 @@ export default function Playing(props) {
           )}
         </Page.CTAs>
       </Fragment>
-    );
-  };
+    )
+  }
 
   // -------- other stuff
 
-  const isAllWordsGuessed = game.papersGuessed === game.round.wordsLeft?.length;
+  const isAllWordsGuessed = game.papersGuessed === game.round.wordsLeft?.length
 
   // Some memo here would be nice.
   const turnStatus = (() => {
-    const isTurnOn = !hasCountdownStarted || !!countdownSec; // aka: it isn't times up
+    const isTurnOn = !hasCountdownStarted || !!countdownSec // aka: it isn't times up
     // Ai jasus...
     const { 0: teamIx, 1: tPlayerIx, 2: tisOdd } = isTurnOn
       ? { 0: turnTeamIndex, 1: turnPlayerIndex, 2: isOdd }
-      : Papers.getNextTurn();
-    const tPlayerId = game.teams[teamIx].players[tisOdd ? 0 : tPlayerIx];
+      : Papers.getNextTurn()
+    const tPlayerId = game.teams[teamIx].players[tisOdd ? 0 : tPlayerIx]
 
     return {
       title: isTurnOn ? 'Playing now' : 'Next up!',
@@ -450,8 +450,8 @@ export default function Playing(props) {
         avatar: profiles[tPlayerId]?.avatar,
       },
       teamName: game.teams[teamIx].name,
-    };
-  })();
+    }
+  })()
 
   return (
     <Page>
@@ -502,7 +502,7 @@ export default function Playing(props) {
         />
       )}
     </Page>
-  );
+  )
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * *\
@@ -542,7 +542,7 @@ const MyTurnGetReady = ({ description, onStartClick, isOdd }) => (
       <Button onPress={onStartClick}>Start now!</Button>
     </Page.CTAs>
   </Fragment>
-);
+)
 
 const MyTurnGo = ({
   papersTurn,
@@ -560,30 +560,30 @@ const MyTurnGo = ({
   isPaperChanging,
   handlePaperClick,
 }) => {
-  const [isDone, setIsDone] = React.useState(false); // nowords || timesup
+  const [isDone, setIsDone] = React.useState(false) // nowords || timesup
   const stillHasWords =
-    papersTurnCurrent !== null || papersTurn.passed.length > 0 || papersTurn.wordsLeft.length > 0;
-  const doneMsg = !stillHasWords ? 'All papers guessed!' : "Time's up!";
-  const prevCountdownSec = usePrevious(countdownSec);
+    papersTurnCurrent !== null || papersTurn.passed.length > 0 || papersTurn.wordsLeft.length > 0
+  const doneMsg = !stillHasWords ? 'All papers guessed!' : "Time's up!"
+  const prevCountdownSec = usePrevious(countdownSec)
 
   React.useLayoutEffect(() => {
     // Use prevCountdownSec to avoid a false positive
     // when the component mounts (3, 2, 1...)
     if (countdownSec === 0 && !!prevCountdownSec) {
-      setIsDone(true);
-      setTimeout(resetIsDone, 1500);
+      setIsDone(true)
+      setTimeout(resetIsDone, 1500)
     }
-  }, [countdownSec, prevCountdownSec]);
+  }, [countdownSec, prevCountdownSec])
 
   React.useLayoutEffect(() => {
     if (!stillHasWords) {
-      setIsDone(true);
-      setTimeout(resetIsDone, 1500);
+      setIsDone(true)
+      setTimeout(resetIsDone, 1500)
     }
-  }, [stillHasWords]);
+  }, [stillHasWords])
 
   function resetIsDone() {
-    setIsDone(false);
+    setIsDone(false)
   }
 
   if (isDone) {
@@ -594,7 +594,7 @@ const MyTurnGo = ({
         </Text>
         <Text style={[Theme.typography.h1, Styles.go_done_msg]}>{doneMsg}</Text>
       </Page.Main>
-    );
+    )
   }
 
   if (!isDone && (!stillHasWords || countdownSec === 0)) {
@@ -606,7 +606,7 @@ const MyTurnGo = ({
         onFinish={handleFinishTurnClick}
         getPaperByKey={getPaperByKey}
       />
-    );
+    )
   }
 
   if (isCount321go) {
@@ -616,7 +616,7 @@ const MyTurnGo = ({
           {countdownSec - initialTimerSec}
         </Text>
       </Page.Main>
-    );
+    )
   }
 
   return (
@@ -706,8 +706,8 @@ const MyTurnGo = ({
         )}
       </Page.CTAs>
     </Fragment>
-  );
-};
+  )
+}
 
 const OthersTurn = ({
   description,
@@ -789,8 +789,8 @@ const OthersTurn = ({
         )}
       </Page.CTAs>
     </Fragment>
-  );
-};
+  )
+}
 
 const TurnStatus = ({ title, player, teamName }) => (
   <View style={Styles.tst}>
@@ -803,7 +803,7 @@ const TurnStatus = ({ title, player, teamName }) => (
       </View>
     </View>
   </View>
-);
+)
 
 const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, getPaperByKey }) => {
   return (
@@ -863,14 +863,14 @@ const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, getPaperByKey })
         <Button onPress={onFinish}>Finish my turn</Button>
       </Page.CTAs>
     </Fragment>
-  );
-};
+  )
+}
 
 const placeMap = {
   0: '1st place',
   1: '2nd place',
   3: '3rd place', // REVIEW - Maximum 3 teams
-};
+}
 
 const CardScore = ({ index, teamName, scoreTotal, scoreRound, bestPlayer }) => (
   <View style={Styles.fscore_item} key={index}>
@@ -897,17 +897,17 @@ const CardScore = ({ index, teamName, scoreTotal, scoreRound, bestPlayer }) => (
       <Text style={Theme.typography.small}>+{scoreRound} this round</Text>
     </View>
   </View>
-);
+)
 
 const EmojiRain = ({ type }) => {
-  const emojis = type === 'winner' ? ['🎉', '🔥', '💖', '😃'] : ['🤡', '💩', '👎', '😓'];
-  const count = Array.from(Array(20), () => 1);
+  const emojis = type === 'winner' ? ['🎉', '🔥', '💖', '😃'] : ['🤡', '💩', '👎', '😓']
+  const count = Array.from(Array(20), () => 1)
   // const [fadeAnim] = React.useState(new Animated.Value(0)); // Initial value for opacity: 0
   // const [rainAnim] = React.useState(new Animated.Value(0)); // Initial value for opacity: 0
 
-  const vw = Dimensions.get('window').width / 100;
-  const vh = Dimensions.get('window').height / 100;
-  const col = 5;
+  const vw = Dimensions.get('window').width / 100
+  const vh = Dimensions.get('window').height / 100
+  const col = 5
 
   // TODO animations.
   // React.useEffect(() => {
@@ -945,5 +945,5 @@ const EmojiRain = ({ type }) => {
         ))}
       </Animated.View>
     </View>
-  );
-};
+  )
+}

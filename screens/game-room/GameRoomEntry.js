@@ -1,6 +1,6 @@
 import React from 'react'
-import { Text } from 'react-native'
 import PropTypes from 'prop-types'
+import { Text } from 'react-native'
 // import * as WebBrowser from 'expo-web-browser'; // WHAT'S THIS?
 
 import { createStackNavigator } from '@react-navigation/stack'

@@ -1,6 +1,6 @@
-import * as firebase from 'firebase';
-import PubSub from 'pubsub-js';
-import { slugString } from '@constants/utils.js';
+import * as firebase from 'firebase'
+import PubSub from 'pubsub-js'
+import { slugString } from '@constants/utils.js'
 
 // Fixing a bug with firebase file upload put() _uploadAvatar()
 // https://forums.expo.io/t/imagepicker-base64-to-firebase-storage-problem/1415/11
@@ -18,10 +18,10 @@ const firebaseConfig = {
   messagingSenderId: '381121722531',
   appId: '1:381121722531:web:5d88b1a0b418e4e8c8e716',
   measurementId: 'G-BFBZ4MNDX4',
-};
+}
 
-let LOCAL_PROFILE = {}; // not sure if this is good.
-let DB; // firebase database
+let LOCAL_PROFILE = {} // not sure if this is good.
+let DB // firebase database
 
 const PUBLIC_API = {
   on,
@@ -45,48 +45,48 @@ const PUBLIC_API = {
   setPapersGuessed,
   finishTurn,
   setRound,
-};
-
-export function serverReconnect({ id, name, gameId }) {
-  if (firebase.apps.length > 0) {
-    // Let's REVIEW this odd scenario later...
-    console.log('⚙️ serverReconnect(), already connected!');
-    return { socket: PUBLIC_API };
-  }
-
-  console.log('⚙️ serverReconnect() - doesnt exist!', LOCAL_PROFILE.id, id);
-
-  const API = init();
-
-  return API;
 }
 
+// export function serverReconnect({ id, name, gameId }) {
+//   if (firebase.apps.length > 0) {
+//     // Let's REVIEW this odd scenario later...
+//     console.log('⚙️ serverReconnect(), already connected!')
+//     return { socket: PUBLIC_API }
+//   }
+
+//   console.log('⚙️ serverReconnect() - doesnt exist!', LOCAL_PROFILE.id, id)
+
+//   const API = init()
+
+//   return API
+// }
+
 export default function init(options) {
-  console.log('⚙️ init()');
+  console.log('⚙️ init()')
 
   if (firebase.apps.length > 0) {
-    console.warn('Already initialized!');
+    console.warn('Already initialized!')
   } else {
-    firebase.initializeApp(firebaseConfig);
+    firebase.initializeApp(firebaseConfig)
   }
 
-  DB = firebase.database();
+  DB = firebase.database()
 
   firebase.auth().onAuthStateChanged(async function (user) {
     if (user) {
-      LOCAL_PROFILE.id = user.uid;
-      LOCAL_PROFILE.isAfk = false;
-      console.log('⚙️ Signed!', LOCAL_PROFILE.id);
+      LOCAL_PROFILE.id = user.uid
+      LOCAL_PROFILE.isAfk = false
+      console.log('⚙️ Signed!', LOCAL_PROFILE.id)
 
-      await updateProfile(LOCAL_PROFILE);
-      PubSub.publish('profile.signed', LOCAL_PROFILE.id);
+      await updateProfile(LOCAL_PROFILE)
+      PubSub.publish('profile.signed', LOCAL_PROFILE.id)
     } else {
       // User is signed out.
       // ...
     }
-  });
+  })
 
-  return PUBLIC_API;
+  return PUBLIC_API
 }
 
 /**
@@ -99,7 +99,7 @@ export default function init(options) {
  * - (id) - the userid from firebase.
  */
 function on(topic, cb) {
-  PubSub.subscribe(topic, cb);
+  PubSub.subscribe(topic, cb)
 }
 
 // ============== AUTH / PROFILE
@@ -108,19 +108,19 @@ function on(topic, cb) {
  * Do Auth. Needed before accessing to a game
  */
 function signIn({ name, avatar }, cb) {
-  LOCAL_PROFILE = { name, avatar };
+  LOCAL_PROFILE = { name, avatar }
 
   firebase
     .auth()
     .signInAnonymously()
     .catch(function (error) {
-      console.error('signInAnonymously error:', error);
-      cb(null, error);
-    });
+      console.error('signInAnonymously error:', error)
+      cb(null, error)
+    })
 }
 
 async function _uploadAvatar({ path, fileName, avatar }) {
-  console.log(':: _uploadAvatar', path, fileName);
+  console.log(':: _uploadAvatar', path, fileName)
 
   // const base64Match = avatar.match(/image\/(jpeg|jpg|gif|png)/);
   // const imgMatched = avatar.match(/\.(jpeg|jpg|gif|png)/);
@@ -137,10 +137,10 @@ async function _uploadAvatar({ path, fileName, avatar }) {
   // https://github.com/aaronksaunders/expo-rn-firebase-image-upload/blob/master/README.md
   // 🐛 Still not working properly: https://github.com/facebook/react-native/issues/22681
   // It seems it failes "Network request failed" when the image is too big. Hum...
-  const response = await fetch(avatar);
-  const blob = await response.blob();
-  const ref = await firebase.storage().ref(path).child(fileName);
-  const task = ref.put(blob); //, metadata);
+  const response = await fetch(avatar)
+  const blob = await response.blob()
+  const ref = await firebase.storage().ref(path).child(fileName)
+  const task = ref.put(blob) //, metadata);
 
   return new Promise((resolve, reject) => {
     task.on(
@@ -148,11 +148,11 @@ async function _uploadAvatar({ path, fileName, avatar }) {
       snapshot => {},
       error => reject(error),
       () => {
-        const downloadURL = task.snapshot.ref.getDownloadURL();
-        resolve(downloadURL);
+        const downloadURL = task.snapshot.ref.getDownloadURL()
+        resolve(downloadURL)
       }
-    );
-  });
+    )
+  })
 }
 
 /**
@@ -164,13 +164,13 @@ async function _uploadAvatar({ path, fileName, avatar }) {
  * @param {Object} profile.gameId - The last gameid they tried to access
  */
 async function updateProfile(profile) {
-  console.log('⚙️ updateProfile()', profile);
-  const { avatar, ...theProfile } = profile;
+  console.log('⚙️ updateProfile()', profile)
+  const { avatar, ...theProfile } = profile
 
   try {
-    const isHTTPLink = avatar && avatar.indexOf('https://') === 0;
+    const isHTTPLink = avatar && avatar.indexOf('https://') === 0
     if (avatar && isHTTPLink) {
-      console.log('avatar upload ignored because its a link');
+      console.log('avatar upload ignored because its a link')
     }
     if (avatar && !isHTTPLink) {
       try {
@@ -178,26 +178,26 @@ async function updateProfile(profile) {
           path: `users/${LOCAL_PROFILE.id}/`,
           fileName: 'avatar',
           avatar,
-        });
-        theProfile.avatar = downloadURL;
-        LOCAL_PROFILE.avatar = downloadURL;
-        console.log(':: avatar uploaded!', downloadURL);
-        PubSub.publish('profile.avatarSet', downloadURL);
+        })
+        theProfile.avatar = downloadURL
+        LOCAL_PROFILE.avatar = downloadURL
+        console.log(':: avatar uploaded!', downloadURL)
+        PubSub.publish('profile.avatarSet', downloadURL)
       } catch (error) {
-        console.warn(':: avatar upload failed!', error);
-        theProfile.avatar = null; // delete. Maybe save base64 as fallback?
+        console.warn(':: avatar upload failed!', error)
+        theProfile.avatar = null // delete. Maybe save base64 as fallback?
       }
     }
     if (avatar === null) {
-      theProfile.avatar = null; // so avatar can be deleted from DB
+      theProfile.avatar = null // so avatar can be deleted from DB
       // TODO - delete avatar from storage.
     }
-    DB.ref('users/' + LOCAL_PROFILE.id).update(theProfile);
+    DB.ref('users/' + LOCAL_PROFILE.id).update(theProfile)
   } catch (error) {
-    console.warn('⚙️ updateProfile failed!', error);
+    console.warn('⚙️ updateProfile failed!', error)
   }
 
-  return theProfile;
+  return theProfile
 }
 
 /**
@@ -209,14 +209,14 @@ function resetProfile(id) {
     name: null,
     avatar: null, // TODO - delete avatar from storage
     gameId: null,
-  });
+  })
 }
 
 /**
  *
  */
 function getUser(userId) {
-  console.log('⚙️ getUser()', LOCAL_PROFILE.id, userId);
+  console.log('⚙️ getUser()', LOCAL_PROFILE.id, userId)
 
   // var userId = firebase.auth().currentUser.uid;
   // return firebase
@@ -269,27 +269,27 @@ const gameInitialState = ({ id, name, creatorId }) => ({
     words: 10,
     time_ms: 60000, // 60s
   },
-});
+})
 
 /**
  *
  * @param {*} gameName
  */
 async function createGame(gameName) {
-  console.log(`⚙️ createGame: ${gameName}`, { LOCAL_PROFILE });
-  const gameId = slugString(gameName); // REVIEW this with @mmbotelho
+  console.log(`⚙️ createGame: ${gameName}`, { LOCAL_PROFILE })
+  const gameId = slugString(gameName) // REVIEW this with @mmbotelho
   // Verify if game exists...
-  const gameRef = DB.ref(`games/${gameId}`);
-  const game = await gameRef.once('value');
+  const gameRef = DB.ref(`games/${gameId}`)
+  const game = await gameRef.once('value')
 
   if (game.exists()) {
-    throw new Error('exists');
+    throw new Error('exists')
   }
 
   // Verify if we can create the game...
-  const id = LOCAL_PROFILE.id;
+  const id = LOCAL_PROFILE.id
   if (!id) {
-    throw new Error('notSigned');
+    throw new Error('notSigned')
   }
 
   // Create the game!
@@ -299,63 +299,63 @@ async function createGame(gameName) {
       name: gameName,
       creatorId: LOCAL_PROFILE.id,
     })
-  );
+  )
 
   // Prevent duplicate subs
-  PubSub.unsubscribe('game');
-  await _unsubGame(gameId);
+  PubSub.unsubscribe('game')
+  await _unsubGame(gameId)
 
   setTimeout(() => {
-    _pubGame(gameId);
-  }, 0);
+    _pubGame(gameId)
+  }, 0)
 
-  return gameId;
+  return gameId
 }
 
 /**
  *
  */
 async function joinGame(gameName) {
-  console.log(`⚙️ joinGame: ${gameName}`);
-  const gameId = slugString(gameName); // REVIEW this with @mmbotelho
+  console.log(`⚙️ joinGame: ${gameName}`)
+  const gameId = slugString(gameName) // REVIEW this with @mmbotelho
   // Verify if game exists...
-  const gameRef = DB.ref(`games/${gameId}`);
-  const game = await gameRef.once('value');
+  const gameRef = DB.ref(`games/${gameId}`)
+  const game = await gameRef.once('value')
 
   if (!game.exists()) {
-    throw new Error('notFound');
+    throw new Error('notFound')
   }
 
   // Verify if we can access the game...
-  const id = LOCAL_PROFILE.id;
+  const id = LOCAL_PROFILE.id
   if (!id) {
-    throw new Error('notSigned');
+    throw new Error('notSigned')
   }
 
-  const alreadyStarted = game.child('alreadyStarted').val();
+  const alreadyStarted = game.child('alreadyStarted').val()
 
-  const gamePlayers = game.child('players');
-  const ImInTheGame = gamePlayers.child(id).val();
+  const gamePlayers = game.child('players')
+  const ImInTheGame = gamePlayers.child(id).val()
 
   if (alreadyStarted && !ImInTheGame) {
     // After the game starts, new players cannot join unless
     // they are already part of the game (were isAfk)
-    throw new Error('alreadyStarted');
+    throw new Error('alreadyStarted')
   }
 
   await DB.ref(`games/${gameId}/players/${id}`).set({
     isAfk: false,
-  });
+  })
 
   // Prevent duplicate subs
-  PubSub.unsubscribe('game');
-  await _unsubGame(gameId);
+  PubSub.unsubscribe('game')
+  await _unsubGame(gameId)
 
   setTimeout(() => {
-    _pubGame(gameId);
-  }, 0);
+    _pubGame(gameId)
+  }, 0)
 
-  return gameId;
+  return gameId
 }
 
 /**
@@ -363,38 +363,38 @@ async function joinGame(gameName) {
  * @param {String} gameId
  */
 function _pubGame(gameId) {
-  LOCAL_PROFILE.gameId = gameId;
-  console.log('⚙️ _pubGame', gameId);
+  LOCAL_PROFILE.gameId = gameId
+  console.log('⚙️ _pubGame', gameId)
 
   // Subscribe to initial game set!
   DB.ref(`games/${gameId}`).once('value', async function (data) {
-    const game = data.val();
+    const game = data.val()
 
     // Retrieve game players' profiles!
-    const profiles = {};
+    const profiles = {}
     for (const playerId in game.players) {
       if (playerId === LOCAL_PROFILE.id) {
         profiles[playerId] = {
           name: LOCAL_PROFILE.name,
           avatar: LOCAL_PROFILE.avatar,
-        };
+        }
       } else {
-        const profile = await DB.ref(`users/${playerId}`).once('value');
-        profiles[playerId] = profile.val();
+        const profile = await DB.ref(`users/${playerId}`).once('value')
+        profiles[playerId] = profile.val()
       }
     }
 
     // Set the initial state of the game.
-    console.log('⚙️ pub.game.set');
-    PubSub.publish('game.set', { game, profiles });
+    console.log('⚙️ pub.game.set')
+    PubSub.publish('game.set', { game, profiles })
 
-    const DB_PLAYERS = DB.ref(`games/${gameId}/players`);
+    const DB_PLAYERS = DB.ref(`games/${gameId}/players`)
 
     // Sub to players status
     DB_PLAYERS.on('child_added', async function (data) {
-      const id = data.key;
-      const val = data.val();
-      const profile = await DB.ref(`users/${id}`).once('value');
+      const id = data.key
+      const val = data.val()
+      const profile = await DB.ref(`users/${id}`).once('value')
 
       // https://stackoverflow.com/questions/18270995/how-to-retrieve-only-new-data
       // OPTMIZE - Throttle this and send only 1 big publish.
@@ -402,142 +402,143 @@ function _pubGame(gameId) {
         id,
         info: val,
         profile: profile.val(),
-      });
+      })
 
       DB.ref(`users/${id}/isAfk`).on('value', data => {
-        console.log('⚙️ player is afk!', id, data.val());
+        console.log('⚙️ player is afk!', id, data.val())
         PubSub.publish('game.players.changed', {
           id,
           info: {
             isAfk: data.val(),
           },
-        });
-      });
-    });
+        })
+      })
+    })
     DB_PLAYERS.on('child_removed', function (data) {
-      const id = data.key;
+      const id = data.key
 
-      DB.ref(`users/${id}/isAfk`).off('value');
+      DB.ref(`users/${id}/isAfk`).off('value')
 
       PubSub.publish('game.players.removed', {
         id,
         newAdmin: null, // TODO
-      });
-    });
+      })
+    })
     DB_PLAYERS.on('child_changed', function (data) {
-      const id = data.key;
+      const id = data.key
       PubSub.publish('game.players.changed', {
         id,
         info: data.val()[id],
-      });
-    });
+      })
+    })
 
     // Sub to teams status
     DB.ref(`games/${gameId}/teams`).on('value', async function (data) {
-      const teams = data.val();
-      PubSub.publish('game.teams.set', teams);
-    });
+      const teams = data.val()
+      PubSub.publish('game.teams.set', teams)
+    })
 
     // Sub to words added
     DB.ref(`games/${gameId}/words`).on('child_added', async function (data) {
       PubSub.publish('game.words.set', {
         pId: data.key,
         words: data.val(),
-      });
-    });
+      })
+    })
 
     DB.ref(`games/${gameId}/words`).on('child_changed', async function (data) {
       PubSub.publish('game.words.set', {
         pId: data.key,
         words: data.val(),
-      });
-    });
+      })
+    })
 
     // Sub to game starting
     DB.ref(`games/${gameId}/hasStarted`).on('value', async function (data) {
-      PubSub.publish('game.hasStarted', data.val());
-    });
+      PubSub.publish('game.hasStarted', data.val())
+    })
 
     // Sub to round status - OPTIMIZE?
     DB.ref(`games/${gameId}/round`).on('value', async function (data) {
-      PubSub.publish('game.round', data.val());
-    });
+      PubSub.publish('game.round', data.val())
+    })
 
     // Sub to round status - OPTIMIZE?
     DB.ref(`games/${gameId}/score`).on('value', async function (data) {
-      PubSub.publish('game.score', data.val());
-    });
+      PubSub.publish('game.score', data.val())
+    })
 
     DB.ref(`games/${gameId}/papersGuessed`).on('value', async function (data) {
-      PubSub.publish('game.papersGuessed', data.val());
-    });
-  });
+      PubSub.publish('game.papersGuessed', data.val())
+    })
+  })
 
   // Prepare in case we get offline.
-  const isAfkRef = firebase.database().ref(`users/${LOCAL_PROFILE.id}/isAfk`);
-  isAfkRef.onDisconnect().set(true); // TODO subscribe
+  const isAfkRef = firebase.database().ref(`users/${LOCAL_PROFILE.id}/isAfk`)
+  isAfkRef.onDisconnect().set(true) // TODO subscribe
+  // TODO/BUG isAFK sometimes is a negative positive. dunno why
 }
 
 /**
  *
  */
 async function leaveGame({ wasKicked = false } = {}) {
-  console.log('⚙️ leaveGame()', { wasKicked }, LOCAL_PROFILE.id);
-  const gameId = LOCAL_PROFILE.gameId;
+  console.log('⚙️ leaveGame()', { wasKicked }, LOCAL_PROFILE.id)
+  const gameId = LOCAL_PROFILE.gameId
 
   if (!gameId) {
-    throw new Error('gameIdMissing');
+    throw new Error('gameIdMissing')
   }
 
-  const gameRef = DB.ref(`games/${gameId}`);
-  const game = await gameRef.once('value');
+  const gameRef = DB.ref(`games/${gameId}`)
+  const game = await gameRef.once('value')
 
   if (!game.exists()) {
-    throw new Error('notFound');
+    throw new Error('notFound')
   }
 
-  await DB.ref(`games/${gameId}/players/${LOCAL_PROFILE.id}`).remove();
+  await DB.ref(`games/${gameId}/players/${LOCAL_PROFILE.id}`).remove()
 
-  PubSub.publish('game.leave');
+  PubSub.publish('game.leave')
 
-  await _unsubGame(gameId);
+  await _unsubGame(gameId)
 
   setTimeout(() => {
-    console.log('⚙️ Unsubscribe game');
-    PubSub.unsubscribe('game');
+    console.log('⚙️ Unsubscribe game')
+    PubSub.unsubscribe('game')
 
     // A kickedout player cannot remove the game.
     // It means there's still someone left.
     if (!wasKicked && Object.keys(game.val().players).length === 1) {
-      console.log(':: last player - remove game');
-      DB.ref(`games/${gameId}`).remove();
+      console.log(':: last player - remove game')
+      DB.ref(`games/${gameId}`).remove()
     }
-  }, 0); // Q: Why did I use timeout here?
+  }, 0) // Q: Why did I use timeout here?
 }
 
 async function _unsubGame(gameId) {
-  console.log('⚙️ _unsubGame()', gameId);
+  console.log('⚙️ _unsubGame()', gameId)
 
   // Disconnect from group
-  const DB_PLAYERS = DB.ref(`games/${gameId}/players`);
+  const DB_PLAYERS = DB.ref(`games/${gameId}/players`)
 
-  DB_PLAYERS.off('child_added');
-  DB_PLAYERS.off('child_removed');
-  DB_PLAYERS.off('child_changed');
+  DB_PLAYERS.off('child_added')
+  DB_PLAYERS.off('child_removed')
+  DB_PLAYERS.off('child_changed')
 
-  DB.ref(`games/${gameId}/teams`).off('value');
+  DB.ref(`games/${gameId}/teams`).off('value')
 
-  DB.ref(`games/${gameId}/words`).off('child_added');
-  DB.ref(`games/${gameId}/words`).off('child_changed');
+  DB.ref(`games/${gameId}/words`).off('child_added')
+  DB.ref(`games/${gameId}/words`).off('child_changed')
 
-  DB.ref(`games/${gameId}/hasStarted`).off('value');
-  DB.ref(`games/${gameId}/round`).off('value');
-  DB.ref(`games/${gameId}/score`).off('value');
+  DB.ref(`games/${gameId}/hasStarted`).off('value')
+  DB.ref(`games/${gameId}/round`).off('value')
+  DB.ref(`games/${gameId}/score`).off('value')
 
-  const players = await DB.ref(`games/${gameId}/players`).once('value');
+  const players = await DB.ref(`games/${gameId}/players`).once('value')
 
   for (const playerId in players.val()) {
-    DB.ref(`users/${playerId}/isAfk`).off('value');
+    DB.ref(`users/${playerId}/isAfk`).off('value')
   }
 }
 
@@ -545,40 +546,40 @@ async function _unsubGame(gameId) {
  *
  */
 async function removePlayer(playerId) {
-  const gameId = LOCAL_PROFILE.gameId;
-  console.log('⚙️ removePlayer()', gameId, playerId);
+  const gameId = LOCAL_PROFILE.gameId
+  console.log('⚙️ removePlayer()', gameId, playerId)
 
   if (!gameId) {
-    throw new Error('gameIdMissing');
+    throw new Error('gameIdMissing')
   }
 
-  const gameRef = DB.ref(`games/${gameId}`);
-  const game = await gameRef.once('value');
+  const gameRef = DB.ref(`games/${gameId}`)
+  const game = await gameRef.once('value')
 
   if (!game.exists()) {
-    throw new Error('notFound');
+    throw new Error('notFound')
   }
 
-  console.log(':: removing player');
-  await DB.ref(`games/${gameId}/players/${playerId}`).remove();
+  console.log(':: removing player')
+  await DB.ref(`games/${gameId}/players/${playerId}`).remove()
 }
 /**
  *
  */
 async function setTeams(teams) {
-  console.log('⚙️ setTeams()');
-  const gameId = LOCAL_PROFILE.gameId;
+  console.log('⚙️ setTeams()')
+  const gameId = LOCAL_PROFILE.gameId
 
-  await DB.ref(`games/${gameId}/teams`).set(teams);
+  await DB.ref(`games/${gameId}/teams`).set(teams)
 }
 
 /**
  *
  */
 async function setWords(words) {
-  console.log('⚙️ setWords()', words);
-  const gameId = LOCAL_PROFILE.gameId;
-  const playerId = LOCAL_PROFILE.id;
+  console.log('⚙️ setWords()', words)
+  const gameId = LOCAL_PROFILE.gameId
+  const playerId = LOCAL_PROFILE.id
 
   /*
   To save memory in DB let's store the words as key:value. The simple key
@@ -591,75 +592,75 @@ async function setWords(words) {
   }
   */
 
-  const wordsOnce = await DB.ref(`games/${gameId}/words/_all`).once('value');
-  const wordsStored = wordsOnce.val() || [];
-  const wordsCount = wordsStored.length;
-  const wordsAsKeys = words.map((w, index) => index + wordsCount);
+  const wordsOnce = await DB.ref(`games/${gameId}/words/_all`).once('value')
+  const wordsStored = wordsOnce.val() || []
+  const wordsCount = wordsStored.length
+  const wordsAsKeys = words.map((w, index) => index + wordsCount)
 
   // - 16:05 BUG - Can't replicate this error! 🐛👀
   // [Unhandled promise rejection: Error: Reference.set failed: First argument contains a function in property 'games.ggg.words.dHwRWKyBdlSNGvKczyyI9coIoRD2.0._targetInst.stateNode._children.0.viewConfig.validAttributes.style.shadowColor.process' with contents = function processColor(color) {]
-  await DB.ref(`games/${gameId}/words/_all`).set([...wordsStored, ...words]);
-  await DB.ref(`games/${gameId}/words/${playerId}`).set(wordsAsKeys);
+  await DB.ref(`games/${gameId}/words/_all`).set([...wordsStored, ...words])
+  await DB.ref(`games/${gameId}/words/${playerId}`).set(wordsAsKeys)
 }
 
 /**
  * a shortcut for dev only.
  */
 async function setWordsForEveryone(allWords) {
-  console.log('⚙️ setWordsForEveyone()');
-  const gameId = LOCAL_PROFILE.gameId;
+  console.log('⚙️ setWordsForEveyone()')
+  const gameId = LOCAL_PROFILE.gameId
 
-  await DB.ref(`games/${gameId}/words`).set(allWords);
+  await DB.ref(`games/${gameId}/words`).set(allWords)
 }
 
 /**
  *
  */
 async function startGame(roundStatus) {
-  console.log('⚙️ startGame()');
-  const gameId = LOCAL_PROFILE.gameId;
+  console.log('⚙️ startGame()')
+  const gameId = LOCAL_PROFILE.gameId
 
-  await DB.ref(`games/${gameId}/round`).set(roundStatus);
-  await DB.ref(`games/${gameId}/hasStarted`).set(true);
+  await DB.ref(`games/${gameId}/round`).set(roundStatus)
+  await DB.ref(`games/${gameId}/hasStarted`).set(true)
 }
 
 /**
  *
  */
 async function startTurn(words) {
-  console.log('⚙️ startTurn()');
-  const gameId = LOCAL_PROFILE.gameId;
+  console.log('⚙️ startTurn()')
+  const gameId = LOCAL_PROFILE.gameId
 
   // The client is responsible for the countdown and then
   // it sends 'finishTurn()' with score. It saves on IO events for each second.
-  await DB.ref(`games/${gameId}/round/status`).set(Date.now());
+  await DB.ref(`games/${gameId}/round/status`).set(Date.now())
 }
 
 function setPapersGuessed(count) {
-  console.log('⚙️ setPapersGuessed()', count);
-  const gameId = LOCAL_PROFILE.gameId;
+  console.log('⚙️ setPapersGuessed()', count)
+  const gameId = LOCAL_PROFILE.gameId
 
-  DB.ref(`games/${gameId}/papersGuessed`).set(count);
+  DB.ref(`games/${gameId}/papersGuessed`).set(count)
 }
 
 /**
  *
  */
 async function finishTurn({ playerScore, roundStatus }) {
-  console.log('⚙️ finishTurn()');
-  const gameId = LOCAL_PROFILE.gameId;
+  console.log('⚙️ finishTurn()')
+  const gameId = LOCAL_PROFILE.gameId
 
-  await DB.ref(`games/${gameId}/score/${roundStatus.current}`).update(playerScore);
-  await DB.ref(`games/${gameId}/round`).update(roundStatus);
-  await DB.ref(`games/${gameId}/papersGuessed`).set(0);
+  await DB.ref(`games/${gameId}/score/${roundStatus.current}`).update(playerScore)
+  await DB.ref(`games/${gameId}/round`).update(roundStatus)
+  await DB.ref(`games/${gameId}/papersGuessed`).set(0)
 }
 
 /**
  *
  */
 async function setRound(roundStatus) {
-  console.log('⚙️ startNextRound()');
-  const gameId = LOCAL_PROFILE.gameId;
+  console.log('⚙️ startNextRound()')
+  const gameId = LOCAL_PROFILE.gameId
 
-  await DB.ref(`games/${gameId}/round`).set(roundStatus);
+  await DB.ref(`games/${gameId}/round`).set(roundStatus)
 }

@@ -1,8 +1,8 @@
-import { Dimensions, StyleSheet } from 'react-native';
-import * as Theme from '@theme';
+import { Dimensions, StyleSheet } from 'react-native'
+import * as Theme from '@theme'
 
-const vw = Dimensions.get('window').width / 100;
-const vh = Dimensions.get('window').height / 100;
+const vw = Dimensions.get('window').width / 100
+const vh = Dimensions.get('window').height / 100
 
 export default StyleSheet.create({
   header: {
@@ -132,4 +132,4 @@ export default StyleSheet.create({
     paddingVertical: 2,
     borderRadius: 10,
   },
-});
+})

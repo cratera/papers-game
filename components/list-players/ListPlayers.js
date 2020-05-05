@@ -63,10 +63,12 @@ export default function ListPlayers({ players, enableKickout, ...otherProps }) {
             <View style={Styles.who}>
               <Avatar src={avatar} hasMargin />
               <View>
-                <Text style={Theme.typography.body}>{name}</Text>
-                <Text style={Theme.typography.small}>
+                <Text style={Theme.typography.body}>
+                  {name}
+                  {playerId === profileId && <Text> (you)</Text>}
+                </Text>
+                <Text style={[Theme.typography.small, Theme.typography.seconday]}>
                   {playerId === game.creatorId ? 'Admin ' : ''}
-                  {playerId === profileId ? '(you) ' : ''}
                   {isAfk && (
                     <Text style={[Theme.typography.small, { color: Theme.colors.primary }]}>
                       Disconnected
