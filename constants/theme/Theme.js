@@ -41,6 +41,11 @@ export const typography = StyleSheet.create({
     fontSize: 14,
     color: colors.grayMedium,
   },
+  bold: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: colors.grayDark,
+  },
   italic: {
     color: colors.grayMedium,
     fontStyle: 'italic',

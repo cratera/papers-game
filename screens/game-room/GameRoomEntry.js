@@ -1,6 +1,6 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import { Text } from 'react-native'
+import PropTypes from 'prop-types'
 // import * as WebBrowser from 'expo-web-browser'; // WHAT'S THIS?
 
 import { createStackNavigator } from '@react-navigation/stack'
@@ -16,7 +16,7 @@ import Button from '@components/button'
 
 const Stack = createStackNavigator()
 
-export default function Room({ navigation }) {
+export default function GameRoom({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const { profile, game } = Papers.state
   const { id: gameId } = game || {}
@@ -97,11 +97,13 @@ export default function Room({ navigation }) {
   )
 }
 
-Room.propTypes = {
-  navigation: PropTypes.object,
+GameRoom.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func, // (componentName: String)
+  }),
 }
 
-Room.navigationOptions = {
+GameRoom.navigationOptions = {
   header: null,
 }
 
