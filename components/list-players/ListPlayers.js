@@ -1,15 +1,16 @@
-import React from 'react';
-import { View, Text, Image, Platform } from 'react-native';
+import React from 'react'
+import PropTypes from 'prop-types'
+import { View, Text, Image, Platform } from 'react-native'
 
-import imgWritting from '@assets/images/writting.gif';
-import imgDone from '@assets/images/done.gif';
+import imgWritting from '@assets/images/writting.gif'
+import imgDone from '@assets/images/done.gif'
 
-import PapersContext from '@store/PapersContext.js';
-import Button from '@components/button';
-import Avatar from '@components/avatar';
+import PapersContext from '@store/PapersContext.js'
+import Button from '@components/button'
+import Avatar from '@components/avatar'
 
-import Styles from './ListPlayersStyles';
-import * as Theme from '@theme';
+import Styles from './ListPlayersStyles'
+import * as Theme from '@theme'
 
 const imgMap = {
   writting: {
@@ -20,52 +21,43 @@ const imgMap = {
     src: imgDone,
     alt: 'All papers done',
   },
-};
+}
 
-export default function ListPlayers({ players, enableKickout = false, ...otherProps }) {
-  const Papers = React.useContext(PapersContext);
-  const { profile, profiles, game } = Papers.state;
-  const profileId = profile.id;
-  const profileIsAdmin = game.creatorId === profileId;
-  const [isKicking, setIsKicking] = React.useState(null); // playerId
-
-  async function handleKickOut(playerId) {
-    const playerName = profiles[playerId].name;
-    if (
-      Platform.OS !== 'web' ||
-      window.confirm(`You are about to kick "${playerName}". Are you sure?`)
-    ) {
-      setIsKicking(playerId);
-      await Papers.removePlayer(playerId);
-      setIsKicking(null);
-    }
-  }
+export default function ListPlayers({ players, enableKickout, ...otherProps }) {
+  const Papers = React.useContext(PapersContext)
+  const [isKicking, setIsKicking] = React.useState(null) // playerId
+  const { profile, profiles, game } = Papers.state
+  const profileId = profile.id
+  const profileIsAdmin = game.creatorId === profileId
+  const playersSorted = React.useMemo(() => players.sort(), [players]) // TODO - sort this by name #F65
 
   return (
     <View style={Styles.list} {...otherProps}>
-      {players.map((playerId, i) => {
-        const isLastChild = i === players.length;
+      {playersSorted.map((playerId, i) => {
+        const isLastChild = i === players.length
+
         if (!game.players[playerId]) {
           // TODO/UX - What should we do in this case?
-          const playerName = profiles[playerId]?.name || playerId;
+          const playerName = profiles[playerId]?.name || playerId
           return (
             <View key={playerId} style={[Styles.item, isLastChild && Styles.item_isLast]}>
               <View style={Styles.who}>
                 <Avatar hasMargin />
                 <View>
                   <Text style={Theme.typography.body}>{playerName}</Text>
-                  <Text style={Theme.typography.seconday}>{' (Left) '}</Text>
+                  <Text style={Theme.typography.seconday}>{' Left '}</Text>
                 </View>
               </View>
             </View>
-          );
+          )
         }
 
-        const { avatar, name } = profiles[playerId] || {};
-        const { isAfk } = game.players[playerId];
-        const wordsSubmitted = game.words && game.words[playerId];
-        const status = game.teams && (!wordsSubmitted ? 'writting' : 'done');
-        const imgInfo = status && imgMap[status];
+        const { avatar, name } = profiles[playerId] || {}
+        const { isAfk } = game.players[playerId]
+        const wordsSubmitted = game.words && game.words[playerId]
+        const status = game.teams && (!wordsSubmitted ? 'writting' : 'done')
+        const imgInfo = status && imgMap[status]
+
         return (
           <View key={playerId} style={[Styles.item, isLastChild && Styles.item_isLast]}>
             <View style={Styles.who}>
@@ -74,8 +66,12 @@ export default function ListPlayers({ players, enableKickout = false, ...otherPr
                 <Text style={Theme.typography.body}>{name}</Text>
                 <Text style={Theme.typography.small}>
                   {playerId === game.creatorId ? 'Admin ' : ''}
-                  {playerId === profileId ? 'you ' : ''}
-                  {isAfk ? '⚠️' : ''}
+                  {playerId === profileId ? '(you) ' : ''}
+                  {isAfk && (
+                    <Text style={[Theme.typography.small, { color: Theme.colors.primary }]}>
+                      Disconnected
+                    </Text>
+                  )}
                 </Text>
               </View>
             </View>
@@ -99,8 +95,25 @@ export default function ListPlayers({ players, enableKickout = false, ...otherPr
               )}
             </View>
           </View>
-        );
+        )
       })}
     </View>
-  );
+  )
+
+  async function handleKickOut(playerId) {
+    const playerName = profiles[playerId].name
+    if (
+      Platform.OS !== 'web' ||
+      window.confirm(`You are about to kick "${playerName}". Are you sure?`)
+    ) {
+      setIsKicking(playerId)
+      await Papers.removePlayer(playerId)
+      setIsKicking(null)
+    }
+  }
+}
+
+ListPlayers.propTypes = {
+  players: PropTypes.arrayOf(PropTypes.string), // [playerId],
+  enableKickout: PropTypes.bool,
 }

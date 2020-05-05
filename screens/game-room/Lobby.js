@@ -1,186 +1,278 @@
-import React, { Fragment } from 'react';
-import { Image, View, StyleSheet, Text, TouchableHighlight } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
+import React, { Fragment } from 'react'
+import PropTypes from 'prop-types'
+import { Image, View, Text } from 'react-native'
+import { ScrollView } from 'react-native-gesture-handler'
 
-import PapersContext from '@store/PapersContext.js';
-import { usePrevious } from '@constants/utils.js';
+import PapersContext from '@store/PapersContext.js'
+import { usePrevious } from '@constants/utils.js'
 
-import imgWaiting from '@assets/images/waiting.gif';
-import imgDone from '@assets/images/done.gif';
+import imgWaiting from '@assets/images/waiting.gif'
+import imgDone from '@assets/images/done.gif'
 
-import WritePapersModal from './WritePapersModal.js';
+import WritePapersModal from './WritePapersModal.js'
 
-import * as Theme from '@theme';
-import Styles from './LobbyStyles.js';
+import * as Theme from '@theme'
+import Styles from './LobbyStyles.js'
 
-import Page from '@components/page';
-import Button from '@components/button';
-import ListPlayers from '@components/list-players';
+import Page from '@components/page'
+import Button from '@components/button'
+import ListPlayers from '@components/list-players'
 
 export default function Lobby({ navigation }) {
-  const Papers = React.useContext(PapersContext);
-  const { profile, profiles, game } = Papers.state;
-  const prevHasTeams = usePrevious(!!game.teams);
-  const [isModalOpen, setModalOpen] = React.useState(false);
-  const profileId = profile.id;
-  const profileIsAdmin = game.creatorId === profileId;
-  const hasTeams = !!game.teams;
-  const gameHasStarted = !!game && game.hasStarted;
+  const Papers = React.useContext(PapersContext)
+  const { profile, profiles, game } = Papers.state
+  const prevHasTeams = usePrevious(!!game.teams)
+  const [isModalOpen, setModalOpen] = React.useState(false)
+  const profileId = profile.id
+  const profileIsAdmin = game.creatorId === profileId
+  const hasTeams = !!game.teams
+  const gameHasStarted = !!game && game.hasStarted
+  const nextPlayer = profiles[game.creatorId]?.name || '???'
 
-  const didSubmitAllWords = plId => {
-    return game.words && game.words[plId] && game.words[plId].length === game.settings.words;
-  };
+  const didSubmitAllWords = React.useCallback(
+    plId => {
+      return game.words && game.words[plId] && game.words[plId].length === game.settings.words
+    },
+    [game.words]
+  )
 
   React.useEffect(() => {
     if (!prevHasTeams && hasTeams) {
       // Teams were submited, force words!
-      !didSubmitAllWords(profileId) && openWords();
+      !didSubmitAllWords(profileId) && openWords()
     }
-  });
+  }, [prevHasTeams, hasTeams, didSubmitAllWords])
 
   React.useEffect(() => {
     if (gameHasStarted) {
-      console.log('Navigating to playing...');
-      navigation.navigate('playing');
+      console.log('Navigate to playing...')
+      navigation.navigate('playing')
     }
-  }, [gameHasStarted]);
+  }, [gameHasStarted])
 
-  /* REVIEW - Hum... maybe create 2 routes? */
-  return !game.teams ? renderLobbyStarting() : renderLobbyWritting();
+  // TODO review all these props.
+  return !game.teams ? (
+    <LobbyStarting
+      game={game}
+      nextPlayer={nextPlayer}
+      onCreateTeams={handleCreateTeams}
+      profileIsAdmin={profileIsAdmin}
+    />
+  ) : (
+    <LobbyWritting
+      game={game}
+      nextPlayer={nextPlayer}
+      didSubmitAllWords={didSubmitAllWords}
+      profileIsAdmin={profileIsAdmin}
+      profileId={profileId}
+      openWords={openWords}
+      profiles={profiles}
+      handleStartClick={handleStartClick}
+      setWordsForEveyone={setWordsForEveyone}
+      isModalOpen={isModalOpen}
+      setModalOpen={setModalOpen}
+    />
+  )
 
   function openWords() {
-    setModalOpen(true);
+    setModalOpen(true)
   }
 
   async function setWordsForEveyone() {
     try {
-      await Papers.setWordsForEveyone();
-      console.log('setwords done!');
+      await Papers.setWordsForEveyone()
+      console.log('setwords done!')
     } catch (error) {
-      console.error('setWordsForEveyone failed!', error);
+      console.error('setWordsForEveyone failed!', error)
     }
   }
 
   function handleStartClick() {
-    Papers.startGame();
+    Papers.startGame()
   }
 
   function handleCreateTeams() {
-    navigation.navigate('teams');
+    navigation.navigate('teams')
+  }
+}
+
+Lobby.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func, // (componentName: String)
+  }),
+}
+
+// ------- LobbyStarting ------- //
+
+const LobbyStarting = ({ game, nextPlayer, onCreateTeams, profileIsAdmin }) => {
+  const { players, name, id: gameId } = game
+  const hasEnoughPlayers = Object.keys(players).length >= 4
+
+  return (
+    <Page>
+      <Page.Header />
+      <Page.Main>
+        <View style={Styles.header}>
+          {profileIsAdmin && (
+            <Text style={[Theme.typography.small, Styles.cap]}>Ask your friends to join!</Text>
+          )}
+          <View style={Styles.title}>
+            <Text style={[Theme.u.center, Theme.typography.h1]}>{name}</Text>
+            {name.toLowerCase() !== gameId && (
+              <Text style={[Theme.u.center, Theme.typography.body]}>
+                Join id: <Text style={Theme.typography.h3}>{gameId}</Text>
+              </Text>
+            )}
+            {/* TODO Later - Share game. */}
+          </View>
+        </View>
+        <ScrollView style={[Theme.u.scrollSideOffset, Styles.list]}>
+          <Text style={Theme.typography.h3}>Lobby</Text>
+          <ListPlayers players={Object.keys(players)} enableKickout />
+        </ScrollView>
+      </Page.Main>
+      <Page.CTAs hasOffset={profileIsAdmin && hasEnoughPlayers}>
+        <LobbyStartingCTAs
+          hasEnoughPlayers={hasEnoughPlayers}
+          profileIsAdmin={profileIsAdmin}
+          onCreateTeams={onCreateTeams}
+          nextPlayer={nextPlayer}
+        />
+      </Page.CTAs>
+    </Page>
+  )
+}
+
+LobbyStarting.propTypes = {
+  game: PropTypes.object.isRequired, // TODO shape this
+  profileIsAdmin: PropTypes.bool.isRequired,
+  onCreateTeams: PropTypes.func.isRequired,
+  nextPlayer: PropTypes.string.isRequired,
+}
+
+const LobbyStartingCTAsToMemo = ({
+  hasEnoughPlayers,
+  profileIsAdmin,
+  onCreateTeams,
+  nextPlayer,
+}) => {
+  if (hasEnoughPlayers) {
+    return profileIsAdmin ? (
+      <Button onPress={onCreateTeams}>Create teams!</Button>
+    ) : (
+      <Text style={[Theme.typography.small, Styles.status]}>
+        Wait for {nextPlayer} to create the teams.
+      </Text>
+    )
   }
 
-  function renderLobbyStarting() {
-    const hasEnoughPlayers = Object.keys(game.players).length >= 4;
-    function CTAs() {
-      if (hasEnoughPlayers) {
-        return profileIsAdmin ? (
-          <Button onPress={handleCreateTeams}>Create teams!</Button>
-        ) : (
-          <Text style={[Theme.typography.small, Styles.status]}>
-            Wait for {profiles[game.creatorId]?.name || '???'} to create the teams.
-          </Text>
-        );
-      } else {
-        return (
-          <Text style={[Theme.typography.small, Styles.status]}>
-            Waiting for your friends to join the game (Minimum 4).
-          </Text>
-        );
-      }
-    }
+  return (
+    <Text style={[Theme.typography.small, Styles.status]}>
+      Waiting for your friends to join the game (minimum 4).
+    </Text>
+  )
+}
 
-    return (
+const LobbyStartingCTAs = React.memo(LobbyStartingCTAsToMemo)
+
+LobbyStartingCTAsToMemo.propTypes = {
+  hasEnoughPlayers: PropTypes.bool.isRequired,
+  profileIsAdmin: PropTypes.bool.isRequired,
+  onCreateTeams: PropTypes.func.isRequired,
+  nextPlayer: PropTypes.string.isRequired,
+}
+
+// ------- LobbyWritting ------- //
+
+const LobbyWritting = ({
+  game,
+  didSubmitAllWords,
+  profileIsAdmin,
+  profileId,
+  openWords,
+  profiles,
+  handleStartClick,
+  setWordsForEveyone,
+  isModalOpen,
+  setModalOpen,
+  nextPlayer,
+}) => {
+  const didEveryoneSubmittedTheirWords = Object.keys(game.players).every(didSubmitAllWords)
+  const didSubmitWords = didSubmitAllWords(profileId)
+  const writeAllShortCut = profileIsAdmin && !didEveryoneSubmittedTheirWords
+
+  return (
+    <Fragment>
       <Page>
         <Page.Header />
         <Page.Main>
-          <View style={Styles.header}>
-            {profileIsAdmin && (
-              <Text style={[Theme.typography.small, Styles.cap]}>Ask your friends to join!</Text>
-            )}
-            <View style={Styles.title}>
-              <Text style={[Theme.u.center, Theme.typography.h1]}>{game.name}</Text>
-              {game.name.toLowerCase() !== game.id && (
-                <Text style={[Theme.u.center, Theme.typography.body]}>
-                  Join id: <Text style={Theme.typography.h3}>{game.id}</Text>
-                </Text>
+          <ScrollView style={Theme.u.scrollSideOffset}>
+            <View style={Styles.header}>
+              {!didEveryoneSubmittedTheirWords && (
+                <Text style={Theme.typography.h1}>{game.name}</Text>
               )}
-              {/* Later - ShAre game. */}
+              <Text style={Theme.typography.secondary}>
+                {!didEveryoneSubmittedTheirWords
+                  ? 'Waiting for other players'
+                  : 'Everyone finished!'}
+              </Text>
+              <Image
+                style={[
+                  Styles.header_img,
+                  didEveryoneSubmittedTheirWords && Styles.header_img_done,
+                ]}
+                source={didEveryoneSubmittedTheirWords ? imgDone : imgWaiting}
+                accessibilityLabel=""
+              />
             </View>
-          </View>
-          <ScrollView style={[Theme.u.scrollSideOffset, Styles.list]}>
-            <Text style={Theme.typography.h3}>Lobby</Text>
-            <ListPlayers players={Object.keys(game.players)} enableKickout />
+            <View>
+              {Object.keys(game.teams).map(teamId => {
+                const { id, name, players } = game.teams[teamId]
+                return (
+                  <View key={id} style={Styles.team}>
+                    <Text style={Theme.typography.h3}>{name}</Text>
+                    <ListPlayers players={players} enableKickout />
+                  </View>
+                )
+              })}
+            </View>
           </ScrollView>
         </Page.Main>
-        <Page.CTAs hasOffset={profileIsAdmin && hasEnoughPlayers}>{CTAs()}</Page.CTAs>
+        <Page.CTAs hasOffset={!(didSubmitWords && !profileIsAdmin)}>
+          {!didSubmitWords && <Button onPress={openWords}>Write your papers</Button>}
+          {didSubmitWords && !profileIsAdmin && (
+            <Text style={[Theme.typography.small, Styles.status]}>
+              {didEveryoneSubmittedTheirWords
+                ? `Waiting for ${nextPlayer} to start the game.`
+                : 'Waiting for everyone to be ready!'}
+            </Text>
+          )}
+          {didEveryoneSubmittedTheirWords && profileIsAdmin && (
+            <Button onPress={handleStartClick}>Start Game!</Button>
+          )}
+          {writeAllShortCut && (
+            <Button variant="danger" onPress={setWordsForEveyone} styleTouch={{ marginTop: 16 }}>
+              {/* eslint-disable-next-line */}
+              Write everyone's papers 💥
+            </Button>
+          )}
+        </Page.CTAs>
       </Page>
-    );
-  }
+      <WritePapersModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
+    </Fragment>
+  )
+}
 
-  function renderLobbyWritting() {
-    const didEveryoneSubmittedTheirWords = Object.keys(game.players).every(didSubmitAllWords);
-    const didSubmitWords = didSubmitAllWords(profileId);
-    const writeAllShortCut = profileIsAdmin && !didEveryoneSubmittedTheirWords;
-
-    return (
-      <Fragment>
-        <Page>
-          <Page.Header />
-          <Page.Main>
-            <ScrollView style={Theme.u.scrollSideOffset}>
-              <View style={Styles.header}>
-                {!didEveryoneSubmittedTheirWords && (
-                  <Text style={Theme.typography.h1}>{game.name}</Text>
-                )}
-                <Text style={Theme.typography.secondary}>
-                  {!didEveryoneSubmittedTheirWords
-                    ? 'Waiting for other players'
-                    : 'Everyone finished!'}
-                </Text>
-                <Image
-                  style={[
-                    Styles.header_img,
-                    didEveryoneSubmittedTheirWords && Styles.header_img_done,
-                  ]}
-                  source={didEveryoneSubmittedTheirWords ? imgDone : imgWaiting}
-                  accessibilityLabel=""
-                />
-              </View>
-              <View>
-                {Object.keys(game.teams).map(teamId => {
-                  const { id, name, players } = game.teams[teamId];
-                  return (
-                    <View key={id} style={Styles.team}>
-                      <Text style={Theme.typography.h3}>{name}</Text>
-                      <ListPlayers players={players} enableKickout />
-                    </View>
-                  );
-                })}
-              </View>
-            </ScrollView>
-          </Page.Main>
-          <Page.CTAs hasOffset={!(didSubmitWords && !profileIsAdmin)}>
-            {!didSubmitWords && <Button onPress={openWords}>Write your papers</Button>}
-            {didSubmitWords && !profileIsAdmin && (
-              <Text style={[Theme.typography.small, Styles.status]}>
-                {didEveryoneSubmittedTheirWords
-                  ? `Waiting for ${profiles[game.creatorId]?.name || '???'} to start the game.`
-                  : 'Waiting for everyone to be ready!'}
-              </Text>
-            )}
-            {didEveryoneSubmittedTheirWords && profileIsAdmin && (
-              <Button onPress={handleStartClick}>Start Game!</Button>
-            )}
-            {writeAllShortCut && (
-              <Button variant="danger" onPress={setWordsForEveyone} styleTouch={{ marginTop: 16 }}>
-                {/* eslint-disable-next-line */}
-                Write everyone's papers 💥
-              </Button>
-            )}
-          </Page.CTAs>
-        </Page>
-        <WritePapersModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
-      </Fragment>
-    );
-  }
+LobbyWritting.propTypes = {
+  game: PropTypes.object.isRequired,
+  didSubmitAllWords: PropTypes.func.isRequired,
+  profileIsAdmin: PropTypes.bool.isRequired,
+  profileId: PropTypes.string.isRequired,
+  openWords: PropTypes.func.isRequired,
+  profiles: PropTypes.object.isRequired, // TODO
+  handleStartClick: PropTypes.func.isRequired,
+  setWordsForEveyone: PropTypes.func.isRequired,
+  isModalOpen: PropTypes.bool.isRequired,
+  setModalOpen: PropTypes.func.isRequired,
+  nextPlayer: PropTypes.string.isRequired,
 }

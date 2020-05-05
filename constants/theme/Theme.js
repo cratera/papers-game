@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native'
 
 export const colors = {
   grayDark: '#484F5D',
@@ -10,7 +10,7 @@ export const colors = {
   successLight: '#DCF2E6',
   danger: '#e51d1d', // TODO/REVIEW @mmbotelho
   bg: '#ffffff',
-};
+}
 
 export const typography = StyleSheet.create({
   h1: {
@@ -45,7 +45,7 @@ export const typography = StyleSheet.create({
     color: colors.grayMedium,
     fontStyle: 'italic',
   },
-});
+})
 
 // Utils
 export const u = StyleSheet.create({
@@ -60,4 +60,4 @@ export const u = StyleSheet.create({
   text_danger: { color: colors.danger },
   text_success: { color: colors.success },
   text_primary: { color: colors.primary },
-});
+})

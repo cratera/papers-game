@@ -1,60 +1,50 @@
-import React from 'react';
-import { View, StyleSheet, Text } from 'react-native';
-import * as WebBrowser from 'expo-web-browser';
+import React from 'react'
+import { Text } from 'react-native'
+import PropTypes from 'prop-types'
+// import * as WebBrowser from 'expo-web-browser'; // WHAT'S THIS?
 
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator } from '@react-navigation/stack'
 
-import PapersContext from '@store/PapersContext.js';
+import PapersContext from '@store/PapersContext.js'
 
-import GameLobby from './Lobby.js';
-import GameTeams from './Teams.js';
-import GamePlaying from './Playing.js';
+import GameLobby from './Lobby.js'
+import GameTeams from './Teams.js'
+import GamePlaying from './Playing.js'
 
-import Page from '@components/page';
-import Button from '@components/button';
+import Page from '@components/page'
+import Button from '@components/button'
 
-const Stack = createStackNavigator();
+const Stack = createStackNavigator()
 
 export default function Room({ navigation }) {
-  const Papers = React.useContext(PapersContext);
-  const { profile, profiles, game } = Papers.state;
-  const { name, id: gameId } = game || {};
+  const Papers = React.useContext(PapersContext)
+  const { profile, game } = Papers.state
+  const { id: gameId } = game || {}
 
-  const urlGameId = null;
-  // const { id: urlGameId } = useParams();
-  const profileId = profile && profile.id;
-  const gameHasStarted = !!game && game.hasStarted;
-  const profileIsAfk = game && game.players[profileId]?.isAfk;
-  const [status, setStatus] = React.useState(gameId ? 'ready' : 'loading'); // needProfile || ready  || notFound
-  // const prevGameId = React.usePrevious(gameId);
+  const profileId = profile && profile.id
+  const gameHasStarted = !!game && game.hasStarted
+  const [status, setStatus] = React.useState(gameId ? 'ready' : 'loading') // needProfile || ready  || notFound
 
   React.useEffect(() => {
     if (!profileId) {
       // REVIEW - do this validation at App.js?
-      return setStatus('noProfile');
+      return setStatus('noProfile')
     }
 
     if (gameId) {
-      return setStatus('ready');
+      return setStatus('ready')
     } else {
       // REVIEW - if just left game, add global status?
-      navigation.navigate('home');
+      navigation.navigate('home')
     }
-  }, [gameId, profileId]);
+  }, [gameId, profileId])
 
   React.useEffect(() => {
     if (gameHasStarted) {
-      console.log('TODO - Navigating to playing...');
+      console.log('TODO - Navigating to playing...')
       // navigation.navigate('playing');
     }
-  }, [gameHasStarted]);
-
-  const Template = ({ children }) => (
-    <Page>
-      <Page.Header />
-      <Page.Main>{children}</Page.Main>
-    </Page>
-  );
+  }, [gameHasStarted])
 
   if (!profileId || status === 'noProfile') {
     return (
@@ -63,24 +53,23 @@ export default function Room({ navigation }) {
 
         <Button onPress={() => navigation.navigate('home')}>Create profile</Button>
       </Template>
-    );
+    )
   }
 
   if (status === 'loading') {
     return (
       <Template>
         <Text>
-          Joining "{profile.gameId}"...
+          Joining {`"${profile.gameId}"`}...
           {'\n'}
           {'\n'}
         </Text>
         {/* <Button onPress={() => navigation.navigate('home')}>Taking too long? Go Home</Button> */}
       </Template>
-    );
+    )
   }
 
-  /* REVIEW TODO - HANDLE THESE 2 CASES */
-
+  /* REVIEW TODO - HANDLE THIS CASE */
   // if (status === 'notFound') {
   //   return (
   //     <Template>
@@ -96,12 +85,8 @@ export default function Room({ navigation }) {
         <Text>Ups, something went wrong while loading {gameId}.</Text>
         <Button onPress={() => navigation.navigate('home')}>Go Home</Button>
       </Template>
-    );
+    )
   }
-
-  // const gamePath = `/game/${gameId}`;
-
-  //       {!game.hasStarted ? <GameLobby /> : <Redirect to={`${gamePath}/playing`} />}
 
   return (
     <Stack.Navigator headerMode="none">
@@ -109,40 +94,24 @@ export default function Room({ navigation }) {
       {game && <Stack.Screen name="playing" component={GamePlaying} />}
       {!game.teams ? <Stack.Screen name="teams" component={GameTeams} /> : null}
     </Stack.Navigator>
-  );
+  )
+}
 
-  // return (
-  //   <Switch>
-  //     <Route exact path="/game/:id">
-  //       <Redirect to={`${gamePath}/lobby`} />
-  //     </Route>
-  //     <Route path="/game/:id/lobby">
-  //       {!game.hasStarted ? <GameLobby /> : <Redirect to={`${gamePath}/playing`} />}
-  //     </Route>
-  //     <Route path="/game/:id/teams">
-  //       {!game.teams ? <GameTeams /> : <Redirect to={`${gamePath}/lobby`} />}
-  //     </Route>
-
-  //     <Route path="/game/:id/playing">
-  //       {game.hasStarted ? <GamePlaying /> : <Redirect to={`${gamePath}/lobby`} />}
-  //     </Route>
-  //     {/* <Route path="/game/:id/words">
-  //       <GameWords />
-  //     </Route> */}
-  //     <Route path="*">
-  //       <Redirect to={`${gamePath}/lobby`} />
-  //     </Route>
-  //   </Switch>
-  // );
+Room.propTypes = {
+  navigation: PropTypes.object,
 }
 
 Room.navigationOptions = {
   header: null,
-};
+}
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-});
+const Template = ({ children }) => (
+  <Page>
+    <Page.Header />
+    <Page.Main>{children}</Page.Main>
+  </Page>
+)
+
+Template.propTypes = {
+  children: PropTypes.element,
+}
