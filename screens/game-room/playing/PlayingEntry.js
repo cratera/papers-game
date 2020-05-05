@@ -4,7 +4,7 @@ import { Text } from 'react-native'
 import { useCountdown, usePrevious, getRandomInt } from '@constants/utils'
 import PapersContext from '@store/PapersContext.js'
 
-import { MyTurnGetReady, MyTurnGo, OthersTurn, RoundScore } from './playing-views'
+import { MyTurnGetReady, MyTurnGo, OthersTurn, RoundScore } from './index'
 
 import Page from '@components/page'
 import i18n from '@constants/i18n'
@@ -50,6 +50,8 @@ export default function Playing() {
   const blurTimeout = React.useRef()
   const papersTurnCurrent = papersTurn?.current
   const isCount321go = countdownSec > initialTimerSec
+
+  console.log(game, profiles, profile)
 
   React.useEffect(() => {
     async function getTurnState() {

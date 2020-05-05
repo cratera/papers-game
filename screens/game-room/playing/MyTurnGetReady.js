@@ -9,7 +9,7 @@ import * as Theme from '@theme'
 
 import { IconNonWords } from '@components/icons'
 
-import Styles from '../PlayingStyles.js'
+import Styles from './PlayingStyles.js'
 
 console.log('hum', IconNonWords)
 

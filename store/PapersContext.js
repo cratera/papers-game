@@ -671,7 +671,7 @@ PapersContextProvider.propTypes = {
     avatar: PropTypes.string,
     gameId: PropTypes.string,
   }),
-  children: PropTypes.element,
+  children: PropTypes.node,
 }
 
 export default PapersContext

@@ -10,7 +10,7 @@ import Page from '@components/page'
 import TurnScore from './TurnScore'
 
 import * as Theme from '@theme'
-import Styles from '../PlayingStyles.js'
+import Styles from './PlayingStyles.js'
 
 const MyTurnGo = ({
   papersTurn,

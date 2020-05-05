@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 import Avatar from '@components/avatar'
 
 import * as Theme from '@theme'
-import Styles from '../PlayingStyles.js'
+import Styles from './PlayingStyles.js'
 
 const TurnStatus = ({ title, player, teamName }) => (
   <View style={Styles.tst}>

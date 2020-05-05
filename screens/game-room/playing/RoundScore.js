@@ -11,7 +11,7 @@ import EmojiRain from './EmojiRain'
 import CardScore from './CardScore'
 
 import * as Theme from '@theme'
-import Styles from '../PlayingStyles.js'
+import Styles from './PlayingStyles.js'
 
 const DESCRIPTIONS = [i18n.round_0_desc, i18n.round_1_desc, i18n.round_2_desc]
 
@@ -40,7 +40,7 @@ const RoundScore = () => {
           if (playerScore > (bestPlayer.score || 0)) {
             bestPlayer = {
               id: playerId,
-              name: profiles[playerId].name,
+              name: profiles[playerId]?.name,
               score: playerScore,
             }
           }
@@ -52,7 +52,7 @@ const RoundScore = () => {
 
           teamsPlayersScore[teamId].push({
             id: playerId,
-            name: profiles[playerId].name,
+            name: profiles[playerId]?.name,
             score: playerScore,
           })
         })
@@ -140,7 +140,7 @@ const RoundScore = () => {
               const bestPlayerId = Object.keys(thisTeamPlayersTotalScore).find(
                 id => thisTeamPlayersTotalScore[id] === highestScore
               )
-              bestPlayer = { name: profiles[bestPlayerId].name, score: highestScore }
+              bestPlayer = { name: profiles[bestPlayerId]?.name, score: highestScore }
             } else {
               const thisTeamPlayersScore = scores[roundIndex].teamsPlayersScore[teamId]
               const highestScore = Math.max(...thisTeamPlayersScore.map(p => p.score))

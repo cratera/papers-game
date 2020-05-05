@@ -8,7 +8,7 @@ import Page from '@components/page'
 // import i18n from '@constants/i18n'
 
 import * as Theme from '@theme'
-import Styles from '../PlayingStyles.js'
+import Styles from './PlayingStyles.js'
 
 const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, getPaperByKey }) => {
   return (

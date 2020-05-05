@@ -3,7 +3,7 @@ import { View, Text } from 'react-native'
 import PropTypes from 'prop-types'
 
 import * as Theme from '@theme'
-import Styles from '../PlayingStyles.js'
+import Styles from './PlayingStyles.js'
 
 const podiumMap = {
   0: '1st place',
@@ -26,9 +26,11 @@ const CardScore = ({ index, teamName, scoreTotal, scoreRound, bestPlayer }) => (
         {podiumMap[index]}
       </Text>
       <Text style={Theme.typography.h3}>{teamName}</Text>
-      <Text style={Theme.typography.small}>
-        {bestPlayer.name} was the best player! ({bestPlayer.score})
-      </Text>
+      {bestPlayer.name && (
+        <Text style={Theme.typography.small}>
+          {bestPlayer.name} was the best player! ({bestPlayer.score})
+        </Text>
+      )}
     </View>
     <View style={Styles.fscore_score}>
       <Text style={Theme.typography.small}>Papers</Text>

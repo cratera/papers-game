@@ -9,7 +9,7 @@ import PapersContext from '@store/PapersContext.js'
 
 import GameLobby from './Lobby.js'
 import GameTeams from './Teams.js'
-import GamePlaying from './Playing.js'
+import GamePlaying from './playing'
 
 import Page from '@components/page'
 import Button from '@components/button'
@@ -115,5 +115,5 @@ const Template = ({ children }) => (
 )
 
 Template.propTypes = {
-  children: PropTypes.element,
+  children: PropTypes.node,
 }

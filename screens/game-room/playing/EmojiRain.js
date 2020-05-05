@@ -3,7 +3,7 @@ import { Animated, Dimensions, View, Text } from 'react-native'
 import PropTypes from 'prop-types'
 
 // import * as Theme from '@theme'
-// import Styles from '../PlayingStyles.js'
+// import Styles from './PlayingStyles.js'
 
 const EmojiRain = ({ type }) => {
   const emojis = type === 'winner' ? ['🎉', '🔥', '💖', '😃'] : ['🤡', '💩', '👎', '😓']

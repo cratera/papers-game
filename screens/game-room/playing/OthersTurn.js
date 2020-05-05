@@ -8,7 +8,7 @@ import Page from '@components/page'
 import TurnStatus from './TurnStatus'
 
 import * as Theme from '@theme'
-import Styles from '../PlayingStyles.js'
+import Styles from './PlayingStyles.js'
 
 const OthersTurn = ({
   description,
