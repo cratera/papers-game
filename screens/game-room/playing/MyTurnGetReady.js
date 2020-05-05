@@ -11,8 +11,6 @@ import { IconNonWords } from '@components/icons'
 
 import Styles from './PlayingStyles.js'
 
-console.log('hum', IconNonWords)
-
 const MyTurnGetReady = ({ description, isOdd, onStartClick, nr }) => {
   const place = (x, y, deg) => ({
     left: x,

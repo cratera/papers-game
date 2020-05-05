@@ -9,7 +9,7 @@ import PapersContext from '@store/PapersContext.js'
 
 import GameLobby from './Lobby.js'
 import GameTeams from './Teams.js'
-import GamePlaying from './playing'
+import GamePlayingEntry from './playing'
 
 import Page from '@components/page'
 import Button from '@components/button'
@@ -88,11 +88,13 @@ export default function GameRoom({ navigation }) {
     )
   }
 
+  // NOTE: didn't understand yet how dynamic routing works on RN.
+  // If this is the right way of doing it, I don't like it.
   return (
     <Stack.Navigator headerMode="none">
       <Stack.Screen name="lobby" component={GameLobby} />
-      {game && <Stack.Screen name="playing" component={GamePlaying} />}
       {!game.teams ? <Stack.Screen name="teams" component={GameTeams} /> : null}
+      {game.teams ? <Stack.Screen name="playing" component={GamePlayingEntry} /> : null}
     </Stack.Navigator>
   )
 }

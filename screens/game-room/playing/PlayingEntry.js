@@ -16,7 +16,7 @@ const ANIM_PAPER_NEXT = 500
 
 const DESCRIPTIONS = [i18n.round_0_desc, i18n.round_1_desc, i18n.round_2_desc]
 
-export default function Playing() {
+export default function PlayingEntry() {
   const Papers = React.useContext(PapersContext)
   const { profile, profiles, game } = Papers.state
   const round = game.round
@@ -50,8 +50,6 @@ export default function Playing() {
   const blurTimeout = React.useRef()
   const papersTurnCurrent = papersTurn?.current
   const isCount321go = countdownSec > initialTimerSec
-
-  console.log(game, profiles, profile)
 
   React.useEffect(() => {
     async function getTurnState() {
