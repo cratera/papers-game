@@ -1,12 +1,13 @@
-import React, { memo } from 'react';
-import { StyleSheet, Text, TouchableHighlight } from 'react-native';
+import React, { memo } from 'react'
+import { Text, TouchableHighlight } from 'react-native'
+import PropTypes from 'prop-types'
 
-import * as Theme from '@theme';
-import * as Styles from './ButtonStyles.js';
+import * as Theme from '@theme'
+import * as Styles from './ButtonStyles.js'
 
 function Button({ variant, size, place, isLoading, children, style, styleTouch, ...otherProps }) {
   if (otherProps.hasBlock) {
-    console.error('hasblock is deprecated!');
+    console.error('hasblock is deprecated!')
   }
   return (
     <TouchableHighlight
@@ -20,13 +21,23 @@ function Button({ variant, size, place, isLoading, children, style, styleTouch, 
         {isLoading ? <Text style={Styles.loading}> ⏳</Text> : ''}
       </Text>
     </TouchableHighlight>
-  );
+  )
 }
 
 Button.defaultProps = {
-  variant: 'primary', // primary | success | light | flat | icon
+  variant: 'primary',
   size: 'default',
-  place: null, // edgeKeyboard,
-};
+  place: null,
+}
 
-export default memo(Button);
+Button.propTypes = {
+  variant: PropTypes.oneOf(['primary', 'success', 'light', 'flat', 'icon']),
+  size: PropTypes.oneOf(['default', 'sm']),
+  place: PropTypes.oneOf(['edgeKeyboard']),
+  isLoading: PropTypes.bool,
+  children: PropTypes.node,
+  style: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+  styleTouch: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+}
+
+export default memo(Button)

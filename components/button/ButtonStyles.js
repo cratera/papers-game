@@ -1,5 +1,5 @@
-import { StyleSheet } from 'react-native';
-import * as Theme from '@theme';
+import { StyleSheet } from 'react-native'
+import * as Theme from '@theme'
 
 const variants = {
   primary: {
@@ -26,7 +26,7 @@ const variants = {
     bg: 'transparent',
     color: Theme.colors.grayDark,
   },
-};
+}
 
 const styles = StyleSheet.create({
   touch: {
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
   edgeKeyboard: {
     marginBottom: 16,
   },
-});
+})
 
 export const button = ({ variant, size, place }) => {
   return [
@@ -105,11 +105,11 @@ export const button = ({ variant, size, place }) => {
     styles[variant],
     styles[size],
     styles[place],
-  ];
-};
+  ]
+}
 
 export const loading = {
   // TODO
-};
+}
 
-export const touch = styles.touch;
+export const touch = styles.touch

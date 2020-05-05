@@ -1,10 +1,11 @@
-import React, { memo } from 'react';
-import { StyleSheet, View, Image } from 'react-native';
+import React from 'react'
+import { StyleSheet, View, Image } from 'react-native'
+import PropTypes from 'prop-types'
 
-import * as Theme from '@theme';
+import * as Theme from '@theme'
 
-export default function Avatar({ src, alt, hasMargin, size = 'md', ...otherProps }) {
-  const Tag = src ? Image : View;
+export default function Avatar({ src, alt, hasMargin, size, ...otherProps }) {
+  const Tag = src ? Image : View
 
   return (
     <Tag
@@ -22,7 +23,18 @@ export default function Avatar({ src, alt, hasMargin, size = 'md', ...otherProps
       ]}
       {...otherProps}
     />
-  );
+  )
+}
+
+Avatar.defaultProps = {
+  size: 'md',
+}
+
+Avatar.propTypes = {
+  src: PropTypes.string,
+  alt: PropTypes.string.isRequired,
+  hasMargin: PropTypes.bool,
+  size: PropTypes.string,
 }
 
 const Styles = StyleSheet.create({
@@ -42,4 +54,4 @@ const Styles = StyleSheet.create({
     height: 56,
     borderRadius: 28,
   },
-});
+})

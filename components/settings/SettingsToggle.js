@@ -1,10 +1,10 @@
-import React, { useContext, useState } from 'react';
-import { View, Text } from 'react-native';
-import Button from '@components/button';
-import SettingsModal from './SettingsModal';
+import React from 'react'
+import { View } from 'react-native'
+import Button from '@components/button'
+import SettingsModal from './SettingsModal'
 
-export default function SettingsToggle(props) {
-  const [isOpen, setOpen] = useState(false);
+export default function SettingsToggle() {
+  const [isOpen, setOpen] = React.useState(false)
 
   return (
     <View>
@@ -13,5 +13,5 @@ export default function SettingsToggle(props) {
         ⚙️
       </Button>
     </View>
-  );
+  )
 }

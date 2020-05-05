@@ -1,1 +1,1 @@
-export { default } from './SettingsToggle';
+export { default } from './SettingsToggle'

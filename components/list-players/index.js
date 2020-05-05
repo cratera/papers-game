@@ -1,1 +1,1 @@
-export { default } from './ListPlayers';
+export { default } from './ListPlayers'

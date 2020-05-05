@@ -42,7 +42,7 @@ export default function ListPlayers({ players, enableKickout, ...otherProps }) {
           return (
             <View key={playerId} style={[Styles.item, isLastChild && Styles.item_isLast]}>
               <View style={Styles.who}>
-                <Avatar hasMargin />
+                <Avatar hasMargin alt="" />
                 <View>
                   <Text style={Theme.typography.body}>{playerName}</Text>
                   <Text style={Theme.typography.seconday}>{' Left '}</Text>
@@ -61,7 +61,7 @@ export default function ListPlayers({ players, enableKickout, ...otherProps }) {
         return (
           <View key={playerId} style={[Styles.item, isLastChild && Styles.item_isLast]}>
             <View style={Styles.who}>
-              <Avatar src={avatar} hasMargin />
+              <Avatar src={avatar} hasMargin alt="" />
               <View>
                 <Text style={Theme.typography.body}>
                   {name}

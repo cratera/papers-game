@@ -1,10 +1,10 @@
-import { StyleSheet } from 'react-native';
-import * as Theme from '@theme';
+import { StyleSheet } from 'react-native'
+import * as Theme from '@theme'
 
-const statusBarH = 24;
-const gutter = 16;
-const fadeH = 40;
-const headerH = statusBarH + 64;
+const statusBarH = 24
+const gutter = 16
+// const fadeH = 40
+const headerH = statusBarH + 64
 
 export default StyleSheet.create({
   page: {
@@ -75,4 +75,4 @@ export default StyleSheet.create({
   //     margin-bottom: 1.6rem;
   //   }
   // `;
-});
+})

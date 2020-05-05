@@ -1,12 +1,13 @@
-import React, { useState, useCallback, useContext } from 'react';
+import React from 'react'
+import PropTypes from 'prop-types'
 
-import * as Theme from '@theme';
-import { Platform, Alert, StyleSheet, RefreshControl, ScrollView, View, Text } from 'react-native';
+import * as Theme from '@theme'
+import { Platform, Alert, StyleSheet, RefreshControl, ScrollView, View, Text } from 'react-native'
 
-import PapersContext from '@store/PapersContext.js';
+import PapersContext from '@store/PapersContext.js'
 
-import Button from '@components/button';
-import Modal from '@components/modal';
+import Button from '@components/button'
+import Modal from '@components/modal'
 
 function Item({ title, btn, onPress, description }) {
   return (
@@ -21,32 +22,39 @@ function Item({ title, btn, onPress, description }) {
       </View>
       <Text style={[Theme.typography.secondary, Theme.typography.small]}>{description}</Text>
     </View>
-  );
+  )
+}
+
+Item.propTypes = {
+  title: PropTypes.string.isRequired,
+  btn: PropTypes.string,
+  onPress: PropTypes.func,
+  description: PropTypes.string.isRequired,
 }
 
 function wait(timeout) {
   return new Promise(resolve => {
-    setTimeout(resolve, timeout);
-  });
+    setTimeout(resolve, timeout)
+  })
 }
 
 export default function SettingsModal({ isOpen, onClose }) {
-  const Papers = useContext(PapersContext);
-  const { game } = Papers.state;
-  const gameId = game && game.name;
-  const [refreshing, setRefreshing] = useState(false);
+  const Papers = React.useContext(PapersContext)
+  const { game } = Papers.state
+  const gameId = game && game.name
+  const [refreshing, setRefreshing] = React.useState(false)
 
-  const onRefresh = useCallback(() => {
-    console.log('Do something to refresh!');
-    setRefreshing(true);
+  const onRefresh = React.useCallback(() => {
+    console.log('Do something to refresh!')
+    setRefreshing(true)
 
-    wait(2000).then(() => setRefreshing(false));
-  }, [refreshing]);
+    wait(2000).then(() => setRefreshing(false))
+  }, [refreshing])
 
   const handleLeaveGame = () => {
     if (Platform.OS === 'web') {
       if (window.confirm('Are you sure you wanna leave the game?')) {
-        Papers.leaveGame();
+        Papers.leaveGame()
       }
     } else {
       Alert.alert(
@@ -65,13 +73,13 @@ export default function SettingsModal({ isOpen, onClose }) {
           },
         ],
         { cancelable: false }
-      );
+      )
     }
-  };
+  }
 
   const handleResetProfile = () => {
-    Papers.resetProfile();
-  };
+    Papers.resetProfile()
+  }
 
   return (
     <Modal visible={isOpen} onClose={onClose}>
@@ -109,7 +117,12 @@ export default function SettingsModal({ isOpen, onClose }) {
         />
       </ScrollView>
     </Modal>
-  );
+  )
+}
+
+SettingsModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
 }
 
 const Styles = StyleSheet.create({
@@ -131,4 +144,4 @@ const Styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 8,
   },
-});
+})

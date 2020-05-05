@@ -1,13 +1,14 @@
-import React from 'react';
+import React from 'react'
+import PropTypes from 'prop-types'
 
-import * as Theme from '@theme';
-import { Platform, StyleSheet, Modal, View } from 'react-native';
+// import * as Theme from '@theme'
+import { Platform, StyleSheet, Modal, View } from 'react-native'
 
-import Button from '@components/button';
+import Button from '@components/button'
 
 const ModalWeb = ({ children, visible, ...otherProps }) => {
   if (!visible) {
-    return null;
+    return null
   }
   return (
     <View
@@ -24,8 +25,13 @@ const ModalWeb = ({ children, visible, ...otherProps }) => {
     >
       {children}
     </View>
-  );
-};
+  )
+}
+
+ModalWeb.propTypes = {
+  children: PropTypes.node,
+  visible: PropTypes.bool,
+}
 
 export default function TheModal({
   children,
@@ -35,7 +41,7 @@ export default function TheModal({
   styleContent,
   ...otherProps
 }) {
-  const Component = Platform.OS === 'web' ? ModalWeb : Modal;
+  const Component = Platform.OS === 'web' ? ModalWeb : Modal
 
   return (
     <Component
@@ -54,7 +60,15 @@ export default function TheModal({
       )}
       <View style={[Styles.content, styleContent]}>{children}</View>
     </Component>
-  );
+  )
+}
+
+TheModal.propTypes = {
+  children: PropTypes.node,
+  visible: PropTypes.bool,
+  onClose: PropTypes.func,
+  hiddenClose: PropTypes.bool,
+  styleContent: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
 }
 
 const Styles = StyleSheet.create({
@@ -69,4 +83,4 @@ const Styles = StyleSheet.create({
     right: 8,
     zIndex: 2,
   },
-});
+})

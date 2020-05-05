@@ -1,16 +1,21 @@
-import React from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import React from 'react'
+import { View } from 'react-native'
+import PropTypes from 'prop-types'
 
-import Styles from './PageStyles.js';
-import SettingsToggle from '@components/settings';
+import Styles from './PageStyles.js'
+import SettingsToggle from '@components/settings'
 
 const Page = ({ children, ...otherProps }) => {
   return (
     <View style={Styles.page} {...otherProps}>
       {children}
     </View>
-  );
-};
+  )
+}
+
+Page.propTypes = {
+  children: PropTypes.node,
+}
 
 const Header = ({ children, ...otherProps }) => {
   return (
@@ -18,7 +23,7 @@ const Header = ({ children, ...otherProps }) => {
       style={[
         Styles.header,
         {
-          justifyContent: !!children ? 'space-between' : 'flex-end',
+          justifyContent: children ? 'space-between' : 'flex-end',
           paddingRight: 8,
         },
       ]}
@@ -27,16 +32,24 @@ const Header = ({ children, ...otherProps }) => {
       {children}
       <SettingsToggle />
     </View>
-  );
-};
+  )
+}
+
+Header.propTypes = {
+  children: PropTypes.node,
+}
 
 const Main = ({ children, style, ...otherProps }) => {
   return (
     <View style={[Styles.main, style]} {...otherProps}>
       {children}
     </View>
-  );
-};
+  )
+}
+
+Main.propTypes = {
+  children: PropTypes.node,
+}
 
 const CTAs = ({ children, hasOffset, style, ...otherProps }) => {
   return (
@@ -44,7 +57,7 @@ const CTAs = ({ children, hasOffset, style, ...otherProps }) => {
       style={[
         Styles.ctas,
         {
-          paddingBottom: !!children ? 40 : 0,
+          paddingBottom: children ? 40 : 0,
         },
         style,
       ]}
@@ -54,11 +67,15 @@ const CTAs = ({ children, hasOffset, style, ...otherProps }) => {
       {hasOffset && <View style={{ marginTop: -22 }}></View>}
       {children}
     </View>
-  );
-};
+  )
+}
 
-export default Page;
+CTAs.propTypes = {
+  children: PropTypes.node,
+}
 
-Page.Header = Header;
-Page.Main = Main;
-Page.CTAs = CTAs;
+export default Page
+
+Page.Header = Header
+Page.Main = Main
+Page.CTAs = CTAs
