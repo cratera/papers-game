@@ -2,42 +2,45 @@ import React, { Fragment } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import PropTypes from 'prop-types'
 
+import PapersContext from '@store/PapersContext.js'
+
 import Button from '@components/button'
 import Page from '@components/page'
+import { IconNonWords } from '@components/icons'
 
 import * as Theme from '@theme'
 
-import { IconNonWords } from '@components/icons'
-
 import Styles from './PlayingStyles.js'
 
-const MyTurnGetReady = ({ description, isOdd, onStartClick, nr }) => {
-  const place = (x, y, deg) => ({
-    left: x,
-    top: y,
-    transform: [{ rotate: deg }],
-  })
-  const opacity = {
-    opacity: 0.3,
-  }
+const place = (x, y, deg) => ({
+  left: x,
+  top: y,
+  transform: [{ rotate: deg }],
+})
 
-  const mirror = {
-    transform: [{ scaleX: -1 }, { rotate: '18deg' }],
+const MyTurnGetReady = ({ description }) => {
+  const Papers = React.useContext(PapersContext)
+  const { game } = Papers.state
+  const round = game.round
+  const roundNr = round.current + 1
+
+  function onStartClick() {
+    Papers.startTurn()
   }
 
   return (
     <Fragment>
       <Page.Main>
         <View style={Styles.header}>
-          <Text style={Theme.typography.h2}>Round {nr}</Text>
+          <Text style={Theme.typography.h2}>Round {roundNr}</Text>
           <View style={StylesIn.illustration}>
-            <IconNonWords style={[StylesIn.icon, opacity, place(25, 0, '30deg')]} />
-            <IconNonWords style={[StylesIn.icon, opacity, place(120, 0, '30deg')]} />
-            <IconNonWords style={[StylesIn.icon, opacity, place(0, 90, '30deg')]} />
-            <IconNonWords style={[StylesIn.icon, opacity, place(150, 70, '-15deg')]} />
+            <IconNonWords style={[StylesIn.icon, StylesIn.faded, place(25, 0, '30deg')]} />
+            <IconNonWords style={[StylesIn.icon, StylesIn.faded, place(120, 0, '30deg')]} />
+            <IconNonWords style={[StylesIn.icon, StylesIn.faded, place(0, 90, '30deg')]} />
+            <IconNonWords style={[StylesIn.icon, StylesIn.faded, place(150, 70, '-15deg')]} />
 
             <IconNonWords style={[StylesIn.icon, place(105, 25, '0deg')]} />
-            <IconNonWords style={[StylesIn.icon, place(30, 50, '18deg'), mirror]} />
+            <IconNonWords style={[StylesIn.icon, place(30, 50, '18deg'), StylesIn.mirror]} />
             <IconNonWords style={[StylesIn.icon, place(87, 87, '18deg')]} />
           </View>
           <Text style={Theme.typography.secondary}>Rules:</Text>
@@ -56,9 +59,6 @@ const MyTurnGetReady = ({ description, isOdd, onStartClick, nr }) => {
 
 MyTurnGetReady.propTypes = {
   description: PropTypes.string.isRequired,
-  isOdd: PropTypes.bool,
-  onStartClick: PropTypes.func.isRequired,
-  nr: PropTypes.number.isRequired,
 }
 
 const StylesIn = StyleSheet.create({
@@ -71,6 +71,12 @@ const StylesIn = StyleSheet.create({
     position: 'absolute',
     width: 90,
     height: 90,
+  },
+  faded: {
+    opacity: 0.3,
+  },
+  mirror: {
+    transform: [{ scaleX: -1 }, { rotate: '18deg' }],
   },
 })
 

@@ -4,6 +4,8 @@ import PropTypes from 'prop-types'
 
 import { msToSecPretty } from '@constants/utils'
 
+import PapersContext from '@store/PapersContext.js'
+
 import Page from '@components/page'
 import TurnStatus from './TurnStatus'
 
@@ -13,25 +15,28 @@ import Styles from './PlayingStyles.js'
 const OthersTurn = ({
   description,
   hasCountdownStarted,
-  roundIndex,
   countdownSec,
   countdown,
   initialTimerSec,
   initialTimer,
-  thisTurnPlayer,
+  thisTurnPlayerName,
   turnStatus,
-  papersGuessed,
-  isAllWordsGuessed,
 }) => {
+  const Papers = React.useContext(PapersContext)
+  const { game } = Papers.state
+  const papersGuessed = game.papersGuessed
+  const isAllWordsGuessed = papersGuessed === game.round.wordsLeft?.length
+  const round = game.round
+  const roundNr = round.current + 1
+
   return (
     <Fragment>
       <Page.Main>
         <View>
           <View style={Styles.header}>
-            <Text style={Theme.typography.h3}>Round {roundIndex + 1}</Text>
+            <Text style={Theme.typography.h3}>Round {roundNr}</Text>
             <Text style={[Theme.typography.secondary, Theme.u.center]}>
-              {'\n'}
-              Try to guess as many papers as possible in 1 minute. {description}
+              {'\n'} {description}
             </Text>
           </View>
           <View style={Styles.main}>
@@ -43,7 +48,7 @@ const OthersTurn = ({
                   {isAllWordsGuessed ? 'All papers guessed!' : "Time's up!"}
                 </Text>
                 <Text style={[Theme.typography.h1, Theme.u.center]}>
-                  {thisTurnPlayer.name} got {papersGuessed} papers right!
+                  {thisTurnPlayerName} got {papersGuessed} papers right!
                 </Text>
               </Fragment>
             )}
@@ -77,9 +82,9 @@ const OthersTurn = ({
       <Page.CTAs>
         {isAllWordsGuessed ? (
           <View>
-            <Text style={Theme.typography.h3}>End of Round {roundIndex}</Text>
+            <Text style={Theme.typography.h3}>End of Round {roundNr}</Text>
             <Text style={[Theme.typography.body, { marginTop: 16 }]}>
-              Waiting for {thisTurnPlayer.name} to finish their turn.
+              Waiting for {thisTurnPlayerName} to finish their turn.
             </Text>
           </View>
         ) : (
@@ -97,14 +102,11 @@ const OthersTurn = ({
 OthersTurn.propTypes = {
   description: PropTypes.string.isRequired,
   hasCountdownStarted: PropTypes.bool.isRequired,
-  roundIndex: PropTypes.number.isRequired,
   countdownSec: PropTypes.number.isRequired,
   countdown: PropTypes.number.isRequired,
   initialTimerSec: PropTypes.number.isRequired,
   initialTimer: PropTypes.number.isRequired,
-  thisTurnPlayer: PropTypes.shape({
-    name: PropTypes.string, // REVIEW - why not just a string?
-  }).isRequired,
+  thisTurnPlayerName: PropTypes.string.isRequired,
   turnStatus: PropTypes.shape({
     title: PropTypes.string,
     player: PropTypes.shape({
@@ -113,8 +115,6 @@ OthersTurn.propTypes = {
     }),
     teamName: PropTypes.string,
   }).isRequired,
-  papersGuessed: PropTypes.number.isRequired,
-  isAllWordsGuessed: PropTypes.bool.isRequired,
 }
 
 export default OthersTurn

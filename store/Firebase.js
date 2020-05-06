@@ -650,13 +650,17 @@ function setPapersGuessed(count) {
 /**
  *
  */
-async function finishTurn({ playerScore, roundStatus }) {
+async function finishTurn({ playerScore, roundStatus }, cb) {
   console.log('⚙️ finishTurn()')
   const gameId = LOCAL_PROFILE.gameId
 
-  await DB.ref(`games/${gameId}/score/${roundStatus.current}`).update(playerScore)
-  await DB.ref(`games/${gameId}/round`).update(roundStatus)
-  await DB.ref(`games/${gameId}/papersGuessed`).set(0)
+  try {
+    await DB.ref(`games/${gameId}/score/${roundStatus.current}`).update(playerScore)
+    await DB.ref(`games/${gameId}/round`).update(roundStatus)
+    await DB.ref(`games/${gameId}/papersGuessed`).set(0)
+  } catch (e) {
+    cb(e)
+  }
 }
 
 /**

@@ -9,7 +9,7 @@ import PapersContext from '@store/PapersContext.js'
 
 import GameLobby from './Lobby.js'
 import GameTeams from './Teams.js'
-import GamePlayingEntry from './playing'
+import GamePlayingEntry from './playing/PlayingEntry'
 
 import Page from '@components/page'
 import Button from '@components/button'

@@ -45,3 +45,15 @@ export const IconNonWords = props => {
     </Svg>
   )
 }
+
+export const IconEdit = props => {
+  const color = Theme.colors.primary
+
+  // prettier-ignore
+  return (
+    <Svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 19" {...props}>
+      <Path d="M9 3H3a2 2 0 00-2 2v11a2 2 0 002 2h12a2 2 0 001-2v-6" stroke={color} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/>
+      <Path d="M15 2a2 2 0 113 2l-8 8-4 1 1-3 8-8z" stroke={color} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/>
+    </Svg>
+  )
+}

@@ -11,10 +11,12 @@ const TurnStatus = ({ title, player, teamName }) => (
   <View style={Styles.tst}>
     <Text style={Theme.typography.h3}>{title}</Text>
     <View style={Styles.tst_flex}>
-      <Avatar hasMargin size="lg" src={player.avatar} />
+      <Avatar hasMargin size="lg" src={player.avatar} alt="" />
       <View>
         <Text style={Theme.typography.h3}>{player.name}</Text>
-        <Text style={[Theme.typography.secondary, Styles.tst_team]}>{teamName}</Text>
+        <Text style={[Theme.typography.secondary, Theme.typography.small, Styles.tst_team]}>
+          {teamName}
+        </Text>
       </View>
     </View>
   </View>

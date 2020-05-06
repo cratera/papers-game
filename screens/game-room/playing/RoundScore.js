@@ -168,7 +168,7 @@ const RoundScore = () => {
           </Button>
         ) : (
           <Text style={[Theme.typography.italic, Theme.u.center]}>
-            Wait for {game.players[game.creatorId].name} (admin) to start next round.
+            Wait for {profiles[game.creatorId].name} (admin) to start the next round.
           </Text>
         )}
       </Page.CTAs>

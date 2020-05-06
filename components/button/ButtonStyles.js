@@ -60,6 +60,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 0,
     paddingHorizontal: 0,
+    borderWidth: 1,
+    borderColor: Theme.colors.grayLight,
   },
   flat: {
     borderRadius: 0,

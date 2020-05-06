@@ -31,13 +31,13 @@ Button.defaultProps = {
 }
 
 Button.propTypes = {
-  variant: PropTypes.oneOf(['primary', 'success', 'light', 'flat', 'icon']),
+  variant: PropTypes.oneOf(['primary', 'success', 'danger', 'light', 'flat', 'icon']),
   size: PropTypes.oneOf(['default', 'sm']),
   place: PropTypes.oneOf(['edgeKeyboard']),
   isLoading: PropTypes.bool,
   children: PropTypes.node,
-  style: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
-  styleTouch: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+  style: PropTypes.oneOfType([PropTypes.array, PropTypes.object, PropTypes.number]),
+  styleTouch: PropTypes.oneOfType([PropTypes.array, PropTypes.object, PropTypes.number]),
 }
 
 export default memo(Button)

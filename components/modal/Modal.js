@@ -53,8 +53,8 @@ export default function TheModal({
     >
       {!hiddenClose && (
         <View style={Styles.close}>
-          <Button variant="icon" onPress={onClose}>
-            [X]
+          <Button variant="icon" accessibilityLabel="Close Modal" onPress={onClose}>
+            ❌
           </Button>
         </View>
       )}

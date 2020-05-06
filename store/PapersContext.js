@@ -560,12 +560,29 @@ export class PapersContextProvider extends Component {
 
     const wordsSoFar = game.score[roundCurrent][profileId] || []
 
-    this.state.socket.finishTurn({
-      playerScore: {
-        [profileId]: [...wordsSoFar, ...papersTurn.guessed],
-      },
-      roundStatus,
+    const allValidWordsGuessed = [...wordsSoFar, ...papersTurn.guessed].filter(word => {
+      if (word === undefined) {
+        console.warn(
+          ':: An undefined word guessed was filtered to avoid DB errors!',
+          wordsSoFar,
+          papersTurn.guessed
+        )
+        return false
+      }
+      return true
     })
+
+    this.state.socket.finishTurn(
+      {
+        playerScore: {
+          [profileId]: allValidWordsGuessed,
+        },
+        roundStatus,
+      },
+      (res, err) => {
+        console.error(':: failed!', err)
+      }
+    )
   }
 
   startNextRound() {
@@ -594,16 +611,18 @@ export class PapersContextProvider extends Component {
     return turnState
   }
 
-  async setTurnLocalState(turnState) {
+  async setTurnLocalState(turn) {
     console.log('📌 setPaperTurnState()')
-    // TODO / OPTIMIZE this very much needed.
-    await AsyncStorage.setItem('turn', JSON.stringify(turnState))
+    if (turn) {
+      await AsyncStorage.setItem('turn', JSON.stringify(turn))
+      const papersGuessed = turn.guessed.length
 
-    const papersGuessed = turnState.guessed.length
-
-    if (papersGuessed !== this.state.game.papersGuessed) {
-      // Send this so all players know n papers were guessed so far.
-      this.state.socket.setPapersGuessed(papersGuessed)
+      if (papersGuessed !== this.state.game.papersGuessed) {
+        // Send this, so all players know N papers were guessed so far.
+        this.state.socket.setPapersGuessed(papersGuessed)
+      }
+    } else {
+      await AsyncStorage.removeItem('turn')
     }
   }
 

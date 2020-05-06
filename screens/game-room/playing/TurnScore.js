@@ -26,18 +26,20 @@ const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, getPaperByKey })
         <ScrollView style={Theme.u.scrollSideOffset}>
           {papersTurn.guessed.length ? (
             <View style={Styles.tscore_list}>
-              {papersTurn.guessed.map((paper, i) => (
-                <View style={[Styles.tscore_item]} key={`${i}_${paper}`}>
-                  <Text style={Theme.typography.body}>{getPaperByKey(paper)}</Text>
-                  <Button
-                    style={Styles.tscore_btnRemove}
-                    variant="flat"
-                    onPress={() => onTogglePaper(paper, false)}
-                  >
-                    Remove
-                  </Button>
-                </View>
-              ))}
+              {papersTurn.guessed
+                .filter(paper => paper !== undefined)
+                .map((paper, i) => (
+                  <View style={[Styles.tscore_item]} key={`${i}_${paper}`}>
+                    <Text style={Theme.typography.body}>{getPaperByKey(paper)}</Text>
+                    <Button
+                      style={Styles.tscore_btnRemove}
+                      variant="flat"
+                      onPress={() => onTogglePaper(paper, false)}
+                    >
+                      Remove
+                    </Button>
+                  </View>
+                ))}
             </View>
           ) : (
             <Text style={[Theme.typography.italic, Theme.u.center, { marginTop: 40 }]}>
@@ -47,18 +49,20 @@ const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, getPaperByKey })
           {!!papersTurn.passed.length && (
             <View style={Styles.tscore_list}>
               <Text style={Theme.typography.h3}>Papers you did not get:</Text>
-              {papersTurn.passed.map((paper, i) => (
-                <View style={Styles.tscore_item} key={`${i}_${paper}`}>
-                  <Text style={Theme.typography.body}>{getPaperByKey(paper)}</Text>
-                  <Button
-                    style={Styles.tscore_btnAdd}
-                    variant="flat"
-                    onPress={() => onTogglePaper(paper, true)}
-                  >
-                    Add
-                  </Button>
-                </View>
-              ))}
+              {papersTurn.passed
+                .filter(paper => paper !== undefined)
+                .map((paper, i) => (
+                  <View style={Styles.tscore_item} key={`${i}_${paper}`}>
+                    <Text style={Theme.typography.body}>{getPaperByKey(paper)}</Text>
+                    <Button
+                      style={Styles.tscore_btnAdd}
+                      variant="flat"
+                      onPress={() => onTogglePaper(paper, true)}
+                    >
+                      Add
+                    </Button>
+                  </View>
+                ))}
             </View>
           )}
         </ScrollView>

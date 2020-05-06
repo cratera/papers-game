@@ -78,6 +78,7 @@ export default function ListPlayers({ players, enableKickout, ...otherProps }) {
               </View>
             </View>
             <View style={Styles.ctas}>
+              {/* TODO make same as design. */}
               {enableKickout && profileIsAdmin && playerId !== profileId && (
                 <Button
                   variant="light"

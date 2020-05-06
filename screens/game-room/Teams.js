@@ -8,6 +8,7 @@ import PapersContext from '@store/PapersContext.js'
 
 import Page from '@components/page'
 import Button from '@components/button'
+import { IconEdit } from '@components/icons'
 import ListPlayers from '@components/list-players'
 
 import * as Theme from '@theme'
@@ -105,9 +106,15 @@ export default function Teams({ navigation }) {
             return (
               <View key={id} style={Styles.team}>
                 <View style={Styles.headerTeam}>
-                  <Text style={Theme.typography.h1}>{name}</Text>
-                  <Button onPress={() => handleRenameOf(id)} style={Styles.rename} variant="flat">
-                    rename
+                  <Text style={Theme.typography.h2}>{name}</Text>
+                  <Button
+                    variant="icon"
+                    accessibilityLabel="Rename team"
+                    onPress={() => handleRenameOf(id)}
+                  >
+                    ✏️
+                    {/* Icon width/height isn't working on IOS. FML. */}
+                    {/* <IconEdit style={Styles.btnEdit_icon} />  */}
                   </Button>
                 </View>
                 <ListPlayers players={players} />
@@ -157,8 +164,16 @@ const Styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  rename: {
-    color: Theme.colors.primary,
-  },
+  // btnEdit: {
+  //   color: Theme.colors.primary,
+  //   textAlign: 'center',
+  // },
+  // btnEdit_icon: {
+  //   width: 17,
+  //   height: 17,
+  //   position: 'absolute',
+  //   top: 10,
+  //   left: 10,
+  // },
   team: {},
 })
