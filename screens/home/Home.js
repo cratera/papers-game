@@ -3,13 +3,31 @@ import PropTypes from 'prop-types'
 
 import PapersContext from '@store/PapersContext.js'
 
+import Page from '@components/page'
 import HomeSigned from './HomeSigned.js'
 import HomeSignup from './HomeSignup.js'
+
+import * as Theme from '@theme'
 
 export default function HomeScreen({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const { profile, game } = Papers.state
   const gameId = game?.id
+
+  console.log('aqui!')
+  React.useEffect(() => {
+    navigation.setOptions({
+      headerTitle: profile.name ? 'Home' : 'Create Profile',
+      headerRight: () => (profile.name ? <Page.HeaderBtnSettings /> : null), // eslint-disable-line
+      // TODO: Define header styles
+      headerTintColor: Theme.colors.bg,
+      headerStyle: {
+        shadowColor: 'transparent',
+        borderBottomWidth: 0,
+        height: 72,
+      },
+    })
+  }, [profile.name])
 
   React.useEffect(() => {
     if (gameId) {
@@ -22,11 +40,16 @@ export default function HomeScreen({ navigation }) {
     Papers.updateProfile(profile)
   }
 
-  return !profile.name ? <HomeSignup onSubmit={handleUpdateProfile} /> : <HomeSigned />
+  return !profile.name ? (
+    <HomeSignup onSubmit={handleUpdateProfile} navigation={navigation} />
+  ) : (
+    <HomeSigned navigation={navigation} />
+  )
 }
 
 HomeScreen.propTypes = {
   navigation: PropTypes.shape({
+    setOptions: PropTypes.func, // (componentName: String)
     navigate: PropTypes.func, // (componentName: String)
   }),
 }

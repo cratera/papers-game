@@ -34,8 +34,45 @@ export default class HomeSignup extends React.Component {
     this.setProfile = this.setProfile.bind(this)
 
     this.handleChangeAvatar = this.handleChangeAvatar.bind(this)
+  }
 
-    // const Papers = useContext(PapersContext);
+  componentDidMount() {
+    this.props.navigation.setOptions({
+      headerTitle: 'Create profile',
+      headerLeft: null,
+      headerRight: null,
+    })
+  }
+
+  componentWillUnmount() {
+    this.props.navigation.setOptions({
+      headerLeft: null,
+      headerRight: null,
+    })
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (!prevState.name && this.state.name) {
+      this.props.navigation.setOptions({
+        headerRight: () => (
+          <Page.HeaderBtn side="right" onPress={() => this.goNextStep('name')}>
+            Next
+          </Page.HeaderBtn>
+        ),
+      })
+    } else if (!this.state.name && prevState.name) {
+      this.props.navigation.setOptions({
+        headerRight: null,
+      })
+    } else if (!prevState.avatar && this.state.avatar) {
+      this.props.navigation.setOptions({
+        headerRight: () => (
+          <Page.HeaderBtn side="right" onPress={this.setProfile}>
+            Finish
+          </Page.HeaderBtn>
+        ),
+      })
+    }
   }
 
   render() {
@@ -48,17 +85,12 @@ export default class HomeSignup extends React.Component {
 
     return (
       <Page>
-        <Page.Header>
-          {state.step > 0 ? (
-            <Button variant="flat" onPress={this.goBackStep} style={{ lineHeight: 44 }}>
-              Back
-            </Button>
-          ) : undefined}
-        </Page.Header>
-        <Page.Main styles={Styles.main}>
+        <Page.Main style={Styles.main}>
           <CurrentStep />
         </Page.Main>
-        <Page.CTAs>{state.step === 0 && <Button onPress={this.goNextStep}>Next</Button>}</Page.CTAs>
+        <Page.CTAs>
+          {state.step === 0 && <Button onPress={this.goNextStep}>Start</Button>}
+        </Page.CTAs>
       </Page>
     )
   }
@@ -99,11 +131,6 @@ export default class HomeSignup extends React.Component {
             onChangeText={name => this.setState(state => ({ ...state, name }))}
           />
         </ScrollView>
-        {this.state.name ? (
-          <Button style={Styles.cta} onPress={this.goNextStep}>
-            Next
-          </Button>
-        ) : undefined}
       </KeyboardAvoidingView>
     )
   }
@@ -114,20 +141,6 @@ export default class HomeSignup extends React.Component {
         <View style={{ flex: 1, alignSelf: 'stretch' }}>
           <InputAvatar avatar={this.state.avatar} onChange={this.handleChangeAvatar} />
         </View>
-
-        {this.state.avatar ? (
-          <Button style={Styles.ctaBottom} onPress={this.setProfile}>
-            Finish
-          </Button>
-        ) : (
-          <Button
-            onPress={this.setProfile}
-            variant="flat"
-            style={[Styles.ctaBottom, { color: Theme.colors.primary }]}
-          >
-            Skip this step
-          </Button>
-        )}
       </View>
     )
   }
@@ -141,18 +154,42 @@ export default class HomeSignup extends React.Component {
     }
   }
 
-  goNextStep() {
+  goNextStep(currentStepId) {
     this.setState(state => ({
       ...state,
       step: state.step + 1,
     }))
+
+    // It should be on cDU, but it's okay. It works and it's harmless.
+    this.props.navigation.setOptions({
+      headerLeft: () => (
+        <Page.HeaderBtn side="left" onPress={this.goBackStep}>
+          Back
+        </Page.HeaderBtn>
+      ),
+    })
+
+    if (currentStepId === 'name') {
+      this.props.navigation.setOptions({
+        headerRight: () => (
+          <Page.HeaderBtn side="right" onPress={this.setProfile}>
+            Skip
+          </Page.HeaderBtn>
+        ),
+      })
+    }
   }
 
   goBackStep() {
+    const step = this.state.step
     this.setState(state => ({
       ...state,
-      step: state.step - 1,
+      step: step - 1,
     }))
+
+    if (step - 1 === 0) {
+      this.props.navigation.setOptions({ headerLeft: null })
+    }
   }
 
   setProfile() {
@@ -163,4 +200,5 @@ export default class HomeSignup extends React.Component {
 
 HomeSignup.propTypes = {
   onSubmit: PropTypes.func.isRequired, // (profile: Object)
+  navigation: PropTypes.object, // reactNavigation
 }

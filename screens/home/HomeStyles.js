@@ -10,6 +10,7 @@ export default StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'flex-start',
     alignItems: 'center',
+    paddingTop: 40,
   },
   content: {
     display: 'flex',

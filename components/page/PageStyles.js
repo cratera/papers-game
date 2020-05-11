@@ -30,7 +30,7 @@ export default StyleSheet.create({
     zIndex: 1,
   },
   main: {
-    paddingTop: headerH,
+    // paddingTop: headerH, // header is from Navigator
     flexGrow: 1,
     flexShrink: 1 /* so it scrolls */,
     paddingHorizontal: gutter,

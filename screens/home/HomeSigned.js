@@ -68,7 +68,6 @@ export default function HomeSigned() {
   return (
     <Fragment>
       <Page>
-        <Page.Header></Page.Header>
         <Page.Main style={Styles.main}>
           <AvatarMeme avatar={profile.avatar} onChange={handleChangeAvatar} />
           <Text style={[Theme.typography.body, Theme.u.center]}>

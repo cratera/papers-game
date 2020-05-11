@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 
 import Styles from './PageStyles.js'
 import SettingsToggle from '@components/settings'
+import Button from '@components/button'
 
 const Page = ({ children, ...otherProps }) => {
   return (
@@ -39,6 +40,24 @@ Header.propTypes = {
   children: PropTypes.node,
 }
 
+const HeaderBtn = ({ side, style, children, ...otherProps }) => (
+  <Button
+    variant="flat"
+    style={[side === 'left' ? { marginLeft: 16 } : { marginRight: 16 }, style]}
+    {...otherProps}
+  >
+    {children}
+  </Button>
+)
+
+HeaderBtn.propTypes = {
+  side: PropTypes.oneOf(['left', 'right']),
+  style: PropTypes.oneOfType([PropTypes.array, PropTypes.object, PropTypes.number]),
+  children: PropTypes.node,
+}
+
+const HeaderBtnSettings = () => <SettingsToggle style={{ marginRight: 16 }} />
+
 const Main = ({ children, style, ...otherProps }) => {
   return (
     <View style={[Styles.main, style]} {...otherProps}>
@@ -48,6 +67,7 @@ const Main = ({ children, style, ...otherProps }) => {
 }
 
 Main.propTypes = {
+  style: PropTypes.oneOfType([PropTypes.array, PropTypes.object, PropTypes.number]),
   children: PropTypes.node,
 }
 
@@ -71,11 +91,15 @@ const CTAs = ({ children, hasOffset, style, ...otherProps }) => {
 }
 
 CTAs.propTypes = {
+  style: PropTypes.oneOfType([PropTypes.array, PropTypes.object, PropTypes.number]),
+  hasOffset: PropTypes.bool,
   children: PropTypes.node,
 }
 
 export default Page
 
-Page.Header = Header
+Page.Header = Header // TODO Remove this.
+Page.HeaderBtn = HeaderBtn
+Page.HeaderBtnSettings = HeaderBtnSettings
 Page.Main = Main
 Page.CTAs = CTAs

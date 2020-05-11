@@ -55,7 +55,7 @@ export default function InputAvatar({ avatar, onChange }) {
   )
 }
 
-InputAvatar.PropTypes = {
+InputAvatar.propTypes = {
   avatar: PropTypes.string,
   onChange: PropTypes.func.isRequired, // (value: String)
 }
