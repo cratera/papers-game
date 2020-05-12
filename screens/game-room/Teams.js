@@ -31,6 +31,7 @@ export default function Teams({ navigation }) {
       headerRight: null,
     })
   }, [])
+
   // This could be useRandomTeams.
   function getRandomTeams() {
     const players = Object.keys(game.players)
@@ -91,8 +92,10 @@ export default function Teams({ navigation }) {
     }
   }
 
-  function submitTeamsAndGoNext() {
-    Papers.setTeams(tempTeams)
+  async function submitTeamsAndGoToPapers() {
+    await Papers.setTeams(tempTeams)
+    navigation.setOptions({ headerRight: null })
+    navigation.navigate('write-papers')
   }
 
   return (
@@ -126,7 +129,7 @@ export default function Teams({ navigation }) {
         <Button variant="light" onPress={generateTeams} styleTouch={{ marginBottom: 16 }}>
           Randomize teams
         </Button>
-        <Button onPress={submitTeamsAndGoNext}>Lock teams</Button>
+        <Button onPress={submitTeamsAndGoToPapers}>Lock teams</Button>
       </Page.CTAs>
     </Page>
   )

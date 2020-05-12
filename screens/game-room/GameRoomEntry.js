@@ -1,5 +1,5 @@
 import React from 'react'
-import { Alert, Platform, Text } from 'react-native'
+import { Text } from 'react-native'
 import PropTypes from 'prop-types'
 // import * as WebBrowser from 'expo-web-browser'; // WHAT'S THIS?
 
@@ -7,9 +7,11 @@ import { createStackNavigator } from '@react-navigation/stack'
 // import { confirmLeaveGame } from '@constants/utils.js'
 import PapersContext from '@store/PapersContext.js'
 
-import GameLobby from './Lobby.js'
-import GameTeams from './Teams.js'
-import GamePlayingEntry from './playing/PlayingEntry'
+import LobbyJoining from './LobbyJoining.js'
+import Teams from './Teams.js'
+import WritePapers from './WritePapers'
+import LobbyWriting from './LobbyWriting.js'
+import Playing from './playing/PlayingEntry'
 
 import Page from '@components/page'
 import Button from '@components/button'
@@ -20,9 +22,9 @@ export default function GameRoomEntry({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const { profile, game } = Papers.state
   const { id: gameId } = game || {}
-
-  const profileId = profile && profile.id
   const [status, setStatus] = React.useState(gameId ? 'ready' : 'loading') // needProfile || ready  || notFound
+  const profileId = profile?.id
+  const wordsAreStored = game?.words && game.words[profileId]
 
   React.useEffect(() => {
     if (!profileId) {
@@ -81,15 +83,17 @@ export default function GameRoomEntry({ navigation }) {
   }
 
   return (
-    <Stack.Navigator screenOptions={{ headerTitleAlign: 'center' }}>
-      {!game.teams ? (
-        <>
-          <Stack.Screen name="lobby" headerTitle="New Game" component={GameLobby} />
-          <Stack.Screen name="teams" headerTitle="Teams" component={GameTeams} />
-        </>
-      ) : (
-        <Stack.Screen name="playing" component={GamePlayingEntry} />
-      )}
+    <Stack.Navigator
+      screenOptions={{ headerTitleAlign: 'center' }}
+      initialRouteName={
+        game.hasStarted ? 'playing' : wordsAreStored ? 'lobby-writing' : 'lobby-joining'
+      }
+    >
+      <Stack.Screen name="lobby-joining" headerTitle="New game" component={LobbyJoining} />
+      <Stack.Screen name="teams" headerTitle="Teams" component={Teams} />
+      <Stack.Screen name="write-papers" headerTitle="Write papers" component={WritePapers} />
+      <Stack.Screen name="lobby-writing" headerTitle="Writting" component={LobbyWriting} />
+      {game.hasStarted ? <Stack.Screen name="playing" component={Playing} /> : null}
     </Stack.Navigator>
   )
 }

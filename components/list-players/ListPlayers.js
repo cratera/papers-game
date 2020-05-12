@@ -23,7 +23,7 @@ const imgMap = {
   },
 }
 
-export default function ListPlayers({ players, enableKickout, ...otherProps }) {
+export default function ListPlayers({ players, enableKickout, isStatusVisible, ...otherProps }) {
   const Papers = React.useContext(PapersContext)
   const [isKicking, setIsKicking] = React.useState(null) // playerId
   const { profile, profiles, game } = Papers.state
@@ -55,7 +55,7 @@ export default function ListPlayers({ players, enableKickout, ...otherProps }) {
         const { avatar, name } = profiles[playerId] || {}
         const { isAfk } = game.players[playerId]
         const wordsSubmitted = game.words && game.words[playerId]
-        const status = game.teams && (!wordsSubmitted ? 'writting' : 'done')
+        const status = isStatusVisible && (!wordsSubmitted ? 'writting' : 'done')
         const imgInfo = status && imgMap[status]
 
         return (
@@ -86,7 +86,7 @@ export default function ListPlayers({ players, enableKickout, ...otherProps }) {
                   isLoading={isKicking === playerId}
                   onPress={() => handleKickOut(playerId)}
                 >
-                  Kick out
+                  Kick
                 </Button>
               )}
               {imgInfo && (
@@ -119,4 +119,5 @@ export default function ListPlayers({ players, enableKickout, ...otherProps }) {
 ListPlayers.propTypes = {
   players: PropTypes.arrayOf(PropTypes.string), // [playerId],
   enableKickout: PropTypes.bool,
+  isStatusVisible: PropTypes.bool,
 }

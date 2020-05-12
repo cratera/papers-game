@@ -7,12 +7,7 @@ export default StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'nowrap',
     alignItems: 'center',
-  },
-  header_icon: {
-    width: 24,
-    height: 24,
-    marginRight: 8,
-    flexShrink: 0,
+    paddingTop: 24,
   },
   header_txt: {
     paddingRight: 60,
