@@ -61,16 +61,20 @@ export default function App(props) {
   } else {
     return (
       <PapersContextProvider initialProfile={initialProfile}>
+        {/* // TODO Show loading while fetching game. */}
         <View style={styles.container}>
           {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
           <NavigationContainer ref={containerRef} initialState={initialNavigationState}>
             <Stack.Navigator
-              initialRouteName="settings"
-              options={{ cardStyleInterpolator: forFade, gestureEnabled: false }}
+              // initialRouteName="home"
               screenOptions={{ gestureEnabled: false }}
             >
               <Stack.Screen name="home" component={Home} />
-              <Stack.Screen name="room" component={GameRoom} />
+              <Stack.Screen
+                name="room"
+                component={GameRoom}
+                options={{ cardStyleInterpolator: forFade }}
+              />
               <Stack.Screen name="settings" component={Settings} />
             </Stack.Navigator>
           </NavigationContainer>

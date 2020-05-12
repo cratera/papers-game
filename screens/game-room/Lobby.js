@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react'
 import PropTypes from 'prop-types'
-import { Alert, Platform, Image, View, Text } from 'react-native'
+import { Image, View, Text } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 
 import PapersContext from '@store/PapersContext.js'
@@ -17,6 +17,7 @@ import Styles from './LobbyStyles.js'
 import Page from '@components/page'
 import Button from '@components/button'
 import ListPlayers from '@components/list-players'
+import ListTeams from '@components/list-teams'
 
 export default function Lobby({ navigation }) {
   const Papers = React.useContext(PapersContext)
@@ -152,35 +153,6 @@ const LobbyJoining = ({
   //   }
   // }, [hasEnoughPlayers, profileIsAdmin])
 
-  // TODO dry this. Here and settings. Maybe a fn component without styles?
-  function handleCancelPress() {
-    const fnToLeave = leaveGame
-
-    if (Platform.OS === 'web') {
-      if (window.confirm('Are you sure you want to leave the game?')) {
-        fnToLeave()
-      }
-    } else {
-      Alert.alert(
-        'Are you sure?',
-        'Your game will be deleted',
-        [
-          {
-            text: 'Leave Game',
-            onPress: fnToLeave,
-            style: 'destructive',
-          },
-          {
-            text: 'Cancel',
-            onPress: () => console.log('Leave Game cancelled'),
-            style: 'cancel',
-          },
-        ],
-        { cancelable: false }
-      )
-    }
-  }
-
   return (
     <Page>
       {/* <Page.Header /> */}
@@ -309,17 +281,7 @@ const LobbyWritting = ({
                 accessibilityLabel=""
               />
             </View>
-            <View>
-              {Object.keys(game.teams).map(teamId => {
-                const { id, name, players } = game.teams[teamId]
-                return (
-                  <View key={id} style={Styles.team}>
-                    <Text style={Theme.typography.h3}>{name}</Text>
-                    <ListPlayers players={players} enableKickout />
-                  </View>
-                )
-              })}
-            </View>
+            <ListTeams />
           </ScrollView>
         </Page.Main>
         <Page.CTAs hasOffset={!(didSubmitWords && !profileIsAdmin)}>

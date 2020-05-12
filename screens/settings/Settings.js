@@ -16,6 +16,7 @@ import PapersContext from '@store/PapersContext.js'
 import * as Theme from '@theme'
 
 import Page from '@components/page'
+import ListTeams from '@components/list-teams'
 
 import { PickAvatarModal } from '@components/profile'
 import { useLeaveGame } from '@components/settings'
@@ -32,13 +33,8 @@ export default function Settings(props) {
       headerTitle: 'Settings',
       headerLeft: function HLB() {
         return (
-          <Page.HeaderBtn
-            side="left"
-            onPress={() =>
-              props.fromScreen ? props.navigation.goBack() : props.navigation.navigate('home')
-            }
-          >
-            Back
+          <Page.HeaderBtn side="left" onPress={() => props.navigation.goBack()}>
+            👈Back
           </Page.HeaderBtn>
         )
       },
@@ -50,7 +46,7 @@ export default function Settings(props) {
   }, [])
 
   return (
-    <Stack.Navigator headerMode="none" initialRouteName="settings-game">
+    <Stack.Navigator headerMode="none">
       {game ? (
         <>
           <Stack.Screen name="settings-game" component={SettingsGame} />
@@ -65,10 +61,11 @@ export default function Settings(props) {
 
 Settings.propTypes = {
   navigation: PropTypes.object.isRequired, // react-navigation
-  fromScreen: PropTypes.bool, // react-navigation
 }
 
-function SettingsProfile() {
+// ======
+
+function SettingsProfile({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const [name, setName] = React.useState('')
   const { profile } = Papers.state
@@ -113,11 +110,18 @@ function SettingsProfile() {
             },
             {
               id: 'reset',
-              title: 'Reset profile',
-              onPress: Papers.resetProfile,
+              title: 'Delete account',
+              variant: 'danger',
+              onPress: async () => {
+                await Papers.resetProfile()
+                navigation.dangerouslyGetParent().reset({
+                  index: 0,
+                  routes: [{ name: 'home' }],
+                })
+              },
             },
           ].map(item => (
-            <Item key={item.id} title={item.title} icon={item.icon} onPress={item.onPress} />
+            <Item key={item.id} {...item} />
           ))}
         </ScrollView>
       </Page.Main>
@@ -125,10 +129,20 @@ function SettingsProfile() {
   )
 }
 
+SettingsProfile.propTypes = {
+  navigation: PropTypes.object.isRequired, // react-navigation
+}
+
+// ======
+
 function SettingsGame({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const { askToLeaveGame } = useLeaveGame()
   const { game } = Papers.state
+
+  if (!game) {
+    return null
+  }
 
   return (
     <Page>
@@ -145,8 +159,8 @@ function SettingsGame({ navigation }) {
               marginVertical: 16,
               padding: 24,
               paddingVertical: 70,
-              borderColor: Theme.colors.grayMedium,
-              borderWidth: 1,
+              borderColor: '#4cc',
+              borderWidth: 5,
               textAlign: 'center',
             }}
           >
@@ -159,18 +173,19 @@ function SettingsGame({ navigation }) {
               title: 'Players',
               icon: '👉',
               onPress: () => {
-                console.warn('TODO navigate to settings-player')
+                // console.warn('TODO navigate to settings-player')
                 // TODO find a way to navigate correctly in nested routes...
-                // navigation.navigate('settings-players')
+                navigation.navigate('settings-players')
               },
             },
             {
               id: 'lg',
               title: 'Leave Game',
+              variant: 'danger',
               onPress: askToLeaveGame,
             },
           ].map(item => (
-            <Item key={item.id} title={item.title} icon={item.icon} onPress={item.onPress} />
+            <Item key={item.id} {...item} />
           ))}
         </ScrollView>
       </Page.Main>
@@ -183,65 +198,47 @@ SettingsGame.propTypes = {
   navigation: PropTypes.object.isRequired, // react-navigation
 }
 
+// ======
+
 function SettingsPlayers({ navigation }) {
-  const Papers = React.useContext(PapersContext)
-  const { game } = Papers.state
+  function updateHeaderBackBtn({ title, btnText, onPress }) {
+    navigation.dangerouslyGetParent().setOptions({
+      headerTitle: title,
+      headerLeft: function HB() {
+        return (
+          <Page.HeaderBtn side="left" onPress={onPress}>
+            👈{btnText}
+          </Page.HeaderBtn>
+        )
+      },
+    })
+  }
 
-  // function updateHeaderBackBtn({ title, btnText, onPress }) {
-  //   navigation.dangerouslyGetParent().setOptions({
-  //     headerTitle: title,
-  //     headerLeft: function HB() {
-  //       return (
-  //         <Page.HeaderBtn side="left" onPress={onPress}>
-  //           {btnText}
-  //         </Page.HeaderBtn>
-  //       )
-  //     },
-  //   })
-  // }
-
-  // React.useEffect(() => {
-  //   // If you find a better way of doing this. Please let me know.
-  //   // I spent 3h googling it and didn't found a way.
-  //   updateHeaderBackBtn({
-  //     title: 'Players',
-  //     btnText: 'Settings',
-  //     onPress: () => {
-  //       navigation.goBack()
-  //       updateHeaderBackBtn({
-  //         title: 'Settings',
-  //         btnText: 'Back',
-  //         onPress: () =>
-  //           navigation.dangerouslyGetState()?.index === 0
-  //             ? navigation.dangerouslyGetParent().navigate('home')
-  //             : navigation.dangerouslyGetParent().goBack(),
-  //       })
-  //     },
-  //   })
-  // }, [])
+  React.useEffect(() => {
+    // If you find a better way of doing this. Please let me know.
+    // I spent 3h googling it and didn't found a way.
+    updateHeaderBackBtn({
+      title: 'Players',
+      btnText: 'Settings',
+      onPress: () => {
+        navigation.goBack()
+        updateHeaderBackBtn({
+          title: 'Settings',
+          btnText: 'Back',
+          onPress: () =>
+            // navigation.dangerouslyGetState()?.index === 0
+            //   ? navigation.dangerouslyGetParent().navigate('home')
+            navigation.dangerouslyGetParent().goBack(),
+        })
+      },
+    })
+  }, [])
 
   return (
     <Page>
       <Page.Main>
         <ScrollView>
-          <Text
-            style={[Theme.typography.h2, Theme.u.center, { marginTop: 24 }]}
-            accessibilityRole="header"
-          >
-            {game.name}
-          </Text>
-          <Text
-            style={{
-              marginVertical: 16,
-              padding: 24,
-              paddingVertical: 70,
-              borderColor: Theme.colors.grayMedium,
-              borderWidth: 1,
-              textAlign: 'center',
-            }}
-          >
-            [TODO: List of players]
-          </Text>
+          <ListTeams />
         </ScrollView>
       </Page.Main>
     </Page>
@@ -319,7 +316,7 @@ const AvatarSquare = ({ avatar, style, onChange }) => {
 
 AvatarSquare.propTypes = {
   avatar: PropTypes.string,
-  style: PropTypes.node,
+  style: PropTypes.oneOfType([PropTypes.array, PropTypes.object, PropTypes.number]),
   onChange: PropTypes.func.isRequired, // (value: String)
 }
 
@@ -354,7 +351,7 @@ const StylesAv = StyleSheet.create({
 
 // ==========================
 
-function Item({ title, icon, isLast, onPress }) {
+function Item({ title, icon, variant, isLast, onPress }) {
   return (
     <TouchableOpacity style={Styles.group} onPress={onPress}>
       <View
@@ -366,7 +363,16 @@ function Item({ title, icon, isLast, onPress }) {
           },
         ]}
       >
-        <Text style={Theme.typography.body}>{title}</Text>
+        <Text
+          style={[
+            Theme.typography.body,
+            {
+              ...(variant === 'danger' ? { color: Theme.colors.danger } : {}),
+            },
+          ]}
+        >
+          {title}
+        </Text>
         <Text>{icon}</Text>
       </View>
     </TouchableOpacity>
@@ -376,6 +382,7 @@ function Item({ title, icon, isLast, onPress }) {
 Item.propTypes = {
   title: PropTypes.string.isRequired,
   isLast: PropTypes.bool,
+  variant: PropTypes.oneOf(['danger']),
   icon: PropTypes.node,
   onPress: PropTypes.func,
 }

@@ -8,7 +8,7 @@ export const colors = {
   primaryLight: '#FFE9DC',
   success: '#4EBD81',
   successLight: '#DCF2E6',
-  danger: '#e51d1d', // TODO/REVIEW @mmbotelho
+  danger: '#FF005c',
   bg: '#ffffff',
 }
 
