@@ -53,13 +53,13 @@ export default function SettingsModal({ isOpen, onClose }) {
 
   const handleLeaveGame = () => {
     if (Platform.OS === 'web') {
-      if (window.confirm('Are you sure you wanna leave the game?')) {
+      if (window.confirm('Are you sure you want to leave the game?')) {
         Papers.leaveGame()
       }
     } else {
       Alert.alert(
         'Leaving the Game',
-        'Are you sure you wanna leave the game?',
+        'Are you sure you want to leave the game?',
         [
           {
             text: 'Leave Game',

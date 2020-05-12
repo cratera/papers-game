@@ -1,10 +1,10 @@
 import React from 'react'
-import { Text } from 'react-native'
+import { Alert, Platform, Text } from 'react-native'
 import PropTypes from 'prop-types'
 // import * as WebBrowser from 'expo-web-browser'; // WHAT'S THIS?
 
 import { createStackNavigator } from '@react-navigation/stack'
-
+// import { confirmLeaveGame } from '@constants/utils.js'
 import PapersContext from '@store/PapersContext.js'
 
 import GameLobby from './Lobby.js'
@@ -16,7 +16,7 @@ import Button from '@components/button'
 
 const Stack = createStackNavigator()
 
-export default function GameRoom({ navigation }) {
+export default function GameRoomEntry({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const { profile, game } = Papers.state
   const { id: gameId } = game || {}
@@ -24,6 +24,26 @@ export default function GameRoom({ navigation }) {
   const profileId = profile && profile.id
   const gameHasStarted = !!game && game.hasStarted
   const [status, setStatus] = React.useState(gameId ? 'ready' : 'loading') // needProfile || ready  || notFound
+
+  React.useEffect(() => {
+    navigation.setOptions({
+      headerTitle: 'Create game',
+      headerLeft: function HBS() {
+        return (
+          <Page.HeaderBtn side="left" onPress={handleCancelPress}>
+            Cancel
+          </Page.HeaderBtn>
+        )
+      },
+      headerRight: null,
+      headerTintColor: '#fff', // TODO this
+      headerStyle: {
+        shadowColor: 'transparent',
+        borderBottomWidth: 0,
+        // height: 72, // REVIEW @mmbotelho
+      },
+    })
+  }, [])
 
   React.useEffect(() => {
     if (!profileId) {
@@ -45,6 +65,35 @@ export default function GameRoom({ navigation }) {
       // navigation.navigate('playing');
     }
   }, [gameHasStarted])
+
+  function handleCancelPress() {
+    // TODO dry this. Here and settings. Maybe a fn component without styles?
+    const fnToLeave = Papers.leaveGame
+
+    if (Platform.OS === 'web') {
+      if (window.confirm('Are yssou sure you want to leave the game?')) {
+        fnToLeave()
+      }
+    } else {
+      Alert.alert(
+        'Leaving the Game',
+        'Are you sure you want to leave the game?',
+        [
+          {
+            text: 'Leave Game',
+            onPress: fnToLeave,
+            style: 'destructive',
+          },
+          {
+            text: 'Cancel',
+            onPress: () => console.log('Leave Game cancelled'),
+            style: 'cancel',
+          },
+        ],
+        { cancelable: false }
+      )
+    }
+  }
 
   if (!profileId || status === 'noProfile') {
     return (
@@ -99,13 +148,22 @@ export default function GameRoom({ navigation }) {
   )
 }
 
-GameRoom.propTypes = {
+// export default function ErrorTodoThis({ navigation }) {
+//   return (
+//     <ErrorBoundary>
+//       <GameRoomEntry navigation={navigation} />
+//     </ErrorBoundary>
+//   )
+// }
+
+GameRoomEntry.propTypes = {
   navigation: PropTypes.shape({
     navigate: PropTypes.func, // (componentName: String)
+    setOptions: PropTypes.func,
   }),
 }
 
-GameRoom.navigationOptions = {
+GameRoomEntry.navigationOptions = {
   header: null,
 }
 
@@ -119,3 +177,25 @@ const Template = ({ children }) => (
 Template.propTypes = {
   children: PropTypes.node,
 }
+
+// class ErrorBoundary extends React.Component {
+//   constructor(props) {
+//     super(props)
+//     this.state = { hasError: false }
+//   }
+
+//   static getDerivedStateFromError(error) {
+//     console.warn('error', error)
+//     // Update state so the next render will show the fallback UI.
+//     return { hasError: true }
+//   }
+
+//   render() {
+//     if (this.state.hasError) {
+//       // You can render any custom fallback UI
+//       return <h1>Something went wrong.</h1>
+//     }
+
+//     return this.props.children
+//   }
+// }

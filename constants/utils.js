@@ -96,3 +96,7 @@ export function useCountdown(initialDate, options = {}) {
 
   return [timeLeft, restartCountdown]
 }
+
+export function confirmLeaveGame(fnToLeave) {
+  console.log('hmmmasaswsmsm FORCE Refresh Bug on Lobby.js')
+}

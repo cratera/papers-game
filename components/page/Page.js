@@ -51,7 +51,7 @@ const HeaderBtn = ({ side, style, children, ...otherProps }) => (
 )
 
 HeaderBtn.propTypes = {
-  side: PropTypes.oneOf(['left', 'right']),
+  side: PropTypes.oneOf(['left', 'right']).isRequired,
   style: PropTypes.oneOfType([PropTypes.array, PropTypes.object, PropTypes.number]),
   children: PropTypes.node,
 }

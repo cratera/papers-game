@@ -20,17 +20,20 @@ import ListPlayers from '@components/list-players'
 
 export default function Lobby({ navigation }) {
   const Papers = React.useContext(PapersContext)
-  const { profile, profiles, game } = Papers.state
-  const profileId = profile.id
-  const profileIsAdmin = game.creatorId === profileId
+  const { profile, profiles, game } = Papers.state || {}
+  const profileId = profile && profile.id
+  const creatorId = !!game && game.creatorId
+  const gameWords = !!game && game.words
+  const profileIsAdmin = creatorId === profileId
   const gameHasStarted = !!game && game.hasStarted
-  const nextPlayer = profiles[game.creatorId]?.name || '???'
-
+  const nextPlayer = (profiles && profiles[creatorId]?.name) || '???'
   const didSubmitAllWords = React.useCallback(
     plId => {
-      return game.words && game.words[plId] && game.words[plId].length === game.settings.words
+      return (
+        game && game.words && game.words[plId] && game.words[plId].length === game.settings.words
+      )
     },
-    [game.words]
+    [gameWords]
   )
 
   React.useEffect(() => {
@@ -39,6 +42,28 @@ export default function Lobby({ navigation }) {
       navigation.navigate('playing')
     }
   }, [gameHasStarted])
+
+  if (!game) {
+    console.log('What went wrong with useContext and PapersContext??', Papers)
+    // TODO/BUG: This is the weirdest BUG with React.
+    // Let me try to explain this and reproduce later...
+    // 1. Create a team a game on IOS. Let another player join.
+    // 2. Open the file utils.js and edit the file (can be anything, ex: confirmLeaveGame)
+    // 3. The page will refresh and PapersContext will return empty {}. (if not, repeat step 2.)
+    //    But the logs at PapersContext.js show all the data as expected.
+    //
+    // Analysis: It seems this component stops receiving new updates from context.
+    // Maybe it's a bug with the hot reload (RN or Expo?) It does not happen on browser.
+    // I hope this never happens IRL.
+
+    // TODO report error to server.
+    return (
+      <View>
+        <Text>Ups! Game does not exist...</Text>
+        <Button onPress={() => navigation.navigate('home')}>Go Home</Button>
+      </View>
+    )
+  }
 
   // TODO review all these props
   return !game.teams ? (
@@ -93,7 +118,6 @@ const LobbyJoining = ({ game, nextPlayer, onCreateTeams, profileIsAdmin }) => {
 
   return (
     <Page>
-      <Page.Header />
       <Page.Main>
         <View style={Styles.header}>
           {profileIsAdmin && (

@@ -14,17 +14,19 @@ export default function HomeScreen({ navigation }) {
   const { profile, game } = Papers.state
   const gameId = game?.id
 
-  console.log('aqui!')
   React.useEffect(() => {
     navigation.setOptions({
       headerTitle: profile.name ? 'Home' : 'Create Profile',
-      headerRight: () => (profile.name ? <Page.HeaderBtnSettings /> : null), // eslint-disable-line
+      headerLeft: null,
+      headerRight: function HBS() {
+        return profile.name ? <Page.HeaderBtnSettings /> : null
+      },
       // TODO: Define header styles
       headerTintColor: Theme.colors.bg,
       headerStyle: {
         shadowColor: 'transparent',
         borderBottomWidth: 0,
-        height: 72,
+        // height: 72, // REVIEW @mmbotelho
       },
     })
   }, [profile.name])

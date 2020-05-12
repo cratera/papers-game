@@ -15,6 +15,12 @@ import GameRoom from './screens/game-room'
 
 const Stack = createStackNavigator()
 
+const forFade = ({ current, closing }) => ({
+  cardStyle: {
+    opacity: current.progress,
+  },
+})
+
 export default function App(props) {
   const [initialProfile, setInitialProfile] = React.useState({})
   const [isLoadingComplete, setLoadingComplete] = React.useState(false)
@@ -57,8 +63,10 @@ export default function App(props) {
         <View style={styles.container}>
           {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
           <NavigationContainer ref={containerRef} initialState={initialNavigationState}>
-            <Stack.Navigator>
-              {/* <Stack.Screen name="Root" component={BottomTabNavigator} /> */}
+            <Stack.Navigator
+              options={{ cardStyleInterpolator: forFade, gestureEnabled: false }}
+              screenOptions={{ gestureEnabled: false }}
+            >
               <Stack.Screen name="home" component={Home} />
               <Stack.Screen name="room" component={GameRoom} />
             </Stack.Navigator>
