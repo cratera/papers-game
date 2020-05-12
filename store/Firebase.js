@@ -29,6 +29,7 @@ let DB // firebase database
 
 const PUBLIC_API = {
   on,
+  offAll,
   signIn,
   updateProfile, // setUser?
   resetProfile,
@@ -103,7 +104,15 @@ export default function init(options) {
  * - (id) - the userid from firebase.
  */
 function on(topic, cb) {
+  console.log('⚙️ on()', topic)
   PubSub.subscribe(topic, cb)
+}
+
+async function offAll() {
+  const gameId = LOCAL_PROFILE.gameId
+  console.log('⚙️ offAll(), Firebase disconnecting!', gameId)
+  PubSub.clearAllSubscriptions()
+  _unsubGame(gameId)
 }
 
 // ============== AUTH / PROFILE
@@ -174,7 +183,7 @@ async function updateProfile(profile) {
   try {
     const isHTTPLink = avatar && avatar.indexOf('https://') === 0
     if (avatar && isHTTPLink) {
-      console.log('avatar upload ignored because its a link')
+      console.log(':: avatar ignored because it is a link')
     }
     if (avatar && !isHTTPLink) {
       try {

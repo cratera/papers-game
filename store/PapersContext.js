@@ -83,6 +83,16 @@ export class PapersContextProvider extends Component {
     await this.tryToReconnect()
   }
 
+  componentWillUnmount() {
+    this.state.socket && this.state.socket.offAll()
+
+    console.log(`
+🎲⏳🎲⏳🎲⏳🎲⏳🎲⏳🎲⏳🎲⏳🎲⏳🎲
+:::::::::::::::::::::::::::::::::::
+       ... Refreshing app ...
+:::::::::::::::::::::::::::::::::::`)
+  }
+
   render() {
     return (
       <PapersContext.Provider
