@@ -123,7 +123,7 @@ export default function WritePapersModal({ isOpen, onClose }) {
     try {
       await Papers.setWords(words)
     } catch (error) {
-      console.log('WritePapersModal submit error:', error)
+      console.warn('WritePapersModal submit error:', error)
       setErrorMsg(`Ups, set papers failed! ${error.message}`)
     }
     setIsSubmiting(false)

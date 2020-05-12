@@ -19,7 +19,7 @@ const ModalWeb = ({ children, visible, ...otherProps }) => {
         width: '100%',
         height: '100%',
         backgroundColor: '#ffffff',
-        zIndex: 4,
+        zIndex: 4, // TODO/BUG Web - header is above Modal.
       }}
       {...otherProps}
     >

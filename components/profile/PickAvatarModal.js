@@ -4,10 +4,9 @@ import { Platform, Text, View, TouchableWithoutFeedback, StyleSheet } from 'reac
 
 import Modal from '@components/modal'
 import Button from '@components/button'
+import usePickAvatar from './usePickAvatar.js'
 
 import * as Theme from '@theme'
-
-import usePickAvatar from './utils/usePickAvatar.js'
 
 export default function PickAvatar({ visible, onSubmit, onClose, onChange }) {
   const pickAvatar = usePickAvatar()

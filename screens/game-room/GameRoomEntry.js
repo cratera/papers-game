@@ -22,20 +22,24 @@ export default function GameRoomEntry({ navigation }) {
   const { id: gameId } = game || {}
 
   const profileId = profile && profile.id
-  const gameHasStarted = !!game && game.hasStarted
+  // const gameHasStarted = !!game && game.hasStarted
   const [status, setStatus] = React.useState(gameId ? 'ready' : 'loading') // needProfile || ready  || notFound
 
   React.useEffect(() => {
     navigation.setOptions({
       headerTitle: 'Create game',
-      headerLeft: function HBS() {
-        return (
-          <Page.HeaderBtn side="left" onPress={handleCancelPress}>
-            Cancel
-          </Page.HeaderBtn>
-        )
+      // headerLeft: function HBS() {
+      //   return (
+      //     <Page.HeaderBtn side="left" onPress={handleCancelPress}>
+      //       Cancel
+      //     </Page.HeaderBtn>
+      //   )
+      // },
+      // headerRight: null,
+      headerLeft: null,
+      headerRight: function HBS() {
+        return profile.name ? <Page.HeaderBtnSettings /> : null
       },
-      headerRight: null,
       headerTintColor: '#fff', // TODO this
       headerStyle: {
         shadowColor: 'transparent',
@@ -59,41 +63,12 @@ export default function GameRoomEntry({ navigation }) {
     }
   }, [gameId, profileId])
 
-  React.useEffect(() => {
-    if (gameHasStarted) {
-      console.log('TODO - Navigating to playing...')
-      // navigation.navigate('playing');
-    }
-  }, [gameHasStarted])
-
-  function handleCancelPress() {
-    // TODO dry this. Here and settings. Maybe a fn component without styles?
-    const fnToLeave = Papers.leaveGame
-
-    if (Platform.OS === 'web') {
-      if (window.confirm('Are yssou sure you want to leave the game?')) {
-        fnToLeave()
-      }
-    } else {
-      Alert.alert(
-        'Leaving the Game',
-        'Are you sure you want to leave the game?',
-        [
-          {
-            text: 'Leave Game',
-            onPress: fnToLeave,
-            style: 'destructive',
-          },
-          {
-            text: 'Cancel',
-            onPress: () => console.log('Leave Game cancelled'),
-            style: 'cancel',
-          },
-        ],
-        { cancelable: false }
-      )
-    }
-  }
+  // React.useEffect(() => {
+  //   if (gameHasStarted) {
+  //     console.log('Navigating to playing...')
+  //     // navigation.navigate('playing');
+  //   }
+  // }, [gameHasStarted])
 
   if (!profileId || status === 'noProfile') {
     return (

@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react'
 import PropTypes from 'prop-types'
-import { Image, View, Text } from 'react-native'
+import { Alert, Platform, Image, View, Text } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 
 import PapersContext from '@store/PapersContext.js'
@@ -44,7 +44,7 @@ export default function Lobby({ navigation }) {
   }, [gameHasStarted])
 
   if (!game) {
-    console.log('What went wrong with useContext and PapersContext??', Papers)
+    console.warn('What went wrong with useContext and PapersContext??', Papers)
     // TODO/BUG: This is the weirdest BUG with React.
     // Let me try to explain this and reproduce later...
     // 1. Create a team a game on IOS. Let another player join.
@@ -72,6 +72,8 @@ export default function Lobby({ navigation }) {
       nextPlayer={nextPlayer}
       onCreateTeams={handleCreateTeams}
       profileIsAdmin={profileIsAdmin}
+      leaveGame={Papers.leaveGame}
+      navigation={navigation}
     />
   ) : (
     <LobbyWritting
@@ -83,6 +85,7 @@ export default function Lobby({ navigation }) {
       profiles={profiles}
       handleStartClick={handleStartClick}
       setWordsForEveyone={setWordsForEveyone}
+      navigation={navigation}
     />
   )
 
@@ -105,19 +108,82 @@ export default function Lobby({ navigation }) {
 }
 
 Lobby.propTypes = {
-  navigation: PropTypes.shape({
-    navigate: PropTypes.func, // (componentName: String)
-  }),
+  navigation: PropTypes.object, // ReactNavigation
 }
 
 // ------- LobbyJoining ------- //
 
-const LobbyJoining = ({ game, nextPlayer, onCreateTeams, profileIsAdmin }) => {
+const LobbyJoining = ({
+  game,
+  nextPlayer,
+  onCreateTeams,
+  profileIsAdmin,
+  leaveGame,
+  navigation,
+}) => {
   const { players, name, id: gameId } = game
   const hasEnoughPlayers = Object.keys(players).length >= 4
 
+  // React.useEffect(() => {
+  //   navigation.setOptions({
+  //     headerTitle: 'Lobby',
+  //     headerLeft: null,
+  //     headerRight: null,
+  //     // headerTintColor: '#fff', // TODO this
+  //     // headerStyle: {
+  //     //   shadowColor: 'transparent',
+  //     //   borderBottomWidth: 0,
+  //     // },
+  //   })
+  // }, [])
+
+  // React.useEffect(() => {
+  //   if (hasEnoughPlayers && profileIsAdmin) {
+  //     navigation.setOptions({
+  //       headerTitle: 'Lobby',
+  //       headerRight: function x() {
+  //         return (
+  //           <Page.HeaderBtn side="right" onPress={onCreateTeams}>
+  //             Create teams
+  //           </Page.HeaderBtn>
+  //         )
+  //       },
+  //     })
+  //   }
+  // }, [hasEnoughPlayers, profileIsAdmin])
+
+  // TODO dry this. Here and settings. Maybe a fn component without styles?
+  function handleCancelPress() {
+    const fnToLeave = leaveGame
+
+    if (Platform.OS === 'web') {
+      if (window.confirm('Are you sure you want to leave the game?')) {
+        fnToLeave()
+      }
+    } else {
+      Alert.alert(
+        'Are you sure?',
+        'Your game will be deleted',
+        [
+          {
+            text: 'Leave Game',
+            onPress: fnToLeave,
+            style: 'destructive',
+          },
+          {
+            text: 'Cancel',
+            onPress: () => console.log('Leave Game cancelled'),
+            style: 'cancel',
+          },
+        ],
+        { cancelable: false }
+      )
+    }
+  }
+
   return (
     <Page>
+      {/* <Page.Header /> */}
       <Page.Main>
         <View style={Styles.header}>
           {profileIsAdmin && (
@@ -155,6 +221,7 @@ LobbyJoining.propTypes = {
   profileIsAdmin: PropTypes.bool.isRequired,
   onCreateTeams: PropTypes.func.isRequired,
   nextPlayer: PropTypes.string.isRequired,
+  navigation: PropTypes.object, // ReactNavigation,
 }
 
 const LobbyJoiningCTAsToMemo = ({
@@ -222,7 +289,6 @@ const LobbyWritting = ({
   return (
     <Fragment>
       <Page>
-        <Page.Header />
         <Page.Main>
           <ScrollView style={Theme.u.scrollSideOffset}>
             <View style={Styles.header}>

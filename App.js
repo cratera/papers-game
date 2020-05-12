@@ -12,6 +12,7 @@ import useLinking from './navigation/useLinking'
 import { PapersContextProvider, loadProfile } from './store/PapersContext.js'
 import Home from './screens/home'
 import GameRoom from './screens/game-room'
+import Settings from './screens/settings'
 
 const Stack = createStackNavigator()
 
@@ -64,11 +65,13 @@ export default function App(props) {
           {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
           <NavigationContainer ref={containerRef} initialState={initialNavigationState}>
             <Stack.Navigator
+              initialRouteName="settings"
               options={{ cardStyleInterpolator: forFade, gestureEnabled: false }}
               screenOptions={{ gestureEnabled: false }}
             >
               <Stack.Screen name="home" component={Home} />
               <Stack.Screen name="room" component={GameRoom} />
+              <Stack.Screen name="settings" component={Settings} />
             </Stack.Navigator>
           </NavigationContainer>
         </View>

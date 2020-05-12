@@ -1,17 +1,17 @@
-import React from 'react';
-import { Alert, Platform } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import * as Permissions from 'expo-permissions';
+import React from 'react'
+import { Alert, Platform } from 'react-native'
+import * as ImagePicker from 'expo-image-picker'
+import * as Permissions from 'expo-permissions'
 
 export default function usePickAvatar() {
-  const [isWeb] = React.useState(Platform.OS === 'web');
+  const [isWeb] = React.useState(Platform.OS === 'web')
 
   async function pickAvatar({ camera } = {}) {
     if (!isWeb) {
       const responseCamera = camera
         ? await Permissions.askAsync(Permissions.CAMERA)
-        : { granted: true };
-      const response = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+        : { granted: true }
+      const response = await Permissions.askAsync(Permissions.CAMERA_ROLL)
       if (!response.granted || !responseCamera.granted) {
         if (!isWeb) {
           Alert.alert(
@@ -22,15 +22,15 @@ export default function usePickAvatar() {
               { text: 'OK', onPress: () => console.log('OK Pressed') },
             ],
             { cancelable: false }
-          );
+          )
         } else {
-          alert('Sorry, we need camera roll permissions to make this work!');
+          alert('Sorry, we need camera roll permissions to make this work!')
         }
-        return;
+        return
       }
     }
 
-    let result;
+    let result
 
     if (camera) {
       result = await ImagePicker.launchCameraAsync({
@@ -40,7 +40,7 @@ export default function usePickAvatar() {
         quality: 0.3,
         base64: false,
         exif: false,
-      });
+      })
     } else {
       result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -49,11 +49,11 @@ export default function usePickAvatar() {
         quality: 0.3,
         base64: false,
         exif: false,
-      });
+      })
     }
 
-    console.log('usePickAvatarModal', result.cancelled ? 'cancelled' : 'done!');
-    return result.cancelled ? null : result.uri;
+    console.log('usePickAvatarModal', result.cancelled ? 'cancelled' : 'done!')
+    return result.cancelled ? null : result.uri
 
     // We'll go back to this again...
     // if (result.uri || result.base64) {
@@ -68,5 +68,5 @@ export default function usePickAvatar() {
     // }
   }
 
-  return pickAvatar;
+  return pickAvatar
 }
