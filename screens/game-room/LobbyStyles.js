@@ -7,6 +7,7 @@ export default StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     paddingBottom: 8,
+    paddingTop: 24,
     // ${Theme.bp.xs} {
     //   margin-bottom: 2rem;
     // }

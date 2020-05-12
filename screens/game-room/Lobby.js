@@ -18,6 +18,7 @@ import Page from '@components/page'
 import Button from '@components/button'
 import ListPlayers from '@components/list-players'
 import ListTeams from '@components/list-teams'
+import { useLeaveGame } from '@components/settings'
 
 export default function Lobby({ navigation }) {
   const Papers = React.useContext(PapersContext)
@@ -29,11 +30,8 @@ export default function Lobby({ navigation }) {
   const gameHasStarted = !!game && game.hasStarted
   const nextPlayer = (profiles && profiles[creatorId]?.name) || '???'
   const didSubmitAllWords = React.useCallback(
-    plId => {
-      return (
-        game && game.words && game.words[plId] && game.words[plId].length === game.settings.words
-      )
-    },
+    plId =>
+      game && game.words && game.words[plId] && game.words[plId].length === game.settings.words,
     [gameWords]
   )
 
@@ -114,48 +112,49 @@ Lobby.propTypes = {
 
 // ------- LobbyJoining ------- //
 
-const LobbyJoining = ({
-  game,
-  nextPlayer,
-  onCreateTeams,
-  profileIsAdmin,
-  leaveGame,
-  navigation,
-}) => {
+const LobbyJoining = ({ game, nextPlayer, onCreateTeams, profileIsAdmin, navigation }) => {
   const { players, name, id: gameId } = game
+  const { askToLeaveGame } = useLeaveGame()
   const hasEnoughPlayers = Object.keys(players).length >= 4
 
-  // React.useEffect(() => {
-  //   navigation.setOptions({
-  //     headerTitle: 'Lobby',
-  //     headerLeft: null,
-  //     headerRight: null,
-  //     // headerTintColor: '#fff', // TODO this
-  //     // headerStyle: {
-  //     //   shadowColor: 'transparent',
-  //     //   borderBottomWidth: 0,
-  //     // },
-  //   })
-  // }, [])
+  React.useEffect(() => {
+    navigation.setOptions({
+      headerTitle: 'New game',
+      headerLeft: function HLB() {
+        return (
+          <Page.HeaderBtn side="left" onPress={askToLeaveGame}>
+            Exit
+          </Page.HeaderBtn>
+        )
+      },
+      headerRight: null,
+      headerStyle: {
+        shadowColor: 'transparent',
+        borderBottomWidth: 0,
+      },
+    })
+  }, [])
 
-  // React.useEffect(() => {
-  //   if (hasEnoughPlayers && profileIsAdmin) {
-  //     navigation.setOptions({
-  //       headerTitle: 'Lobby',
-  //       headerRight: function x() {
-  //         return (
-  //           <Page.HeaderBtn side="right" onPress={onCreateTeams}>
-  //             Create teams
-  //           </Page.HeaderBtn>
-  //         )
-  //       },
-  //     })
-  //   }
-  // }, [hasEnoughPlayers, profileIsAdmin])
+  React.useEffect(() => {
+    if (profileIsAdmin && hasEnoughPlayers) {
+      navigation.setOptions({
+        headerRight: function HLB() {
+          return (
+            <Page.HeaderBtn side="right" onPress={() => navigation.navigate('teams')}>
+              Teams 👉
+            </Page.HeaderBtn>
+          )
+        },
+      })
+    } else {
+      navigation.setOptions({
+        headerRight: null,
+      })
+    }
+  }, [profileIsAdmin, hasEnoughPlayers])
 
   return (
     <Page>
-      {/* <Page.Header /> */}
       <Page.Main>
         <View style={Styles.header}>
           {profileIsAdmin && (
@@ -203,9 +202,8 @@ const LobbyJoiningCTAsToMemo = ({
   nextPlayer,
 }) => {
   if (hasEnoughPlayers) {
-    return profileIsAdmin ? (
-      <Button onPress={onCreateTeams}>Create teams!</Button>
-    ) : (
+    // <Button onPress={onCreateTeams}>Create teams!</Button>
+    return profileIsAdmin ? null : (
       <Text style={[Theme.typography.small, Styles.status]}>
         Wait for {nextPlayer} to create the teams.
       </Text>

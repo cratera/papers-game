@@ -8,14 +8,10 @@ import PapersContext from '@store/PapersContext.js'
 
 import Page from '@components/page'
 import Button from '@components/button'
-import { IconEdit } from '@components/icons'
+// import { IconEdit } from '@components/icons'
 import ListPlayers from '@components/list-players'
 
 import * as Theme from '@theme'
-
-const Title = () => (
-  <Text style={[Theme.typography.small, Theme.u.center, { marginBottom: 16 }]}>Create teams</Text>
-)
 
 export default function Teams({ navigation }) {
   const Papers = React.useContext(PapersContext)
@@ -23,13 +19,22 @@ export default function Teams({ navigation }) {
   const { game } = Papers.state
   const [tempTeams, setTeams] = React.useState(PaperTeams || getRandomTeams())
 
-  function backToLobby() {
-    navigation.navigate('lobby')
-  }
-
+  React.useEffect(() => {
+    navigation.setOptions({
+      headerLeft: function HLB() {
+        return (
+          <Page.HeaderBtn side="left" onPress={navigation.goBack}>
+            👈Back
+          </Page.HeaderBtn>
+        )
+      },
+      headerRight: null,
+    })
+  }, [])
+  // This could be useRandomTeams.
   function getRandomTeams() {
     const players = Object.keys(game.players)
-    const teamsNr = 2 // LATER - game setting
+    const teamsNr = 2 // LATER - Game Setting
     const teams = Array.from(Array(teamsNr), () => [])
     const limit = Math.round(players.length / teamsNr)
     const newTempTeams = {}
@@ -92,14 +97,8 @@ export default function Teams({ navigation }) {
 
   return (
     <Page>
-      <Page.Header>
-        <Button style={Styles.backBtn} variant="flat" onPress={backToLobby}>
-          Back to lobby
-        </Button>
-      </Page.Header>
       <Page.Main>
         <ScrollView style={Theme.u.scrollSideOffset}>
-          <Title />
           {Object.keys(tempTeams).map(teamId => {
             const { id, name, players } = tempTeams[teamId]
 
@@ -125,18 +124,16 @@ export default function Teams({ navigation }) {
       </Page.Main>
       <Page.CTAs hasOffset>
         <Button variant="light" onPress={generateTeams} styleTouch={{ marginBottom: 16 }}>
-          Create a different random team
+          Randomize teams
         </Button>
-        <Button onPress={submitTeamsAndGoNext}>Next: Write your 10 papers!</Button>
+        <Button onPress={submitTeamsAndGoNext}>Lock teams</Button>
       </Page.CTAs>
     </Page>
   )
 }
 
 Teams.propTypes = {
-  navigation: PropTypes.shape({
-    navigate: PropTypes.func, // (componentName: String)
-  }),
+  navigation: PropTypes.object.isRequired, // react-navigation
 }
 
 const Styles = StyleSheet.create({
@@ -163,6 +160,7 @@ const Styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    marginTop: 16,
   },
   // btnEdit: {
   //   color: Theme.colors.primary,
@@ -175,5 +173,4 @@ const Styles = StyleSheet.create({
   //   top: 10,
   //   left: 10,
   // },
-  team: {},
 })

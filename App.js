@@ -73,7 +73,7 @@ export default function App(props) {
               <Stack.Screen
                 name="room"
                 component={GameRoom}
-                options={{ cardStyleInterpolator: forFade }}
+                options={{ cardStyleInterpolator: forFade, headerShown: false }}
               />
               <Stack.Screen name="settings" component={Settings} />
             </Stack.Navigator>

@@ -13,7 +13,7 @@ export default function useLeaveGame() {
       }
     } else {
       Alert.alert(
-        'Leaving the Game',
+        'Exit game',
         'Are you sure you want to leave the game?',
         [
           {

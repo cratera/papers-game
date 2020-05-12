@@ -22,32 +22,7 @@ export default function GameRoomEntry({ navigation }) {
   const { id: gameId } = game || {}
 
   const profileId = profile && profile.id
-  // const gameHasStarted = !!game && game.hasStarted
   const [status, setStatus] = React.useState(gameId ? 'ready' : 'loading') // needProfile || ready  || notFound
-
-  React.useEffect(() => {
-    navigation.setOptions({
-      headerTitle: 'Create game',
-      // headerLeft: function HBS() {
-      //   return (
-      //     <Page.HeaderBtn side="left" onPress={handleCancelPress}>
-      //       Cancel
-      //     </Page.HeaderBtn>
-      //   )
-      // },
-      // headerRight: null,
-      headerLeft: null,
-      headerRight: function HBS() {
-        return profile.name ? <Page.HeaderBtnSettings /> : null
-      },
-      headerTintColor: '#fff', // TODO this
-      headerStyle: {
-        shadowColor: 'transparent',
-        borderBottomWidth: 0,
-        // height: 72, // REVIEW @mmbotelho
-      },
-    })
-  }, [])
 
   React.useEffect(() => {
     if (!profileId) {
@@ -63,17 +38,10 @@ export default function GameRoomEntry({ navigation }) {
     }
   }, [gameId, profileId])
 
-  // React.useEffect(() => {
-  //   if (gameHasStarted) {
-  //     console.log('Navigating to playing...')
-  //     // navigation.navigate('playing');
-  //   }
-  // }, [gameHasStarted])
-
   if (!profileId || status === 'noProfile') {
     return (
       <Template>
-        <Text>To join {gameId || 'a room'} you need to create a profile before!</Text>
+        <Text>To join {gameId || 'a game'} you need to create a profile before!</Text>
 
         <Button onPress={() => navigation.navigate('home')}>Create profile</Button>
       </Template>
@@ -112,13 +80,16 @@ export default function GameRoomEntry({ navigation }) {
     )
   }
 
-  // NOTE: didn't understand yet how dynamic routing works on RN.
-  // If this is the right way of doing it, I don't like it.
   return (
-    <Stack.Navigator headerMode="none">
-      <Stack.Screen name="lobby" component={GameLobby} />
-      {!game.teams ? <Stack.Screen name="teams" component={GameTeams} /> : null}
-      {game.teams ? <Stack.Screen name="playing" component={GamePlayingEntry} /> : null}
+    <Stack.Navigator screenOptions={{ headerTitleAlign: 'center' }}>
+      {!game.teams ? (
+        <>
+          <Stack.Screen name="lobby" headerTitle="New Game" component={GameLobby} />
+          <Stack.Screen name="teams" headerTitle="Teams" component={GameTeams} />
+        </>
+      ) : (
+        <Stack.Screen name="playing" component={GamePlayingEntry} />
+      )}
     </Stack.Navigator>
   )
 }
@@ -136,10 +107,6 @@ GameRoomEntry.propTypes = {
     navigate: PropTypes.func, // (componentName: String)
     setOptions: PropTypes.func,
   }),
-}
-
-GameRoomEntry.navigationOptions = {
-  header: null,
 }
 
 const Template = ({ children }) => (
