@@ -44,8 +44,8 @@ const PUBLIC_API = {
   setTeams,
   setWords,
   setWordsForEveryone,
+  markMeAsReady,
 
-  startGame,
   startTurn,
   setPapersGuessed,
   finishTurn,
@@ -356,7 +356,7 @@ async function joinGame(gameName) {
     throw new Error('alreadyStarted')
   }
 
-  await DB.ref(`games/${gameId}/players/${id}`).set({
+  await DB.ref(`games/${gameId}/players/${id}`).update({
     isAfk: false,
   })
 
@@ -441,7 +441,7 @@ function _pubGame(gameId) {
       const id = data.key
       PubSub.publish('game.players.changed', {
         id,
-        info: data.val()[id],
+        info: data.val(),
       })
     })
 
@@ -629,12 +629,25 @@ async function setWordsForEveryone(allWords) {
 /**
  *
  */
-async function startGame(roundStatus) {
-  console.log('⚙️ startGame()')
-  const gameId = LOCAL_PROFILE.gameId
+async function markMeAsReady(roundStatus) {
+  console.log('⚙️ markMeAsReady()')
+  const { gameId, id } = LOCAL_PROFILE
 
+  // REVIEW: Maybe round update should be done before, once all words are submitted.
   await DB.ref(`games/${gameId}/round`).set(roundStatus)
-  await DB.ref(`games/${gameId}/hasStarted`).set(true)
+
+  await DB.ref(`games/${gameId}/players/${id}`).update({ isReady: true })
+
+  // REVIEW: Is this the right place?
+  // It's a side effect, I never know where to place it.
+  const playersRef = await DB.ref(`games/${gameId}/players`).once('value')
+  const players = playersRef.val()
+  const isEveryoneReady = Object.keys(players).every(pId => players[pId].isReady)
+
+  if (isEveryoneReady) {
+    console.log(':: everyones ready. Start Game!')
+    await DB.ref(`games/${gameId}/hasStarted`).set(true)
+  }
 }
 
 /**

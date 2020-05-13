@@ -18,15 +18,20 @@ import { useLeaveGame } from '@components/settings'
 export default function LobbyWritting({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const { askToLeaveGame } = useLeaveGame()
-  const { game } = Papers.state || {}
-  const gameWords = !!game && game.words
-
+  const { game, profile } = Papers.state || {}
+  const gameWords = game?.words
+  const amIReady = game?.players[profile.id]?.isReady
   const didSubmitAllWords = React.useCallback(
-    plId =>
-      game && game.words && game.words[plId] && game.words[plId].length === game.settings.words,
+    plId => game?.words[plId]?.length === game.settings.words,
     [gameWords]
   )
   const didEveryoneSubmittedTheirWords = Object.keys(game.players).every(didSubmitAllWords)
+
+  React.useEffect(() => {
+    if (amIReady) {
+      navigation.navigate('playing')
+    }
+  }, [amIReady])
 
   React.useEffect(() => {
     navigation.setOptions({
@@ -70,7 +75,7 @@ export default function LobbyWritting({ navigation }) {
           </ScrollView>
         </Page.Main>
         <Page.CTAs hasOffset>
-          <Button onPress={Papers.markMeReady}>I'm ready!</Button>
+          <Button onPress={Papers.markMeAsReady}>I'm ready!</Button>
         </Page.CTAs>
       </Page>
       {/* <WritePapersModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} /> */}

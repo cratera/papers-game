@@ -14,9 +14,7 @@ const TurnStatus = ({ title, player, teamName }) => (
       <Avatar hasMargin size="lg" src={player.avatar} alt="" />
       <View>
         <Text style={Theme.typography.h3}>{player.name}</Text>
-        <Text style={[Theme.typography.secondary, Theme.typography.small, Styles.tst_team]}>
-          {teamName}
-        </Text>
+        <Text style={[Theme.typography.small, Styles.tst_team]}>{teamName}</Text>
       </View>
     </View>
   </View>

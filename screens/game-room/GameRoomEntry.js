@@ -82,18 +82,18 @@ export default function GameRoomEntry({ navigation }) {
     )
   }
 
+  const amIReady = game?.players[profileId]?.isReady
+
   return (
     <Stack.Navigator
       screenOptions={{ headerTitleAlign: 'center' }}
-      initialRouteName={
-        game.hasStarted ? 'playing' : wordsAreStored ? 'lobby-writing' : 'lobby-joining'
-      }
+      initialRouteName={amIReady ? 'playing' : wordsAreStored ? 'lobby-writing' : 'lobby-joining'}
     >
       <Stack.Screen name="lobby-joining" headerTitle="New game" component={LobbyJoining} />
       <Stack.Screen name="teams" headerTitle="Teams" component={Teams} />
       <Stack.Screen name="write-papers" headerTitle="Write papers" component={WritePapers} />
       <Stack.Screen name="lobby-writing" headerTitle="Writting" component={LobbyWriting} />
-      {game.hasStarted ? <Stack.Screen name="playing" component={Playing} /> : null}
+      {amIReady ? <Stack.Screen name="playing" component={Playing} /> : null}
     </Stack.Navigator>
   )
 }

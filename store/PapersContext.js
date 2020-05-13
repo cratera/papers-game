@@ -56,7 +56,8 @@ export class PapersContextProvider extends Component {
       setWords: this.setWords.bind(this),
       setWordsForEveyone: this.setWordsForEveyone.bind(this),
 
-      startGame: this.startGame.bind(this),
+      markMeAsReady: this.markMeAsReady.bind(this),
+
       startTurn: this.startTurn.bind(this),
       getNextTurn: this.getNextTurn.bind(this),
       finishTurn: this.finishTurn.bind(this),
@@ -252,7 +253,7 @@ export class PapersContextProvider extends Component {
     }
 
     socket.on('game.set', (topic, data) => {
-      console.log(`:: on.${topic}`)
+      console.log(`:: on.${topic}`, data.game)
       const { game, profiles } = data
       this.setState({ game, profiles })
     })
@@ -481,8 +482,9 @@ export class PapersContextProvider extends Component {
     this.state.socket.setTeams(teams, (res, e) => console.warn('TODO HANDLE ERROR', e))
   }
 
-  startGame() {
-    console.log('📌 startGame()')
+  markMeAsReady() {
+    console.log('📌 markMeAsReady()')
+
     const roundStatus = {
       current: 0,
       turnWho: { 0: 0, 1: 0, 2: false },
@@ -491,7 +493,7 @@ export class PapersContextProvider extends Component {
       // all words by key to save space
       wordsLeft: this.state.game.words._all.map((w, i) => i),
     }
-    this.state.socket.startGame(roundStatus)
+    this.state.socket.markMeAsReady(roundStatus)
   }
 
   startTurn() {

@@ -49,22 +49,23 @@ export default function PlayingEntry() {
   // Some memo here would be nice.
   const turnStatus = (() => {
     const isTurnOn = !hasCountdownStarted || !!countdownSec // aka: it isn't times up
-    // Ai jasus...
+    // Ai jasus... 🙈
     const { 0: teamIx, 1: tPlayerIx, 2: tisOdd } = isTurnOn
       ? { 0: turnTeamIndex, 1: turnPlayerIndex, 2: isOdd }
       : Papers.getNextTurn()
     const tPlayerId = game.teams[teamIx].players[tisOdd ? 0 : tPlayerIx]
 
     return {
-      title: isTurnOn ? 'Playing now' : 'Next up!',
+      title: isTurnOn && game.hasStarted ? 'Playing now' : 'Next up!',
       player: {
         name: tPlayerId === profile.id ? 'You!' : profiles[tPlayerId]?.name || `? ${tPlayerId} ?`,
         avatar: profiles[tPlayerId]?.avatar,
       },
-      teamName:
-        tPlayerId === profile.id
-          ? `Waiting for ${thisTurnPlayer?.name} to finish their turn.` // REVIEW
-          : game.teams[teamIx].name,
+      teamName: !game.hasStarted
+        ? 'Waiting for everyone to say they are ready.'
+        : tPlayerId === profile.id
+        ? `Waiting for ${thisTurnPlayer?.name} to finish their turn.` // REVIEW
+        : game.teams[teamIx].name,
     }
   })()
 
