@@ -50,8 +50,5 @@ export default function HomeScreen({ navigation }) {
 }
 
 HomeScreen.propTypes = {
-  navigation: PropTypes.shape({
-    setOptions: PropTypes.func, // (componentName: String)
-    navigate: PropTypes.func, // (componentName: String)
-  }),
+  navigation: PropTypes.object.isRequired, // ReactNavigation
 }

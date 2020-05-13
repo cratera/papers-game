@@ -85,7 +85,7 @@ const RoundScore = () => {
   const winnerId = arrayOfTeamsId[winnerIndex]
   const myTeamWon = myTeamId === winnerId
 
-  const title = myTeamWon ? 'You won! 🎉' : 'You lost 💩'
+  const title = myTeamWon ? 'You won!' : 'You lost'
   const description = myTeamWon ? 'They never stood a change' : 'Yikes.'
   const isFinalRound = roundIndex === game.settings.roundsCount - 1
 
@@ -97,7 +97,7 @@ const RoundScore = () => {
 
   return (
     <Fragment>
-      {isFinalRound && <EmojiRain type={myTeamWon ? 'winner' : 'loser'} />}
+      {/* {isFinalRound && <EmojiRain type={myTeamWon ? 'winner' : 'loser'} />} */}
       <Page.Main>
         <View style={[Styles.header, { marginBottom: 16 }]}>
           {!isFinalRound ? (

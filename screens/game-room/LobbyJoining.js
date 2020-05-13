@@ -148,5 +148,5 @@ export default function LobbyJoining({ navigation }) {
 }
 
 LobbyJoining.propTypes = {
-  navigation: PropTypes.object, // ReactNavigation
+  navigation: PropTypes.object.isRequired, // ReactNavigation
 }

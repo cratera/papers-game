@@ -107,10 +107,7 @@ export default function GameRoomEntry({ navigation }) {
 // }
 
 GameRoomEntry.propTypes = {
-  navigation: PropTypes.shape({
-    navigate: PropTypes.func, // (componentName: String)
-    setOptions: PropTypes.func,
-  }),
+  navigation: PropTypes.object, // ReactNavigation
 }
 
 const Template = ({ children }) => (

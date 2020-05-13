@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react'
-import PropTypes from 'prop-types'
 import { Image, View, Text } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
+import PropTypes from 'prop-types'
 
 import PapersContext from '@store/PapersContext.js'
 import imgWaiting from '@assets/images/waiting.gif'

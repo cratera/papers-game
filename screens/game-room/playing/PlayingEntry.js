@@ -1,5 +1,6 @@
 import React from 'react'
 // import { Text } from 'react-native'
+import PropTypes from 'prop-types'
 
 import { useCountdown, usePrevious } from '@constants/utils'
 import PapersContext from '@store/PapersContext.js'
@@ -9,19 +10,20 @@ import { MyTurnGetReady, MyTurnGo, OthersTurn, RoundScore } from './index'
 import Page from '@components/page'
 import i18n from '@constants/i18n'
 
+import * as Theme from '@theme'
 // import * as Theme from '@theme'
 // import Styles from './PlayingStyles.js'
 
 const DESCRIPTIONS = [i18n.round_0_desc, i18n.round_1_desc, i18n.round_2_desc]
 
-export default function PlayingEntry() {
+export default function PlayingEntry({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const { profile, profiles, game } = Papers.state
   const round = game.round
   const hasStatusFinished = round.status === 'finished'
   const hasCountdownStarted = !['getReady', 'finished'].includes(round.status)
   const prevHasCountdownStarted = usePrevious(hasCountdownStarted)
-  const initialTimer = 60000 // game.settings.time_ms;
+  const initialTimer = 30000 // game.settings.time_ms;
   const timerReady = 3400
   const [countdown, startCountdown] = useCountdown(hasCountdownStarted ? round.status : null, {
     timer: initialTimer + timerReady, // 400 - threshold for io connection.
@@ -45,6 +47,20 @@ export default function PlayingEntry() {
       startCountdown(round.status)
     }
   }, [startedCounting, startCountdown, round.status])
+
+  React.useEffect(() => {
+    navigation.setOptions({
+      headerTitle: 'Playing',
+      headerRight: function HLB() {
+        return <Page.HeaderBtnSettings />
+      },
+      headerTintColor: Theme.colors.bg,
+      headerStyle: {
+        shadowColor: 'transparent',
+        borderBottomWidth: 0,
+      },
+    })
+  }, [])
 
   // Some memo here would be nice.
   const turnStatus = (() => {
@@ -71,7 +87,6 @@ export default function PlayingEntry() {
 
   return (
     <Page>
-      <Page.Header></Page.Header>
       {hasStatusFinished ? (
         <RoundScore />
       ) : isMyTurn ? (
@@ -100,4 +115,8 @@ export default function PlayingEntry() {
       )}
     </Page>
   )
+}
+
+PlayingEntry.propTypes = {
+  navigation: PropTypes.object.isRequired, // ReactNavigation
 }

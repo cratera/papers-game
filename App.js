@@ -67,7 +67,7 @@ export default function App(props) {
           <NavigationContainer ref={containerRef} initialState={initialNavigationState}>
             <Stack.Navigator
               // initialRouteName="home"
-              screenOptions={{ gestureEnabled: false }}
+              screenOptions={{ gestureEnabled: false, headerTitleAlign: 'center' }}
             >
               <Stack.Screen name="home" component={Home} />
               <Stack.Screen
