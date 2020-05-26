@@ -38,8 +38,9 @@ export const typography = StyleSheet.create({
     color: colors.grayMedium,
   },
   small: {
-    fontSize: 14,
+    fontSize: 13, // TODO - 14 is too big compared to figma. @mmbotelho
     color: colors.grayMedium,
+    letterSpacing: -0.3,
   },
   bold: {
     fontSize: 16,

@@ -25,6 +25,7 @@ export default function LobbyJoining({ navigation }) {
   const profileIsAdmin = creatorId === profileId
   const playersKeys = hasGame ? Object.keys(game.players) : []
   const hasEnoughPlayers = playersKeys.length >= 4
+  const wordsAreStored = !!game.words && !!game.words[profileId]
 
   React.useEffect(() => {
     navigation.setOptions({
@@ -61,6 +62,12 @@ export default function LobbyJoining({ navigation }) {
       })
     }
   }, [profileIsAdmin, hasEnoughPlayers, hasTeams])
+
+  React.useEffect(() => {
+    if (wordsAreStored) {
+      navigation.navigate('lobby-writing')
+    }
+  }, [wordsAreStored])
 
   if (!game) {
     console.warn('Lobby: Hot reload bug happened!', Papers)
@@ -108,7 +115,7 @@ export default function LobbyJoining({ navigation }) {
             <ScrollView style={[Theme.u.scrollSideOffset, Styles.list]}>
               <Text style={Theme.typography.h3}>Lobby</Text>
               {!hasEnoughPlayers && (
-                <Text style={Theme.typography.small}>
+                <Text style={[Theme.typography.small, { marginTop: 4 }]}>
                   Waiting for your friends to join (4 minimum)
                 </Text>
               )}

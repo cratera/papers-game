@@ -30,6 +30,8 @@ export default function ListPlayers({ players, enableKickout, isStatusVisible, .
   const profileId = profile.id
   const profileIsAdmin = game.creatorId === profileId
   const playersSorted = React.useMemo(() => players.sort(), [players]) // TODO - sort this by name #F65
+  const playersKeys = Object.keys(game.players || {})
+  const hasEnoughPlayers = playersKeys.length >= 4
 
   return (
     <View style={Styles.list} {...otherProps}>
@@ -37,7 +39,7 @@ export default function ListPlayers({ players, enableKickout, isStatusVisible, .
         const isLastChild = i === players.length
 
         if (!game.players[playerId]) {
-          // TODO/UX - What should we do in this case?
+          // TODO/UX - What should we do in this case? @mmbotelho
           const playerName = profiles[playerId]?.name || playerId
           return (
             <View key={playerId} style={[Styles.item, isLastChild && Styles.item_isLast]}>
@@ -68,7 +70,15 @@ export default function ListPlayers({ players, enableKickout, isStatusVisible, .
                   {playerId === profileId && <Text> (you)</Text>}
                 </Text>
                 <Text style={[Theme.typography.small, Theme.typography.seconday]}>
-                  {playerId === game.creatorId ? 'Admin ' : ''}
+                  {playerId === game.creatorId
+                    ? game.hasStarted
+                      ? ''
+                      : !hasEnoughPlayers
+                      ? 'Creating game...'
+                      : !game.teams
+                      ? 'Creating teams...'
+                      : ''
+                    : ''}
                   {isAfk && (
                     <Text style={[Theme.typography.small, { color: Theme.colors.primary }]}>
                       Disconnected
