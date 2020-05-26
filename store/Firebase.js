@@ -44,7 +44,9 @@ const PUBLIC_API = {
   setTeams,
   setWords,
   setWordsForEveryone,
+
   markMeAsReady,
+  markMeAsReadyForNextRound,
 
   startTurn,
   setPapersGuessed,
@@ -633,13 +635,13 @@ async function markMeAsReady(roundStatus) {
   console.log('⚙️ markMeAsReady()')
   const { gameId, id } = LOCAL_PROFILE
 
-  // REVIEW: Maybe round update should be done before, once all words are submitted.
+  // REVIEW/TODO: Maybe round update should be done before, once all words are submitted.
   await DB.ref(`games/${gameId}/round`).set(roundStatus)
 
   await DB.ref(`games/${gameId}/players/${id}`).update({ isReady: true })
 
   // REVIEW: Is this the right place?
-  // It's a side effect, I never know where to place it.
+  // It's a side effect, I never know what's the best place for it.
   const playersRef = await DB.ref(`games/${gameId}/players`).once('value')
   const players = playersRef.val()
   const isEveryoneReady = Object.keys(players).every(pId => players[pId].isReady)
@@ -647,6 +649,25 @@ async function markMeAsReady(roundStatus) {
   if (isEveryoneReady) {
     console.log(':: everyones ready. Start Game!')
     await DB.ref(`games/${gameId}/hasStarted`).set(true)
+  }
+}
+
+async function markMeAsReadyForNextRound(everyonesReadyCb) {
+  console.log('⚙️ markMeAsReadyForNextRound()')
+  const { gameId, id } = LOCAL_PROFILE
+
+  await DB.ref(`games/${gameId}/players/${id}`).update({ isReady: true })
+
+  // REVIEW: Is this the right place?
+  // It's a side effect, I never know what's the best place for it.
+  const playersRef = await DB.ref(`games/${gameId}/players`).once('value')
+  const players = playersRef.val()
+  const isEveryoneReady = Object.keys(players).every(pId => players[pId].isReady)
+
+  if (isEveryoneReady) {
+    console.log(':: everyones ready. Start next round!')
+    // REVIEW: Should this be responsability of context or firebase?
+    everyonesReadyCb()
   }
 }
 
@@ -677,6 +698,19 @@ async function finishTurn({ playerScore, roundStatus }, cb) {
   const gameId = LOCAL_PROFILE.gameId
 
   try {
+    if (roundStatus.status === 'finished') {
+      // Mark players as not ready for the next round.
+      // Do this before, so that RoundScore UI shows correctly
+      const playersRef = await DB.ref(`games/${gameId}/players`).once('value')
+      const players = playersRef.val()
+
+      for (const pId in players) {
+        players[pId].isReady = false
+      }
+
+      await DB.ref(`games/${gameId}/players/`).set(players)
+    }
+
     await DB.ref(`games/${gameId}/score/${roundStatus.current}`).update(playerScore)
     await DB.ref(`games/${gameId}/round`).update(roundStatus)
     await DB.ref(`games/${gameId}/papersGuessed`).set(0)

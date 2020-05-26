@@ -65,13 +65,14 @@ const OthersTurn = ({
                 },
               ]}
             >
-              {hasCountdownStarted
-                ? countdownSec > initialTimerSec // isCount321go
-                  ? countdownSec - initialTimerSec // 3, 2, 1...
-                  : countdownSec && !isAllWordsGuessed
-                  ? msToSecPretty(countdown) // 59, 58, counting...
-                  : '' // timeout or all words guessed
-                : msToSecPretty(initialTimer) // waiting to start
+              {
+                hasCountdownStarted
+                  ? countdownSec > initialTimerSec // isCount321go
+                    ? countdownSec - initialTimerSec // 3, 2, 1...
+                    : countdownSec && !isAllWordsGuessed
+                    ? msToSecPretty(countdown) // 59, 58, counting...
+                    : '' // timeout or all words guessed
+                  : msToSecPretty(initialTimer) // waiting to start
               }
             </Text>
             <Text style={Theme.typography.small}>{papersGuessed} papers guessed</Text>

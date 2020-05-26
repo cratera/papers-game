@@ -28,6 +28,8 @@ export default function LobbyWritting({ navigation }) {
   const didEveryoneSubmittedTheirWords = Object.keys(game.players).every(didSubmitAllWords)
 
   React.useEffect(() => {
+    // TODO This should not happen but just for sanity check while developing.
+    console.warn('hum... amIReady at LobbyWritting')
     if (amIReady) {
       navigation.navigate('playing')
     }

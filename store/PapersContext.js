@@ -57,6 +57,7 @@ export class PapersContextProvider extends Component {
       setWordsForEveyone: this.setWordsForEveyone.bind(this),
 
       markMeAsReady: this.markMeAsReady.bind(this),
+      markMeAsReadyForNextRound: this.markMeAsReadyForNextRound.bind(this),
 
       startTurn: this.startTurn.bind(this),
       getNextTurn: this.getNextTurn.bind(this),
@@ -494,6 +495,13 @@ export class PapersContextProvider extends Component {
       wordsLeft: this.state.game.words._all.map((w, i) => i),
     }
     this.state.socket.markMeAsReady(roundStatus)
+  }
+
+  markMeAsReadyForNextRound() {
+    this.state.socket.markMeAsReadyForNextRound(() => {
+      // Only called if everyone's ready!
+      this.PapersAPI.startNextRound()
+    })
   }
 
   startTurn() {

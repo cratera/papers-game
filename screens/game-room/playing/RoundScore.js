@@ -18,7 +18,6 @@ const DESCRIPTIONS = [i18n.round_0_desc, i18n.round_1_desc, i18n.round_2_desc]
 const RoundScore = () => {
   const Papers = React.useContext(PapersContext)
   const { profile, profiles, game } = Papers.state
-  const profileIsAdmin = game.creatorId === profile.id
   const round = game.round
   const roundIndex = round.current
 
@@ -88,11 +87,20 @@ const RoundScore = () => {
   const title = myTeamWon ? 'You won!' : 'You lost'
   const description = myTeamWon ? 'They never stood a change' : 'Yikes.'
   const isFinalRound = roundIndex === game.settings.roundsCount - 1
+  const amIReady = game.players[profile.id].isReady
 
   const sortTeamIdByScore = (teamAId, teamBId) => arrayOfScores[teamBId] - arrayOfScores[teamAId]
 
-  function handleStartNextRoundClick() {
-    Papers.startNextRound()
+  function handleReadyClick() {
+    Papers.markMeAsReadyForNextRound()
+  }
+
+  if (amIReady) {
+    return (
+      <Page.Main>
+        <Text>[TODO] - Waiting for everyone to say they are ready.</Text>
+      </Page.Main>
+    )
   }
 
   return (
@@ -105,6 +113,7 @@ const RoundScore = () => {
               <Text style={Theme.typography.h3}>End of round {roundIndex + 1}</Text>
               <Text style={Theme.typography.h2}>
                 {myTeamWon ? (
+                  // TODO these titles styles are incorrect
                   <Text style={{ color: Theme.colors.success }}>Your team won!</Text>
                 ) : (
                   <Text style={{ color: Theme.colors.danger }}>Your team lost!</Text>
@@ -162,14 +171,8 @@ const RoundScore = () => {
       <Page.CTAs>
         {isFinalRound ? (
           <Button onPress={Papers.leaveGame}>Go to homepage</Button>
-        ) : profileIsAdmin ? (
-          <Button onPress={handleStartNextRoundClick}>
-            Start Round {round.current + 1 + 1} of {game.settings.roundsCount}!
-          </Button>
         ) : (
-          <Text style={[Theme.typography.italic, Theme.u.center]}>
-            Wait for {profiles[game.creatorId].name} (admin) to start the next round.
-          </Text>
+          <Button onPress={handleReadyClick}>I'm ready for round {round.current + 1 + 1}!</Button>
         )}
       </Page.CTAs>
     </Fragment>
