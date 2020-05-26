@@ -13,7 +13,7 @@ import Styles from './PlayingStyles.js'
 const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, getPaperByKey }) => {
   return (
     <Fragment>
-      <Page.Main>
+      <Page.Main blankBg>
         <View style={Styles.header}>
           <Text style={Theme.typography.secondary}>
             {type === 'timesup' ? "Time's Up!" : 'All papers guessed!'}
@@ -67,9 +67,9 @@ const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, getPaperByKey })
           )}
         </ScrollView>
       </Page.Main>
-      <Page.CTAs hasOffset>
+      <Page.CTAs blankBg hasOffset>
         {/* TODO add loading */}
-        <Button onPress={onFinish}>Finish your turn</Button>
+        <Button onPress={onFinish}>End turn</Button>
       </Page.CTAs>
     </Fragment>
   )

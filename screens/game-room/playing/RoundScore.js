@@ -97,7 +97,7 @@ const RoundScore = () => {
 
   if (amIReady) {
     return (
-      <Page.Main>
+      <Page.Main blankBg>
         <Text>[TODO!] - Waiting for everyone to say they are ready.</Text>
       </Page.Main>
     )

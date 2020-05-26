@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 
 import { useCountdown, usePrevious } from '@constants/utils'
 import PapersContext from '@store/PapersContext.js'
+import { headerTheme } from '@navigation/headerStuff.js'
 
 import { MyTurnGetReady, MyTurnGo, OthersTurn, RoundScore } from './index'
 
@@ -50,14 +51,11 @@ export default function PlayingEntry({ navigation }) {
 
   React.useEffect(() => {
     navigation.setOptions({
+      ...headerTheme({ hiddenBorder: true }),
       headerTitle: 'Playing',
+      headerTintColor: Theme.colors.bg,
       headerRight: function HLB() {
         return <Page.HeaderBtnSettings />
-      },
-      headerTintColor: Theme.colors.bg,
-      headerStyle: {
-        shadowColor: 'transparent',
-        borderBottomWidth: 0,
       },
     })
   }, [])
