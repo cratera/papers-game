@@ -2,6 +2,7 @@ import React from 'react'
 import { View } from 'react-native'
 import PropTypes from 'prop-types'
 
+import * as Theme from '@theme'
 import Styles from './PageStyles.js'
 import SettingsToggle from '@components/settings'
 import Button from '@components/button'
@@ -18,39 +19,32 @@ Page.propTypes = {
   children: PropTypes.node,
 }
 
-const Header = ({ children, ...otherProps }) => {
-  return (
-    <View
-      style={[
-        Styles.header,
-        {
-          justifyContent: children ? 'space-between' : 'flex-end',
-          paddingRight: 8,
-        },
-      ]}
-      {...otherProps}
-    >
-      {children}
-      <SettingsToggle />
-    </View>
-  )
+const iconsMap = {
+  back: '👈 ',
+  next: ' 👉',
 }
 
-Header.propTypes = {
-  children: PropTypes.node,
-}
-
-const HeaderBtn = ({ side, style, children, ...otherProps }) => (
+const HeaderBtn = ({ side, icon, style, textPrimary, children, ...otherProps }) => (
   <Button
     variant="flat"
-    style={[side === 'left' ? { marginLeft: 16 } : { marginRight: 16 }, style]}
+    style={[
+      side === 'left' ? { marginLeft: 16 } : { marginRight: 16 },
+      {
+        color: textPrimary ? Theme.colors.primary : Theme.colors.grayMedium,
+      },
+      style,
+    ]}
     {...otherProps}
   >
+    {side === 'left' && iconsMap[icon]}
     {children}
+    {side === 'right' && iconsMap[icon]}
   </Button>
 )
 
 HeaderBtn.propTypes = {
+  icon: PropTypes.node,
+  textPrimary: PropTypes.bool,
   side: PropTypes.oneOf(['left', 'right']).isRequired,
   style: PropTypes.oneOfType([PropTypes.array, PropTypes.object, PropTypes.number]),
   children: PropTypes.node,
@@ -58,26 +52,40 @@ HeaderBtn.propTypes = {
 
 const HeaderBtnSettings = () => <SettingsToggle style={{ marginRight: 16 }} />
 
-const Main = ({ children, style, ...otherProps }) => {
+const Main = ({ children, style, blankBg, ...otherProps }) => {
   return (
-    <View style={[Styles.main, style]} {...otherProps}>
+    <View
+      style={[
+        Styles.main,
+        !blankBg && {
+          backgroundColor: Theme.colors.grayBg,
+        },
+        style,
+      ]}
+      {...otherProps}
+    >
       {children}
     </View>
   )
 }
 
 Main.propTypes = {
-  style: PropTypes.oneOfType([PropTypes.array, PropTypes.object, PropTypes.number]),
+  /** The bg gets white. */
+  blankBg: PropTypes.bool,
   children: PropTypes.node,
+  style: PropTypes.oneOfType([PropTypes.array, PropTypes.object, PropTypes.number]),
 }
 
-const CTAs = ({ children, hasOffset, style, ...otherProps }) => {
+const CTAs = ({ children, hasOffset, blankBg, style, ...otherProps }) => {
   return (
     <View
       style={[
         Styles.ctas,
         {
           paddingBottom: children ? 40 : 0,
+        },
+        !blankBg && {
+          backgroundColor: Theme.colors.grayBg,
         },
         style,
       ]}
@@ -91,6 +99,8 @@ const CTAs = ({ children, hasOffset, style, ...otherProps }) => {
 }
 
 CTAs.propTypes = {
+  /** The bg gets white. */
+  blankBg: PropTypes.bool,
   style: PropTypes.oneOfType([PropTypes.array, PropTypes.object, PropTypes.number]),
   hasOffset: PropTypes.bool,
   children: PropTypes.node,
@@ -98,7 +108,6 @@ CTAs.propTypes = {
 
 export default Page
 
-Page.Header = Header // TODO Remove this.
 Page.HeaderBtn = HeaderBtn
 Page.HeaderBtnSettings = HeaderBtnSettings
 Page.Main = Main

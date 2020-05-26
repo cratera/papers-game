@@ -4,6 +4,7 @@ export const colors = {
   grayDark: '#484F5D',
   grayMedium: '#7F848E',
   grayLight: '#E5E6E8',
+  grayBg: '#F7F8FA',
   primary: '#FF8F50',
   primaryLight: '#FFE9DC',
   success: '#4EBD81',

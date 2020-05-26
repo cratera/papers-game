@@ -7,6 +7,7 @@ import PapersContext from '@store/PapersContext.js'
 import Button from '@components/button'
 import Page from '@components/page'
 import { IconNonWords } from '@components/icons'
+import TurnStatus from './TurnStatus'
 
 import * as Theme from '@theme'
 
@@ -20,7 +21,7 @@ const place = (x, y, deg) => ({
 
 const MyTurnGetReady = ({ description }) => {
   const Papers = React.useContext(PapersContext)
-  const { game } = Papers.state
+  const { game, profile } = Papers.state
   const round = game.round
   const roundNr = round.current + 1
 
@@ -30,7 +31,7 @@ const MyTurnGetReady = ({ description }) => {
 
   return (
     <Fragment>
-      <Page.Main>
+      <Page.Main blankBg>
         <View style={Styles.header}>
           <Text style={Theme.typography.h2}>Round {roundNr}</Text>
           <View style={StylesIn.illustration}>
@@ -49,9 +50,17 @@ const MyTurnGetReady = ({ description }) => {
           </Text>
         </View>
       </Page.Main>
-      <Page.CTAs>
-        <Text>[TODO Next player]</Text>
-        <Button onPress={onStartClick}>Start your turn</Button>
+      <Page.CTAs blankBg>
+        <TurnStatus
+          title="Next up"
+          player={profile}
+          teamName={
+            !game.hasStarted ? 'Waiting for everyone to say they are ready' : 'Everyone is ready!'
+          }
+        />
+
+        {/* TODO/REVIEW use hasStarted vs every isReady */}
+        {game.hasStarted && <Button onPress={onStartClick}>Start turn</Button>}
       </Page.CTAs>
     </Fragment>
   )

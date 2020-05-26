@@ -81,7 +81,7 @@ export default function PlayingEntry({ navigation }) {
         ? 'Waiting for everyone to say they are ready.'
         : tPlayerId === profile.id
         ? `Waiting for ${thisTurnPlayer?.name} to finish their turn.` // REVIEW
-        : game.teams[teamIx].name,
+        : game.teams[teamIx].name, // TODO "Everyone's ready"
     }
   })()
 

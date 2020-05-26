@@ -71,7 +71,9 @@ export default function ListPlayers({ players, enableKickout, isStatusVisible, .
                 </Text>
                 <Text style={[Theme.typography.small, Theme.typography.seconday]}>
                   {playerId === game.creatorId
-                    ? game.hasStarted
+                    ? playerId === profileId
+                      ? ''
+                      : game.hasStarted
                       ? ''
                       : !hasEnoughPlayers
                       ? 'Creating game...'

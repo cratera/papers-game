@@ -117,7 +117,6 @@ GameRoomEntry.propTypes = {
 
 const Template = ({ children }) => (
   <Page>
-    <Page.Header />
     <Page.Main>{children}</Page.Main>
   </Page>
 )

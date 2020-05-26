@@ -8,9 +8,9 @@ import PapersContext from '@store/PapersContext.js'
 
 import Page from '@components/page'
 import Button from '@components/button'
-// import { IconEdit } from '@components/icons'
 import ListPlayers from '@components/list-players'
 
+import { headerTheme } from '@navigation/headerStuff.js'
 import * as Theme from '@theme'
 
 export default function Teams({ navigation }) {
@@ -21,10 +21,12 @@ export default function Teams({ navigation }) {
 
   React.useEffect(() => {
     navigation.setOptions({
+      ...headerTheme(),
+      title: 'Teams',
       headerLeft: function HLB() {
         return (
-          <Page.HeaderBtn side="left" onPress={navigation.goBack}>
-            👈Back
+          <Page.HeaderBtn side="left" icon="back" onPress={navigation.goBack}>
+            Back
           </Page.HeaderBtn>
         )
       },
@@ -65,7 +67,7 @@ export default function Teams({ navigation }) {
 
     if (JSON.stringify(newTempTeams) === JSON.stringify(tempTeams)) {
       console.log('Generateed equal teams. Generating again...')
-      generateTeams()
+      return getRandomTeams()
     } else {
       return newTempTeams
     }

@@ -16,7 +16,7 @@ const variants = {
   },
   light: {
     bg: Theme.colors.bg,
-    text: Theme.colors.primary,
+    text: Theme.colors.grayDark,
   },
   flat: {
     bg: Theme.colors.bg,
@@ -74,9 +74,9 @@ const styles = StyleSheet.create({
   },
   light: {
     // REVIEW DESIGN with @mmbotelho
-    borderWidth: 2,
-    lineHeight: 14, // make up the border
-    borderColor: Theme.colors.primary,
+    borderWidth: 1,
+    lineHeight: 17, // make up the border
+    borderColor: Theme.colors.grayMedium,
   },
 
   // ${variant === 'success' ? '' : 'box-shadow: 0px 4px 16px rgba(204, 127, 81, 0.3);'}

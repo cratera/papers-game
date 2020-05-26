@@ -7,6 +7,7 @@ import { ScrollView } from 'react-native-gesture-handler'
 import * as Theme from '@theme'
 import Styles from './HomeStyles.js'
 
+import { headerTheme } from '@navigation/headerStuff.js'
 import Page from '@components/page'
 import Button from '@components/button'
 
@@ -39,6 +40,7 @@ export default class HomeSignup extends React.Component {
   componentDidMount() {
     this.props.navigation.setOptions({
       headerTitle: 'Create profile',
+      ...headerTheme(),
       headerLeft: null,
       headerRight: null,
     })
@@ -55,10 +57,18 @@ export default class HomeSignup extends React.Component {
     if (!prevState.name && this.state.name) {
       this.props.navigation.setOptions({
         headerRight: () => (
-          <Page.HeaderBtn side="right" onPress={() => this.goNextStep('name')}>
+          <Page.HeaderBtn
+            side="right"
+            icon="next"
+            textPrimary
+            onPress={() => this.goNextStep('name')}
+          >
             Next
           </Page.HeaderBtn>
         ),
+        headerStyle: {
+          borderBottomWidth: 1,
+        },
       })
     } else if (!this.state.name && prevState.name) {
       this.props.navigation.setOptions({
@@ -67,7 +77,7 @@ export default class HomeSignup extends React.Component {
     } else if (!prevState.avatar && this.state.avatar) {
       this.props.navigation.setOptions({
         headerRight: () => (
-          <Page.HeaderBtn side="right" onPress={this.setProfile}>
+          <Page.HeaderBtn side="right" textPrimary onPress={this.setProfile}>
             Finish
           </Page.HeaderBtn>
         ),
@@ -85,7 +95,7 @@ export default class HomeSignup extends React.Component {
 
     return (
       <Page>
-        <Page.Main style={Styles.main}>
+        <Page.Main style={Styles.main} blankBg={state.step === 0}>
           <CurrentStep />
         </Page.Main>
         <Page.CTAs>
@@ -155,24 +165,30 @@ export default class HomeSignup extends React.Component {
   }
 
   goNextStep(currentStepId) {
+    const currentStep = state.step
     this.setState(state => ({
       ...state,
       step: state.step + 1,
     }))
 
-    // It should be on cDU, but it's okay. It works and it's harmless.
-    this.props.navigation.setOptions({
-      headerLeft: () => (
-        <Page.HeaderBtn side="left" onPress={this.goBackStep}>
-          Back
-        </Page.HeaderBtn>
-      ),
-    })
+    if (currentStep === 0) {
+      // It should be on cDU, but it's okay. It works and it's harmless.
+      this.props.navigation.setOptions({
+        headerLeft: () => (
+          <Page.HeaderBtn side="left" icon="back" onPress={this.goBackStep}>
+            Back
+          </Page.HeaderBtn>
+        ),
+        headerStyle: {
+          borderBottomWidth: 1,
+        },
+      })
+    }
 
     if (currentStepId === 'name') {
       this.props.navigation.setOptions({
         headerRight: () => (
-          <Page.HeaderBtn side="right" onPress={this.setProfile}>
+          <Page.HeaderBtn side="right" primary onPress={this.setProfile}>
             Skip
           </Page.HeaderBtn>
         ),
@@ -188,7 +204,12 @@ export default class HomeSignup extends React.Component {
     }))
 
     if (step - 1 === 0) {
-      this.props.navigation.setOptions({ headerLeft: null })
+      this.props.navigation.setOptions({
+        headerLeft: null,
+        headerStyle: {
+          borderBottomWidth: 0,
+        },
+      })
     }
   }
 

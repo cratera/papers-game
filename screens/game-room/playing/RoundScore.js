@@ -98,7 +98,7 @@ const RoundScore = () => {
   if (amIReady) {
     return (
       <Page.Main>
-        <Text>[TODO] - Waiting for everyone to say they are ready.</Text>
+        <Text>[TODO!] - Waiting for everyone to say they are ready.</Text>
       </Page.Main>
     )
   }
@@ -106,7 +106,7 @@ const RoundScore = () => {
   return (
     <Fragment>
       {/* {isFinalRound && <EmojiRain type={myTeamWon ? 'winner' : 'loser'} />} */}
-      <Page.Main>
+      <Page.Main blankBg>
         <View style={[Styles.header, { marginBottom: 16 }]}>
           {!isFinalRound ? (
             <Fragment>
@@ -168,7 +168,7 @@ const RoundScore = () => {
           })}
         </View>
       </Page.Main>
-      <Page.CTAs>
+      <Page.CTAs blankBg>
         {isFinalRound ? (
           <Button onPress={Papers.leaveGame}>Go to homepage</Button>
         ) : (

@@ -26,9 +26,9 @@ export default function AccessGameModal({ isOpen, variant, onClose }) {
       cta: "Let's go!",
     },
     create: {
-      title: 'Give this party an original name!',
+      title: 'Give this party a name!',
       description: 'Your friends will use it to join the game.',
-      cta: 'Next: Add Players',
+      cta: 'Next: Add Friends',
     },
   }[variant]
 

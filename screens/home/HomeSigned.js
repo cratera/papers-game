@@ -58,7 +58,7 @@ export default function HomeSigned() {
   if (Papers.status === 'isJoining') {
     return (
       <Page>
-        <Page.Main style={Styles.main}>
+        <Page.Main style={Styles.main} blankBg>
           <Text style={Theme.typography.h2}>Joining {`"${profile.gameId}"`} ⏳</Text>
         </Page.Main>
       </Page>
@@ -68,7 +68,7 @@ export default function HomeSigned() {
   return (
     <Fragment>
       <Page>
-        <Page.Main style={Styles.main}>
+        <Page.Main style={Styles.main} blankBg>
           <AvatarMeme avatar={profile.avatar} onChange={handleChangeAvatar} />
           <Text style={[Theme.typography.body, Theme.u.center]}>
             Welcome

@@ -20,6 +20,7 @@ import ListTeams from '@components/list-teams'
 
 import { PickAvatarModal } from '@components/profile'
 import { useLeaveGame } from '@components/settings'
+import { headerTheme } from '@navigation/headerStuff.js'
 
 const Stack = createStackNavigator()
 
@@ -29,18 +30,13 @@ export default function Settings(props) {
 
   React.useEffect(() => {
     props.navigation.setOptions({
-      headerRight: null,
-      headerTitle: 'Settings',
+      ...headerTheme(),
       headerLeft: function HLB() {
         return (
-          <Page.HeaderBtn side="left" onPress={() => props.navigation.goBack()}>
-            👈Back
+          <Page.HeaderBtn side="left" icon="back" onPress={() => props.navigation.goBack()}>
+            Back
           </Page.HeaderBtn>
         )
-      },
-      headerStyle: {
-        shadowColor: 'transparent',
-        borderBottomWidth: 0,
       },
     })
   }, [])

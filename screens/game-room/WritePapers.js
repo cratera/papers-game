@@ -8,6 +8,7 @@ import PapersContext from '@store/PapersContext.js'
 
 import Button from '@components/button'
 import Page from '@components/page'
+import { headerTheme } from '@navigation/headerStuff.js'
 
 import * as Theme from '@theme'
 import Styles from './WritePapersStyles.js'
@@ -29,18 +30,18 @@ export default function WritePapers({ navigation }) {
 
   React.useEffect(() => {
     navigation.setOptions({
+      ...headerTheme(),
       headerTitle: 'Write papers',
       headerLeft: function HLB() {
         return (
-          <Page.HeaderBtn side="left" onPress={() => navigation.navigate('lobby-joining')}>
-            👈Back
+          <Page.HeaderBtn
+            side="left"
+            icon="back"
+            onPress={() => navigation.navigate('lobby-joining')}
+          >
+            Back
           </Page.HeaderBtn>
         )
-      },
-      headerRight: null,
-      headerStyle: {
-        shadowColor: 'transparent',
-        borderBottomWidth: 0,
       },
     })
   }, [])
@@ -50,8 +51,8 @@ export default function WritePapers({ navigation }) {
       navigation.setOptions({
         headerRight: function HLB() {
           return (
-            <Page.HeaderBtn side="right" onPress={handleSubmitClick}>
-              Finish ✅
+            <Page.HeaderBtn side="right" textPrimary onPress={handleSubmitClick}>
+              Finish
             </Page.HeaderBtn>
           )
         },

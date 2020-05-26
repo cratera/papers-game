@@ -13,6 +13,7 @@ import Button from '@components/button'
 import ListPlayers from '@components/list-players'
 import ListTeams from '@components/list-teams'
 import { useLeaveGame } from '@components/settings'
+import { headerTheme } from '@navigation/headerStuff.js'
 
 export default function LobbyJoining({ navigation }) {
   const Papers = React.useContext(PapersContext)
@@ -29,6 +30,7 @@ export default function LobbyJoining({ navigation }) {
 
   React.useEffect(() => {
     navigation.setOptions({
+      ...headerTheme(),
       headerTitle: 'New game',
       headerLeft: function HLB() {
         return (
@@ -36,11 +38,6 @@ export default function LobbyJoining({ navigation }) {
             Exit
           </Page.HeaderBtn>
         )
-      },
-      headerRight: null,
-      headerStyle: {
-        shadowColor: 'transparent',
-        borderBottomWidth: 0,
       },
     })
   }, [])
@@ -50,8 +47,13 @@ export default function LobbyJoining({ navigation }) {
       navigation.setOptions({
         headerRight: function HLB() {
           return (
-            <Page.HeaderBtn side="right" onPress={() => navigation.navigate('teams')}>
-              Teams 👉
+            <Page.HeaderBtn
+              side="right"
+              icon="next"
+              textPrimary
+              onPress={() => navigation.navigate('teams')}
+            >
+              Teams
             </Page.HeaderBtn>
           )
         },
@@ -62,6 +64,14 @@ export default function LobbyJoining({ navigation }) {
       })
     }
   }, [profileIsAdmin, hasEnoughPlayers, hasTeams])
+
+  React.useEffect(() => {
+    if (hasTeams) {
+      navigation.setOptions({
+        headerTitle: 'Teams',
+      })
+    }
+  }, [hasTeams])
 
   React.useEffect(() => {
     if (wordsAreStored) {

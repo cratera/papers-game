@@ -31,7 +31,7 @@ const OthersTurn = ({
 
   return (
     <Fragment>
-      <Page.Main>
+      <Page.Main blankBg>
         <View>
           <View style={Styles.header}>
             <Text style={Theme.typography.h3}>Round {roundNr}</Text>
@@ -80,7 +80,7 @@ const OthersTurn = ({
           {/* TODO - view when all papers were guessed */}
         </View>
       </Page.Main>
-      <Page.CTAs>
+      <Page.CTAs blankBg>
         {isAllWordsGuessed ? (
           <View>
             <Text style={Theme.typography.h3}>End of Round {roundNr}</Text>

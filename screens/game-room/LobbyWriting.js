@@ -14,6 +14,7 @@ import Page from '@components/page'
 import Button from '@components/button'
 import ListTeams from '@components/list-teams'
 import { useLeaveGame } from '@components/settings'
+import { headerTheme } from '@navigation/headerStuff.js'
 
 export default function LobbyWritting({ navigation }) {
   const Papers = React.useContext(PapersContext)
@@ -28,16 +29,17 @@ export default function LobbyWritting({ navigation }) {
   const didEveryoneSubmittedTheirWords = Object.keys(game.players).every(didSubmitAllWords)
 
   React.useEffect(() => {
-    // TODO This should not happen but just for sanity check while developing.
-    console.warn('hum... amIReady at LobbyWritting')
     if (amIReady) {
+      // TODO This should not happen but just for sanity check while developing.
+      console.warn('hum... amIReady at LobbyWritting')
       navigation.navigate('playing')
     }
   }, [amIReady])
 
   React.useEffect(() => {
     navigation.setOptions({
-      headerTitle: 'New game',
+      ...headerTheme(),
+      headerTitle: 'Waiting...',
       headerLeft: function HLB() {
         return (
           <Page.HeaderBtn side="left" onPress={askToLeaveGame}>
@@ -45,13 +47,16 @@ export default function LobbyWritting({ navigation }) {
           </Page.HeaderBtn>
         )
       },
-      headerRight: null,
-      headerStyle: {
-        shadowColor: 'transparent',
-        borderBottomWidth: 0,
-      },
     })
   }, [])
+
+  React.useEffect(() => {
+    if (didEveryoneSubmittedTheirWords) {
+      navigation.setOptions({
+        headerTitle: 'Done!',
+      })
+    }
+  }, [didEveryoneSubmittedTheirWords])
 
   return (
     <Fragment>
@@ -59,11 +64,6 @@ export default function LobbyWritting({ navigation }) {
         <Page.Main>
           <ScrollView style={Theme.u.scrollSideOffset}>
             <View style={Styles.header}>
-              <Text style={Theme.typography.secondary}>
-                {!didEveryoneSubmittedTheirWords
-                  ? 'Waiting for other players'
-                  : 'Everyone finished!'}
-              </Text>
               <Image
                 style={[
                   Styles.header_img,

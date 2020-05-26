@@ -313,7 +313,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
 
   return (
     <Fragment>
-      <Page.Main>
+      <Page.Main blankBg>
         <View>
           <Text
             style={[
@@ -359,7 +359,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
         </View>
       </Page.Main>
 
-      <Page.CTAs hasOffset style={Styles.go_ctas}>
+      <Page.CTAs hasOffset blankBg style={Styles.go_ctas}>
         {!isPaperChanging ? (
           <Fragment>
             <Button
