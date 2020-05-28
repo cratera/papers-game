@@ -107,18 +107,16 @@ export default function LobbyJoining({ navigation }) {
         {!game.teams ? (
           <>
             <View style={Styles.header}>
-              {profileIsAdmin && (
-                <Text style={[Theme.typography.small, Styles.cap]}>Ask your friends to join!</Text>
-              )}
-              <View style={Styles.title}>
-                <Text style={[Theme.u.center, Theme.typography.h1]}>{game.name}</Text>
-                {game.name.toLowerCase() !== game.id && (
-                  <Text style={[Theme.u.center, Theme.typography.body]}>
-                    Join id: <Text style={Theme.typography.h3}>{game.id}</Text>
-                  </Text>
-                )}
-                <Text style={[Theme.typography.secondary]}>[TODO: Access code]</Text>
+              <Text style={[Theme.typography.small]}>Ask your friends to join:</Text>
+              <View style={Styles.header_title}>
+                <Text style={[Theme.typography.h1]}>{game.name}</Text>
                 {/* TODO Later - Share game. */}
+              </View>
+              <View>
+                <Text style={[Theme.typography.small, { marginBottom: 4 }]}>Access code</Text>
+                <Text style={[Theme.typography.body]} accessibilityLabel={game.code.toString()}>
+                  {game.code.toString().split('').join('・')}
+                </Text>
               </View>
             </View>
 

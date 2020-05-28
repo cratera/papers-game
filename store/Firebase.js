@@ -245,9 +245,10 @@ function getUser(userId) {
 
 // ============== GAME
 
-const gameInitialState = ({ id, name, creatorId }) => ({
-  id,
-  name: name,
+const gameInitialState = ({ id, name, code, creatorId }) => ({
+  id, // gameSlugged_code
+  name,
+  code,
   creatorId: creatorId, // the one that will decide the flow
   hasStarted: false,
   players: {
@@ -292,8 +293,17 @@ const gameInitialState = ({ id, name, creatorId }) => ({
  */
 async function createGame(gameName) {
   console.log(`⚙️ createGame: ${gameName}`, { LOCAL_PROFILE })
-  const gameId = slugString(gameName) // REVIEW this with @mmbotelho
-  // Verify if game exists...
+  const gameNameLower = gameName.toLowerCase()
+
+  if (slugString(gameName) !== gameNameLower) {
+    console.log('::', slugString(gameName), gameNameLower)
+    throw new Error('invalid name')
+  }
+
+  // Have a passcode to "guarantee" unique game rooms.
+  const code = Math.floor(1000 + Math.random() * 9000) // e.g. 3456
+  const gameId = `${gameNameLower}_${code}`
+
   const gameRef = DB.ref(`games/${gameId}`)
   const game = await gameRef.once('value')
 
@@ -312,11 +322,12 @@ async function createGame(gameName) {
     gameInitialState({
       id: gameId,
       name: gameName,
+      code,
       creatorId: LOCAL_PROFILE.id,
     })
   )
 
-  // Prevent duplicate subs
+  // Prevent duplicated game subs
   PubSub.unsubscribe('game')
   await _unsubGame(gameId)
 
@@ -328,11 +339,11 @@ async function createGame(gameName) {
 }
 
 /**
- *
+ * gameId = gameSlugged_code
  */
-async function joinGame(gameName) {
-  console.log(`⚙️ joinGame: ${gameName}`)
-  const gameId = slugString(gameName) // REVIEW this with @mmbotelho
+async function joinGame(gameId) {
+  console.log(`⚙️ joinGame: ${gameId}`)
+
   // Verify if game exists...
   const gameRef = DB.ref(`games/${gameId}`)
   const game = await gameRef.once('value')
@@ -362,7 +373,7 @@ async function joinGame(gameName) {
     isAfk: false,
   })
 
-  // Prevent duplicate subs
+  // Prevent duplicated game subs
   PubSub.unsubscribe('game')
   await _unsubGame(gameId)
 

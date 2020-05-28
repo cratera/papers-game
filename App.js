@@ -13,6 +13,7 @@ import { PapersContextProvider, loadProfile } from './store/PapersContext.js'
 import Home from './screens/home'
 import GameRoom from './screens/game-room'
 import Settings from './screens/settings'
+import AccessGame from './screens/access-game'
 
 const Stack = createStackNavigator()
 
@@ -70,6 +71,7 @@ export default function App(props) {
               screenOptions={{ gestureEnabled: false, headerTitleAlign: 'center' }}
             >
               <Stack.Screen name="home" component={Home} />
+              <Stack.Screen name="access-game" component={AccessGame} />
               <Stack.Screen
                 name="room"
                 component={GameRoom}

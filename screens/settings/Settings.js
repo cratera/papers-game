@@ -31,6 +31,7 @@ export default function Settings(props) {
   React.useEffect(() => {
     props.navigation.setOptions({
       ...headerTheme(),
+      headerTitle: 'Settings',
       headerLeft: function HLB() {
         return (
           <Page.HeaderBtn side="left" icon="back" onPress={() => props.navigation.goBack()}>

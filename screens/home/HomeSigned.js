@@ -12,8 +12,6 @@ import Button from '@components/button'
 import { PickAvatarModal } from '@components/profile'
 import danceGif from '@assets/images/dance.gif'
 
-import AccessGameModal from './AccessGameModal.js'
-
 const AvatarMeme = ({ avatar, onChange }) => {
   const [isPickerVisible, setIsPickerVisible] = React.useState(false)
 
@@ -50,10 +48,9 @@ AvatarMeme.propTypes = {
   onChange: PropTypes.func.isRequired, // (value: String)
 }
 
-export default function HomeSigned() {
+export default function HomeSigned({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const profile = Papers.state.profile
-  const [modalState, setModalState] = React.useState({ isOpen: false, variant: null })
 
   if (Papers.status === 'isJoining') {
     return (
@@ -87,26 +84,18 @@ export default function HomeSigned() {
           </Button>
         </Page.CTAs>
       </Page>
-      <AccessGameModal
-        isOpen={modalState.isOpen}
-        variant={modalState.variant}
-        onClose={closeAccessModalClose}
-      />
     </Fragment>
   )
 
   function openAccessGameModal(variant) {
-    setModalState({
-      isOpen: true,
-      variant,
-    })
-  }
-
-  function closeAccessModalClose() {
-    setModalState({ isOpen: false, variant: null })
+    navigation.navigate('access-game', { variant })
   }
 
   async function handleChangeAvatar(avatar) {
     Papers.updateProfile({ avatar })
   }
+}
+
+HomeSigned.propTypes = {
+  navigation: PropTypes.object, // reactNavigation
 }

@@ -20,6 +20,7 @@ const TurnStatus = ({ title, player, teamName }) => (
   </View>
 )
 
+// TODO - Refactor these naming props...
 TurnStatus.propTypes = {
   title: PropTypes.string.isRequired,
   player: PropTypes.shape({

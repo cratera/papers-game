@@ -63,7 +63,7 @@ export default function LobbyWritting({ navigation }) {
       <Page>
         <Page.Main>
           <ScrollView style={Theme.u.scrollSideOffset}>
-            <View style={Styles.header}>
+            <View style={Styles.headerW}>
               <Image
                 style={[
                   Styles.header_img,

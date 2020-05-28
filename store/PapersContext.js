@@ -231,7 +231,10 @@ export class PapersContextProvider extends Component {
       }
 
       const errorMsg = (errorMsgMap[e.message] || errorMsgMap.ups)()
-      console.warn(':: accessGame error!:', variant, gameName, errorMsg)
+      console.warn(':: accessGame failed!', variant, gameName, errorMsg)
+
+      this._removeGameFromState()
+
       return cb(null, errorMsg)
     }
   }
