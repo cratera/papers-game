@@ -19,24 +19,9 @@ const copy = {
   cta: 'Join',
 }
 
-// Maybe move to utils?
-const replaceAt = (string, index, replacement) => {
-  return string.substr(0, index) + replacement + string.substr(index + replacement.length)
-}
-const getDigits = str => {
-  const match = str.match(/\d+/g)
-  return match ? match.join('') : ''
-}
-
 export default function JoinGame({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const [isJoining, setJoining] = React.useState(false)
-  const codeDigitRefs = React.useRef([
-    React.createRef(),
-    React.createRef(),
-    React.createRef(),
-    React.createRef(),
-  ])
   const [step, setStep] = React.useState(0) // TODO create router between steps
   const [state, setState] = React.useState({
     gameName: '',
@@ -62,7 +47,7 @@ export default function JoinGame({ navigation }) {
 
   React.useEffect(() => {
     const hasValidName = !state.isInvalid && state.gameName && state.gameName.length >= 3
-    const has4DigitsCode = getDigits(state.code).length === 4
+    const has4DigitsCode = state.code.length === 4
     const hasValidCode = state.code && has4DigitsCode
 
     navigation.setOptions({
@@ -111,7 +96,7 @@ export default function JoinGame({ navigation }) {
           keyboardShouldPersistTaps="always"
           style={{ flex: 1, alignSelf: 'stretch' }}
         >
-          <ScrollView>
+          <ScrollView keyboardShouldPersistTaps="always">
             {step === 0 ? (
               <>
                 <Text style={[Styles.title, Theme.typography.h3]}>{copy.nameLabel}</Text>
@@ -119,9 +104,9 @@ export default function JoinGame({ navigation }) {
                   key="name"
                   style={[Theme.typography.h1, Styles.input]}
                   inputAccessoryViewID="name"
+                  nativeID="inputNameLabel"
                   autoFocus
                   autoCorrect={false}
-                  nativeID="inputNameLabel"
                   defaultValue={state.gameName}
                   onChangeText={handleNameChange}
                 />
@@ -129,27 +114,32 @@ export default function JoinGame({ navigation }) {
             ) : (
               <>
                 <Text style={[Styles.title, Theme.typography.h3]}>{copy.codeLabel}</Text>
-                <View style={Styles.code}>
-                  {[1, 2, 3, 4].map((c, index) => (
+                <TextInput
+                  key="code"
+                  style={[Styles.code_input]}
+                  keyboardType="number-pad"
+                  inputAccessoryViewID="code"
+                  nativeID="inputCodeName"
+                  autoFocus
+                  autoCorrect={false}
+                  maxLength={4}
+                  defaultValue={state.code}
+                  onChangeText={handleCodeChange}
+                  caretHidden
+                />
+                <View style={Styles.code} accessibilityLabel={`Code: ${state.code}`}>
+                  {[0, 0, 0, 0].map((c, index) => (
                     <View key={index} style={Styles.code}>
-                      <TextInput
-                        ref={codeDigitRefs.current[index]}
-                        style={[Theme.typography.h1, Styles.code_input]}
-                        keyboardType="number-pad"
-                        inputAccessoryViewID="code"
-                        autoFocus={index === 0}
-                        autoCorrect={false}
-                        placeholder="*"
-                        maxLength={1}
-                        nativeID="inputCodeName"
-                        onChangeText={digit => handleCodeChange(digit, index)}
-                        // defaultValue={state.code[index]} // this is buggy when deleting a char
-                      />
-                      {index < 3 && <Text style={[Theme.typography.h1, Styles.code_mask]}>・</Text>}
+                      <Text style={[Theme.typography.h1, Styles.code_maskDigit]}>
+                        {state.code[index] || (
+                          <Text style={[Theme.typography.h1, Styles.code_maskPlaceholder]}>*</Text>
+                        )}
+                      </Text>
+                      {index < 3 && <Text style={[Theme.typography.h1]}>・</Text>}
                     </View>
                   ))}
                 </View>
-                <Text>{state.code}</Text>
+                {/* <Text>{state.code}</Text> */}
               </>
             )}
 
@@ -171,17 +161,11 @@ export default function JoinGame({ navigation }) {
     }))
   }
 
-  function handleCodeChange(digit, index) {
-    console.log('codeChange', digit, index)
-
+  function handleCodeChange(code) {
     setState(state => ({
       ...state,
-      code: replaceAt(state.code, index, digit || ' '),
+      code,
     }))
-
-    if (getDigits(digit) && index < 3) {
-      codeDigitRefs.current[index + 1].current.focus()
-    }
   }
 
   function submit() {

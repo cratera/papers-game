@@ -25,11 +25,18 @@ export default StyleSheet.create({
     marginTop: 32,
   },
   code_input: {
-    color: Theme.colors.grayDark,
-    textAlign: 'center',
-    width: 26,
+    position: 'absolute',
+    opacity: 0,
   },
-  code_mask: {},
+  code_maskDigit: {
+    textAlign: 'center',
+    width: 25,
+  },
+  code_maskPlaceholder: {
+    color: Theme.colors.grayMedium,
+    textAlign: 'center',
+    width: 25,
+  },
   hintMsg: {
     marginVertical: 8,
     textAlign: 'center',
