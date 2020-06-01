@@ -5,6 +5,7 @@ import { ScrollView } from 'react-native-gesture-handler'
 
 import { getRandomInt } from '@constants/utils'
 import PapersContext from '@store/PapersContext.js'
+import teamNames from '@constants/teamNames.js'
 
 import Page from '@components/page'
 import Button from '@components/button'
@@ -13,11 +14,23 @@ import ListPlayers from '@components/list-players'
 import { headerTheme } from '@navigation/headerStuff.js'
 import * as Theme from '@theme'
 
+function areTeamPlayersEqual(teamsOld, teamsNew) {
+  const tOld = {}
+  const tNew = {}
+  for (const ix in teamsNew) {
+    tNew[ix] = teamsNew[ix].players
+  }
+
+  for (const ix in teamsOld) {
+    tOld[ix] = teamsOld[ix].players
+  }
+  return JSON.stringify(tOld) === JSON.stringify(tNew)
+}
+
 export default function Teams({ navigation }) {
   const Papers = React.useContext(PapersContext)
-  const PaperTeams = Papers.teams
   const { game } = Papers.state
-  const [tempTeams, setTeams] = React.useState(PaperTeams || getRandomTeams())
+  const [tempTeams, setTeams] = React.useState(getRandomTeams())
 
   React.useEffect(() => {
     navigation.setOptions({
@@ -34,7 +47,7 @@ export default function Teams({ navigation }) {
     })
   }, [])
 
-  // This could be useRandomTeams.
+  // This could be useRandomTeams()
   function getRandomTeams() {
     const players = Object.keys(game.players)
     const teamsNr = 2 // LATER - Game Setting
@@ -59,14 +72,18 @@ export default function Teams({ navigation }) {
     teams.forEach((team, index) => {
       newTempTeams[index] = {
         id: index,
-        // TODO @mmbotelho - Funny teams names
-        name: `Team ${String.fromCharCode(index + 65)}`, // 65 = A
+        name: teamNames[getRandomInt(teamNames.length - 1)],
         players: team,
+      }
+
+      if (index === 1 && newTempTeams[1].name === newTempTeams[0].name) {
+        console.log('Teams with same name. Get new one.')
+        newTempTeams[1].name = teamNames[getRandomInt(teamNames.length - 1)]
       }
     })
 
-    if (JSON.stringify(newTempTeams) === JSON.stringify(tempTeams)) {
-      console.log('Generateed equal teams. Generating again...')
+    if (areTeamPlayersEqual(tempTeams, newTempTeams)) {
+      console.log('Randomize equal teams. Randomize again.')
       return getRandomTeams()
     } else {
       return newTempTeams

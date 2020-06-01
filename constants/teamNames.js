@@ -1,0 +1,17 @@
+export default [
+  'Cereal Killers',
+  'Party Poopers',
+  'Illuminati',
+  'Kardashians',
+  'Avocados',
+  'Rotten Potatoes',
+  'Sashimi Killers',
+  'Queen Bees',
+  'Noodles',
+  'Couch Potatoes',
+  'Sugar Babies',
+  'Sugar Daddies',
+  'Boomers',
+  'Millennials',
+  'Dreamers',
+]

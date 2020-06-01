@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { AsyncStorage } from 'react-native'
 import PropTypes from 'prop-types'
 
-import wordsForEveryone from './wordsForEveryone.js'
+import wordsForEveryone from '@constants/wordsForEveryone.js'
 import { getNextTurn } from './papersMethods.js'
 
 import serverInit from './Firebase.js'
