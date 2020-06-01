@@ -114,19 +114,6 @@ export default function JoinGame({ navigation }) {
             ) : (
               <>
                 <Text style={[Styles.title, Theme.typography.h3]}>{copy.codeLabel}</Text>
-                <TextInput
-                  key="code"
-                  style={[Styles.code_input]}
-                  keyboardType="number-pad"
-                  inputAccessoryViewID="code"
-                  nativeID="inputCodeName"
-                  autoFocus
-                  autoCorrect={false}
-                  maxLength={4}
-                  defaultValue={state.code}
-                  onChangeText={handleCodeChange}
-                  caretHidden
-                />
                 <View style={Styles.code} accessibilityLabel={`Code: ${state.code}`}>
                   {[0, 0, 0, 0].map((c, index) => (
                     <View key={index} style={Styles.code}>
@@ -138,6 +125,20 @@ export default function JoinGame({ navigation }) {
                       {index < 3 && <Text style={[Theme.typography.h1]}>・</Text>}
                     </View>
                   ))}
+                  <TextInput
+                    key="code"
+                    style={[Theme.typography.h1, Styles.code_input]}
+                    placeholder="4 digits"
+                    keyboardType="number-pad"
+                    inputAccessoryViewID="code"
+                    nativeID="inputCodeName"
+                    autoFocus
+                    autoCorrect={false}
+                    maxLength={4}
+                    defaultValue={state.code}
+                    onChangeText={handleCodeChange}
+                    caretHidden
+                  />
                 </View>
                 {/* <Text>{state.code}</Text> */}
               </>

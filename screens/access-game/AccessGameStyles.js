@@ -26,7 +26,12 @@ export default StyleSheet.create({
   },
   code_input: {
     position: 'absolute',
+    top: 0,
+    left: 0,
     opacity: 0,
+    width: '100%',
+    textAlign: 'center',
+    marginTop: 32,
   },
   code_maskDigit: {
     textAlign: 'center',

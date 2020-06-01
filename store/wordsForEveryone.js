@@ -1,3 +1,4 @@
+// Pre defined words up to 5 players.
 export default [
   [
     'conservative',
@@ -47,4 +48,5 @@ export default [
     'obstacle',
     'explicit',
   ],
+  ['black', 'grey', 'white', 'red', 'yellow', 'purple', 'green', 'violet', 'blue', 'brown'],
 ]

@@ -20,14 +20,39 @@ const OthersTurn = ({
   initialTimerSec,
   initialTimer,
   thisTurnPlayerName,
-  turnStatus,
 }) => {
   const Papers = React.useContext(PapersContext)
-  const { game } = Papers.state
+  const { profile, profiles, game } = Papers.state
   const papersGuessed = game.papersGuessed
   const isAllWordsGuessed = papersGuessed === game.round.wordsLeft?.length
   const round = game.round
+  const turnWho = round?.turnWho || {}
   const roundNr = round.current + 1
+  const isTurnOn = !hasCountdownStarted || !!countdownSec // aka: it isn't times up
+  const turnStatus = React.useMemo(() => {
+    if (isAllWordsGuessed) {
+      // No need to calculate this because the component is not rendered.
+      return {}
+    }
+
+    const turnState = isTurnOn ? turnWho : Papers.getNextTurn()
+    const teamId = turnState.team
+    const tPlayerIx = turnState[turnState.team]
+    const tPlayerId = game.teams[teamId].players[tPlayerIx]
+
+    return {
+      title: isTurnOn && game.hasStarted ? 'Playing now' : 'Next up!',
+      player: {
+        name: tPlayerId === profile.id ? 'You!' : profiles[tPlayerId]?.name || `? ${tPlayerId} ?`,
+        avatar: profiles[tPlayerId]?.avatar,
+      },
+      teamName: !game.hasStarted
+        ? 'Waiting for everyone to say they are ready.'
+        : tPlayerId === profile.id
+        ? `Waiting for ${thisTurnPlayerName} to finish their turn.`
+        : game.teams[teamId].name, // TODO "Everyone's ready"
+    }
+  }, [isAllWordsGuessed, isTurnOn])
 
   return (
     <Fragment>
@@ -108,14 +133,6 @@ OthersTurn.propTypes = {
   initialTimerSec: PropTypes.number.isRequired,
   initialTimer: PropTypes.number.isRequired,
   thisTurnPlayerName: PropTypes.string.isRequired,
-  turnStatus: PropTypes.shape({
-    title: PropTypes.string,
-    player: PropTypes.shape({
-      name: PropTypes.string,
-      avatar: PropTypes.string,
-    }),
-    teamName: PropTypes.string,
-  }).isRequired,
 }
 
 export default OthersTurn

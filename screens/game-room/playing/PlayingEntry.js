@@ -21,25 +21,27 @@ export default function PlayingEntry({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const { profile, profiles, game } = Papers.state
   const round = game.round
+
   const hasStatusFinished = round.status === 'finished'
   const hasCountdownStarted = !['getReady', 'finished'].includes(round.status)
   const prevHasCountdownStarted = usePrevious(hasCountdownStarted)
-  const initialTimer = game.settings.time_ms / 2
-  const timerReady = 3400
+  const initialTimer = game.settings.time_ms / 3
+  const timerReady = 3400 // 400 - threshold for io connection.
   const [countdown, startCountdown] = useCountdown(hasCountdownStarted ? round.status : null, {
-    timer: initialTimer + timerReady, // 400 - threshold for io connection.
+    timer: initialTimer + timerReady,
   }) // 3,2,1... go!
   const initialTimerSec = Math.round(initialTimer / 1000)
   const countdownSec = Math.round(countdown / 1000)
 
   const roundIndex = round.current
-  const { 0: turnTeamIndex, 1: turnPlayerIndex, 2: isOdd } = round?.turnWho || {}
-  const turnPlayerId = game.teams[turnTeamIndex].players[isOdd ? 0 : turnPlayerIndex]
-  const isMyTurn = turnPlayerId === profile.id
+  const turnWho = round?.turnWho || {}
+  const turnTeam = game.teams[turnWho.team]
+  const turnPlayerId = turnTeam.players[turnWho[turnWho.team]]
+  const thisTurnPlayer = profiles[turnPlayerId]
 
+  const isMyTurn = turnPlayerId === profile.id
   const isCount321go = countdownSec > initialTimerSec
   const startedCounting = prevHasCountdownStarted === false && hasCountdownStarted
-  const thisTurnPlayer = profiles[game.teams[turnTeamIndex].players[isOdd ? 0 : turnPlayerIndex]]
 
   React.useEffect(() => {
     // use false to avoid undefined on first render
@@ -60,29 +62,6 @@ export default function PlayingEntry({ navigation }) {
     })
   }, [])
 
-  // Some memo here would be nice.
-  const turnStatus = (() => {
-    const isTurnOn = !hasCountdownStarted || !!countdownSec // aka: it isn't times up
-    // Ai jasus... 🙈
-    const { 0: teamIx, 1: tPlayerIx, 2: tisOdd } = isTurnOn
-      ? { 0: turnTeamIndex, 1: turnPlayerIndex, 2: isOdd }
-      : Papers.getNextTurn()
-    const tPlayerId = game.teams[teamIx].players[tisOdd ? 0 : tPlayerIx]
-
-    return {
-      title: isTurnOn && game.hasStarted ? 'Playing now' : 'Next up!',
-      player: {
-        name: tPlayerId === profile.id ? 'You!' : profiles[tPlayerId]?.name || `? ${tPlayerId} ?`,
-        avatar: profiles[tPlayerId]?.avatar,
-      },
-      teamName: !game.hasStarted
-        ? 'Waiting for everyone to say they are ready.'
-        : tPlayerId === profile.id
-        ? `Waiting for ${thisTurnPlayer?.name} to finish their turn.` // REVIEW
-        : game.teams[teamIx].name, // TODO "Everyone's ready"
-    }
-  })()
-
   return (
     <Page>
       {hasStatusFinished ? (
@@ -102,8 +81,7 @@ export default function PlayingEntry({ navigation }) {
       ) : (
         <OthersTurn
           description={DESCRIPTIONS[roundIndex]}
-          thisTurnPlayerName={thisTurnPlayer?.name}
-          turnStatus={turnStatus}
+          thisTurnPlayerName={thisTurnPlayer?.name || `? ${turnPlayerId} ?`}
           hasCountdownStarted={hasCountdownStarted}
           countdownSec={countdownSec}
           countdown={countdown}

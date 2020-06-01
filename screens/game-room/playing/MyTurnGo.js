@@ -278,7 +278,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
 
   if (isDone) {
     return (
-      <Page.Main>
+      <Page.Main blankBg>
         <Text style={[Theme.typography.h1, Styles.go_count321, { color: Theme.colors.danger }]}>
           {msToSecPretty(countdown)}
         </Text>
@@ -303,7 +303,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
 
   if (isCount321go) {
     return (
-      <Page.Main>
+      <Page.Main blankBg>
         <Text style={[Styles.go_count321, Theme.typography.h1]}>
           {countdownSec - initialTimerSec}
         </Text>

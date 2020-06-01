@@ -270,7 +270,14 @@ const gameInitialState = ({ id, name, code, creatorId }) => ({
   papersGuessed: 0, // Number - updated as the player guesses words.
   round: {
     current: null, // Number - Round index
-    turnWho: null, // { Number, Number, Bool } - { 0: teamIndex, 1: playerIndex, 2: isOdd }
+    turnWho: null, // {team: teamId, ...teamId: [playerIndex] }
+    /* ex: team 1, player 2 is playing.
+    turnWho: {
+      team: 1,
+      0: 3,
+      1: 2
+    }
+    */
     turnCount: 0, // Number - Turn index
     status: null, // String - 'getReady' | Date.now() | 'timesup'
     wordsLeft: null, // Array - words left to guess.

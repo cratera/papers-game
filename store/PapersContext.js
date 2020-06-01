@@ -3,8 +3,8 @@ import { AsyncStorage } from 'react-native'
 import PropTypes from 'prop-types'
 
 import wordsForEveryone from './wordsForEveryone.js'
+import { getNextTurn } from './papersMethods.js'
 
-// OPTIMIZE - Pass this as prop, so it's agnostic to any type of server / API.
 import serverInit from './Firebase.js'
 
 const PapersContext = React.createContext({})
@@ -491,7 +491,7 @@ export class PapersContextProvider extends Component {
 
     const roundStatus = {
       current: 0,
-      turnWho: { 0: 0, 1: 0, 2: false },
+      turnWho: { cTeam: 0, 0: 0, 1: 0 }, // Note: support only 2 teams
       turnCount: 0,
       status: 'getReady',
       // all words by key to save space
@@ -514,39 +514,7 @@ export class PapersContextProvider extends Component {
 
   getNextTurn() {
     const { teams, round } = this.state.game
-    const { 0: teamIndex, 1: playerIndex } = round.turnWho
-    const totalTeams = Object.keys(teams).length
-
-    // BUG / TODO - Handle correctly when teams are not even! [1]
-    if (teamIndex < totalTeams - 1) {
-      const nextTeamIndex = teamIndex + 1
-      const totalTeamPlayers = teams[nextTeamIndex].players.length
-
-      if (playerIndex < totalTeamPlayers) {
-        return { 0: nextTeamIndex, 1: playerIndex }
-      } else {
-        return { 0: nextTeamIndex, 1: playerIndex, 2: true } // [1]
-      }
-    } else {
-      const totalTeamPlayers = teams[0].players.length
-      const nextPlayer = playerIndex + 1
-
-      if (nextPlayer < totalTeamPlayers) {
-        return { 0: 0, 1: nextPlayer }
-      } else {
-        return { 0: 0, 1: 0 }
-      }
-    }
-
-    // if (player < totalPlayers) {
-    //   return [team, player + 1];
-    // } else {
-    //   if (team < totalTeams) {
-    //     return [team + 1, 0];
-    //   } else {
-    //     return [0, 0];
-    //   }
-    // }
+    return getNextTurn(round.turnWho, teams)
   }
 
   finishTurn(papersTurn) {

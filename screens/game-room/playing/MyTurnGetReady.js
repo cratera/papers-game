@@ -52,14 +52,18 @@ const MyTurnGetReady = ({ description }) => {
       </Page.Main>
       <Page.CTAs blankBg>
         <TurnStatus
+          style={{ marginBottom: 16 }}
           title="Next up"
-          player={profile}
+          player={{ ...profile, name: 'You' }}
           teamName={
-            !game.hasStarted ? 'Waiting for everyone to say they are ready' : 'Everyone is ready!'
+            // It works, but it's kinda meh how  hasStarted is used here.
+            !game.hasStarted
+              ? 'Waiting for everyone to say they are ready'
+              : round.turnCount === 0
+              ? 'Everyone is ready!'
+              : ''
           }
         />
-
-        {/* TODO/REVIEW use hasStarted vs every isReady */}
         {game.hasStarted && <Button onPress={onStartClick}>Start turn</Button>}
       </Page.CTAs>
     </Fragment>

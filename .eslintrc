@@ -9,7 +9,8 @@
     }
   },
   "env": {
-    "react-native/react-native": true
+    "react-native/react-native": true,
+    "jest": true
   },
   "rules": {
     "prettier/prettier": "error"
