@@ -20,6 +20,7 @@ const OthersTurn = ({
   initialTimerSec,
   initialTimer,
   thisTurnPlayerName,
+  amIWaiting,
 }) => {
   const Papers = React.useContext(PapersContext)
   const { profile, profiles, game } = Papers.state
@@ -35,22 +36,23 @@ const OthersTurn = ({
       return {}
     }
 
-    const turnState = isTurnOn ? turnWho : Papers.getNextTurn()
+    const turnState = isTurnOn && !amIWaiting ? turnWho : Papers.getNextTurn()
     const teamId = turnState.team
     const tPlayerIx = turnState[turnState.team]
     const tPlayerId = game.teams[teamId].players[tPlayerIx]
 
     return {
-      title: isTurnOn && game.hasStarted ? 'Playing now' : 'Next up!',
+      title: isTurnOn && game.hasStarted && !amIWaiting ? 'Playing now' : 'Next up!',
       player: {
         name: tPlayerId === profile.id ? 'You!' : profiles[tPlayerId]?.name || `? ${tPlayerId} ?`,
         avatar: profiles[tPlayerId]?.avatar,
       },
-      teamName: !game.hasStarted
-        ? 'Waiting for everyone to say they are ready.'
-        : tPlayerId === profile.id
-        ? `Waiting for ${thisTurnPlayerName} to finish their turn.`
-        : game.teams[teamId].name, // TODO "Everyone's ready"
+      teamName:
+        !game.hasStarted || amIWaiting
+          ? 'Waiting for everyone to say they are ready.'
+          : tPlayerId === profile.id
+          ? `Waiting for ${thisTurnPlayerName} to finish their turn.`
+          : game.teams[teamId].name,
     }
   }, [isAllWordsGuessed, isTurnOn])
 
@@ -133,6 +135,8 @@ OthersTurn.propTypes = {
   initialTimerSec: PropTypes.number.isRequired,
   initialTimer: PropTypes.number.isRequired,
   thisTurnPlayerName: PropTypes.string.isRequired,
+  /** I am ready, waiting for the next round to start. */
+  amIWaiting: PropTypes.bool,
 }
 
 export default OthersTurn

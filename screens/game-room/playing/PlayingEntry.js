@@ -35,8 +35,8 @@ export default function PlayingEntry({ navigation }) {
 
   const roundIndex = round.current
   const turnWho = round?.turnWho || {}
-  const turnTeam = game.teams[turnWho.team]
-  const turnPlayerId = turnTeam.players[turnWho[turnWho.team]]
+  const turnTeam = turnWho.team
+  const turnPlayerId = game.teams[turnTeam].players[turnWho[turnTeam]]
   const thisTurnPlayer = profiles[turnPlayerId]
 
   const isMyTurn = turnPlayerId === profile.id

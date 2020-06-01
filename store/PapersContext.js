@@ -478,7 +478,7 @@ export class PapersContextProvider extends Component {
         [playerId]: wordsForEveryone[pIndex].map((w, windex) => windex + pIndex * 10),
       }
     }, {})
-    allWords._all = wordsForEveryone.flat()
+    allWords._all = wordsForEveryone.slice(0, this.state.game.players.length).flat()
     await this.state.socket.setWordsForEveryone(allWords)
   }
 
@@ -491,7 +491,7 @@ export class PapersContextProvider extends Component {
 
     const roundStatus = {
       current: 0,
-      turnWho: { cTeam: 0, 0: 0, 1: 0 }, // Note: support only 2 teams
+      turnWho: { team: 0, 0: 0, 1: 0 }, // Note: ATM supports only 2 teams
       turnCount: 0,
       status: 'getReady',
       // all words by key to save space

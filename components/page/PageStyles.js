@@ -7,6 +7,7 @@ export default StyleSheet.create({
   page: {
     width: '100%',
     maxWidth: 500,
+    // paddingHorizontal: calc((100vw - 500px) / 2)
     marginHorizontal: 'auto',
     flex: 1,
     alignItems: 'stretch',

@@ -7,7 +7,8 @@ import Button from '@components/button'
 import Page from '@components/page'
 import i18n from '@constants/i18n'
 
-import EmojiRain from './EmojiRain'
+// import EmojiRain from './EmojiRain'
+import { MyTurnGetReady, OthersTurn } from './index'
 import CardScore from './CardScore'
 
 import * as Theme from '@theme'
@@ -19,15 +20,15 @@ const RoundScore = () => {
   const Papers = React.useContext(PapersContext)
   const { profile, profiles, game } = Papers.state
   const round = game.round
-  const roundIndex = round.current
+  const roundIx = round.current
 
   const teamsTotalScore = {}
   let myTeamId = null
 
   // TODO URGENT. This is the perfect definition of 🍝 code.
-  const getRoundScore = roundIndex => {
+  const getRoundScore = roundIx => {
     const teamsPlayersScore = {}
-    const scorePlayers = game.score[roundIndex]
+    const scorePlayers = game.score[roundIx]
     const teamsScore = {}
     let bestPlayer = {}
 
@@ -83,10 +84,8 @@ const RoundScore = () => {
   const winnerIndex = arrayOfScores.indexOf(winnerScore)
   const winnerId = arrayOfTeamsId[winnerIndex]
   const myTeamWon = myTeamId === winnerId
-
-  const title = myTeamWon ? 'You won!' : 'You lost'
-  const description = myTeamWon ? 'They never stood a change' : 'Yikes.'
-  const isFinalRound = roundIndex === game.settings.roundsCount - 1
+  const isTie = arrayOfScores[1] === arrayOfScores[0]
+  const isFinalRound = roundIx === game.settings.roundsCount - 1
   const amIReady = game.players[profile.id].isReady
 
   const sortTeamIdByScore = (teamAId, teamBId) => arrayOfScores[teamBId] - arrayOfScores[teamAId]
@@ -96,9 +95,36 @@ const RoundScore = () => {
   }
 
   if (amIReady) {
+    // epah... i don't like this here, but couldn't find better.
+    const nextTurnWho = Papers.getNextTurn()
+    const nextRoundIx = round.current + 1
+    const turnTeam = nextTurnWho.team
+    const turnPlayerId = game.teams[turnTeam].players[nextTurnWho[turnTeam]]
+    const turnPlayer = profiles[turnPlayerId]
+    const isMyTurn = turnPlayerId === profile.id
+    const initialTimer = game.settings.time_ms
+    const initialTimerSec = Math.round(initialTimer / 1000)
+
     return (
       <Page.Main blankBg>
-        <Text>[TODO!] - Waiting for everyone to say they are ready.</Text>
+        {isMyTurn ? (
+          <MyTurnGetReady
+            description={DESCRIPTIONS[nextRoundIx]}
+            roundIx={nextRoundIx}
+            amIWaiting={true}
+          />
+        ) : (
+          <OthersTurn
+            description={DESCRIPTIONS[nextRoundIx]}
+            thisTurnPlayerName={turnPlayer?.name || `? ${turnPlayer} ?`}
+            hasCountdownStarted={false}
+            countdownSec={initialTimerSec}
+            countdown={initialTimer}
+            initialTimerSec={initialTimerSec}
+            initialTimer={initialTimer}
+            amIWaiting={true}
+          />
+        )}
       </Page.Main>
     )
   }
@@ -108,29 +134,30 @@ const RoundScore = () => {
       {/* {isFinalRound && <EmojiRain type={myTeamWon ? 'winner' : 'loser'} />} */}
       <Page.Main blankBg>
         <View style={[Styles.header, { marginBottom: 16 }]}>
-          {!isFinalRound ? (
+          {isFinalRound ? (
             <Fragment>
-              <Text style={Theme.typography.h3}>End of round {roundIndex + 1}</Text>
-              <Text style={Theme.typography.h2}>
-                {myTeamWon ? (
-                  // TODO these titles styles are incorrect
-                  <Text style={{ color: Theme.colors.success }}>Your team won!</Text>
-                ) : (
-                  <Text style={{ color: Theme.colors.danger }}>Your team lost!</Text>
-                )}
+              {/* <Text style={Theme.typography.h3}>End of round {roundIx + 1}</Text> */}
+              <Text style={Theme.typography.h1}>
+                {myTeamWon ? 'Your team won!' : 'Your team lost!'}
               </Text>
             </Fragment>
           ) : (
             <Fragment>
-              <Text style={Theme.typography.h1}>{title}</Text>
-              <Text style={Theme.typography.body}>{description}</Text>
+              <Text style={Theme.typography.h3}>
+                {isTie
+                  ? "It's a tie!"
+                  : myTeamWon
+                  ? 'Your team won this round!'
+                  : 'Your team lost this round...'}
+              </Text>
             </Fragment>
           )}
         </View>
+        {/* TODO - Extract this to TeamsScore and use at Settings (score) */}
         <View>
-          {scores[roundIndex].arrayOfTeamsId.sort(sortTeamIdByScore).map((teamId, index) => {
+          {scores[roundIx].arrayOfTeamsId.sort(sortTeamIdByScore).map((teamId, index) => {
             let bestPlayer
-            // it hurts omgosh...
+            // it hurts om gosh...
             if (isFinalRound) {
               // Join all scores for each round in the team.
               // Memo is welcome!
@@ -151,7 +178,7 @@ const RoundScore = () => {
               )
               bestPlayer = { name: profiles[bestPlayerId]?.name, score: highestScore }
             } else {
-              const thisTeamPlayersScore = scores[roundIndex].teamsPlayersScore[teamId]
+              const thisTeamPlayersScore = scores[roundIx].teamsPlayersScore[teamId]
               const highestScore = Math.max(...thisTeamPlayersScore.map(p => p.score))
               bestPlayer = thisTeamPlayersScore.find(p => p.score === highestScore)
             }
@@ -159,10 +186,11 @@ const RoundScore = () => {
               <CardScore
                 key={teamId}
                 index={index}
+                isTie={isTie}
                 teamName={game.teams[teamId].name}
                 bestPlayer={bestPlayer}
                 scoreTotal={teamsTotalScore[teamId]}
-                scoreRound={scores[roundIndex].teamsScore[teamId]}
+                scoreRound={scores[roundIx].teamsScore[teamId]}
               />
             )
           })}

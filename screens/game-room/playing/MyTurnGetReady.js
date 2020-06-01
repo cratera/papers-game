@@ -19,7 +19,7 @@ const place = (x, y, deg) => ({
   transform: [{ rotate: deg }],
 })
 
-const MyTurnGetReady = ({ description }) => {
+const MyTurnGetReady = ({ description, roundIx, amIWaiting }) => {
   const Papers = React.useContext(PapersContext)
   const { game, profile } = Papers.state
   const round = game.round
@@ -54,17 +54,14 @@ const MyTurnGetReady = ({ description }) => {
         <TurnStatus
           style={{ marginBottom: 16 }}
           title="Next up"
-          player={{ ...profile, name: 'You' }}
+          player={{ ...profile, name: 'You!' }}
           teamName={
-            // It works, but it's kinda meh how  hasStarted is used here.
-            !game.hasStarted
-              ? 'Waiting for everyone to say they are ready'
-              : round.turnCount === 0
-              ? 'Everyone is ready!'
-              : ''
+            !game.hasStarted || amIWaiting
+              ? 'Waiting for everyone to say they are ready.'
+              : 'Everyone is ready!'
           }
         />
-        {game.hasStarted && <Button onPress={onStartClick}>Start turn</Button>}
+        {game.hasStarted && !amIWaiting && <Button onPress={onStartClick}>Start turn</Button>}
       </Page.CTAs>
     </Fragment>
   )
@@ -72,6 +69,8 @@ const MyTurnGetReady = ({ description }) => {
 
 MyTurnGetReady.propTypes = {
   description: PropTypes.string.isRequired,
+  roundIx: PropTypes.number,
+  amIWaiting: PropTypes.bool,
 }
 
 const StylesIn = StyleSheet.create({

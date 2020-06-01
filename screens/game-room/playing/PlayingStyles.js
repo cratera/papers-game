@@ -129,7 +129,8 @@ export default StyleSheet.create({
     fontSize: 14,
     color: Theme.colors.bg,
     paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 10,
+    paddingVertical: 1,
+    borderRadius: 9,
+    overflow: 'hidden',
   },
 })

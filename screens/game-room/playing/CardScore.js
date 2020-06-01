@@ -11,23 +11,23 @@ const podiumMap = {
   3: '3rd place', // REVIEW - Maximum 3 teams
 }
 
-const CardScore = ({ index, teamName, scoreTotal, scoreRound, bestPlayer }) => (
+const CardScore = ({ index, isTie, teamName, scoreTotal, scoreRound, bestPlayer }) => (
   <View style={Styles.fscore_item} key={index}>
     <View style={Styles.fscore_info}>
       <Text
         style={[
           Styles.fscore_tag,
           {
-            backgroundColor: index === 0 ? Theme.colors.primary : Theme.colors.grayDark,
+            backgroundColor: isTie || index === 0 ? Theme.colors.primary : Theme.colors.grayDark,
             marginBottom: 8,
           },
         ]}
       >
-        {podiumMap[index]}
+        {isTie ? 'Tie' : podiumMap[index]}
       </Text>
       <Text style={Theme.typography.h3}>{teamName}</Text>
       {bestPlayer.name && (
-        <Text style={Theme.typography.small}>
+        <Text style={[Theme.typography.small, { color: Theme.colors.grayDark, marginTop: 2 }]}>
           {bestPlayer.name} was the best player! ({bestPlayer.score})
         </Text>
       )}
@@ -42,6 +42,7 @@ const CardScore = ({ index, teamName, scoreTotal, scoreRound, bestPlayer }) => (
 
 CardScore.propTypes = {
   index: PropTypes.number.isRequired,
+  isTie: PropTypes.bool.isRequired,
   teamName: PropTypes.string.isRequired,
   scoreTotal: PropTypes.number.isRequired,
   scoreRound: PropTypes.number.isRequired,

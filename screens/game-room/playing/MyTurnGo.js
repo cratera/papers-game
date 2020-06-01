@@ -29,7 +29,10 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
   const blurTime = 1500 // TODO - game individual setting
   const papersTurnCurrent = papersTurn?.current
   const stillHasWords =
-    papersTurnCurrent !== null || papersTurn.passed.length > 0 || papersTurn.wordsLeft.length > 0
+    !papersTurn ||
+    papersTurnCurrent !== null ||
+    papersTurn.passed.length > 0 ||
+    papersTurn.wordsLeft.length > 0
   const doneMsg = !stillHasWords ? 'All papers guessed!' : "Time's up!"
   const prevCountdownSec = usePrevious(countdownSec)
 
