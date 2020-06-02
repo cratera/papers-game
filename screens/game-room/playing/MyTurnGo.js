@@ -303,8 +303,8 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
 
   if (isCount321go) {
     return (
-      <Page.Main blankBg>
-        <Text style={[Styles.go_count321, Theme.typography.h1]}>
+      <Page.Main blankBg style={Styles.go_countMain}>
+        <Text style={[Theme.typography.h1, Styles.go_count321]}>
           {countdownSec - initialTimerSec}
         </Text>
       </Page.Main>
@@ -363,13 +363,18 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
         {!isPaperChanging ? (
           <Fragment>
             <Button
-              variant="success"
-              styleTouch={{ flex: 1 }}
+              variant="icon"
+              style={{
+                borderWidth: 0,
+                backgroundColor: Theme.colors.success,
+                color: Theme.colors.bg,
+              }}
+              accessibilityLabel="Got it"
               onPress={() => handlePaperClick(true)}
             >
-              Got it!
+              ✓
             </Button>
-            <Text style={{ width: 16 }}>{/* lazyness lvl 99 */}</Text>
+            <Text style={{ flexGrow: 1 }}>{/* lazyness lvl 99 */}</Text>
 
             {papersTurn.current !== null &&
             !papersTurn.wordsLeft.length &&
@@ -385,11 +390,16 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
               </Text>
             ) : (
               <Button
-                variant="primary"
-                styleTouch={{ flex: 1 }}
+                variant="icon"
+                style={{
+                  borderWidth: 0,
+                  backgroundColor: Theme.colors.primary,
+                  color: Theme.colors.bg,
+                }}
+                accessibilityLabel="Pass"
                 onPress={() => handlePaperClick(false)}
               >
-                Pass paper
+                🤷‍♀️
               </Button>
             )}
           </Fragment>

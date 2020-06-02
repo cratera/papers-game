@@ -58,9 +58,9 @@ const OthersTurn = ({
 
   return (
     <Fragment>
-      <Page.Main blankBg>
+      <Page.Main>
         <View>
-          <View style={Styles.header}>
+          <View style={[Styles.header, { marginTop: 24 }]}>
             <Text style={Theme.typography.h3}>Round {roundNr}</Text>
             <Text style={[Theme.typography.secondary, Theme.u.center]}>
               {'\n'} {description}

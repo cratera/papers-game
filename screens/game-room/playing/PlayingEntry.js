@@ -25,7 +25,7 @@ export default function PlayingEntry({ navigation }) {
   const hasStatusFinished = round.status === 'finished'
   const hasCountdownStarted = !['getReady', 'finished'].includes(round.status)
   const prevHasCountdownStarted = usePrevious(hasCountdownStarted)
-  const initialTimer = game.settings.time_ms / 3
+  const initialTimer = game.settings.time_ms * 50
   const timerReady = 3400 // 400 - threshold for io connection.
   const [countdown, startCountdown] = useCountdown(hasCountdownStarted ? round.status : null, {
     timer: initialTimer + timerReady,
@@ -53,14 +53,14 @@ export default function PlayingEntry({ navigation }) {
 
   React.useEffect(() => {
     navigation.setOptions({
-      ...headerTheme({ hiddenBorder: true }),
+      ...headerTheme({ hiddenBorder: isMyTurn }),
       headerTitle: 'Playing',
       headerTintColor: Theme.colors.bg,
       headerRight: function HLB() {
         return <Page.HeaderBtnSettings />
       },
     })
-  }, [])
+  }, [isMyTurn])
 
   return (
     <Page>

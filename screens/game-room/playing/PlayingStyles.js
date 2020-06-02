@@ -18,6 +18,13 @@ export default StyleSheet.create({
   },
 
   // go view (counting...)
+  go_countMain: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: -40,
+  },
   go_count321: {
     color: Theme.colors.primary,
     textAlign: 'center',
@@ -64,6 +71,7 @@ export default StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 24,
   },
   go_cta_dim: {
     opacity: 0.5,
