@@ -249,9 +249,6 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
         ...wordsModified,
       }
 
-      // TODO/BUG: When papers are all guessed and I select one as not guessed.
-      //  - The timer continues but the current word is empty.
-
       Papers.setTurnLocalState(newState)
       return newState
     })

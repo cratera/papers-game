@@ -351,6 +351,12 @@ async function createGame(gameName) {
 async function joinGame(gameId) {
   console.log(`⚙️ joinGame: ${gameId}`)
 
+  // Verify if we can access the game...
+  const id = LOCAL_PROFILE.id
+  if (!id) {
+    throw new Error('notSigned')
+  }
+
   // Verify if game exists...
   const gameRef = DB.ref(`games/${gameId}`)
   const game = await gameRef.once('value')
@@ -359,20 +365,14 @@ async function joinGame(gameId) {
     throw new Error('notFound')
   }
 
-  // Verify if we can access the game...
-  const id = LOCAL_PROFILE.id
-  if (!id) {
-    throw new Error('notSigned')
-  }
-
-  const alreadyStarted = game.child('alreadyStarted').val()
+  const teams = game.child('teams').val()
 
   const gamePlayers = game.child('players')
   const ImInTheGame = gamePlayers.child(id).val()
 
-  if (alreadyStarted && !ImInTheGame) {
-    // After the game starts, new players cannot join unless
-    // they are already part of the game (were isAfk)
+  if (teams && !ImInTheGame) {
+    // After the teams are made, new players cannot join unless
+    // they are already part of the game
     throw new Error('alreadyStarted')
   }
 
