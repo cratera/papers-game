@@ -27,22 +27,19 @@ export default function GameRoomEntry({ navigation }) {
   const wordsAreStored = game?.words && game.words[profileId]
 
   React.useLayoutEffect(() => {
-    if (!game) {
-      // Unexpect lost of game. (e.g. Game was directly deleted from DB)
-      console.warn('!game. Unexpected')
-      navigation.navigate('home')
-    }
-  }, [game])
-
-  React.useEffect(() => {
     if (gameId) {
       return setStatus('ready')
     } else {
-      console.warn('!gameId roomEntry. Left game?')
-      // REVIEW - if just left game, add global status?
       navigation.navigate('home')
     }
   }, [gameId, profileId])
+
+  React.useLayoutEffect(() => {
+    if (!game) {
+      // Unexpect lost of game. (e.g. Game was directly deleted from DB)
+      navigation.navigate('home')
+    }
+  }, [game])
 
   if (!profileId || status === 'noProfile') {
     return (

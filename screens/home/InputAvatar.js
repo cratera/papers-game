@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import { Image, TouchableHighlight, Text, View } from 'react-native'
 import { Svg, Path } from 'react-native-svg'
 
-import { PickAvatarModal } from '@components/profile'
+import { PickAvatar } from '@components/profile'
 
 import * as Theme from '@theme'
 import Styles from './HomeStyles.js'
@@ -45,7 +45,7 @@ export default function InputAvatar({ avatar, onChange }) {
         {status === 'loaded' ? 'Looking good!' : ''}
       </Text>
 
-      <PickAvatarModal
+      <PickAvatar
         visible={isPickerVisible}
         onSubmit={onChange}
         onClose={() => setIsPickerVisible(false)}

@@ -8,6 +8,8 @@ import Page from '@components/page'
 import HomeSigned from './HomeSigned.js'
 import HomeSignup from './HomeSignup.js'
 
+import * as Theme from '@theme'
+
 export default function HomeScreen({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const { profile, game } = Papers.state
@@ -17,6 +19,7 @@ export default function HomeScreen({ navigation }) {
     navigation.setOptions({
       ...headerTheme({ hiddenBorder: true }),
       headerTitle: profile.name ? 'Home' : 'Create Profile',
+      headerTintColor: Theme.colors.bg,
       headerRight: function HBS() {
         return profile.name ? <Page.HeaderBtnSettings /> : null
       },

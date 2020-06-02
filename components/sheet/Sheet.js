@@ -60,7 +60,7 @@ PickAvatar.propTypes = {
 const Styles = StyleSheet.create({
   options: {
     backgroundColor: Theme.colors.bg,
-    marginBottom: 24,
+    marginBottom: 16, // Review these spacing across all views.
     paddingVertical: 8,
     borderRadius: 16,
   },
@@ -77,6 +77,6 @@ const Styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'flex-end',
-    paddingBottom: 44, // 56 in avatarPicker. REVIEW
+    paddingBottom: 42,
   },
 })

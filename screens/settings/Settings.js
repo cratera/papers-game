@@ -18,7 +18,7 @@ import * as Theme from '@theme'
 import Page from '@components/page'
 import ListTeams from '@components/list-teams'
 
-import { PickAvatarModal } from '@components/profile'
+import { PickAvatar } from '@components/profile'
 import { useLeaveGame } from '@components/settings'
 import { headerTheme } from '@navigation/headerStuff.js'
 
@@ -301,7 +301,7 @@ const AvatarSquare = ({ avatar, style, onChange }) => {
         )}
       </TouchableHighlight>
       <Text style={[StylesAv.icon]}>📸</Text>
-      <PickAvatarModal
+      <PickAvatar
         visible={isPickerVisible}
         onChange={() => null}
         onSubmit={onChange}

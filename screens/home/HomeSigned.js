@@ -9,7 +9,7 @@ import Styles from './HomeStyles.js'
 
 import Page from '@components/page'
 import Button from '@components/button'
-import { PickAvatarModal } from '@components/profile'
+import { PickAvatar } from '@components/profile'
 import danceGif from '@assets/images/dance.gif'
 
 const AvatarMeme = ({ avatar, onChange }) => {
@@ -33,7 +33,7 @@ const AvatarMeme = ({ avatar, onChange }) => {
         )}
       </TouchableHighlight>
       <Image style={Styles.memeBody} source={danceGif} accessible={false} />
-      <PickAvatarModal
+      <PickAvatar
         visible={isPickerVisible}
         onChange={() => null}
         onSubmit={onChange}

@@ -52,7 +52,7 @@ export default function usePickAvatar() {
       })
     }
 
-    console.log('usePickAvatarModal', result.cancelled ? 'cancelled' : 'done!')
+    console.log('usePickAvatar', result.cancelled ? 'cancelled' : 'done!')
     return result.cancelled ? null : result.uri
 
     // We'll go back to this again...
