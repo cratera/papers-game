@@ -90,7 +90,7 @@ export default StyleSheet.create({
 
   // Turn score:
   tscore_list: {
-    marginBottom: 40,
+    marginBottom: 20,
   },
   tscore_item: {
     display: 'flex',
@@ -99,10 +99,14 @@ export default StyleSheet.create({
     alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: Theme.colors.grayLight,
-    marginVertical: 4,
+    paddingHorizontal: 20,
+    paddingVertical: 20,
   },
   tscore_btnRemove: {
     color: Theme.colors.danger,
+  },
+  tscore_btnToggle: {
+    color: Theme.colors.primary,
   },
 
   // Final score:

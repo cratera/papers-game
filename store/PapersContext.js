@@ -482,7 +482,7 @@ export class PapersContextProvider extends Component {
     await this.state.socket.setWordsForEveryone(allWords)
   }
 
-  async setTeams(teams, cb) {
+  async setTeams(teams) {
     await this.state.socket.setTeams(teams)
   }
 
@@ -517,7 +517,7 @@ export class PapersContextProvider extends Component {
     return getNextTurn(round.turnWho, teams)
   }
 
-  finishTurn(papersTurn) {
+  async finishTurn(papersTurn, cb) {
     console.log('📌 finishTurn()')
     const game = this.state.game
     const profileId = this.state.profile.id
@@ -563,17 +563,21 @@ export class PapersContextProvider extends Component {
       return true
     })
 
-    this.state.socket.finishTurn(
-      {
-        playerScore: {
-          [profileId]: allValidWordsGuessed,
+    try {
+      await this.state.socket.finishTurn(
+        {
+          playerScore: {
+            [profileId]: allValidWordsGuessed,
+          },
+          roundStatus,
         },
-        roundStatus,
-      },
-      (res, err) => {
-        console.error(':: failed!', err)
-      }
-    )
+        (res, err) => {
+          console.error(':: failed!', err)
+        }
+      )
+    } catch (error) {
+      cb(null, error)
+    }
   }
 
   startNextRound() {

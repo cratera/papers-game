@@ -600,16 +600,11 @@ async function removePlayer(playerId) {
 /**
  *
  */
-async function setTeams(teams, cb) {
+async function setTeams(teams) {
   console.log('⚙️ setTeams()')
   const gameId = LOCAL_PROFILE.gameId
 
-  try {
-    await DB.ref(`games/${gameId}/teams`).set(teams)
-  } catch (e) {
-    console.warn('setTeams failed', e)
-    cb(null, e)
-  }
+  await DB.ref(`games/${gameId}/teams`).set(teams)
 }
 
 /**

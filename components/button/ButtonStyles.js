@@ -110,8 +110,4 @@ export const button = ({ variant, size, place }) => {
   ]
 }
 
-export const loading = {
-  // TODO
-}
-
 export const touch = styles.touch

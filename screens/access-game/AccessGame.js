@@ -9,7 +9,7 @@ export default function AccessGame({ route, navigation }) {
   const Papers = React.useContext(PapersContext)
   const { game } = Papers.state
   const gameId = game?.id
-  const { variant } = route.params
+  const { variant } = route.params || {}
 
   React.useEffect(() => {
     if (!variant) {
@@ -32,6 +32,7 @@ export default function AccessGame({ route, navigation }) {
   } else if (variant === 'create') {
     return <CreateGame navigation={navigation} />
   }
+  return null
 }
 
 AccessGame.propTypes = {

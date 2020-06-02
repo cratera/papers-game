@@ -25,7 +25,7 @@ export default function PlayingEntry({ navigation }) {
   const hasStatusFinished = round.status === 'finished'
   const hasCountdownStarted = !['getReady', 'finished'].includes(round.status)
   const prevHasCountdownStarted = usePrevious(hasCountdownStarted)
-  const initialTimer = game.settings.time_ms * 50
+  const initialTimer = game.settings.time_ms / 3
   const timerReady = 3400 // 400 - threshold for io connection.
   const [countdown, startCountdown] = useCountdown(hasCountdownStarted ? round.status : null, {
     timer: initialTimer + timerReady,

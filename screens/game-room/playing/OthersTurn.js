@@ -107,7 +107,7 @@ const OthersTurn = ({
           {/* TODO - view when all papers were guessed */}
         </View>
       </Page.Main>
-      <Page.CTAs blankBg>
+      <Page.CTAs>
         {isAllWordsGuessed ? (
           <View>
             <Text style={Theme.typography.h3}>End of Round {roundNr}</Text>

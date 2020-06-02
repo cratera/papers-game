@@ -20,6 +20,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
   const [isDone, setIsDone] = React.useState(false) // All words are guessed or timesups
   const [papersTurn, setPapersTurn] = React.useState(null)
   const [isPaperChanging, setIsPaperChanging] = React.useState(false)
+  const [isFinishingTurn, setIsFinishingTurn] = React.useState(false)
   const [isPaperBlur, setPaperBlur] = React.useState(false)
   const [paperAnim, setPaperAnimation] = React.useState(null) // gotcha || nope
   const blurTimeout = React.useRef()
@@ -255,17 +256,24 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
   }
 
   function handleFinishTurnClick() {
+    if (isFinishingTurn) return false
+    setIsFinishingTurn(true)
+
     // just to double check...
     setPaperBlur(false)
     setIsPaperChanging(false)
-
-    // TODO - add loading state
 
     // Cleanup local papers turn to avoid memory leaks.
     // Ex: Start a new game, the LS may still contain data from prev game
     // TODO/REVIEW - Maybe do this when game starts. Dunno what's the best place to do it.
     Papers.setTurnLocalState(null)
-    Papers.finishTurn(papersTurn)
+
+    Papers.finishTurn(papersTurn, (res, error) => {
+      if (error) {
+        console.warn('finish turn failed', error)
+        setIsFinishingTurn(false)
+      }
+    })
   }
 
   if (!papersTurn) {
@@ -288,7 +296,6 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
   }
 
   // BUG - This view shows for 5ms before the isCount321go.
-
   if (!stillHasWords || countdownSec === 0) {
     return (
       <TurnScore
@@ -297,6 +304,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
         type={!stillHasWords ? 'nowords' : 'timesup'}
         onFinish={handleFinishTurnClick}
         getPaperByKey={getPaperByKey}
+        isSubmitting={isFinishingTurn}
       />
     )
   }

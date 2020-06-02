@@ -17,8 +17,7 @@ function Button({ variant, size, place, isLoading, children, style, styleTouch, 
       {...(isLoading ? { disabled: true } : {})}
     >
       <Text style={[Styles.button({ variant, size, place }), style]}>
-        <Text>{children}</Text>
-        {isLoading ? <Text style={Styles.loading}> ⏳</Text> : ''}
+        <Text>{!isLoading ? children : '⏳'}</Text>
       </Text>
     </TouchableHighlight>
   )

@@ -1,16 +1,24 @@
 import React, { Fragment } from 'react'
-import { View, Text } from 'react-native'
+import { View, Text, TouchableHighlight } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import PropTypes from 'prop-types'
 
 import Button from '@components/button'
 import Page from '@components/page'
+import Sheet from '@components/sheet'
+
 // import i18n from '@constants/i18n'
 
 import * as Theme from '@theme'
 import Styles from './PlayingStyles.js'
 
-const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, getPaperByKey }) => {
+const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, getPaperByKey, isSubmitting }) => {
+  const [isNotGuessedVisible, setIsNotGuessedVisible] = React.useState(false)
+  const [editingPaper, setEditingPaper] = React.useState(['', null])
+
+  function closeSheet() {
+    setEditingPaper(['', null])
+  }
   return (
     <Fragment>
       <Page.Main blankBg>
@@ -23,22 +31,20 @@ const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, getPaperByKey })
           </Text>
         </View>
 
-        <ScrollView style={Theme.u.scrollSideOffset}>
+        <ScrollView style={{ marginHorizontal: -16 }}>
           {papersTurn.guessed.length ? (
             <View style={Styles.tscore_list}>
               {papersTurn.guessed
                 .filter(paper => paper !== undefined)
                 .map((paper, i) => (
-                  <View style={[Styles.tscore_item]} key={`${i}_${paper}`}>
-                    <Text style={Theme.typography.body}>{getPaperByKey(paper)}</Text>
-                    <Button
-                      style={Styles.tscore_btnRemove}
-                      variant="flat"
-                      onPress={() => onTogglePaper(paper, false)}
-                    >
-                      Remove
-                    </Button>
-                  </View>
+                  <TouchableHighlight
+                    underlayColor={Theme.colors.grayLight}
+                    onPress={() => setEditingPaper([paper, false])}
+                    style={Styles.tscore_item}
+                    key={`${i}_${paper}`}
+                  >
+                    <Text style={Theme.typography.bold}>{getPaperByKey(paper)}</Text>
+                  </TouchableHighlight>
                 ))}
             </View>
           ) : (
@@ -47,29 +53,61 @@ const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, getPaperByKey })
             </Text>
           )}
           {!!papersTurn.passed.length && (
-            <View style={Styles.tscore_list}>
-              <Text style={Theme.typography.h3}>Papers you did not get:</Text>
-              {papersTurn.passed
-                .filter(paper => paper !== undefined)
-                .map((paper, i) => (
-                  <View style={Styles.tscore_item} key={`${i}_${paper}`}>
-                    <Text style={Theme.typography.body}>{getPaperByKey(paper)}</Text>
-                    <Button
-                      style={Styles.tscore_btnAdd}
-                      variant="flat"
-                      onPress={() => onTogglePaper(paper, true)}
+            <View style={[Styles.tscore_list, { marginBottom: 80 }]}>
+              {/* Toggle visibility */}
+              <View style={[Styles.tscore_item, { paddingBottom: 0 }]} key="ng">
+                <Text style={[Theme.typography.secondary, { marginLeft: 8 }]}>
+                  Not guessed ({papersTurn.passed.length})
+                </Text>
+                <Button
+                  style={Styles.tscore_btnToggle}
+                  variant="flat"
+                  onPress={() => setIsNotGuessedVisible(bool => !bool)}
+                >
+                  {isNotGuessedVisible ? 'Hide' : 'Show'}
+                </Button>
+              </View>
+
+              {isNotGuessedVisible &&
+                papersTurn.passed
+                  .filter(paper => paper !== undefined)
+                  .map((paper, i) => (
+                    <TouchableHighlight
+                      underlayColor={Theme.colors.grayLight}
+                      onPress={() => setEditingPaper([paper, true])}
+                      style={Styles.tscore_item}
+                      key={`${i}_${paper}`}
                     >
-                      Add
-                    </Button>
-                  </View>
-                ))}
+                      <Text style={Theme.typography.bold}>{getPaperByKey(paper)}</Text>
+                    </TouchableHighlight>
+                  ))}
             </View>
           )}
         </ScrollView>
+
+        <Sheet
+          visible={!!editingPaper[0]}
+          onClose={closeSheet}
+          list={[
+            {
+              text: !editingPaper[0]
+                ? ''
+                : editingPaper[1]
+                ? `✅ Mark "${getPaperByKey(editingPaper[0])}" guessed`
+                : `❌ Remove "${getPaperByKey(editingPaper[0])}"`,
+              onPress: () => {
+                closeSheet()
+                setIsNotGuessedVisible(true)
+                onTogglePaper(...editingPaper)
+              },
+            },
+          ]}
+        />
       </Page.Main>
       <Page.CTAs blankBg hasOffset>
-        {/* TODO add loading */}
-        <Button onPress={onFinish}>End turn</Button>
+        <Button onPress={onFinish} isLoading={isSubmitting}>
+          End turn
+        </Button>
       </Page.CTAs>
     </Fragment>
   )
@@ -81,6 +119,7 @@ TurnScore.propTypes = {
   onTogglePaper: PropTypes.func.isRequired,
   onFinish: PropTypes.func.isRequired,
   getPaperByKey: PropTypes.func.isRequired,
+  isSubmitting: PropTypes.bool,
 }
 
 export default TurnScore
