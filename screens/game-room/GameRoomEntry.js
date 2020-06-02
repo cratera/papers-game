@@ -26,15 +26,19 @@ export default function GameRoomEntry({ navigation }) {
   const profileId = profile?.id
   const wordsAreStored = game?.words && game.words[profileId]
 
-  React.useEffect(() => {
-    if (!profileId) {
-      // REVIEW - do this validation at App.js?
-      return setStatus('noProfile')
+  React.useLayoutEffect(() => {
+    if (!game) {
+      // Unexpect lost of game. (e.g. Game was directly deleted from DB)
+      console.warn('!game. Unexpected')
+      navigation.navigate('home')
     }
+  }, [game])
 
+  React.useEffect(() => {
     if (gameId) {
       return setStatus('ready')
     } else {
+      console.warn('!gameId roomEntry. Left game?')
       // REVIEW - if just left game, add global status?
       navigation.navigate('home')
     }

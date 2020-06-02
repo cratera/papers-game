@@ -299,6 +299,7 @@ const gameInitialState = ({ id, name, code, creatorId }) => ({
  * @param {*} gameName
  */
 async function createGame(gameName) {
+  // TODO later - "Play again" feature? create game with predefined teams?
   console.log(`⚙️ createGame: ${gameName}`, { LOCAL_PROFILE })
   const gameNameLower = gameName.toLowerCase()
 
@@ -366,11 +367,9 @@ async function joinGame(gameId) {
   }
 
   const teams = game.child('teams').val()
+  const imInTheGame = game.child('players').child(id).val()
 
-  const gamePlayers = game.child('players')
-  const ImInTheGame = gamePlayers.child(id).val()
-
-  if (teams && !ImInTheGame) {
+  if (teams && !imInTheGame) {
     // After the teams are made, new players cannot join unless
     // they are already part of the game
     throw new Error('alreadyStarted')
@@ -540,7 +539,7 @@ async function leaveGame({ wasKicked = false } = {}) {
     console.log('⚙️ Unsubscribe game')
     PubSub.unsubscribe('game')
 
-    // A kickedout player cannot remove the game.
+    // A kicked-out player cannot remove the game.
     // It means there's still someone left.
     if (!wasKicked && Object.keys(game.val().players).length === 1) {
       console.log(':: last player - remove game')
