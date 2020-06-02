@@ -108,41 +108,4 @@ export default StyleSheet.create({
   tscore_btnToggle: {
     color: Theme.colors.primary,
   },
-
-  // Final score:
-  fscore_list: {
-    marginBottom: 16,
-  },
-  fscore_item: {
-    backgroundColor: Theme.colors.grayLight,
-    borderRadius: 4,
-    overflow: 'hidden',
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    marginVertical: 8,
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  fscore_info: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-    flexShrink: 1,
-    marginRight: 8,
-  },
-  fscore_score: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-end',
-  },
-  fscore_tag: {
-    fontSize: 14,
-    color: Theme.colors.bg,
-    paddingHorizontal: 8,
-    paddingVertical: 1,
-    borderRadius: 9,
-    overflow: 'hidden',
-  },
 })

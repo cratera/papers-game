@@ -32,6 +32,7 @@ export default function ListPlayers({ players, enableKickout, isStatusVisible, .
   const playersSorted = React.useMemo(() => players.sort(), [players]) // TODO - sort this by name #F65
   const playersKeys = Object.keys(game.players || {})
   const hasEnoughPlayers = playersKeys.length >= 4
+  const hasTeams = !!game.teams
 
   return (
     <View style={Styles.list} {...otherProps}>
@@ -95,7 +96,7 @@ export default function ListPlayers({ players, enableKickout, isStatusVisible, .
             </View>
             <View style={Styles.ctas}>
               {/* TODO make same as design. */}
-              {enableKickout && profileIsAdmin && playerId !== profileId && (
+              {enableKickout && playerId !== profileId && (hasTeams || profileIsAdmin) && (
                 <Button
                   variant="light"
                   size="sm"

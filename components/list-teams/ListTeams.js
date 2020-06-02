@@ -7,7 +7,7 @@ import ListPlayers from '@components/list-players'
 
 import * as Theme from '@theme'
 
-export default function ListTeams({ isStatusVisible, ...otherProps }) {
+export default function ListTeams({ isStatusVisible, enableKickout, ...otherProps }) {
   const Papers = React.useContext(PapersContext)
   const { game } = Papers.state
 
@@ -20,7 +20,7 @@ export default function ListTeams({ isStatusVisible, ...otherProps }) {
     return (
       <ListPlayers
         players={Object.keys(game.players)}
-        enableKickout
+        enableKickout={enableKickout}
         isStatusVisible={isStatusVisible}
         {...otherProps}
       />
@@ -34,7 +34,11 @@ export default function ListTeams({ isStatusVisible, ...otherProps }) {
         return (
           <View key={id} style={Styles.team}>
             <Text style={Theme.typography.h3}>{name}</Text>
-            <ListPlayers players={players} enableKickout isStatusVisible={isStatusVisible} />
+            <ListPlayers
+              players={players}
+              enableKickout={enableKickout}
+              isStatusVisible={isStatusVisible}
+            />
           </View>
         )
       })}

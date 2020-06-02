@@ -5,7 +5,7 @@ import { ScrollView } from 'react-native-gesture-handler'
 
 import { getRandomInt } from '@constants/utils'
 import PapersContext from '@store/PapersContext.js'
-import teamNames from '@constants/teamNames.js'
+import teamNames from '@store/teamNames.js'
 
 import Page from '@components/page'
 import Button from '@components/button'

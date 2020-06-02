@@ -17,6 +17,7 @@ import * as Theme from '@theme'
 
 import Page from '@components/page'
 import ListTeams from '@components/list-teams'
+import GameScore from '@components/game-score'
 
 import { PickAvatar } from '@components/profile'
 import { useLeaveGame } from '@components/settings'
@@ -146,23 +147,19 @@ function SettingsGame({ navigation }) {
       <Page.Main>
         <ScrollView>
           <Text
-            style={[Theme.typography.h2, Theme.u.center, { marginTop: 24 }]}
+            style={[Theme.typography.h2, Theme.u.center, { marginTop: 24, marginBottom: 8 }]}
             accessibilityRole="header"
           >
             {game.name}
           </Text>
-          <Text
+          <GameScore
             style={{
-              marginVertical: 16,
-              padding: 24,
-              paddingVertical: 70,
-              borderColor: '#4cc',
-              borderWidth: 5,
-              textAlign: 'center',
+              paddingBottom: 16,
+              marginBottom: 12,
+              borderBottomWidth: 1,
+              borderBottomColor: Theme.colors.grayLight,
             }}
-          >
-            [TODO: Game Score]
-          </Text>
+          />
           {/* BUG FlatList: https://github.com/GeekyAnts/NativeBase/issues/2947 */}
           {[
             {
@@ -233,9 +230,9 @@ function SettingsPlayers({ navigation }) {
 
   return (
     <Page>
-      <Page.Main>
+      <Page.Main style={{ paddingTop: 16 }}>
         <ScrollView>
-          <ListTeams />
+          <ListTeams enableKickout />
         </ScrollView>
       </Page.Main>
     </Page>

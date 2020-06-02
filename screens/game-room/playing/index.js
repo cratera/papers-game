@@ -1,4 +1,3 @@
-export { default as CardScore } from './CardScore'
 export { default as EmojiRain } from './EmojiRain'
 export { default as MyTurnGetReady } from './MyTurnGetReady'
 export { default as MyTurnGo } from './MyTurnGo'

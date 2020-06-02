@@ -55,14 +55,14 @@ export default function PlayingEntry({ navigation }) {
 
   React.useEffect(() => {
     navigation.setOptions({
-      ...headerTheme({ hiddenBorder: isMyTurn }),
+      ...headerTheme({ hiddenBorder: isMyTurn || hasStatusFinished }),
       headerTitle: 'Playing',
       headerTintColor: Theme.colors.bg,
       headerRight: function HLB() {
         return <Page.HeaderBtnSettings />
       },
     })
-  }, [isMyTurn])
+  }, [isMyTurn, hasStatusFinished])
 
   if (hasStatusFinished && amIReady) {
     const nextTurnWho = Papers.getNextTurn()

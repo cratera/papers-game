@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { AsyncStorage } from 'react-native'
 import PropTypes from 'prop-types'
 
-import wordsForEveryone from '@constants/wordsForEveryone.js'
+import wordsForEveryone from './wordsForEveryone.js'
 import { getNextTurn } from './papersMethods.js'
 
 import serverInit from './Firebase.js'
@@ -478,7 +478,7 @@ export class PapersContextProvider extends Component {
         [playerId]: wordsForEveryone[pIndex].map((w, windex) => windex + pIndex * 10),
       }
     }, {})
-    allWords._all = wordsForEveryone.slice(0, this.state.game.players.length).flat()
+    allWords._all = wordsForEveryone.slice(0, Object.keys(this.state.game.players).length).flat()
     await this.state.socket.setWordsForEveryone(allWords)
   }
 

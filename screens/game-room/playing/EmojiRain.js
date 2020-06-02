@@ -43,7 +43,7 @@ const EmojiRain = ({ type }) => {
               fontSize: 18,
               position: 'absolute',
               left: ((index % col) * 20 + (Math.floor(index / col) % 2 ? 10 : 0)) * vh,
-              top: (Math.floor(index / col) * 15 + (index * 1.5 + 20)) * vh,
+              top: (Math.floor(index / col) + (index * 5 + 20) - 20) * vh,
             }}
           >
             {emojis[index % 4]}
