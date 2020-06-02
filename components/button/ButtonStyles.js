@@ -41,7 +41,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 16,
     textAlign: 'center',
-
     // BUG IOS: Shadow doesn't work on safari 🤦‍♀️
     // shadowColor: Theme.colors.primary,
     // shadowRadius: 2,
@@ -50,6 +49,11 @@ const styles = StyleSheet.create({
   },
 
   // ------- variants
+
+  primary: {
+    borderWidth: 1,
+    borderColor: Theme.colors.primary,
+  },
   icon: {
     width: 44,
     height: 44,
@@ -75,10 +79,9 @@ const styles = StyleSheet.create({
   light: {
     // REVIEW DESIGN with @mmbotelho
     borderWidth: 1,
-    lineHeight: 17, // make up the border
+    lineHeight: 17,
     borderColor: Theme.colors.grayMedium,
   },
-
   // ${variant === 'success' ? '' : 'box-shadow: 0px 4px 16px rgba(204, 127, 81, 0.3);'}
 
   // --------- sizes

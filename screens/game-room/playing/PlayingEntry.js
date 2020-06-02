@@ -25,7 +25,7 @@ export default function PlayingEntry({ navigation }) {
   const hasStatusFinished = round.status === 'finished'
   const hasCountdownStarted = !['getReady', 'finished'].includes(round.status)
   const prevHasCountdownStarted = usePrevious(hasCountdownStarted)
-  const initialTimer = game.settings.time_ms / 3
+  const initialTimer = game.settings.time_ms / 2
   const timerReady = 3400 // 400 - threshold for io connection.
   const [countdown, startCountdown] = useCountdown(hasCountdownStarted ? round.status : null, {
     timer: initialTimer + timerReady,
@@ -42,6 +42,8 @@ export default function PlayingEntry({ navigation }) {
   const isMyTurn = turnPlayerId === profile.id
   const isCount321go = countdownSec > initialTimerSec
   const startedCounting = prevHasCountdownStarted === false && hasCountdownStarted
+
+  const amIReady = game.players[profile.id].isReady
 
   React.useEffect(() => {
     // use false to avoid undefined on first render
@@ -61,6 +63,39 @@ export default function PlayingEntry({ navigation }) {
       },
     })
   }, [isMyTurn])
+
+  if (hasStatusFinished && amIReady) {
+    const nextTurnWho = Papers.getNextTurn()
+    const nextRoundIx = round.current + 1
+    const turnTeam = nextTurnWho.team
+    const turnPlayerId = game.teams[turnTeam].players[nextTurnWho[turnTeam]]
+    const turnPlayer = profiles[turnPlayerId]
+    const isMeNextTurn = turnPlayerId === profile.id
+
+    // REVIEW / OPTIMIZE later. I don't like this duplication.
+    return (
+      <Page>
+        {isMeNextTurn ? (
+          <MyTurnGetReady
+            description={DESCRIPTIONS[nextRoundIx]}
+            roundIx={nextRoundIx}
+            amIWaiting={true}
+          />
+        ) : (
+          <OthersTurn
+            description={DESCRIPTIONS[nextRoundIx]}
+            thisTurnPlayerName={turnPlayer?.name || `? ${turnPlayer} ?`}
+            hasCountdownStarted={false}
+            countdownSec={initialTimerSec}
+            countdown={initialTimer}
+            initialTimerSec={initialTimerSec}
+            initialTimer={initialTimer}
+            amIWaiting={true}
+          />
+        )}
+      </Page>
+    )
+  }
 
   return (
     <Page>

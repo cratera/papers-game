@@ -400,8 +400,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
               <Button
                 variant="icon"
                 style={{
-                  borderWidth: 0,
-                  backgroundColor: Theme.colors.primary,
+                  backgroundColor: Theme.colors.bg,
                   color: Theme.colors.bg,
                 }}
                 accessibilityLabel="Pass"

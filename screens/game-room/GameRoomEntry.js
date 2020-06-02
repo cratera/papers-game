@@ -26,7 +26,7 @@ export default function GameRoomEntry({ navigation }) {
   const profileId = profile?.id
   const wordsAreStored = game?.words && game.words[profileId]
 
-  React.useLayoutEffect(() => {
+  React.useEffect(() => {
     if (gameId) {
       return setStatus('ready')
     } else {
@@ -34,9 +34,9 @@ export default function GameRoomEntry({ navigation }) {
     }
   }, [gameId, profileId])
 
-  React.useLayoutEffect(() => {
+  React.useEffect(() => {
     if (!game) {
-      // Unexpect lost of game. (e.g. Game was directly deleted from DB)
+      // e.g. Game was directly deleted from DB
       navigation.navigate('home')
     }
   }, [game])

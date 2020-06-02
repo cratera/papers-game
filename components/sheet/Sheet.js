@@ -12,7 +12,8 @@ export default function PickAvatar({ visible, list, onClose }) {
 
   React.useEffect(() => {
     if (isWeb && visible) {
-      alert('Support sheet on web')
+      alert('TODO: Support sheet on web')
+      onClose()
     }
   }, [isWeb, visible])
 
@@ -71,12 +72,13 @@ const Styles = StyleSheet.create({
     backgroundColor: Theme.colors.bg,
     color: Theme.colors.grayDark,
     textAlign: 'left',
+    borderWidth: 0,
   },
   modalContent: {
     backgroundColor: 'rgba(0, 0, 0, 0.4)',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'flex-end',
-    paddingBottom: 42,
+    paddingBottom: 41,
   },
 })

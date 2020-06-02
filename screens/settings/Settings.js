@@ -203,8 +203,8 @@ function SettingsPlayers({ navigation }) {
       headerTitle: title,
       headerLeft: function HB() {
         return (
-          <Page.HeaderBtn side="left" onPress={onPress}>
-            👈{btnText}
+          <Page.HeaderBtn side="left" icon="back" onPress={onPress}>
+            {btnText}
           </Page.HeaderBtn>
         )
       },
@@ -216,7 +216,7 @@ function SettingsPlayers({ navigation }) {
     // I spent 3h googling it and didn't found a way.
     updateHeaderBackBtn({
       title: 'Players',
-      btnText: 'Settings',
+      btnText: 'Back',
       onPress: () => {
         navigation.goBack()
         updateHeaderBackBtn({

@@ -8,7 +8,6 @@ import Page from '@components/page'
 import i18n from '@constants/i18n'
 
 // import EmojiRain from './EmojiRain'
-import { MyTurnGetReady, OthersTurn } from './index'
 import CardScore from './CardScore'
 
 import * as Theme from '@theme'
@@ -86,47 +85,11 @@ const RoundScore = () => {
   const myTeamWon = myTeamId === winnerId
   const isTie = arrayOfScores[1] === arrayOfScores[0]
   const isFinalRound = roundIx === game.settings.roundsCount - 1
-  const amIReady = game.players[profile.id].isReady
 
   const sortTeamIdByScore = (teamAId, teamBId) => arrayOfScores[teamBId] - arrayOfScores[teamAId]
 
   function handleReadyClick() {
     Papers.markMeAsReadyForNextRound()
-  }
-
-  if (amIReady) {
-    // epah... i don't like this here, but couldn't find better.
-    const nextTurnWho = Papers.getNextTurn()
-    const nextRoundIx = round.current + 1
-    const turnTeam = nextTurnWho.team
-    const turnPlayerId = game.teams[turnTeam].players[nextTurnWho[turnTeam]]
-    const turnPlayer = profiles[turnPlayerId]
-    const isMyTurn = turnPlayerId === profile.id
-    const initialTimer = game.settings.time_ms
-    const initialTimerSec = Math.round(initialTimer / 1000)
-
-    return (
-      <Page.Main blankBg>
-        {isMyTurn ? (
-          <MyTurnGetReady
-            description={DESCRIPTIONS[nextRoundIx]}
-            roundIx={nextRoundIx}
-            amIWaiting={true}
-          />
-        ) : (
-          <OthersTurn
-            description={DESCRIPTIONS[nextRoundIx]}
-            thisTurnPlayerName={turnPlayer?.name || `? ${turnPlayer} ?`}
-            hasCountdownStarted={false}
-            countdownSec={initialTimerSec}
-            countdown={initialTimer}
-            initialTimerSec={initialTimerSec}
-            initialTimer={initialTimer}
-            amIWaiting={true}
-          />
-        )}
-      </Page.Main>
-    )
   }
 
   return (

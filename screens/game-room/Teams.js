@@ -140,6 +140,7 @@ export default function Teams({ navigation }) {
           {Object.keys(tempTeams).map(teamId => {
             const { id, name, players } = tempTeams[teamId]
 
+            // REVIEW DESIGN - Small flickr when changing teams.
             return (
               <View key={id} style={Styles.team}>
                 <View style={Styles.headerTeam}>
