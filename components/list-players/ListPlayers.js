@@ -46,8 +46,12 @@ export default function ListPlayers({ players, enableKickout, isStatusVisible, .
               <View style={Styles.who}>
                 <Avatar hasMargin alt="" />
                 <View>
-                  <Text style={Theme.typography.body}>{playerName}</Text>
-                  <Text style={Theme.typography.seconday}>{' Left '}</Text>
+                  <Text style={[Theme.typography.body, { color: Theme.colors.grayMedium }]}>
+                    {playerName}
+                  </Text>
+                  <Text style={[Theme.typography.seconday, { color: Theme.colors.primary }]}>
+                    Left
+                  </Text>
                 </View>
               </View>
             </View>

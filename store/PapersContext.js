@@ -482,8 +482,8 @@ export class PapersContextProvider extends Component {
     await this.state.socket.setWordsForEveryone(allWords)
   }
 
-  setTeams(teams) {
-    this.state.socket.setTeams(teams, (res, e) => console.warn('TODO HANDLE ERROR', e))
+  async setTeams(teams, cb) {
+    await this.state.socket.setTeams(teams)
   }
 
   markMeAsReady() {

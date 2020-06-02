@@ -24,7 +24,7 @@ const iconsMap = {
   next: ' 👉',
 }
 
-const HeaderBtn = ({ side, icon, style, textPrimary, children, ...otherProps }) => (
+const HeaderBtn = ({ side, icon, style, textPrimary, children, isLoading, ...otherProps }) => (
   <Button
     variant="flat"
     style={[
@@ -36,9 +36,15 @@ const HeaderBtn = ({ side, icon, style, textPrimary, children, ...otherProps }) 
     ]}
     {...otherProps}
   >
-    {side === 'left' && iconsMap[icon]}
-    {children}
-    {side === 'right' && iconsMap[icon]}
+    {!isLoading ? (
+      <>
+        {side === 'left' && iconsMap[icon]}
+        {children}
+        {side === 'right' && iconsMap[icon]}
+      </>
+    ) : (
+      '⏳'
+    )}
   </Button>
 )
 
@@ -47,6 +53,7 @@ HeaderBtn.propTypes = {
   textPrimary: PropTypes.bool,
   side: PropTypes.oneOf(['left', 'right']).isRequired,
   style: PropTypes.oneOfType([PropTypes.array, PropTypes.object, PropTypes.number]),
+  isLoading: PropTypes.bool,
   children: PropTypes.node,
 }
 

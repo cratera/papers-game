@@ -12,3 +12,11 @@ Here's a list of my learnings while building this mobile game with reac-native.
 - 🐛 Had to transform a Fn component to a Class, so TextInput would work properly. (HomeSignup). Back in a function component, on each onChangeText, the TextInput would unmount/mount, causing the keyboard to close (and re-open if autoFocus).... have no idea why. Google didn't help :(
 - IOS: shadow doesn't work on elements with overflow:hidden (border-radius). ex: Button.
 - Upload files to Firebase was a nightmare. See `store/Firebase.js _uploadAvatar()` for more info.
+
+- **Update June 1:**
+  So far, my biggest learning was to realize that it's okay to not follow best practices while building a side project / prototype.
+  - Three components in the same file? No problem at all.
+  - A component with 🍝 code? Add a `TODO`.
+  - No unit tests? Making it work is the first test you need.
+  - Not sure what's the best place for something? Just do it and leave a `REVIEW`.
+  - Just have fun and don't be afraid to experiment.

@@ -42,7 +42,7 @@ const OthersTurn = ({
     const tPlayerId = game.teams[teamId].players[tPlayerIx]
 
     return {
-      title: isTurnOn && game.hasStarted && !amIWaiting ? 'Playing now' : 'Next up!',
+      title: isTurnOn && game.hasStarted && !amIWaiting ? 'Playing now' : 'Next up',
       player: {
         name: tPlayerId === profile.id ? 'You!' : profiles[tPlayerId]?.name || `? ${tPlayerId} ?`,
         avatar: profiles[tPlayerId]?.avatar,

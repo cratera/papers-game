@@ -79,14 +79,14 @@ export default function JoinGame({ navigation }) {
           : step === 1 && hasValidCode
           ? function Join() {
               return (
-                <Page.HeaderBtn side="right" textPrimary onPress={submit}>
+                <Page.HeaderBtn side="right" textPrimary onPress={submit} isLoading={isJoining}>
                   Join
                 </Page.HeaderBtn>
               )
             }
           : null,
     })
-  }, [step, state.gameName, state.code])
+  }, [step, state.gameName, state.code, isJoining])
 
   return (
     <Page>

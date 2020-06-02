@@ -51,14 +51,20 @@ export default function CreateGame({ navigation }) {
       headerRight: hasValidName
         ? function HB() {
             return (
-              <Page.HeaderBtn side="right" icon="next" textPrimary onPress={submit}>
+              <Page.HeaderBtn
+                side="right"
+                icon="next"
+                textPrimary
+                isLoading={isCreating}
+                onPress={submit}
+              >
                 Add Friends
               </Page.HeaderBtn>
             )
           }
         : null,
     })
-  }, [hasValidName, state.gameName])
+  }, [hasValidName, state.gameName, isCreating])
 
   return (
     <Page>

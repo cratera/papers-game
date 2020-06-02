@@ -1,3 +1,5 @@
+// ANALYZE: I assume this entire file would be a set of "Cloud Functions".
+
 import firebase from 'firebase/app'
 import 'firebase/database'
 import 'firebase/auth'
@@ -598,11 +600,16 @@ async function removePlayer(playerId) {
 /**
  *
  */
-async function setTeams(teams) {
+async function setTeams(teams, cb) {
   console.log('⚙️ setTeams()')
   const gameId = LOCAL_PROFILE.gameId
 
-  await DB.ref(`games/${gameId}/teams`).set(teams)
+  try {
+    await DB.ref(`games/${gameId}/teams`).set(teams)
+  } catch (e) {
+    console.warn('setTeams failed', e)
+    cb(null, e)
+  }
 }
 
 /**

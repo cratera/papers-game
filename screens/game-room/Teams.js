@@ -17,20 +17,23 @@ import * as Theme from '@theme'
 function areTeamPlayersEqual(teamsOld, teamsNew) {
   const tOld = {}
   const tNew = {}
+
   for (const ix in teamsNew) {
     tNew[ix] = teamsNew[ix].players
   }
-
   for (const ix in teamsOld) {
     tOld[ix] = teamsOld[ix].players
   }
+
   return JSON.stringify(tOld) === JSON.stringify(tNew)
 }
 
 export default function Teams({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const { game } = Papers.state
+  const playersCount = Object.keys(game.players).length
   const [tempTeams, setTeams] = React.useState(getRandomTeams())
+  const [isLocking, setLocking] = React.useState(false)
 
   React.useEffect(() => {
     navigation.setOptions({
@@ -46,6 +49,11 @@ export default function Teams({ navigation }) {
       headerRight: null,
     })
   }, [])
+
+  React.useEffect(() => {
+    // If someone just joined/left, create new teams.
+    generateTeams()
+  }, [playersCount])
 
   // This could be useRandomTeams()
   function getRandomTeams() {
@@ -111,10 +119,18 @@ export default function Teams({ navigation }) {
     }
   }
 
-  async function submitTeamsAndGoToPapers() {
-    await Papers.setTeams(tempTeams)
-    navigation.setOptions({ headerRight: null })
-    navigation.navigate('write-papers')
+  async function handleLockClick() {
+    if (isLocking) return false
+    setLocking(true)
+
+    try {
+      await Papers.setTeams(tempTeams)
+      navigation.setOptions({ headerRight: null })
+      navigation.navigate('write-papers')
+    } catch (e) {
+      console.warn('Lock teams failed', e)
+      setLocking(false)
+    }
   }
 
   return (
@@ -148,7 +164,9 @@ export default function Teams({ navigation }) {
         <Button variant="light" onPress={generateTeams} styleTouch={{ marginBottom: 16 }}>
           Randomize teams
         </Button>
-        <Button onPress={submitTeamsAndGoToPapers}>Lock teams</Button>
+        <Button onPress={handleLockClick} isLoading={isLocking}>
+          Lock teams
+        </Button>
       </Page.CTAs>
     </Page>
   )
