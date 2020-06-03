@@ -30,6 +30,11 @@ export default StyleSheet.create({
     textAlign: 'center',
     marginBottom: 24,
   },
+  go_counting: {
+    color: Theme.colors.grayDark,
+    textAlign: 'center',
+    marginBottom: 24,
+  },
   go_done_msg: {
     textAlign: 'center',
     marginTop: 25 * vh,
@@ -57,7 +62,9 @@ export default StyleSheet.create({
     justifyContent: 'center',
   },
   go_paper_word: {
-    paddingHorizontal: 2,
+    paddingHorizontal: 4,
+    lineHeight: 32,
+    marginVertical: 3,
   },
   go_paper_blur: {
     color: Theme.colors.grayLight,
@@ -104,16 +111,10 @@ export default StyleSheet.create({
   go_ctas_yes: {
     borderWidth: 0,
     backgroundColor: Theme.colors.success,
-    paddingTop: 4,
   },
   go_ctas_no: {
     borderWidth: 0,
     backgroundColor: Theme.colors.primary,
-    paddingTop: 4,
-  },
-  go_ctas_btnIcon: {
-    width: 30,
-    height: 30,
   },
 
   // Turn StaTus:

@@ -13,10 +13,10 @@ export default function SettingsToggle({ style, ...props }) {
       variant="icon"
       accessibilityLabel="Settings page"
       onPress={() => navigation.navigate('settings')}
-      style={[{ paddingTop: 8 }, style]}
+      style={style}
       {...props}
     >
-      <IconGear style={{ width: 20, height: 20 }} />
+      <IconGear size="20" />
     </Button>
   )
 }
