@@ -8,7 +8,7 @@ export const headerTheme = (opts = {}) => ({
     shadowColor: 'transparent',
     borderBottomWidth: opts.hiddenBorder ? 0 : 1,
     borderBottomColor: Theme.colors.grayLight,
-    height: 80,
+    // height: 80,
   },
   headerTitleStyle: {
     fontWeight: 'bold',

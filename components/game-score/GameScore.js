@@ -28,7 +28,7 @@ const GameScore = ({ BOAT, style }) => {
             isTie={isTie}
             teamName={game.teams[teamId].name}
             bestPlayer={{
-              name: profiles[bestPlayer.id].name,
+              name: profiles[bestPlayer.id]?.name || '???',
               score: bestPlayer.score,
             }}
             scoreTotal={scoreTotal[teamId]}

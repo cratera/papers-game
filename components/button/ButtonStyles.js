@@ -33,15 +33,14 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   base: {
-    paddingVertical: 16,
-    paddingHorizontal: 24,
     minHeight: 44,
     borderRadius: 22,
+    paddingHorizontal: 24,
     overflow: 'hidden', // so borderRadius works.
-    fontSize: 16,
-    lineHeight: 16,
-    textAlign: 'center',
-    // BUG IOS: Shadow doesn't work on safari 🤦‍♀️
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   // ------- variants
@@ -65,18 +64,15 @@ const styles = StyleSheet.create({
     borderRadius: 0,
     height: 'auto',
     minHeight: 'auto',
-    lineHeight: 44,
     alignSelf: 'center',
     paddingVertical: 0,
     paddingHorizontal: 0,
   },
   light: {
-    // REVIEW DESIGN with @mmbotelho
     borderWidth: 1,
     lineHeight: 17,
     borderColor: Theme.colors.grayMedium,
   },
-  // ${variant === 'success' ? '' : 'box-shadow: 0px 4px 16px rgba(204, 127, 81, 0.3);'}
 
   // --------- sizes
   sm: {
@@ -84,8 +80,6 @@ const styles = StyleSheet.create({
     borderRadius: 17,
     paddingVertical: 5,
     paddingHorizontal: 15,
-    fontSize: 14,
-    lineHeight: 20,
   },
 
   // --------- place
@@ -94,17 +88,29 @@ const styles = StyleSheet.create({
   },
 })
 
-export const button = ({ variant, size, place }) => {
+const stylesSize = {
+  default: 16,
+  sm: 14,
+}
+
+// TODO Later - This code is 💩...
+export const btnWrapper = ({ variant, size, place, bgColor }) => {
   return [
     styles.base,
     {
-      backgroundColor: variants[variant].bg,
-      color: variants[variant].text,
+      backgroundColor: bgColor || variants[variant].bg,
     },
     styles[variant],
     styles[size],
     styles[place],
   ]
+}
+
+export const btnText = ({ variant, size, color }) => {
+  return {
+    fontSize: stylesSize[size],
+    color: color || variants[variant].text,
+  }
 }
 
 export const touch = styles.touch

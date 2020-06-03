@@ -25,11 +25,10 @@ const CardScore = ({ index, isTie, teamName, scoreTotal, scoreRound, bestPlayer 
         {isTie ? 'Tie' : podiumMap[index]}
       </Text>
       <Text style={Theme.typography.h3}>{teamName}</Text>
-      {bestPlayer.name && (
-        <Text style={[Theme.typography.small, { color: Theme.colors.grayDark, marginTop: 2 }]}>
-          {bestPlayer.name} was the best player! ({bestPlayer.score})
-        </Text>
-      )}
+
+      <Text style={[Theme.typography.small, { color: Theme.colors.grayDark, marginTop: 2 }]}>
+        {bestPlayer.name} was the best player! ({bestPlayer.score})
+      </Text>
     </View>
     <View style={Styles.fscore_score}>
       <Text style={Theme.typography.small}>Papers</Text>

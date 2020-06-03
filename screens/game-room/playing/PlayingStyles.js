@@ -142,10 +142,4 @@ export default StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 20,
   },
-  tscore_btnRemove: {
-    color: Theme.colors.danger,
-  },
-  tscore_btnToggle: {
-    color: Theme.colors.primary,
-  },
 })

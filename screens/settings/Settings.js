@@ -15,13 +15,14 @@ import PropTypes from 'prop-types'
 import PapersContext from '@store/PapersContext.js'
 import * as Theme from '@theme'
 
+import { headerTheme } from '@navigation/headerStuff.js'
 import Page from '@components/page'
 import ListTeams from '@components/list-teams'
 import GameScore from '@components/game-score'
 
 import { PickAvatar } from '@components/profile'
 import { useLeaveGame } from '@components/settings'
-import { headerTheme } from '@navigation/headerStuff.js'
+import { IconArrow, IconCamera } from '@components/icons'
 
 const Stack = createStackNavigator()
 
@@ -98,7 +99,7 @@ function SettingsProfile({ navigation }) {
             {
               id: 'fb',
               title: 'Send feedback',
-              icon: '👉',
+              icon: 'next',
               onPress: () => console.warn('TODO send feedback'),
             },
             {
@@ -165,10 +166,8 @@ function SettingsGame({ navigation }) {
             {
               id: 'pl',
               title: 'Players',
-              icon: '👉',
+              icon: 'next',
               onPress: () => {
-                // console.warn('TODO navigate to settings-player')
-                // TODO find a way to navigate correctly in nested routes...
                 navigation.navigate('settings-players')
               },
             },
@@ -268,7 +267,7 @@ const Styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 10,
     paddingVertical: 10,
     paddingBottom: 20, // looks better visually
     paddingHorizontal: 8,
@@ -297,7 +296,9 @@ const AvatarSquare = ({ avatar, style, onChange }) => {
           <View style={[StylesAv.place]} />
         )}
       </TouchableHighlight>
-      <Text style={[StylesAv.icon]}>📸</Text>
+      <View style={[StylesAv.icon]}>
+        <IconCamera size={13} color={Theme.colors.bg} />
+      </View>
       <PickAvatar
         visible={isPickerVisible}
         onChange={() => null}
@@ -333,10 +334,13 @@ const StylesAv = StyleSheet.create({
     position: 'absolute',
     bottom: -8,
     right: -8,
-    // backgroundColor: Theme.colors.primary,
-    // width: 20,
-    // height: 20,
-    // borderRadius: 4,
+    backgroundColor: Theme.colors.primary,
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+    paddingTop: 3,
+    paddingLeft: 3,
+    overflow: 'hidden',
   },
   img: {
     resizeMode: 'cover',
@@ -367,7 +371,7 @@ function Item({ title, icon, variant, isLast, onPress }) {
         >
           {title}
         </Text>
-        <Text>{icon}</Text>
+        {icon && <IconArrow size={20} />}
       </View>
     </TouchableOpacity>
   )

@@ -403,7 +403,8 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
         !papersTurn.wordsLeft.length &&
         !papersTurn.passed.length ? (
           <Text
-            style={[{ flex: 1, textAlign: 'center' }, Theme.typography.secondary, Theme.u.center]}
+            numberOfLines={1}
+            style={[{ flexGrow: 1 }, Theme.typography.secondary, Theme.u.center]}
           >
             Last paper!
           </Text>

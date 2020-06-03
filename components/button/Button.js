@@ -6,31 +6,46 @@ import { IconSpin } from '@components/icons'
 import * as Theme from '@theme'
 import * as Styles from './ButtonStyles.js'
 
-function Button({ variant, size, place, isLoading, children, style, styleTouch, ...otherProps }) {
+function Button({
+  variant,
+  size,
+  place,
+  textColor,
+  bgColor,
+  numberOfLines,
+  isLoading,
+  children,
+  style,
+  styleTouch,
+  ...otherProps
+}) {
   if (otherProps.hasBlock) {
     console.error('hasblock is deprecated!')
   }
   const isIcon = variant === 'icon'
-  const Block = isIcon || isLoading ? View : Text
   return (
     <TouchableHighlight
       {...otherProps}
       style={[Styles.touch, styleTouch]}
-      underlayColor={Theme.colors.bg}
+      underlayColor={'transparent'}
       {...(isLoading ? { disabled: true } : {})}
     >
-      {/* BUG - When is a icon, the button doesn't work?? myturn go */}
-      <Block style={[Styles.button({ variant, size, place }), style]}>
+      <View style={[Styles.btnWrapper({ variant, size, place, bgColor }), style]}>
         {!isLoading ? (
           isIcon ? (
             children
           ) : (
-            <Text>{children}</Text>
+            <Text
+              numberOfLines={numberOfLines}
+              style={Styles.btnText({ variant, size, color: textColor })}
+            >
+              {children}
+            </Text>
           )
         ) : (
           <IconSpin size={20} color={Theme.colors.bg} />
         )}
-      </Block>
+      </View>
     </TouchableHighlight>
   )
 }
@@ -47,8 +62,13 @@ Button.propTypes = {
   place: PropTypes.oneOf(['edgeKeyboard']),
   isLoading: PropTypes.bool,
   children: PropTypes.node,
+  numberOfLines: PropTypes.number,
+
+  // Let's give full freedom while this is a prototype and DS is not yet fully defined.
   style: PropTypes.oneOfType([PropTypes.array, PropTypes.object, PropTypes.number]),
   styleTouch: PropTypes.oneOfType([PropTypes.array, PropTypes.object, PropTypes.number]),
+  bgColor: PropTypes.string,
+  textColor: PropTypes.string,
 }
 
 export default memo(Button)

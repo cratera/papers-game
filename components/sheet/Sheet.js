@@ -7,9 +7,8 @@ import Button from '@components/button'
 
 import * as Theme from '@theme'
 
-export default function PickAvatar({ visible, list, onClose }) {
+const Sheet = React.memo(function Sheet({ visible, list, onClose }) {
   const [isWeb] = React.useState(Platform.OS === 'web')
-
   React.useEffect(() => {
     if (isWeb && visible) {
       alert('TODO: Support sheet on web')
@@ -35,19 +34,38 @@ export default function PickAvatar({ visible, list, onClose }) {
         <Text style={Styles.options_outside} accessible={false}></Text>
       </TouchableHighlight>
       <View style={Styles.options}>
-        {list.map(({ text, onPress }, i) => (
-          <Button key={i} style={[Styles.options_btn]} onPress={onPress}>
-            {text}
+        {list.map(({ Icon, text, variant, onPress }, i) => (
+          <Button
+            key={i}
+            style={[Styles.options_btn]}
+            textColor={Theme.colors.grayDark}
+            onPress={onPress}
+            numberOfLines={1}
+          >
+            {Icon && (
+              <Icon
+                size={20}
+                color={variant === 'danger' ? Theme.colors.danger : null}
+                style={{ transform: [{ translateY: 4 }] }}
+              />
+            )}
+            {/* lazyness level 99 */}
+            <View style={{ width: 8 }}></View>
+            <Text style={{ color: variant === 'danger' && Theme.colors.danger }}>{text}</Text>
           </Button>
         ))}
       </View>
 
-      <Button onPress={onClose}>Close</Button>
+      <Button variant="light" style={{ borderColor: Theme.colors.bg }} onPress={onClose}>
+        Cancel
+      </Button>
     </Modal>
   )
-}
+})
 
-PickAvatar.propTypes = {
+export default Sheet
+
+Sheet.propTypes = {
   visible: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   list: PropTypes.arrayOf(
@@ -61,8 +79,9 @@ PickAvatar.propTypes = {
 const Styles = StyleSheet.create({
   options: {
     backgroundColor: Theme.colors.bg,
-    marginBottom: 16, // Review these spacing across all views.
+    marginBottom: 16,
     paddingVertical: 8,
+    paddingBottom: 12,
     borderRadius: 16,
   },
   options_outside: {
@@ -70,9 +89,9 @@ const Styles = StyleSheet.create({
   },
   options_btn: {
     backgroundColor: Theme.colors.bg,
-    color: Theme.colors.grayDark,
-    textAlign: 'left',
+    justifyContent: 'flex-start',
     borderWidth: 0,
+    paddingVertical: 14,
   },
   modalContent: {
     backgroundColor: 'rgba(0, 0, 0, 0.4)',

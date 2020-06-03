@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { Platform } from 'react-native'
 
 import Sheet from '@components/sheet'
+import { IconCamera, IconLibrary } from '@components/icons'
 import usePickAvatar from './usePickAvatar.js'
 
 export default function PickAvatar({ visible, onSubmit, onClose, onChange }) {
@@ -27,11 +28,13 @@ export default function PickAvatar({ visible, onSubmit, onClose, onChange }) {
       onClose={onClose}
       list={[
         {
-          text: '📷 Camera',
+          Icon: IconCamera,
+          text: 'Camera',
           onPress: () => handleUpdateAvatar({ camera: true }),
         },
         {
-          text: '🖼 Library',
+          Icon: IconLibrary,
+          text: 'Library',
           onPress: handleUpdateAvatar,
         },
       ]}

@@ -6,6 +6,7 @@ import * as Theme from '@theme'
 import Styles from './PageStyles.js'
 import SettingsToggle from '@components/settings'
 import Button from '@components/button'
+import { IconArrow, IconSpin } from '@components/icons'
 
 const Page = ({ children, ...otherProps }) => {
   return (
@@ -20,33 +21,47 @@ Page.propTypes = {
 }
 
 const iconsMap = {
-  back: '👈 ',
-  next: ' 👉',
+  back: IconArrow,
+  next: IconArrow,
 }
 
-const HeaderBtn = ({ side, icon, style, textPrimary, children, isLoading, ...otherProps }) => (
-  <Button
-    variant="flat"
-    style={[
-      side === 'left' ? { marginLeft: 16 } : { marginRight: 16 },
-      {
-        color: textPrimary ? Theme.colors.primary : Theme.colors.grayMedium,
-      },
-      style,
-    ]}
-    {...otherProps}
-  >
-    {!isLoading ? (
-      <>
-        {side === 'left' && iconsMap[icon]}
-        {children}
-        {side === 'right' && iconsMap[icon]}
-      </>
-    ) : (
-      '⏳'
-    )}
-  </Button>
-)
+const HeaderBtn = ({ side, icon, style, textPrimary, children, isLoading, ...otherProps }) => {
+  if (style) {
+    // TODO later this...
+    console.warn('HeaderBtn - style is used:', children)
+  }
+  const IconMapped = iconsMap[icon]
+  const color = textPrimary ? Theme.colors.primary : Theme.colors.grayMedium
+  return (
+    <Button
+      variant="flat"
+      textColor={color}
+      style={[side === 'left' ? { marginLeft: 16 } : { marginRight: 16 }]}
+      {...otherProps}
+    >
+      {!isLoading ? (
+        <>
+          {side === 'left' && IconMapped && (
+            <IconMapped
+              size={16}
+              style={{ transform: [{ rotate: '180deg' }, { translateY: -2 }, { translateX: 3 }] }}
+            />
+          )}
+          {children}
+          {side === 'right' && IconMapped && (
+            // it feels like 1998
+            <>
+              <View style={{ width: 8 }} />
+              <IconMapped size={16} color={color} style={{ transform: [{ translateY: -9 }] }} />
+            </>
+          )}
+        </>
+      ) : (
+        <IconSpin size={20} />
+      )}
+    </Button>
+  )
+}
 
 HeaderBtn.propTypes = {
   icon: PropTypes.node,
@@ -57,7 +72,7 @@ HeaderBtn.propTypes = {
   children: PropTypes.node,
 }
 
-const HeaderBtnSettings = () => <SettingsToggle style={{ marginRight: 16 }} />
+const HeaderBtnSettings = () => <SettingsToggle style={{ marginRight: 8 }} />
 
 const Main = ({ children, style, blankBg, ...otherProps }) => {
   return (

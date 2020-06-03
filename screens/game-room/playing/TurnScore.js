@@ -6,6 +6,7 @@ import PropTypes from 'prop-types'
 import Button from '@components/button'
 import Page from '@components/page'
 import Sheet from '@components/sheet'
+import { IconCheck, IconTimes } from '@components/icons'
 
 // import i18n from '@constants/i18n'
 
@@ -15,10 +16,29 @@ import Styles from './PlayingStyles.js'
 const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, getPaperByKey, isSubmitting }) => {
   const [isNotGuessedVisible, setIsNotGuessedVisible] = React.useState(false)
   const [editingPaper, setEditingPaper] = React.useState(['', null])
-
-  function closeSheet() {
+  const list = React.useMemo(() => {
+    return [
+      {
+        Icon: !editingPaper[0] ? '' : editingPaper[1] ? IconCheck : IconTimes,
+        text: !editingPaper[0]
+          ? ''
+          : editingPaper[1]
+          ? // TODO ellipsis this word
+            `We guessed "${getPaperByKey(editingPaper[0])}"`
+          : `Remove "${getPaperByKey(editingPaper[0])}"`,
+        variant: !editingPaper[1] && 'danger',
+        onPress: () => {
+          closeSheet()
+          setIsNotGuessedVisible(true)
+          onTogglePaper(...editingPaper)
+        },
+      },
+    ]
+  }, [editingPaper])
+  const closeSheet = React.useCallback(() => {
     setEditingPaper(['', null])
-  }
+  }, [])
+
   return (
     <Fragment>
       <Page.Main blankBg>
@@ -60,8 +80,8 @@ const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, getPaperByKey, i
                   Not guessed ({papersTurn.passed.length})
                 </Text>
                 <Button
-                  style={Styles.tscore_btnToggle}
                   variant="flat"
+                  textColor={Theme.colors.primary}
                   onPress={() => setIsNotGuessedVisible(bool => !bool)}
                 >
                   {isNotGuessedVisible ? 'Hide' : 'Show'}
@@ -85,24 +105,7 @@ const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, getPaperByKey, i
           )}
         </ScrollView>
 
-        <Sheet
-          visible={!!editingPaper[0]}
-          onClose={closeSheet}
-          list={[
-            {
-              text: !editingPaper[0]
-                ? ''
-                : editingPaper[1]
-                ? `✅ Mark "${getPaperByKey(editingPaper[0])}" guessed`
-                : `❌ Remove "${getPaperByKey(editingPaper[0])}"`,
-              onPress: () => {
-                closeSheet()
-                setIsNotGuessedVisible(true)
-                onTogglePaper(...editingPaper)
-              },
-            },
-          ]}
-        />
+        <Sheet visible={!!editingPaper[0]} onClose={closeSheet} list={list} />
       </Page.Main>
       <Page.CTAs blankBg hasOffset>
         <Button onPress={onFinish} isLoading={isSubmitting}>
