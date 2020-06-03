@@ -36,16 +36,32 @@ export default StyleSheet.create({
   },
   go_paper: {
     height: 60 * vw,
-    backgroundColor: Theme.colors.grayLight,
+    backgroundColor: Theme.colors.bg,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+
+    shadowColor: Theme.colors.grayDark,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  go_paper_sentence: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   go_paper_word: {
-    textAlign: 'center',
+    paddingHorizontal: 2,
   },
   go_paper_blur: {
-    opacity: 0.8,
+    color: Theme.colors.grayLight,
+    backgroundColor: Theme.colors.grayLight,
   },
   go_paper_key: {
     position: 'absolute',
@@ -53,7 +69,19 @@ export default StyleSheet.create({
     right: 4,
     opacity: 0.5,
   },
-  // go_paper_tipBlur: {},
+  go_paper_icon: {
+    position: 'absolute',
+    bottom: 16,
+    left: 0,
+    right: 0,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  go_paper_iconSvg: {
+    width: 24,
+    height: 24,
+  },
   go_paper_gotcha: {
     backgroundColor: Theme.colors.successLight,
   },
@@ -73,8 +101,19 @@ export default StyleSheet.create({
     alignItems: 'center',
     marginBottom: 24,
   },
-  go_cta_dim: {
-    opacity: 0.5,
+  go_ctas_yes: {
+    borderWidth: 0,
+    backgroundColor: Theme.colors.success,
+    paddingTop: 4,
+  },
+  go_ctas_no: {
+    borderWidth: 0,
+    backgroundColor: Theme.colors.primary,
+    paddingTop: 4,
+  },
+  go_ctas_btnIcon: {
+    width: 30,
+    height: 30,
   },
 
   // Turn StaTus:

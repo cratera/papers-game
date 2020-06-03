@@ -42,10 +42,6 @@ const styles = StyleSheet.create({
     lineHeight: 16,
     textAlign: 'center',
     // BUG IOS: Shadow doesn't work on safari 🤦‍♀️
-    // shadowColor: Theme.colors.primary,
-    // shadowRadius: 2,
-    // shadowOffset: { width: 4, height: 2 },
-    // shadowOpacity: 0.7,
   },
 
   // ------- variants
@@ -57,8 +53,6 @@ const styles = StyleSheet.create({
   icon: {
     width: 44,
     height: 44,
-    fontSize: 16,
-    lineHeight: 44,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

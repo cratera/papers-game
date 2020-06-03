@@ -9,6 +9,7 @@ import Button from '@components/button'
 import Page from '@components/page'
 // import i18n from '@constants/i18n'
 import TurnScore from './TurnScore'
+import { IconEyeClosed, IconEyeOpen, IconCheck, IconArrow } from '@components/icons'
 
 import * as Theme from '@theme'
 import Styles from './PlayingStyles.js'
@@ -334,37 +335,50 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
           </Text>
           {/* display paper */}
           <TouchableHighlight
+            underlayColor={Theme.colors.bg}
             onPressIn={() => setPaperBlur(false)}
             onPressOut={() => setPaperBlur(true)}
           >
             <View style={[Styles.go_paper, Styles[`go_paper_${paperAnim}`]]}>
-              <Text
-                style={[
-                  Theme.typography.h2,
-                  Styles.go_paper_word,
-                  isPaperBlur && Styles.go_paper_blur,
-                  Styles[`go_paper_word_${paperAnim}`],
-                ]}
-              >
-                {!isPaperBlur
-                  ? getPaperByKey(papersTurnCurrent) ||
-                    `😱 BUG PAPER 😱 ${papersTurnCurrent} (Click pass)`
-                  : `*****`}
-              </Text>
+              <View style={Styles.go_paper_sentence}>
+                {/* nice CSS trick - Split sentence by each word
+                to simulate display: inline (background) */}
+                {(getPaperByKey(papersTurnCurrent) || `😱 BUG 😱 ${papersTurnCurrent} (Click pass)`)
+                  .split(' ')
+                  .map(word => (
+                    <Text
+                      key={word}
+                      style={[
+                        Theme.typography.h2,
+                        Styles.go_paper_word,
+                        isPaperBlur && Styles.go_paper_blur,
+                        Styles[`go_paper_word_${paperAnim}`],
+                      ]}
+                    >
+                      {word}
+                    </Text>
+                  ))}
+              </View>
               <Text style={Styles.go_paper_key}>{String(papersTurnCurrent)}</Text>
-              {isPaperBlur && !isPaperChanging && (
-                <Text style={Theme.typography.small}>Press to reveal</Text>
-              )}
+              <View style={Styles.go_paper_icon} accessible={false}>
+                {isPaperBlur && !isPaperChanging ? (
+                  <IconEyeClosed style={Styles.go_paper_iconSvg} color={Theme.colors.grayMedium} />
+                ) : (
+                  <IconEyeOpen style={Styles.go_paper_iconSvg} color={Theme.colors.grayMedium} />
+                )}
+              </View>
             </View>
           </TouchableHighlight>
         </View>
-        {/* words debug on */}
-        <View style={{ display: 'block' }}>
-          <Text style={{ fontSize: 10, lineHeight: 10 }}>
-            {'\n'} - passed: {papersTurn.passed.join(', ')} {'\n'} - guessed:{' '}
-            {papersTurn.guessed.join(', ')} {'\n'} - wordsLeft: {papersTurn.wordsLeft.join(', ')}{' '}
-          </Text>
-        </View>
+
+        {false && (
+          <View style={{ display: 'block' }}>
+            <Text style={{ fontSize: 10, lineHeight: 10 }}>
+              {'\n'} - passed: {papersTurn.passed.join(', ')} {'\n'} - guessed:{' '}
+              {papersTurn.guessed.join(', ')} {'\n'} - wordsLeft: {papersTurn.wordsLeft.join(', ')}{' '}
+            </Text>
+          </View>
+        )}
       </Page.Main>
 
       <Page.CTAs hasOffset blankBg style={Styles.go_ctas}>
@@ -372,16 +386,13 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
           <Fragment>
             <Button
               variant="icon"
-              style={{
-                borderWidth: 0,
-                backgroundColor: Theme.colors.success,
-                color: Theme.colors.bg,
-              }}
+              style={Styles.go_ctas_yes}
               accessibilityLabel="Got it"
               onPress={() => handlePaperClick(true)}
             >
-              ✓
+              <IconCheck style={Styles.go_ctas_btnIcon} color={Theme.colors.bg} />
             </Button>
+
             <Text style={{ flexGrow: 1 }}>{/* lazyness lvl 99 */}</Text>
 
             {papersTurn.current !== null &&
@@ -399,14 +410,11 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
             ) : (
               <Button
                 variant="icon"
-                style={{
-                  backgroundColor: Theme.colors.bg,
-                  color: Theme.colors.bg,
-                }}
+                style={Styles.go_ctas_no}
                 accessibilityLabel="Pass"
                 onPress={() => handlePaperClick(false)}
               >
-                🤷‍♀️
+                <IconArrow style={Styles.go_ctas_btnIcon} color={Theme.colors.bg} />
               </Button>
             )}
           </Fragment>

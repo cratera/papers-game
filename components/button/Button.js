@@ -1,5 +1,5 @@
 import React, { memo } from 'react'
-import { Text, TouchableHighlight } from 'react-native'
+import { View, Text, TouchableHighlight } from 'react-native'
 import PropTypes from 'prop-types'
 
 import * as Theme from '@theme'
@@ -9,6 +9,7 @@ function Button({ variant, size, place, isLoading, children, style, styleTouch, 
   if (otherProps.hasBlock) {
     console.error('hasblock is deprecated!')
   }
+  const Block = variant === 'icon' ? View : Text
   return (
     <TouchableHighlight
       {...otherProps}
@@ -16,9 +17,10 @@ function Button({ variant, size, place, isLoading, children, style, styleTouch, 
       underlayColor={Theme.colors.bg}
       {...(isLoading ? { disabled: true } : {})}
     >
-      <Text style={[Styles.button({ variant, size, place }), style]}>
+      {/* BUG - When is a icon, the button doesn't work?? myturn go */}
+      <Block style={[Styles.button({ variant, size, place }), style]}>
         <Text>{!isLoading ? children : '⏳'}</Text>
-      </Text>
+      </Block>
     </TouchableHighlight>
   )
 }
