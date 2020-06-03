@@ -1,5 +1,5 @@
 import React from 'react'
-import { View } from 'react-native'
+import { Platform, View } from 'react-native'
 import PropTypes from 'prop-types'
 
 import * as Theme from '@theme'
@@ -19,6 +19,8 @@ const Page = ({ children, ...otherProps }) => {
 Page.propTypes = {
   children: PropTypes.node,
 }
+
+const isIOS = Platform.OS === 'ios'
 
 const iconsMap = {
   back: IconArrow,
@@ -52,7 +54,11 @@ const HeaderBtn = ({ side, icon, style, textPrimary, children, isLoading, ...oth
             // it feels like 1998
             <>
               <View style={{ width: 8 }} />
-              <IconMapped size={16} color={color} style={{ transform: [{ translateY: -9 }] }} />
+              <IconMapped
+                size={16}
+                color={color}
+                style={{ transform: [{ translateY: isIOS ? -9 : 3 }] }}
+              />
             </>
           )}
         </>

@@ -70,7 +70,6 @@ const styles = StyleSheet.create({
   },
   light: {
     borderWidth: 1,
-    lineHeight: 17,
     borderColor: Theme.colors.grayMedium,
   },
 

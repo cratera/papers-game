@@ -165,7 +165,7 @@ export default class HomeSignup extends React.Component {
   }
 
   goNextStep(currentStepId) {
-    const currentStep = state.step
+    const currentStep = this.state.step
     this.setState(state => ({
       ...state,
       step: state.step + 1,
