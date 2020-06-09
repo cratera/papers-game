@@ -4,12 +4,8 @@
     "slug": "papers-game",
     "privacy": "public",
     "sdkVersion": "36.0.0",
-    "platforms": [
-      "ios",
-      "android",
-      "web"
-    ],
-    "version": "1.0.0",
+    "platforms": ["ios", "android", "web"],
+    "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -21,11 +17,10 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.nabicas.papers"
     },
     "description": "\"Papers\" is the perfect game for your dinner party. Made with love by Maggie and Sandy 😎\n\nWIP: About 80% done. Come back in the Summer ;)",
     "githubUrl": "https://github.com/sandrina-p/papers-game"

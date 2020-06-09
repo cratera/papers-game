@@ -1,4 +1,4 @@
-// ANALYZE: I assume this entire file would be a set of "Cloud Functions".
+// TODO/REVIEW: I assume this entire file would be a set of "Cloud Functions".
 
 import firebase from 'firebase/app'
 import 'firebase/database'
@@ -14,9 +14,8 @@ import { slugString } from '@constants/utils.js'
 // global.atob = Base64.encode;
 
 const firebaseConfig = {
-  // TODO - remove this from source code
+  // https://stackoverflow.com/questions/37482366/is-it-safe-to-expose-firebase-apikey-to-the-public
   apiKey: 'AIzaSyBYB6fczaHoB-SKjMRM4VHradIyLtluBHM',
-
   authDomain: 'papers-game.firebaseapp.com',
   databaseURL: 'https://papers-game.firebaseio.com',
   projectId: 'papers-game',
@@ -497,7 +496,6 @@ function _pubGame(gameId) {
       PubSub.publish('game.round', data.val())
     })
 
-    // Sub to round status - OPTIMIZE?
     DB.ref(`games/${gameId}/score`).on('value', async function (data) {
       PubSub.publish('game.score', data.val())
     })

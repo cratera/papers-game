@@ -262,7 +262,6 @@ export class PapersContextProvider extends Component {
       this.setState({ game, profiles })
     })
 
-    // Players Subscription
     socket.on('game.players.added', (topic, data) => {
       console.log(`:: on.${topic}`, data)
       const { id, info, profile } = data
@@ -322,7 +321,6 @@ export class PapersContextProvider extends Component {
       }))
     })
 
-    // Teams subscription
     socket.on('game.teams.set', (topic, data) => {
       console.log(`:: on.${topic}`, data)
       const teams = data
@@ -332,7 +330,6 @@ export class PapersContextProvider extends Component {
       }))
     })
 
-    // Words subscription
     socket.on('game.words.set', (topic, data) => {
       console.log(`:: on.${topic}`, data)
       const { pId, words } = data // pId can be '_all' too.
@@ -345,7 +342,6 @@ export class PapersContextProvider extends Component {
       }))
     })
 
-    // Sub to game starting
     socket.on('game.hasStarted', (topic, data) => {
       console.log(`:: on.${topic}`, data)
       const hasStarted = data
@@ -355,7 +351,6 @@ export class PapersContextProvider extends Component {
       }))
     })
 
-    // Sub to round status - OPTIMIZE!!
     socket.on('game.round', (topic, data) => {
       console.log(`:: on.${topic}`)
       const round = data
@@ -365,7 +360,6 @@ export class PapersContextProvider extends Component {
       }))
     })
 
-    // Sub to score status - OPTIMIZE!!
     socket.on('game.score', (topic, data) => {
       console.log(`:: on.${topic}`)
       const score = data
@@ -375,7 +369,6 @@ export class PapersContextProvider extends Component {
       }))
     })
 
-    // Sub to papers guessed
     socket.on('game.papersGuessed', (topic, data) => {
       console.log(`:: on.${topic}`)
       const papersGuessed = data // Number

@@ -23,6 +23,26 @@ Here's a list of my learnings while building this mobile game with reac-native.
 - [Troubleshooting turtle-cli](https://github.com/expo/turtle/issues/179). Install node 12.0.0 using `NVM` and try again.
 - [Release Channels](https://docs.expo.io/distribution/release-channels/) - Useful to test diff versions (a.k.a staging) for users before going to production.
 
+```bash
+
+# setup boilerplate
+turtle setup:ios
+
+# export
+expo export --public-url https://papers-game.firebaseapp.com/
+
+# build to ios
+expo build:ios --public-url https://papers-game.firebaseapp.com/ios-index.json
+
+# upload to test flight
+expo upload:ios --url https://papers-game.firebaseapp.com/ios-index.json
+
+  # create a app-specific password
+  https://appleid.apple.com/account/manage
+
+  # wait 5-10 minutes...
+```
+
 ---
 
 - **Update June 1:**
@@ -31,4 +51,4 @@ Here's a list of my learnings while building this mobile game with reac-native.
   - A component with 🍝 code? Add a `TODO`.
   - No unit tests? Making it work is the first test you need.
   - Not sure what's the best place for something? Just do it and leave a `REVIEW`.
-  - Just have fun and don't be afraid to experiment.
+  - Remember to have fun and don't be afraid to experiment.
