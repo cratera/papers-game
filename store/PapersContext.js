@@ -287,7 +287,7 @@ export class PapersContextProvider extends Component {
       const { id: playerId /*, newAdmin */ } = data
 
       if (playerId === this.state.profile.id) {
-        console.log(':: we are the player being removed! A.k.a we were quicked out')
+        console.log(':: we are the player being removed!')
         // OPTIMIZE/BUG - avoid ping pong with firebase the 2nd time is removed.
         // (When being the last to leave the game)
         // this.kickedFromGame() is a better name.

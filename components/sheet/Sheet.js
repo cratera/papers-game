@@ -51,7 +51,9 @@ const Sheet = React.memo(function Sheet({ visible, list, onClose }) {
             )}
             {/* lazyness level 99 */}
             <View style={{ width: 8 }}></View>
-            <Text style={{ color: variant === 'danger' && Theme.colors.danger }}>{text}</Text>
+            <Text style={{ color: variant === 'danger' ? Theme.colors.danger : undefined }}>
+              {text}
+            </Text>
           </Button>
         ))}
       </View>

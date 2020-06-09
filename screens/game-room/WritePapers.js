@@ -150,7 +150,7 @@ export default function WritePapers({ navigation }) {
     setIsSubmiting(true)
 
     try {
-      // Loading State
+      // TODO!! Loading State
       await Papers.setWords(words)
     } catch (error) {
       console.warn('WritePapers submit error:', error)

@@ -17,6 +17,12 @@ Here's a list of my learnings while building this mobile game with reac-native.
 - IOS: shadow doesn't work on elements with overflow:hidden (border-radius). ex: Button.
 - Upload files to Firebase was a nightmare. See `store/Firebase.js _uploadAvatar()` for more info.
 
+### Release
+
+- [Upload apps](https://docs.expo.io/distribution/uploading-apps/#2-start-the-upload)
+- [Troubleshooting turtle-cli](https://github.com/expo/turtle/issues/179). Install node 12.0.0 using `NVM` and try again.
+- [Release Channels](https://docs.expo.io/distribution/release-channels/) - Useful to test diff versions (a.k.a staging) for users before going to production.
+
 ---
 
 - **Update June 1:**

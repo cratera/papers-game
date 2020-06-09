@@ -607,6 +607,11 @@ async function setTeams(teams) {
   await DB.ref(`games/${gameId}/teams`).set(teams)
 }
 
+// TODO simultaneos stuff
+// https://firebase.google.com/docs/database/web/read-and-write
+// transactions
+// https://firebase.google.com/docs/database/web/read-and-write#save_data_as_transactions
+
 /**
  *
  */
@@ -633,7 +638,10 @@ async function setWords(words) {
 
   // - 16:05 BUG - Can't replicate this error! 🐛👀
   // [Unhandled promise rejection: Error: Reference.set failed: First argument contains a function in property 'games.ggg.words.dHwRWKyBdlSNGvKczyyI9coIoRD2.0._targetInst.stateNode._children.0.viewConfig.validAttributes.style.shadowColor.process' with contents = function processColor(color) {]
+
+  // replace this by push.
   await DB.ref(`games/${gameId}/words/_all`).set([...wordsStored, ...words])
+
   await DB.ref(`games/${gameId}/words/${playerId}`).set(wordsAsKeys)
 }
 

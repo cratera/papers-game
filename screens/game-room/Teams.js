@@ -145,15 +145,13 @@ export default function Teams({ navigation }) {
               <View key={id} style={Styles.team}>
                 <View style={Styles.headerTeam}>
                   <Text style={Theme.typography.h2}>{name}</Text>
-                  <Button
+                  {/* <Button
                     variant="icon"
                     accessibilityLabel="Rename team"
                     onPress={() => handleRenameOf(id)}
                   >
                     ✏️
-                    {/* Icon width/height isn't working on IOS. FML. */}
-                    {/* <IconEdit style={Styles.btnEdit_icon} />  */}
-                  </Button>
+                  </Button> */}
                 </View>
                 <ListPlayers players={players} />
               </View>
