@@ -2,15 +2,17 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { View, Text, Image, Platform } from 'react-native'
 
-import imgWritting from '@assets/images/writting.gif'
-import imgDone from '@assets/images/done.gif'
-
 import PapersContext from '@store/PapersContext.js'
 import Button from '@components/button'
 import Avatar from '@components/avatar'
 
 import Styles from './ListPlayersStyles'
 import * as Theme from '@theme'
+
+const imgWritting =
+  'https://firebasestorage.googleapis.com/v0/b/papers-game.appspot.com/o/game%2Fwritting.gif?alt=media&token=4f14b37a-370e-4c8d-8902-15a658cde869'
+const imgDone =
+  'https://firebasestorage.googleapis.com/v0/b/papers-game.appspot.com/o/game%2Fdone.gif?alt=media&token=ffa86784-aa18-414c-95e6-3ae5fcb15ed5'
 
 const imgMap = {
   writting: {
@@ -109,7 +111,7 @@ export default function ListPlayers({ players, enableKickout, isStatusVisible, .
               {imgInfo && (
                 <Image
                   style={[Styles.itemStatus, Styles[`itemStatus_${status}`]]}
-                  source={imgInfo.src}
+                  source={{ uri: imgInfo.src }}
                   accessibilityLabel={imgInfo.alt}
                 />
               )}

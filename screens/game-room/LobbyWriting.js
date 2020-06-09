@@ -4,8 +4,6 @@ import { ScrollView } from 'react-native-gesture-handler'
 import PropTypes from 'prop-types'
 
 import PapersContext from '@store/PapersContext.js'
-import imgWaiting from '@assets/images/waiting.gif'
-import imgDone from '@assets/images/done.gif'
 
 import * as Theme from '@theme'
 import Styles from './LobbyStyles.js'
@@ -15,6 +13,11 @@ import Button from '@components/button'
 import ListTeams from '@components/list-teams'
 import { useLeaveGame } from '@components/settings'
 import { headerTheme } from '@navigation/headerStuff.js'
+
+const imgWaiting =
+  'https://firebasestorage.googleapis.com/v0/b/papers-game.appspot.com/o/game%2Fwaiting.gif?alt=media&token=e3bc3fde-7d8b-48f7-afc1-b0135fc6fa20'
+const imgDone =
+  'https://firebasestorage.googleapis.com/v0/b/papers-game.appspot.com/o/game%2Fdone.gif?alt=media&token=ffa86784-aa18-414c-95e6-3ae5fcb15ed5'
 
 export default function LobbyWriting({ navigation }) {
   const Papers = React.useContext(PapersContext)
@@ -60,7 +63,7 @@ export default function LobbyWriting({ navigation }) {
                   Styles.header_img,
                   didEveryoneSubmittedTheirWords && Styles.header_img_done,
                 ]}
-                source={didEveryoneSubmittedTheirWords ? imgDone : imgWaiting}
+                source={{ uri: didEveryoneSubmittedTheirWords ? imgDone : imgWaiting }}
                 accessibilityLabel=""
               />
             </View>

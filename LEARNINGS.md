@@ -25,6 +25,9 @@ Here's a list of my learnings while building this mobile game with reac-native.
 
 ```bash
 
+# update app version
+- go to `app.json` and update based on versioning conventions.
+
 # setup boilerplate
 turtle setup:ios
 
@@ -41,6 +44,9 @@ expo upload:ios --url https://papers-game.firebaseapp.com/ios-index.json
   https://appleid.apple.com/account/manage
 
   # wait 5-10 minutes...
+
+# build to the web
+expo build:web --public-url https://papers-game.firebaseapp.com/ios-index.json
 ```
 
 ---

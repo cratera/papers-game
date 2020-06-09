@@ -10,7 +10,9 @@ import Styles from './HomeStyles.js'
 import Page from '@components/page'
 import Button from '@components/button'
 import { PickAvatar } from '@components/profile'
-import danceGif from '@assets/images/dance.gif'
+
+const danceGif =
+  'https://firebasestorage.googleapis.com/v0/b/papers-game.appspot.com/o/game%2Fdance.gif?alt=media&token=e29aa06e-45af-4f97-9ec8-6d31f30e7290'
 
 const AvatarMeme = ({ avatar, onChange }) => {
   const [isPickerVisible, setIsPickerVisible] = React.useState(false)
@@ -32,7 +34,7 @@ const AvatarMeme = ({ avatar, onChange }) => {
           <View style={[Styles.avatarPlace, Styles.memeFace]} />
         )}
       </TouchableHighlight>
-      <Image style={Styles.memeBody} source={danceGif} accessible={false} />
+      <Image style={Styles.memeBody} source={{ uri: danceGif }} accessible={false} />
       <PickAvatar
         visible={isPickerVisible}
         onChange={() => null}

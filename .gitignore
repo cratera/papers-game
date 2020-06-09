@@ -12,6 +12,9 @@ web-report
 dist
 hosting.*
 
+# personal stuff
+stash
+
 # firebase
 firebase-debug.log
 

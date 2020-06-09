@@ -36,11 +36,12 @@ export default function GameRoomEntry({ navigation }) {
 
   React.useEffect(() => {
     if (!game) {
-      // e.g. Game was directly deleted from DB
+      // e.g. Game was directly deleted from DB or player left
       navigation.navigate('home')
     }
   }, [game])
 
+  // TODO / REVIEW this condition
   if (!profileId || status === 'noProfile') {
     return (
       <Template>
