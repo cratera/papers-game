@@ -1,5 +1,17 @@
 {
   "projects": {
     "default": "papers-game"
+  },
+  "targets": {
+    "papers-game": {
+      "hosting": {
+        "web": [
+          "papers-game"
+        ],
+        "native": [
+          "papers-native"
+        ]
+      }
+    }
   }
 }

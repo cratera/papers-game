@@ -25,28 +25,47 @@ Here's a list of my learnings while building this mobile game with reac-native.
 
 ```bash
 
-# update app version
-- go to `app.json` and update based on versioning conventions.
+# RELEASE IOS
+# Make sure everything is commited and pushed.
+# Update the app version at app.json following versioning conventions
 
-# setup boilerplate
+# verify everything is okay
 turtle setup:ios
 
-# export
-expo export --public-url https://papers-game.firebaseapp.com/
+# export app with explicit CDN endpoint
+rm -R dist && expo export --public-url https://papers-native.firebaseapp.com/
 
-# build to ios
-expo build:ios --public-url https://papers-game.firebaseapp.com/ios-index.json
+# deploy the IOS app to firebase
+
+  ## do this only first time to apply (like git setupstream, I guess?)
+  firebase target:apply hosting native papers-native
+
+  # deploy
+  firebase deploy --only hosting:native -m "[release description]"
+
+# build a local standalone app IPA ready for Apple App Store
+  # fetch the certificates made by expo previously
+  expo fetch:ios:certs
+
+  # build it
+  EXPO_IOS_DIST_P12_PASSWORD=<pass> turtle build:ios --public-url https://papers-native.firebaseapp.com/ios-index.json --team-id <teamid> --dist-p12-path papers-game_dist.p12 --provisioning-profile-path papers-game.mobileprovision
+
+  # a build path is shown in the last lines of log... something like:
+  ## /Users/sandrina-p/expo-apps/@anonymous__papers-game-....8-archive.ipa
 
 # upload to test flight
-expo upload:ios --url https://papers-game.firebaseapp.com/ios-index.json
+expo upload:ios --path path/to/archive.ipa
 
   # create a app-specific password
   https://appleid.apple.com/account/manage
 
-  # wait 5-10 minutes...
+  # wait 10-15 minutes... be patient... and success!
 
-# build to the web
-expo build:web --public-url https://papers-game.firebaseapp.com/ios-index.json
+# RELEASE WEB
+# change firebase.json     "public": from "dist" to "web-build",
+expo build:web
+
+firebase deploy --only hosting:web.app
 ```
 
 ---
