@@ -49,7 +49,7 @@ export function useScores(gameScore, gameTeams, profileId) {
 
   const scoreByRound = [1, 2, 3].map((x, roundIx) => {
     const teamsPlayersScore = {}
-    const scorePlayers = gameScore[roundIx]
+    const scorePlayers = gameScore ? gameScore[roundIx] : null
     const teamsScore = {}
     let bestPlayer = {}
 
