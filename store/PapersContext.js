@@ -33,6 +33,9 @@ export class PapersContextProvider extends Component {
       },
       game: null, // see Firebase.js to see structure.
       profiles: {}, // List of game players' profiles.
+      about: {
+        version: '0.2.0', // TODO REVIEW - where should this come from?
+      },
     }
 
     this._removeGameFromState = this._removeGameFromState.bind(this)
@@ -105,6 +108,7 @@ export class PapersContextProvider extends Component {
             profile: this.state.profile,
             game: this.state.game,
             profiles: this.state.profiles,
+            about: this.state.about,
           },
           ...this.PapersAPI,
         }}

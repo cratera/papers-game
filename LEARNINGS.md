@@ -41,7 +41,7 @@ rm -R dist && expo export --public-url https://papers-native.firebaseapp.com/
   firebase target:apply hosting native papers-native
 
   # deploy
-  firebase deploy --only hosting:native -m "[release description]"
+  firebase deploy --only hosting:native -m "[description]"
 
 # build a local standalone app IPA ready for Apple App Store
   # fetch the certificates made by expo previously
@@ -59,8 +59,9 @@ expo upload:ios --path path/to/archive.ipa
   # create a app-specific password
   https://appleid.apple.com/account/manage
 
-  # wait 10-15 minutes... be patient...
-  # Go to appstore connect the the new build is there. It will take +1h to process the build
+  # wait ~15 minutes... be patient...
+  # After, go to AppStoreConnect. The the new build is there. It will take a few hours to process the build
+
 
 # RELEASE WEB
 # change firebase.json     "public": from "dist" to "web-build",

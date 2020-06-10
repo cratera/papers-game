@@ -67,12 +67,12 @@ Settings.propTypes = {
 function SettingsProfile({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const [name, setName] = React.useState('')
-  const { profile } = Papers.state
+  const { profile, about } = Papers.state
 
   return (
     <Page>
       <Page.Main>
-        <ScrollView>
+        <ScrollView style={Theme.u.scrollSideOffset}>
           <AvatarSquare
             style={Styles.avatar}
             avatar={profile.avatar}
@@ -122,6 +122,9 @@ function SettingsProfile({ navigation }) {
           ].map(item => (
             <Item key={item.id} {...item} />
           ))}
+          <View style={[{ marginLeft: 8, marginVertical: 24, marginBottom: 32 }]}>
+            <Text style={Theme.typography.small}>@2020 - Version {about.version}</Text>
+          </View>
         </ScrollView>
       </Page.Main>
     </Page>
