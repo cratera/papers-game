@@ -3,8 +3,11 @@
     "name": "Papers Game - beta",
     "slug": "papers-game",
     "privacy": "public",
-    "sdkVersion": "36.0.0",
-    "platforms": ["ios", "android", "web"],
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "version": "0.1.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -17,7 +20,9 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.nabicas.papers"
