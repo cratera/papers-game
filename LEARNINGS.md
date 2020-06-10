@@ -59,7 +59,8 @@ expo upload:ios --path path/to/archive.ipa
   # create a app-specific password
   https://appleid.apple.com/account/manage
 
-  # wait 10-15 minutes... be patient... and success!
+  # wait 10-15 minutes... be patient...
+  # Go to appstore connect the the new build is there. It will take +1h to process the build
 
 # RELEASE WEB
 # change firebase.json     "public": from "dist" to "web-build",
