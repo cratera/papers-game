@@ -661,7 +661,12 @@ async function markMeAsReady(roundStatus) {
   const { gameId, id } = LOCAL_PROFILE
 
   // REVIEW/TODO: Maybe round update should be done before, once all words are submitted.
-  await DB.ref(`games/${gameId}/round`).set(roundStatus)
+  const refGameRound = DB.ref(`games/${gameId}/round`)
+  const round = await refGameRound.once('value')
+
+  if (!round.exists()) {
+    await refGameRound.set(roundStatus)
+  }
 
   await DB.ref(`games/${gameId}/players/${id}`).update({ isReady: true })
 

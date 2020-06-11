@@ -498,8 +498,8 @@ export class PapersContextProvider extends Component {
     await this.state.socket.markMeAsReady(roundStatus)
   }
 
-  markMeAsReadyForNextRound() {
-    this.state.socket.markMeAsReadyForNextRound(() => {
+  async markMeAsReadyForNextRound() {
+    await this.state.socket.markMeAsReadyForNextRound(() => {
       // Only called if everyone's ready!
       this.PapersAPI.startNextRound()
     })

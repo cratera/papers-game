@@ -19,13 +19,23 @@ const RoundScore = () => {
   const round = game.round
   const roundIx = round.current
   const isFinalRound = roundIx === game.settings.roundsCount - 1
+  const [isSubmitting, setIsSubmitting] = React.useState(false)
   const { isMyTeamWinner, isTie } = React.useMemo(
     () => useScores(game.score, game.teams, profile.id),
     []
   )
 
-  function handleReadyClick() {
-    Papers.markMeAsReadyForNextRound()
+  async function handleReadyClick() {
+    if (isSubmitting === true) {
+      return
+    }
+    setIsSubmitting(true)
+
+    try {
+      await Papers.markMeAsReadyForNextRound()
+    } catch (error) {
+      console.warn('Ready next round failed', error.message)
+    }
   }
 
   return (
@@ -61,7 +71,7 @@ const RoundScore = () => {
         {isFinalRound ? (
           <Button onPress={Papers.leaveGame}>Go to homepage</Button>
         ) : (
-          <Button onPress={handleReadyClick}>
+          <Button isLoading={isSubmitting} onPress={handleReadyClick}>
             {`I'm ready for round ${round.current + 1 + 1}!`}
           </Button>
         )}

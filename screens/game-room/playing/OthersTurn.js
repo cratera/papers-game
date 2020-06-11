@@ -48,13 +48,13 @@ const OthersTurn = ({
         avatar: profiles[tPlayerId]?.avatar,
       },
       teamName:
-        !game.hasStarted || (game.hasStarted && amIWaiting)
+        !game.hasStarted || amIWaiting
           ? 'Waiting for everyone to say they are ready.'
           : tPlayerId === profile.id
           ? `Waiting for ${thisTurnPlayerName} to finish their turn.`
           : game.teams[teamId].name,
     }
-  }, [isAllWordsGuessed, isTurnOn])
+  }, [isAllWordsGuessed, amIWaiting, isTurnOn])
 
   return (
     <Fragment>
