@@ -483,7 +483,7 @@ export class PapersContextProvider extends Component {
     await this.state.socket.setTeams(teams)
   }
 
-  markMeAsReady() {
+  async markMeAsReady() {
     console.log('📌 markMeAsReady()')
 
     const roundStatus = {
@@ -494,7 +494,8 @@ export class PapersContextProvider extends Component {
       // all words by key to save space
       wordsLeft: this.state.game.words._all.map((w, i) => i),
     }
-    this.state.socket.markMeAsReady(roundStatus)
+
+    await this.state.socket.markMeAsReady(roundStatus)
   }
 
   markMeAsReadyForNextRound() {

@@ -21,6 +21,7 @@ const imgDone =
 
 export default function LobbyWriting({ navigation }) {
   const Papers = React.useContext(PapersContext)
+  const [isSubmitting, setIsSubmitting] = React.useState(false)
   const { askToLeaveGame } = useLeaveGame()
   const { game } = Papers.state || {}
   const gameWords = game?.words
@@ -52,6 +53,23 @@ export default function LobbyWriting({ navigation }) {
     }
   }, [didEveryoneSubmittedTheirWords])
 
+  async function handleReadyClick() {
+    if (isSubmitting === true) {
+      return
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      await Papers.markMeAsReady()
+    } catch (error) {
+      // TODO handle error
+      console.warn('Ready error', error.message)
+    }
+
+    setIsSubmitting(false)
+  }
+
   return (
     <Fragment>
       <Page>
@@ -71,7 +89,9 @@ export default function LobbyWriting({ navigation }) {
           </ScrollView>
         </Page.Main>
         <Page.CTAs hasOffset>
-          <Button onPress={Papers.markMeAsReady}>{"I'm ready!"}</Button>
+          <Button onPress={handleReadyClick} isLoading={isSubmitting}>
+            {"I'm ready!"}
+          </Button>
         </Page.CTAs>
       </Page>
     </Fragment>
