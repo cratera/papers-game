@@ -26,9 +26,11 @@ Here's a list of my learnings while building this mobile game with reac-native.
 ```bash
 
 # RELEASE IOS
-# Make sure everything is commited and pushed.
-# Update the app version at app.json following versioning conventions
-
+
+# Update version:
+  ## If it's a release to App Store, update "version" at `app.json`.
+  ## Update "about" version and/or OTA at `PapersContext.js`.
+
 # verify everything is okay
 turtle setup:ios
 

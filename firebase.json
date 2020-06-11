@@ -16,7 +16,18 @@
     },
     {
       "target": "native",
-      "public": "dist"
+      "public": "dist",
+      "headers": [
+        {
+          "source": "**/*.js",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/javascript"
+            }
+          ]
+        }
+      ]
     }
   ],
   "functions": {

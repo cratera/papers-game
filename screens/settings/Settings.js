@@ -126,7 +126,7 @@ function SettingsProfile({ navigation }) {
           <View style={[{ marginVertical: 24, marginBottom: 32 }]}>
             <OtaChecker />
             <Text style={[Theme.typography.small, Theme.u.center]}>
-              @2020 - Version {about.version}
+              @2020 - V.{about.version} OTA@{about.ota}
             </Text>
           </View>
         </ScrollView>
