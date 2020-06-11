@@ -44,8 +44,8 @@ rm -R dist && expo export --public-url https://papers-native.firebaseapp.com/
   firebase deploy --only hosting:native -m "[description]"
 
 # build a local standalone app IPA ready for Apple App Store
-  # fetch the certificates made by expo previously
-  expo fetch:ios:certs
+  # fetch the certificates made by expo previously (only first time)
+  ## expo fetch:ios:certs
 
   # build it
   EXPO_IOS_DIST_P12_PASSWORD=<pass> turtle build:ios --public-url https://papers-native.firebaseapp.com/ios-index.json --team-id <teamid> --dist-p12-path papers-game_dist.p12 --provisioning-profile-path papers-game.mobileprovision
@@ -56,10 +56,10 @@ rm -R dist && expo export --public-url https://papers-native.firebaseapp.com/
 # upload to test flight
 expo upload:ios --path path/to/archive.ipa
 
-  # create a app-specific password
+  # after a few seconds it asks for app-specific password
   https://appleid.apple.com/account/manage
 
-  # wait ~15 minutes... be patient...
+  # wait 1min... and then wait more ~15 minutes... be patient...
   # After, go to AppStoreConnect. The the new build is there. It will take a few hours to process the build
 
 
