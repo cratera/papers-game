@@ -11,6 +11,7 @@ import {
 } from 'react-native'
 import { createStackNavigator } from '@react-navigation/stack'
 import PropTypes from 'prop-types'
+import * as Updates from 'expo-updates'
 
 import PapersContext from '@store/PapersContext.js'
 import * as Theme from '@theme'
@@ -19,7 +20,7 @@ import { headerTheme } from '@navigation/headerStuff.js'
 import Page from '@components/page'
 import ListTeams from '@components/list-teams'
 import GameScore from '@components/game-score'
-
+import Button from '@components/button'
 import { PickAvatar } from '@components/profile'
 import { useLeaveGame } from '@components/settings'
 import { IconArrow, IconCamera } from '@components/icons'
@@ -122,8 +123,11 @@ function SettingsProfile({ navigation }) {
           ].map(item => (
             <Item key={item.id} {...item} />
           ))}
-          <View style={[{ marginLeft: 8, marginVertical: 24, marginBottom: 32 }]}>
-            <Text style={Theme.typography.small}>@2020 - Version {about.version}</Text>
+          <View style={[{ marginVertical: 24, marginBottom: 32 }]}>
+            <OtaChecker />
+            <Text style={[Theme.typography.small, Theme.u.center]}>
+              @2020 - Version {about.version}
+            </Text>
           </View>
         </ScrollView>
       </Page.Main>
@@ -386,4 +390,54 @@ Item.propTypes = {
   variant: PropTypes.oneOf(['danger']),
   icon: PropTypes.node,
   onPress: PropTypes.func,
+}
+
+// ==========================
+
+function OtaChecker() {
+  const [status, setstatus] = React.useState('')
+  const [errorMsg, setErrorMsg] = React.useState(null)
+  const [manifest, setManifest] = React.useState(null)
+
+  async function handleCheckClick() {
+    try {
+      setErrorMsg(null)
+      setstatus('checking')
+      const update = await Updates.checkForUpdateAsync()
+      if (update.isAvailable) {
+        await Updates.fetchUpdateAsync()
+        setstatus('available')
+        setManifest(JSON.stringify(update.manifest))
+      } else {
+        setstatus('not-available')
+      }
+    } catch (e) {
+      setstatus('error')
+      setErrorMsg(e.message)
+    }
+    console.log('Result', status)
+  }
+
+  async function handleReloadClick() {
+    await Updates.reloadAsync()
+  }
+  return (
+    <View>
+      <Button variant="light" isLoading={status === 'checking'} onPress={handleCheckClick}>
+        Check for new updates
+      </Button>
+      {status === 'available' && (
+        <Button variant="light" isLoading={status === 'checking'} onPress={handleReloadClick}>
+          New update available! Reload app.
+        </Button>
+      )}
+      <View style={{ marginVertical: 8 }}>
+        {status === 'not-available' && (
+          <Text style={[Theme.typography.sencondary, Theme.u.center]}>App is already updated!</Text>
+        )}
+        {errorMsg && <Text style={[Theme.typography.error, Theme.u.center]}>{errorMsg}</Text>}
+        {manifest && <Text style={[Theme.typography.secondary, Theme.u.center]}>{manifest}</Text>}
+      </View>
+    </View>
+  )
 }
