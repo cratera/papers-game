@@ -52,6 +52,10 @@ export const typography = StyleSheet.create({
     color: colors.grayMedium,
     fontStyle: 'italic',
   },
+  error: {
+    fontSize: 14,
+    color: colors.danger,
+  },
 })
 
 // Utils

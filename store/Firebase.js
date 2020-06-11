@@ -73,7 +73,7 @@ export default function init(options) {
   console.log('⚙️ init()')
 
   if (firebase.apps.length > 0) {
-    console.warn('Already initialized!')
+    console.log('Already initialized!')
   } else {
     firebase.initializeApp(firebaseConfig)
   }
@@ -619,9 +619,9 @@ async function setWords(words) {
   const playerId = LOCAL_PROFILE.id
 
   /*
-  To save memory in DB let's store the words as key:value. The simple key
+  To save memory in DB let's store the words as key:value. The key
   is the word index in the array of all words. The final output will be
-  something like: (example has 3 words per player:)
+  something like: (example with 3 words per player)
   words: {
     _all: ['run', 'portugal', 'development', 'card', 'sea', 'cold'],
     playerId1: [0, 1, 2], // run, portugal, development
@@ -629,16 +629,16 @@ async function setWords(words) {
   }
   */
 
-  const wordsOnce = await DB.ref(`games/${gameId}/words/_all`).once('value')
-  const wordsStored = wordsOnce.val() || []
-  const wordsCount = wordsStored.length
-  const wordsAsKeys = words.map((w, index) => index + wordsCount)
+  let wordsAsKeys = null
 
-  // - 16:05 BUG - Can't replicate this error! 🐛👀
-  // [Unhandled promise rejection: Error: Reference.set failed: First argument contains a function in property 'games.ggg.words.dHwRWKyBdlSNGvKczyyI9coIoRD2.0._targetInst.stateNode._children.0.viewConfig.validAttributes.style.shadowColor.process' with contents = function processColor(color) {]
+  await DB.ref(`games/${gameId}/words/_all`).transaction(wordsOnce => {
+    const wordsStored = wordsOnce || []
+    const wordsCount = wordsStored.length
+    wordsAsKeys = words.map((w, index) => index + wordsCount)
+    const allWords = [...wordsStored, ...words]
 
-  // replace this by push.
-  await DB.ref(`games/${gameId}/words/_all`).set([...wordsStored, ...words])
+    return allWords
+  })
 
   await DB.ref(`games/${gameId}/words/${playerId}`).set(wordsAsKeys)
 }

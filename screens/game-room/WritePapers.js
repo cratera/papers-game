@@ -17,7 +17,6 @@ export default function WritePapers({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const { game, profile } = Papers.state
   const [words, setLocalWords] = React.useState([])
-  // const [textareasHeight, setTextareasHeight] = React.useState({});
 
   const [errorMsg, setErrorMsg] = React.useState(null)
   const [isSubmiting, setIsSubmiting] = React.useState(false)
@@ -51,14 +50,24 @@ export default function WritePapers({ navigation }) {
       navigation.setOptions({
         headerRight: function HLB() {
           return (
-            <Page.HeaderBtn side="right" textPrimary onPress={handleSubmitClick}>
+            <Page.HeaderBtn
+              side="right"
+              textPrimary
+              isLoading={isSubmiting}
+              onPress={handleSubmitClick}
+            >
               Finish
             </Page.HeaderBtn>
           )
         },
       })
+    } else {
+      navigation.setOptions({
+        headerRight: null,
+      })
     }
-  }, [isAllWordsDone])
+    // Pass words as dependency so that "Finish" has the most recent words on submit.
+  }, [isAllWordsDone, words, isSubmiting])
 
   React.useEffect(() => {
     if (wordsAreStored) {
@@ -79,12 +88,12 @@ export default function WritePapers({ navigation }) {
             {paperIndex + 1} of {wordsGoal} • {wordsCount} {wordsCount === 1 ? 'paper' : 'papers'}{' '}
             filled
           </Text>
+          {errorMsg && <Text style={[Theme.typography.error, { marginTop: 4 }]}>{errorMsg}</Text>}
         </View>
 
         <KeyboardAvoidingView behavior="padding" style={Styles.scrollKAV}>
           <ScrollView style={[Styles.slides, Theme.u.scrollSideOffset]}>
             {renderSliders()}
-            {errorMsg && <Text style={Styles.sliderLabels}>{errorMsg}</Text>}
           </ScrollView>
           <Page.CTAs style={{ paddingBottom: 80, paddingHorizontal: 0 }} hasOffset>
             {!isAllWordsDone && (
@@ -102,7 +111,6 @@ export default function WritePapers({ navigation }) {
     const papers = []
     for (let i = 0; i < wordsGoal; i++) {
       const isActive = i === paperIndex
-      // const height = textareasHeight[i] || '4rem';
 
       papers.push(
         <SlidePaper
@@ -128,7 +136,7 @@ export default function WritePapers({ navigation }) {
     const wordsToEdit = [...words]
     wordsToEdit[index] = word
 
-    // OPTIMIZE - Maybe change state only on blur?
+    // Q: Maybe change state only on blur?
     // A: No, parent needs to know the value so "Next paper" works
     setLocalWords(wordsToEdit)
   }
@@ -148,9 +156,7 @@ export default function WritePapers({ navigation }) {
     }
 
     setIsSubmiting(true)
-
     try {
-      // TODO!! Loading State
       await Papers.setWords(words)
     } catch (error) {
       console.warn('WritePapers submit error:', error)
