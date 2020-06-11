@@ -22,6 +22,7 @@ Here's a list of my learnings while building this mobile game with reac-native.
 - [Upload apps](https://docs.expo.io/distribution/uploading-apps/#2-start-the-upload)
 - [Troubleshooting turtle-cli](https://github.com/expo/turtle/issues/179). Install node 12.0.0 using `NVM` and try again.
 - [Release Channels](https://docs.expo.io/distribution/release-channels/) - Useful to test diff versions (a.k.a staging) for users before going to production.
+- [HTTP Headers for firebase](https://github.com/expo/expo/issues/4069)
 
 ```bash
 
@@ -66,10 +67,7 @@ expo upload:ios --path path/to/archive.ipa
 
 
 # RELEASE WEB
-# change firebase.json     "public": from "dist" to "web-build",
-expo build:web
-
-firebase deploy --only hosting:web
+expo build:web && firebase deploy --only hosting:web
 ```
 
 ---
