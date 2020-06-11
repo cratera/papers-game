@@ -1,4 +1,5 @@
 import React from 'react'
+import { Animated, Easing } from 'react-native'
 import { Svg, Path, Rect, G, Defs, ClipPath } from 'react-native-svg'
 
 import * as Theme from '@theme'
@@ -88,12 +89,37 @@ export const IconEyeClosed = ({ size, color, style, ...props }) /* eslint-disabl
 }
 
 export const IconSpin = ({ size, color, style, ...props }) /* eslint-disable-line */ => {
+  const rotateAnim = React.useRef(new Animated.Value(0)).current // Initial value for opacity: 0
   const { styleWithSize, baseColor } = useProps(size, color, style)
+
+  React.useEffect(() => {
+    Animated.loop(
+      Animated.timing(rotateAnim, {
+        toValue: 1,
+        duration: 2500,
+        easing: Easing.inOut(Easing.ease), // Review @mmbotelho
+        useNativeDriver: true,
+      }),
+      { iterations: 50 }
+    ).start()
+  }, [])
+
   // prettier-ignore
   return (
-    <Svg style={ styleWithSize } fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22" {...props}>
-      <Path d="M11 1v4M11 17v4M4 4l3 3M15 15l3 3M1 11h4M17 11h4M4 18l3-3M15 7l3-3" stroke={baseColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    </Svg>
+    <Animated.View style={{
+      transform: [
+        { rotate: rotateAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: ['0deg', '360deg'],
+        }) },
+        { perspective: 1000 }
+      ]
+    }}>
+      <Svg style={ styleWithSize } fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22" {...props}>
+        <Path d="M11 1v4M11 17v4M4 4l3 3M15 15l3 3M1 11h4M17 11h4M4 18l3-3M15 7l3-3" stroke={baseColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      </Svg>
+
+    </Animated.View>
   )
 }
 

@@ -38,7 +38,7 @@ rm -R dist && expo export --public-url https://papers-native.firebaseapp.com/
 # deploy the IOS app to firebase
 
   ## do this only first time to apply (like git setupstream, I guess?)
-  firebase target:apply hosting native papers-native
+  ### firebase target:apply hosting native papers-native
 
   # deploy
   firebase deploy --only hosting:native -m "[description]"
@@ -67,7 +67,7 @@ expo upload:ios --path path/to/archive.ipa
 # change firebase.json     "public": from "dist" to "web-build",
 expo build:web
 
-firebase deploy --only hosting:web.app
+firebase deploy --only hosting:web
 ```
 
 ---

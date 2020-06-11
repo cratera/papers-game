@@ -43,7 +43,7 @@ function Button({
             </Text>
           )
         ) : (
-          <IconSpin size={20} color={Theme.colors.bg} />
+          <IconSpin size={20} color={variant !== 'flat' ? Theme.colors.bg : Theme.colors.primary} />
         )}
       </View>
     </TouchableHighlight>

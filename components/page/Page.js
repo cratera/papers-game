@@ -1,12 +1,12 @@
 import React from 'react'
-import { View } from 'react-native'
+import { View, Text } from 'react-native'
 import PropTypes from 'prop-types'
 
 import * as Theme from '@theme'
 import Styles from './PageStyles.js'
 import SettingsToggle from '@components/settings'
 import Button from '@components/button'
-import { IconArrow, IconSpin } from '@components/icons'
+import { IconArrow } from '@components/icons'
 
 const Page = ({ children, ...otherProps }) => {
   return (
@@ -38,29 +38,26 @@ const HeaderBtn = ({ side, icon, style, textPrimary, children, isLoading, ...oth
     <Button
       variant="flat"
       textColor={color}
+      isLoading={isLoading}
       style={[side === 'left' ? { marginLeft: 16 } : { marginRight: 16 }]}
       {...otherProps}
     >
-      {!isLoading ? (
-        <>
-          {side === 'left' && IconMapped && (
-            <IconMapped
-              size={16}
-              style={{ transform: [{ rotate: '180deg' }, { translateY: -2 }, { translateX: 3 }] }}
-            />
-          )}
-          {children}
-          {side === 'right' && IconMapped && (
-            // it feels like 1998
-            <>
-              <View style={{ width: 8 }} />
-              <IconMapped size={16} color={color} style={{ transform: [{ translateY: 3 }] }} />
-            </>
-          )}
-        </>
-      ) : (
-        <IconSpin size={20} />
-      )}
+      <>
+        {side === 'left' && IconMapped && (
+          <IconMapped
+            size={16}
+            style={{ transform: [{ rotate: '180deg' }, { translateY: -2 }, { translateX: 3 }] }}
+          />
+        )}
+        {children}
+        {side === 'right' && IconMapped && (
+          // it feels like 1998
+          <>
+            <View style={{ width: 8 }} />
+            <IconMapped size={16} color={color} style={{ transform: [{ translateY: 3 }] }} />
+          </>
+        )}
+      </>
     </Button>
   )
 }

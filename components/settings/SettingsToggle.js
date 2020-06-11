@@ -16,7 +16,8 @@ export default function SettingsToggle({ style, ...props }) {
       style={[{ borderWidth: 0 }, style]}
       {...props}
     >
-      <IconGear size="20" />
+      {/* BUG Weird. size does not work on Firefox, but inline style does. */}
+      <IconGear size="20" style={{ width: 20, height: 20 }} />
     </Button>
   )
 }
