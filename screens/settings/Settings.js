@@ -19,6 +19,7 @@ import PapersContext from '@store/PapersContext.js'
 import * as Theme from '@theme'
 
 import { headerTheme } from '@navigation/headerStuff.js'
+import { logEvent } from '@store/Firebase.js'
 import Page from '@components/page'
 import ListTeams from '@components/list-teams'
 import GameScore from '@components/game-score'
@@ -26,7 +27,7 @@ import Button from '@components/button'
 import { PickAvatar } from '@components/profile'
 import { useLeaveGame } from '@components/settings'
 import { IconArrow, IconCamera } from '@components/icons'
-import { logEvent } from '@store/Firebase.js'
+import AudioPreview from './AudioPreview.js'
 
 const Stack = createStackNavigator()
 
@@ -58,6 +59,7 @@ export default function Settings(props) {
       ) : (
         <Stack.Screen name="settings-profile" component={SettingsProfile} />
       )}
+      {/* <Stack.Screen name="settings-profile" component={SettingsSoundSk} /> */}
     </Stack.Navigator>
   )
 }
@@ -153,6 +155,8 @@ function SettingsProfile({ navigation }) {
             <Item key={item.id} {...item} />
           ))}
           <View style={[{ marginTop: 32, marginBottom: 32 }]}>
+            <AudioPreview />
+            <Text>{'\n'}</Text>
             <TestCrashing />
             <Text>{'\n'}</Text>
             <OtaChecker />

@@ -20,6 +20,7 @@
     "@react-navigation/web": "~1.0.0-alpha.9",
     "expo": "^37.0.0",
     "expo-asset": "~8.1.5",
+    "expo-av": "~8.1.0",
     "expo-constants": "~9.0.0",
     "expo-firebase-analytics": "~2.1.1",
     "expo-font": "~8.1.0",

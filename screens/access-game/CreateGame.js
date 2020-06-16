@@ -6,7 +6,7 @@ import { ScrollView } from 'react-native-gesture-handler'
 
 import PapersContext from '@store/PapersContext.js'
 import Page from '@components/page'
-import Button from '@components/button'
+// import Button from '@components/button'
 import { headerTheme } from '@navigation/headerStuff.js'
 import { slugString } from '@constants/utils.js'
 
@@ -17,7 +17,6 @@ const copy = {
   headerTitle: 'Create',
   title: 'Give this party a name!',
   description: 'Your friends will use it to join the game.',
-  cta: 'Next: Add Friends',
 }
 
 export default function CreateGame({ navigation }) {
