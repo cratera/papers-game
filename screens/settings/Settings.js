@@ -8,6 +8,8 @@ import {
   View,
   Text,
   TextInput,
+  Alert,
+  Platform,
 } from 'react-native'
 import { createStackNavigator } from '@react-navigation/stack'
 import PropTypes from 'prop-types'
@@ -70,6 +72,38 @@ function SettingsProfile({ navigation }) {
   const [name, setName] = React.useState('')
   const { profile, about } = Papers.state
 
+  function handleDeleteAccount() {
+    if (Platform.OS === 'web') {
+      if (window.confirm('Are you sure you want to leave the game?')) {
+        Papers.leaveGame()
+      }
+    } else {
+      Alert.alert(
+        'Delete account',
+        "This will delete your account locally and from Papers' servers",
+        [
+          {
+            text: 'Delete account',
+            onPress: async () => {
+              await Papers.resetProfile()
+              navigation.dangerouslyGetParent().reset({
+                index: 0,
+                routes: [{ name: 'home' }],
+              })
+            },
+            style: 'destructive',
+          },
+          {
+            text: 'Cancel',
+            onPress: () => console.log('Delete account cancelled'),
+            style: 'cancel',
+          },
+        ],
+        { cancelable: false }
+      )
+    }
+  }
+
   return (
     <Page>
       <Page.Main>
@@ -112,13 +146,7 @@ function SettingsProfile({ navigation }) {
               id: 'reset',
               title: 'Delete account',
               variant: 'danger',
-              onPress: async () => {
-                await Papers.resetProfile()
-                navigation.dangerouslyGetParent().reset({
-                  index: 0,
-                  routes: [{ name: 'home' }],
-                })
-              },
+              onPress: handleDeleteAccount,
             },
           ].map(item => (
             <Item key={item.id} {...item} />
