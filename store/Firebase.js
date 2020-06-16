@@ -1,11 +1,13 @@
 // TODO/REVIEW: I assume this entire file would be a set of "Cloud Functions".
 
 import firebase from 'firebase/app'
-import 'firebase/database'
 import 'firebase/auth'
+import 'firebase/database'
 import 'firebase/storage'
 
 import PubSub from 'pubsub-js'
+import * as Analytics from 'expo-firebase-analytics'
+
 import { slugString } from '@constants/utils.js'
 
 // Fixing a bug with firebase file upload put() _uploadAvatar()
@@ -53,6 +55,8 @@ const PUBLIC_API = {
   setPapersGuessed,
   finishTurn,
   setRound,
+
+  logEvent,
 }
 
 // export function serverReconnect({ id, name, gameId }) {
@@ -758,4 +762,12 @@ async function setRound(roundStatus) {
   const gameId = LOCAL_PROFILE.gameId
 
   await DB.ref(`games/${gameId}/round`).set(roundStatus)
+}
+
+export async function logEvent(...args) {
+  // TODO add support to android.
+  // TODO ask for permission in settings.
+  // TODO review "Automatically collected events"
+  console.log('⚙️ logEvent() - disabled')
+  // await Analytics.logEvent(...args)
 }

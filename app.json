@@ -4,7 +4,7 @@
     "slug": "papers-game",
     "privacy": "public",
     "platforms": ["ios", "android", "web"],
-    "version": "0.2.1",
+    "version": "0.2.2",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -21,7 +21,22 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.nabicas.papers"
+      "bundleIdentifier": "com.nabicas.papers",
+      "googleServicesFile": "./stash/GoogleService-Info.plist"
+    },
+    "web": {
+      "config": {
+        "firebase": {
+          "apiKey": "AIzaSyBYB6fczaHoB-SKjMRM4VHradIyLtluBHM",
+          "authDomain": "papers-game.firebaseapp.com",
+          "databaseURL": "https://papers-game.firebaseio.com",
+          "projectId": "papers-game",
+          "storageBucket": "papers-game.appspot.com",
+          "messagingSenderId": "381121722531",
+          "appId": "1:381121722531:web:5d88b1a0b418e4e8c8e716",
+          "measurementId": "G-BFBZ4MNDX4"
+        }
+      }
     },
     "description": "The perfect game for your dinner party with friends!",
     "githubUrl": "https://github.com/sandrina-p/papers-game"

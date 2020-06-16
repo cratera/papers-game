@@ -26,6 +26,7 @@ import Button from '@components/button'
 import { PickAvatar } from '@components/profile'
 import { useLeaveGame } from '@components/settings'
 import { IconArrow, IconCamera } from '@components/icons'
+import { logEvent } from '@store/Firebase.js'
 
 const Stack = createStackNavigator()
 
@@ -140,7 +141,7 @@ function SettingsProfile({ navigation }) {
             {
               id: 'donation',
               title: 'Buy us a beer',
-              onPress: () => console.warn('TODO buy us a better'),
+              onPress: () => logEvent('click', { type: 'buy a beer!' }),
             },
             {
               id: 'reset',
@@ -151,7 +152,9 @@ function SettingsProfile({ navigation }) {
           ].map(item => (
             <Item key={item.id} {...item} />
           ))}
-          <View style={[{ marginVertical: 24, marginBottom: 32 }]}>
+          <View style={[{ marginTop: 32, marginBottom: 32 }]}>
+            <TestCrashing />
+            <Text>{'\n'}</Text>
             <OtaChecker />
             <Text style={[Theme.typography.small, Theme.u.center]}>
               @2020 - V.{about.version} OTA@{about.ota}
@@ -466,6 +469,23 @@ function OtaChecker() {
         {errorMsg && <Text style={[Theme.typography.error, Theme.u.center]}>{errorMsg}</Text>}
         {manifest && <Text style={[Theme.typography.secondary, Theme.u.center]}>{manifest}</Text>}
       </View>
+    </View>
+  )
+}
+
+function TestCrashing() {
+  const [status, setstatus] = React.useState('')
+
+  async function handleCheckClick() {
+    setstatus('error')
+  }
+
+  return (
+    <View>
+      <Button variant="light" onPress={handleCheckClick}>
+        Force error crash
+      </Button>
+      {status === 'error' && <View>Cabbom!!</View>}
     </View>
   )
 }

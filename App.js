@@ -1,5 +1,7 @@
 import * as React from 'react'
-import { Platform, StatusBar, StyleSheet, View } from 'react-native'
+import { AsyncStorage, Platform, StatusBar, StyleSheet, View, Text } from 'react-native'
+import * as Updates from 'expo-updates'
+
 import { SplashScreen } from 'expo'
 // import * as Font from 'expo-font';
 // import { Ionicons } from '@expo/vector-icons';
@@ -14,6 +16,31 @@ import Home from './screens/home'
 import GameRoom from './screens/game-room'
 import Settings from './screens/settings'
 import AccessGame from './screens/access-game'
+import ErrorCrashed from './screens/misc/ErrorCrashed.js'
+
+if (typeof ErrorUtils !== 'undefined') {
+  console.log(':: has ErrorUtils')
+  // TODO this is shitty and I don't understand... still figuring out how to do error handle/recover using Expo.
+  // https://docs.expo.io/versions/latest/sdk/error-recovery/
+  const defaultHandler =
+    (ErrorUtils.getGlobalHandler && ErrorUtils.getGlobalHandler()) || ErrorUtils._globalHandler
+
+  const customErrorHandler = async (err, isFatal) => {
+    console.log('handling error...')
+    const error = await AsyncStorage.getItem('lastError')
+    console.log('hasLasterror!', !!error)
+    if (!error) {
+      await AsyncStorage.setItem('lastError', JSON.stringify(err, Object.getOwnPropertyNames(err)))
+      await Updates.reloadAsync()
+    } else {
+      // return defaultHandler(err, isFatal)
+    }
+  }
+
+  ErrorUtils.setGlobalHandler(customErrorHandler)
+}
+
+// import * as ErrorRecovery from 'expo-error-recovery';
 
 const Stack = createStackNavigator()
 
@@ -26,17 +53,24 @@ const forFade = ({ current, closing }) => ({
 export default function App(props) {
   const [initialProfile, setInitialProfile] = React.useState({})
   const [isLoadingComplete, setLoadingComplete] = React.useState(false)
+  const [errorRecent, setErrorRecent] = React.useState(false)
   const [initialNavigationState, setInitialNavigationState] = React.useState()
   const containerRef = React.useRef()
   const { getInitialState } = useLinking(containerRef)
 
+  console.log(':: App errorRecovery::', props.errorRecovery)
   // Load any resources or data that we need prior to rendering the app
   React.useEffect(() => {
     async function loadResourcesAndDataAsync() {
       try {
         SplashScreen.preventAutoHide()
 
-        // Load our initial navigation state
+        console.log('getting last error...')
+        const lastError = await AsyncStorage.getItem('lastError')
+
+        if (lastError) {
+          setErrorRecent(lastError)
+        }
         setInitialNavigationState(await getInitialState())
 
         setInitialProfile(await loadProfile())
@@ -56,6 +90,10 @@ export default function App(props) {
 
     loadResourcesAndDataAsync()
   }, [])
+
+  if (errorRecent) {
+    return <ErrorCrashed errorStr={errorRecent} />
+  }
 
   if (!isLoadingComplete && !props.skipLoadingScreen) {
     return null
