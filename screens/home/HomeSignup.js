@@ -57,12 +57,7 @@ export default class HomeSignup extends React.Component {
     if (!prevState.name && this.state.name) {
       this.props.navigation.setOptions({
         headerRight: () => (
-          <Page.HeaderBtn
-            side="right"
-            icon="next"
-            textPrimary
-            onPress={() => this.goNextStep('name')}
-          >
+          <Page.HeaderBtn side="right" icon="next" textPrimary onPress={this.goNextStep}>
             Next
           </Page.HeaderBtn>
         ),
@@ -164,7 +159,10 @@ export default class HomeSignup extends React.Component {
     }
   }
 
-  goNextStep(currentStepId) {
+  // OPTIMIZE - Find a cleaner way header state based on step.
+  // State machines, right?
+
+  goNextStep() {
     const currentStep = this.state.step
     this.setState(state => ({
       ...state,
@@ -172,20 +170,31 @@ export default class HomeSignup extends React.Component {
     }))
 
     if (currentStep === 0) {
-      // It should be on cDU, but it's okay. It works and it's harmless.
       this.props.navigation.setOptions({
         headerLeft: () => (
           <Page.HeaderBtn side="left" icon="back" onPress={this.goBackStep}>
             Back
           </Page.HeaderBtn>
         ),
+        headerRight: this.state.name
+          ? () => (
+              <Page.HeaderBtn
+                side="right"
+                icon="next"
+                textPrimary
+                onPress={() => this.goNextStep('name')}
+              >
+                Next
+              </Page.HeaderBtn>
+            )
+          : null,
         headerStyle: {
           borderBottomWidth: 1,
         },
       })
     }
 
-    if (currentStepId === 'name') {
+    if (currentStep === 1) {
       this.props.navigation.setOptions({
         headerRight: () => (
           <Page.HeaderBtn side="right" primary onPress={this.setProfile}>
@@ -206,6 +215,23 @@ export default class HomeSignup extends React.Component {
     if (step - 1 === 0) {
       this.props.navigation.setOptions({
         headerLeft: null,
+        headerRight: null,
+        headerStyle: {
+          borderBottomWidth: 0,
+        },
+      })
+    } else if (step - 1 === 1) {
+      this.props.navigation.setOptions({
+        headerRight: () => (
+          <Page.HeaderBtn
+            side="right"
+            icon="next"
+            textPrimary
+            onPress={() => this.goNextStep('avatar')}
+          >
+            Next
+          </Page.HeaderBtn>
+        ),
         headerStyle: {
           borderBottomWidth: 0,
         },
