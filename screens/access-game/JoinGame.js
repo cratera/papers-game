@@ -22,6 +22,7 @@ const copy = {
 export default function JoinGame({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const [isJoining, setJoining] = React.useState(false)
+  const [didAutoJoin, setDidAutoJoin] = React.useState(false)
   const [step, setStep] = React.useState(0) // TODO create router between steps
   const [state, setState] = React.useState({
     gameName: '',
@@ -86,7 +87,14 @@ export default function JoinGame({ navigation }) {
             }
           : null,
     })
-  }, [step, state.gameName, state.code, isJoining])
+
+    console.log('effect', isJoining, didAutoJoin)
+    if (hasValidCode && !isJoining && !didAutoJoin) {
+      // use didAutoJoin to avoid retry autoJoin in case of failure
+      console.log('auto joining...')
+      submit()
+    }
+  }, [step, state.gameName, state.code, didAutoJoin, isJoining])
 
   return (
     <Page>
@@ -96,66 +104,78 @@ export default function JoinGame({ navigation }) {
           keyboardShouldPersistTaps="always"
           style={{ flex: 1, alignSelf: 'stretch' }}
         >
-          <ScrollView keyboardShouldPersistTaps="always">
-            {step === 0 ? (
-              <>
-                <Text style={[Styles.title, Theme.typography.h3]}>{copy.nameLabel}</Text>
-                <TextInput
-                  key="name"
-                  style={[Theme.typography.h1, Styles.input]}
-                  inputAccessoryViewID="name"
-                  nativeID="inputNameLabel"
-                  autoFocus
-                  autoCorrect={false}
-                  defaultValue={state.gameName}
-                  onChangeText={handleNameChange}
-                />
-              </>
-            ) : (
-              <>
-                <Text style={[Styles.title, Theme.typography.h3]}>{copy.codeLabel}</Text>
-                <View style={Styles.code} accessibilityLabel={`Code: ${state.code}`}>
-                  {[0, 0, 0, 0].map((c, index) => (
-                    <View key={index} style={Styles.code}>
-                      <Text style={[Theme.typography.h1, Styles.code_maskDigit]}>
-                        {state.code[index] || (
-                          <Text style={[Theme.typography.h1, Styles.code_maskPlaceholder]}>*</Text>
-                        )}
-                      </Text>
-                      {index < 3 && <Text style={[Theme.typography.h1]}>・</Text>}
-                    </View>
-                  ))}
+          {isJoining ? (
+            <Text style={[Theme.typography.secondary, Theme.u.center, { marginTop: 150 }]}>
+              Joining game...
+            </Text>
+          ) : (
+            <ScrollView keyboardShouldPersistTaps="always">
+              {step === 0 ? (
+                <>
+                  <Text style={[Styles.title, Theme.typography.h3]}>{copy.nameLabel}</Text>
                   <TextInput
-                    key="code"
-                    style={[Theme.typography.h1, Styles.code_input]}
-                    placeholder="4 digits"
-                    keyboardType="number-pad"
-                    inputAccessoryViewID="code"
-                    nativeID="inputCodeName"
+                    key="name"
+                    style={[Theme.typography.h1, Styles.input]}
+                    inputAccessoryViewID="name"
+                    nativeID="inputNameLabel"
                     autoFocus
                     autoCorrect={false}
-                    maxLength={4}
-                    defaultValue={state.code}
-                    onChangeText={handleCodeChange}
-                    caretHidden
+                    defaultValue={state.gameName}
+                    onChangeText={handleNameChange}
                   />
-                </View>
-                {/* <Text>{state.code}</Text> */}
-              </>
-            )}
+                </>
+              ) : (
+                <>
+                  <Text style={[Styles.title, Theme.typography.h3]}>{copy.codeLabel}</Text>
+                  <View style={Styles.code} accessibilityLabel={`Code: ${state.code}`}>
+                    {[0, 0, 0, 0].map((c, index) => (
+                      <View key={index} style={Styles.code}>
+                        <Text style={[Theme.typography.h1, Styles.code_maskDigit]}>
+                          {state.code[index] || (
+                            <Text style={[Theme.typography.h1, Styles.code_maskPlaceholder]}>
+                              *
+                            </Text>
+                          )}
+                        </Text>
+                        {index < 3 && <Text style={[Theme.typography.h1]}>・</Text>}
+                      </View>
+                    ))}
+                    <TextInput
+                      key="code"
+                      style={[Theme.typography.h1, Styles.code_input]}
+                      placeholder="4 digits"
+                      keyboardType="number-pad"
+                      inputAccessoryViewID="code"
+                      nativeID="inputCodeName"
+                      autoFocus
+                      autoCorrect={false}
+                      maxLength={4}
+                      defaultValue={state.code}
+                      onChangeText={handleCodeChange}
+                      caretHidden
+                    />
+                  </View>
+                  {/* <Text>{state.code}</Text> */}
+                </>
+              )}
 
-            {state.errorMsg && (
-              <Text style={[Theme.typography.small, Styles.hintMsg, Styles.errorMsg]}>
-                {state.errorMsg}
-              </Text>
-            )}
-          </ScrollView>
+              {state.errorMsg && (
+                <Text style={[Theme.typography.small, Styles.hintMsg, Styles.errorMsg]}>
+                  {state.errorMsg}
+                </Text>
+              )}
+            </ScrollView>
+          )}
         </KeyboardAvoidingView>
       </Page.Main>
     </Page>
   )
 
   function handleNameChange(gameName) {
+    if (isJoining) {
+      return false
+    }
+
     setState(state => ({
       ...state,
       gameName,
@@ -174,6 +194,7 @@ export default function JoinGame({ navigation }) {
       return
     }
 
+    setDidAutoJoin(true)
     setJoining(true)
     setState(state => ({ ...state, errorMsg: null }))
 
