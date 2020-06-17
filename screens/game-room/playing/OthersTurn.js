@@ -19,6 +19,7 @@ const OthersTurn = ({
   countdown,
   initialTimerSec,
   initialTimer,
+  thisTurnTeamName,
   thisTurnPlayerName,
   amIWaiting,
 }) => {
@@ -71,11 +72,11 @@ const OthersTurn = ({
               <Text style={Theme.typography.small}>Not started yet</Text>
             ) : countdownSec && !isAllWordsGuessed ? null : (
               <Fragment>
-                <Text style={[Theme.typography.small]}>
+                <Text style={[Theme.typography.small, { marginBottom: 16 }]}>
                   {isAllWordsGuessed ? 'All papers guessed!' : "Time's up!"}
                 </Text>
                 <Text style={[Theme.typography.h1, Theme.u.center]}>
-                  {thisTurnPlayerName} got {papersGuessed} papers right!
+                  {thisTurnTeamName} got {papersGuessed} papers right!
                 </Text>
               </Fragment>
             )}
@@ -102,7 +103,9 @@ const OthersTurn = ({
                   : msToSecPretty(initialTimer) // waiting to start
               }
             </Text>
-            <Text style={Theme.typography.small}>{papersGuessed} papers guessed</Text>
+            {hasCountdownStarted && countdownSec && !isAllWordsGuessed ? (
+              <Text style={Theme.typography.small}>{papersGuessed} papers guessed</Text>
+            ) : null}
           </View>
           {/* TODO - view when all papers were guessed */}
         </View>
@@ -134,6 +137,7 @@ OthersTurn.propTypes = {
   countdown: PropTypes.number.isRequired,
   initialTimerSec: PropTypes.number.isRequired,
   initialTimer: PropTypes.number.isRequired,
+  thisTurnTeamName: PropTypes.string,
   thisTurnPlayerName: PropTypes.string.isRequired,
   /** I am ready, waiting for the next round to start. */
   amIWaiting: PropTypes.bool,

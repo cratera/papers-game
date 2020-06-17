@@ -38,6 +38,7 @@ export default function PlayingEntry({ navigation }) {
   const turnTeam = turnWho.team
   const turnPlayerId = game.teams[turnTeam].players[turnWho[turnTeam]]
   const thisTurnPlayer = profiles[turnPlayerId]
+  const turnTeamName = game.teams[turnTeam].name
 
   const isMyTurn = turnPlayerId === profile.id
   const isCount321go = countdownSec > initialTimerSec
@@ -84,6 +85,7 @@ export default function PlayingEntry({ navigation }) {
         ) : (
           <OthersTurn
             description={DESCRIPTIONS[nextRoundIx]}
+            thisTurnTeamName={turnTeamName}
             thisTurnPlayerName={turnPlayer?.name || `? ${turnPlayer} ?`}
             hasCountdownStarted={false}
             countdownSec={initialTimerSec}
@@ -116,6 +118,7 @@ export default function PlayingEntry({ navigation }) {
       ) : (
         <OthersTurn
           description={DESCRIPTIONS[roundIndex]}
+          thisTurnTeamName={turnTeamName}
           thisTurnPlayerName={thisTurnPlayer?.name || `? ${turnPlayerId} ?`}
           hasCountdownStarted={hasCountdownStarted}
           countdownSec={countdownSec}
