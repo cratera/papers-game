@@ -34,6 +34,11 @@ Here's a list of my learnings while building this mobile game with reac-native.
   ## If it's a release to App Store, update "version" at `app.json`.
   ## Update "about" version and/or OTA at `PapersContext.js`.
 
+
+# One command OTA update:
+yarn release:ota -- -m "x.x.x@xx [release summary]"
+
+
 # verify everything is okay
 turtle setup:ios
 

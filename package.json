@@ -5,6 +5,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "release:ota": "turtle setup:ios && rm -R dist && expo export --public-url https://papers-native.firebaseapp.com/ && firebase deploy --only hosting:native",
     "eject": "expo eject",
     "test": "jest --watchAll"
   },
