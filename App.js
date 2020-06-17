@@ -30,7 +30,6 @@ if (typeof ErrorUtils !== 'undefined') {
   const customErrorHandler = async (err, isFatal) => {
     console.log('handling error...')
     const error = await AsyncStorage.getItem('lastError')
-    console.log('hasLasterror!', !!error)
     if (!error) {
       await AsyncStorage.setItem('lastError', JSON.stringify(err, Object.getOwnPropertyNames(err)))
 

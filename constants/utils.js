@@ -100,3 +100,18 @@ export function useCountdown(initialDate, options = {}) {
 export function confirmLeaveGame(fnToLeave) {
   console.log('hmmmm FORCE Refresh Bug on Lobby.js')
 }
+
+export function mailToSupport() {
+  return (
+    'mailto:a.sandrina.p@gmail.com' +
+    '?subject=The Papers Game Feedback' +
+    '&body=' +
+    '%0D%0A' + // new line
+    '%0D%0A' + // new line
+    '%0D%0A' + // new line
+    '- - - - - - - - - - - - -' +
+    '%0D%0A' + // new line
+    'Please keep this sentence so that we can better help you: ' + // new line
+    '[version] [device] [deviceOS]'
+  ).replace(/\s/g, '%20')
+}

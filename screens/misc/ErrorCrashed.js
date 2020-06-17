@@ -54,7 +54,7 @@ export default function ErrorCrashed({ errorStr }) {
               { fontSize: 12, color: Theme.colors.bg, marginBottom: 24 },
             ]}
           >
-            {error.componentStack.substring(0, 200)}
+            {(error.componentStack || error.stack || 'unknown error').substring(0, 200)}
           </Text>
           <Button variant="light" isLoading={isLoading} onPress={handleTryAgain}>
             Report the error and reload app

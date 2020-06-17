@@ -19,7 +19,7 @@ const variants = {
     text: Theme.colors.grayDark,
   },
   flat: {
-    bg: Theme.colors.bg,
+    bg: 'transparent',
     text: Theme.colors.grayDark, // primary just on skip. @mmbotelho
   },
   icon: {

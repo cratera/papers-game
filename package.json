@@ -25,6 +25,7 @@
     "expo-firebase-analytics": "~2.1.1",
     "expo-font": "~8.1.0",
     "expo-image-picker": "~8.1.0",
+    "expo-store-review": "~2.1.0",
     "expo-updates": "~0.2.1",
     "expo-web-browser": "~8.2.1",
     "firebase": "7.9.0",

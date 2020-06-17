@@ -14,12 +14,14 @@ import {
 import { createStackNavigator } from '@react-navigation/stack'
 import PropTypes from 'prop-types'
 import * as Updates from 'expo-updates'
+import * as Linking from 'expo-linking'
 
 import PapersContext from '@store/PapersContext.js'
 import * as Theme from '@theme'
 
+import { mailToSupport } from '@constants/utils'
 import { headerTheme } from '@navigation/headerStuff.js'
-import { logEvent } from '@store/Firebase.js'
+// import { logEvent } from '@store/Firebase.js'
 import Page from '@components/page'
 import ListTeams from '@components/list-teams'
 import GameScore from '@components/game-score'
@@ -28,8 +30,15 @@ import { PickAvatar } from '@components/profile'
 import { useLeaveGame } from '@components/settings'
 import { IconArrow, IconCamera } from '@components/icons'
 import AudioPreview from './AudioPreview.js'
+import * as StoreReview from 'expo-store-review'
 
 const Stack = createStackNavigator()
+
+const propTypesCommon = {
+  navigation: PropTypes.object.isRequired, // react-navigation
+}
+
+// TODO later Hummm... it's about time to split these into diff files, no?
 
 export default function Settings(props) {
   const Papers = React.useContext(PapersContext)
@@ -59,7 +68,9 @@ export default function Settings(props) {
       ) : (
         <Stack.Screen name="settings-profile" component={SettingsProfile} />
       )}
-      {/* <Stack.Screen name="settings-profile" component={SettingsSoundSk} /> */}
+      <Stack.Screen name="settings-feedback" component={SettingsFeedback} />
+      <Stack.Screen name="settings-playground" component={SettingsPlayground} />
+      <Stack.Screen name="settings-credits" component={SettingsCredits} />
     </Stack.Navigator>
   )
 }
@@ -126,27 +137,40 @@ function SettingsProfile({ navigation }) {
             defaultValue={profile.name}
             returnKeyType="done"
             onChangeText={text => setName(text)}
-            onBlur={() => Papers.updateProfile({ name })}
+            onBlur={() => name && Papers.updateProfile({ name })}
           />
-          <Text
-            style={[Styles.alignLeft, Theme.typography.small, { marginTop: 24, marginBottom: 16 }]}
+          <View
+            style={{
+              paddingTop: 24,
+              paddingBottom: 16,
+              borderBottomWidth: 1,
+              borderBottomColor: Theme.colors.grayLight,
+            }}
           >
-            Help us out!
-          </Text>
+            <Text style={[Styles.alignLeft, Theme.typography.small, {}]}>More options</Text>
+          </View>
           {[
             {
               id: 'fb',
-              title: 'Send feedback',
+              title: 'Feedback',
               icon: 'next',
-              onPress: () => console.warn('TODO send feedback'),
+              onPress: () => navigation.navigate('settings-feedback'),
             },
             {
-              id: 'donation',
-              title: 'Buy us a beer',
-              onPress: () => logEvent('click', { type: 'buy a beer!' }),
+              id: 'pg',
+              title: 'Playground',
+              icon: 'next',
+              onPress: () => navigation.navigate('settings-playground'),
             },
             {
-              id: 'reset',
+              id: 'don',
+              title: 'Buy us a coffee', // TODO!! Before release
+              onPress: () => {
+                Linking.openURL('https://www.buymeacoffee.com/sandrinap')
+              },
+            },
+            {
+              id: 'del',
               title: 'Delete account',
               variant: 'danger',
               onPress: handleDeleteAccount,
@@ -155,14 +179,20 @@ function SettingsProfile({ navigation }) {
             <Item key={item.id} {...item} />
           ))}
           <View style={[{ marginTop: 32, marginBottom: 32 }]}>
-            <AudioPreview />
-            <Text>{'\n'}</Text>
-            <TestCrashing />
-            <Text>{'\n'}</Text>
-            <OtaChecker />
-            <Text style={[Theme.typography.small, Theme.u.center]}>
-              @2020 - V.{about.version} OTA@{about.ota}
-            </Text>
+            <TouchableOpacity onPress={() => navigation.navigate('settings-credits')}>
+              <Text style={[Theme.typography.small, Theme.u.center]}>
+                You are using version {about.version}.{about.ota}
+              </Text>
+              <Text
+                style={[
+                  Theme.typography.small,
+                  Theme.u.center,
+                  { color: Theme.colors.grayDark, marginTop: 4 },
+                ]}
+              >
+                Acknowledgments
+              </Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
       </Page.Main>
@@ -235,7 +265,7 @@ SettingsGame.propTypes = {
 
 // ======
 
-function SettingsPlayers({ navigation }) {
+function SettingsFeedback({ navigation }) {
   function updateHeaderBackBtn({ title, btnText, onPress }) {
     navigation.dangerouslyGetParent().setOptions({
       headerTitle: title,
@@ -250,23 +280,113 @@ function SettingsPlayers({ navigation }) {
   }
 
   React.useEffect(() => {
-    // If you find a better way of doing this. Please let me know.
-    // I spent 3h googling it and didn't found a way.
     updateHeaderBackBtn({
-      title: 'Players',
+      title: 'Feedback',
       btnText: 'Back',
       onPress: () => {
         navigation.goBack()
         updateHeaderBackBtn({
           title: 'Settings',
           btnText: 'Back',
-          onPress: () =>
-            // navigation.dangerouslyGetState()?.index === 0
-            //   ? navigation.dangerouslyGetParent().navigate('home')
-            navigation.dangerouslyGetParent().goBack(),
+          onPress: () => navigation.dangerouslyGetParent().goBack(),
         })
       },
     })
+  }, [])
+
+  return (
+    <Page>
+      <Page.Main style={{ paddingTop: 16 }}>
+        <ScrollView>
+          {[
+            {
+              id: 'rate',
+              title: 'Rate Papers',
+              icon: '',
+              onPress: () => StoreReview.requestReview(), // TODO!! before release
+            },
+            {
+              id: 'fb',
+              title: 'Send Feedback',
+              icon: '',
+              onPress: () => {
+                const url = mailToSupport()
+                Linking.openURL(url)
+              },
+            },
+          ].map(item => (
+            <Item key={item.id} {...item} />
+          ))}
+        </ScrollView>
+      </Page.Main>
+    </Page>
+  )
+}
+
+SettingsFeedback.propTypes = {
+  navigation: PropTypes.object.isRequired, // react-navigation
+}
+
+// ======
+
+function SettingsPlayground({ navigation }) {
+  React.useEffect(() => {
+    setSubHeader(navigation, 'Playground')
+  }, [])
+
+  const styleBlock = {
+    borderBottomWidth: 2,
+    borderColor: Theme.colors.grayMedium,
+    paddingVertical: 24,
+    paddingHorizontal: 8,
+    // marginVertical: 8,
+  }
+  return (
+    <Page>
+      <Page.Main style={{ paddingTop: 16 }}>
+        <ScrollView>
+          <Text style={[Theme.typography.h3, Theme.u.center]}>🚧 For Devs only. Stay away! 🚧</Text>
+
+          <View style={styleBlock}>
+            <TestCrashing />
+          </View>
+          <View style={styleBlock}>
+            <OtaChecker />
+          </View>
+          <View style={styleBlock}>
+            <AudioPreview />
+          </View>
+        </ScrollView>
+      </Page.Main>
+    </Page>
+  )
+}
+SettingsPlayground.propTypes = propTypesCommon
+
+// ======
+
+function SettingsCredits({ navigation }) {
+  React.useEffect(() => {
+    setSubHeader(navigation, 'Acknowledgements')
+  }, [])
+
+  return (
+    <Page>
+      <Page.Main style={{ paddingTop: 16 }}>
+        <ScrollView>
+          <Text>TODO: Acknowledgments</Text>
+        </ScrollView>
+      </Page.Main>
+    </Page>
+  )
+}
+SettingsCredits.propTypes = propTypesCommon
+
+// ======
+
+function SettingsPlayers({ navigation }) {
+  React.useEffect(() => {
+    setSubHeader(navigation, 'Players')
   }, [])
 
   return (
@@ -280,9 +400,7 @@ function SettingsPlayers({ navigation }) {
   )
 }
 
-SettingsPlayers.propTypes = {
-  navigation: PropTypes.object.isRequired, // react-navigation
-}
+SettingsPlayers.propTypes = propTypesCommon
 
 const Styles = StyleSheet.create({
   avatar: {
@@ -296,7 +414,7 @@ const Styles = StyleSheet.create({
     marginTop: 4,
     fontSize: 16,
     color: Theme.colors.grayDark,
-    backgroundColor: Theme.colors.grayLight,
+    backgroundColor: Theme.colors.bg,
   },
   list: {
     marginTop: 10,
@@ -309,8 +427,7 @@ const Styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
-    paddingVertical: 10,
+    paddingVertical: 20,
     paddingBottom: 20, // looks better visually
     paddingHorizontal: 8,
   },
@@ -393,7 +510,7 @@ const StylesAv = StyleSheet.create({
 
 function Item({ title, icon, variant, isLast, onPress }) {
   return (
-    <TouchableOpacity style={Styles.group} onPress={onPress}>
+    <TouchableHighlight underlayColor={Theme.colors.grayLight} onPress={onPress}>
       <View
         style={[
           Styles.item,
@@ -413,9 +530,9 @@ function Item({ title, icon, variant, isLast, onPress }) {
         >
           {title}
         </Text>
-        {icon && <IconArrow size={20} />}
+        {icon ? <IconArrow size={20} /> : null}
       </View>
-    </TouchableOpacity>
+    </TouchableHighlight>
   )
 }
 
@@ -466,7 +583,7 @@ function OtaChecker() {
           New update available! Reload app.
         </Button>
       )}
-      <View style={{ marginVertical: 8 }}>
+      <View style={{ marginTop: 8 }}>
         {status === 'not-available' && (
           <Text style={[Theme.typography.sencondary, Theme.u.center]}>App is already updated!</Text>
         )}
@@ -492,4 +609,41 @@ function TestCrashing() {
       {status === 'error' && <View>Cabbom!!</View>}
     </View>
   )
+}
+
+/// =======================
+/// =======================
+
+function setSubHeader(navigation, title) {
+  // If you find a better way of doing this. Please let me know.
+  // I spent too many hours googling it and didn't find a pretty way.
+  // In these corner cases, react navigation docs weren't very helpful...
+  function updateHeaderBackBtn({ title, btnText, onPress }) {
+    navigation.dangerouslyGetParent().setOptions({
+      headerTitle: title,
+      headerLeft: function HB() {
+        return (
+          <Page.HeaderBtn side="left" icon="back" onPress={onPress}>
+            {btnText}
+          </Page.HeaderBtn>
+        )
+      },
+    })
+  }
+
+  updateHeaderBackBtn({
+    title: title,
+    btnText: 'Back',
+    onPress: () => {
+      navigation.goBack()
+      updateHeaderBackBtn({
+        title: 'Settings',
+        btnText: 'Back',
+        onPress: () =>
+          // navigation.dangerouslyGetState()?.index === 0
+          //   ? navigation.dangerouslyGetParent().navigate('home')
+          navigation.dangerouslyGetParent().goBack(),
+      })
+    },
+  })
 }

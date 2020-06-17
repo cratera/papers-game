@@ -56,7 +56,7 @@ export default function AudioPreview() {
   }
 
   return (
-    <View style={{ backgroundColor: Theme.colors.primaryLight, paddingVertical: 16 }}>
+    <View>
       <Button variant="light" onPress={() => startSound('startCount')}>
         {isLoading ? 'Loading sound...' : 'Start turn 🔉'}
       </Button>
