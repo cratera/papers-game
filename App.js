@@ -20,10 +20,12 @@ import ErrorCrashed from './screens/misc/ErrorCrashed.js'
 
 if (typeof ErrorUtils !== 'undefined') {
   console.log(':: has ErrorUtils')
-  // TODO this is shitty and I don't understand... still figuring out how to do error handle/recover using Expo.
+  // TODO this is shitty and I don't understand...
+  // still figuring out how to do (properly) error handle/recover using Expo.
+
   // https://docs.expo.io/versions/latest/sdk/error-recovery/
-  const defaultHandler =
-    (ErrorUtils.getGlobalHandler && ErrorUtils.getGlobalHandler()) || ErrorUtils._globalHandler
+  // const defaultHandler =
+  //   (ErrorUtils.getGlobalHandler && ErrorUtils.getGlobalHandler()) || ErrorUtils._globalHandler
 
   const customErrorHandler = async (err, isFatal) => {
     console.log('handling error...')
@@ -31,7 +33,10 @@ if (typeof ErrorUtils !== 'undefined') {
     console.log('hasLasterror!', !!error)
     if (!error) {
       await AsyncStorage.setItem('lastError', JSON.stringify(err, Object.getOwnPropertyNames(err)))
-      await Updates.reloadAsync()
+
+      if (!__DEV__) {
+        await Updates.reloadAsync()
+      }
     } else {
       // return defaultHandler(err, isFatal)
     }

@@ -12,21 +12,53 @@ import { logEvent } from '@store/Firebase.js'
 
 export default function ErrorCrashed({ errorStr }) {
   const [error] = React.useState(JSON.parse(errorStr) || {})
+  const [isLoading, setIsLoading] = React.useState(false)
 
   async function handleTryAgain() {
-    await AsyncStorage.removeItem('lastError')
-    await logEvent('test', { screen: 'crash', message: error.message, memo: 'Testing this out!' })
-    await Updates.reloadAsync()
+    setIsLoading(true)
+    try {
+      await logEvent('crash', {
+        screen: 'crash',
+        message: error.message,
+        error: errorStr,
+        memo: 'nop',
+      })
+      await AsyncStorage.removeItem('lastError')
+      await Updates.reloadAsync()
+    } catch (e) {
+      await AsyncStorage.removeItem('lastError')
+    }
   }
 
   return (
     <Page>
-      <Page.Main>
+      <Page.Main style={{ backgroundColor: Theme.colors.danger }}>
         <View style={{ marginTop: 72 }}>
-          <Text>Damn! The app just crashed!</Text>
-          <Text style={{ fontSize: 12 }}>{error.message}</Text>
+          <Text style={[Theme.typography.h2, Theme.u.center, { color: Theme.colors.bg }]}>
+            Ouch, the app crashed! 🥺
+          </Text>
 
-          <Button onPress={handleTryAgain}>Report the error and try again</Button>
+          <Text
+            style={[
+              Theme.typography.body,
+              Theme.u.center,
+              { color: Theme.colors.bg, marginTop: 24 },
+            ]}
+          >
+            {error.message}
+          </Text>
+          <Text
+            style={[
+              Theme.typography.small,
+              Theme.u.center,
+              { fontSize: 12, color: Theme.colors.bg, marginBottom: 24 },
+            ]}
+          >
+            {error.componentStack.substring(0, 200)}
+          </Text>
+          <Button variant="light" isLoading={isLoading} onPress={handleTryAgain}>
+            Report the error and reload app
+          </Button>
         </View>
       </Page.Main>
     </Page>
