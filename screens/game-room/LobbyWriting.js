@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react'
-import { Image, View } from 'react-native'
+import { Image, Text, View } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import PropTypes from 'prop-types'
 
@@ -22,6 +22,7 @@ const imgDone =
 export default function LobbyWriting({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const [isSubmitting, setIsSubmitting] = React.useState(false)
+  const [errorMsg, setErrorMsg] = React.useState('')
   const { askToLeaveGame } = useLeaveGame()
   const { game } = Papers.state || {}
   const gameWords = game?.words
@@ -58,16 +59,18 @@ export default function LobbyWriting({ navigation }) {
       return
     }
 
+    if (errorMsg) {
+      setErrorMsg('')
+    }
+
     setIsSubmitting(true)
 
     try {
       await Papers.markMeAsReady()
     } catch (error) {
-      // TODO handle error
-      console.warn('Ready error', error.message)
+      setErrorMsg(`Ups! ${error.message}`)
+      setIsSubmitting(false)
     }
-
-    setIsSubmitting(false)
   }
 
   return (
@@ -89,6 +92,9 @@ export default function LobbyWriting({ navigation }) {
           </ScrollView>
         </Page.Main>
         <Page.CTAs hasOffset>
+          <Text style={[Theme.typography.error, Theme.u.center, { marginBottom: 8 }]}>
+            {errorMsg}
+          </Text>
           <Button onPress={handleReadyClick} isLoading={isSubmitting}>
             {"I'm ready!"}
           </Button>
