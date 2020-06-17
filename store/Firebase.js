@@ -274,18 +274,19 @@ const gameInitialState = ({ id, name, code, creatorId }) => ({
   },
   papersGuessed: 0, // Number - updated as the player guesses words.
   round: {
-    current: null, // Number - Round index
-    turnWho: null, // {team: teamId, ...teamId: [playerIndex] }
-    /* ex: team 1, player 2 is playing.
-    turnWho: {
-      team: 1,
-      0: 3,
-      1: 2
-    }
-    */
-    turnCount: 0, // Number - Turn index
-    status: null, // String - 'getReady' | Date.now() | 'timesup'
-    wordsLeft: null, // Array - words left to guess.
+    // // Empty by default so that markMeAsReady works properly
+    // current: null, // Number - Round index
+    // turnWho: null, // {team: teamId, ...teamId: [playerIndex] }
+    // /* ex: team 1, player 2 is playing.
+    // turnWho: {
+    //   team: 1,
+    //   0: 3,
+    //   1: 2
+    // }
+    // */
+    // turnCount: 0, // Number - Turn index
+    // status: null, // String - 'getReady' | Date.now() | 'timesup'
+    // wordsLeft: null, // Array - words left to guess.
   },
   score: [
     //  Array by round for each player:
@@ -664,11 +665,12 @@ async function markMeAsReady(roundStatus) {
   console.log('⚙️ markMeAsReady()')
   const { gameId, id } = LOCAL_PROFILE
 
-  // REVIEW/TODO: Maybe round update should be done before, once all words are submitted.
+  // REVIEW/TODO: Maybe round update should be done before, once teams are created.
   const refGameRound = DB.ref(`games/${gameId}/round`)
   const round = await refGameRound.once('value')
 
   if (!round.exists()) {
+    console.log(':: set roundStatus')
     await refGameRound.set(roundStatus)
   }
 
@@ -768,6 +770,7 @@ export async function logEvent(...args) {
   // TODO add support to android.
   // TODO ask for permission in settings.
   // TODO review "Automatically collected events"
-  console.log('⚙️ logEvent() - disabled')
-  // await Analytics.logEvent(...args)
+  if (!__DEV__) {
+    await Analytics.logEvent(...args)
+  }
 }
