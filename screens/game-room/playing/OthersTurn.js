@@ -51,7 +51,7 @@ const OthersTurn = ({
       teamName:
         !game.hasStarted || amIWaiting
           ? 'Waiting for everyone to say they are ready.'
-          : tPlayerId === profile.id
+          : tPlayerId === profile.id // if we are the next one
           ? `Waiting for ${thisTurnPlayerName} to finish their turn.`
           : game.teams[teamId].name,
     }

@@ -22,7 +22,7 @@ export default function PlayingEntry({ navigation }) {
   const { profile, profiles, game } = Papers.state
   const round = game.round
 
-  const hasStatusFinished = round.status === 'finished'
+  const isRoundFinished = round.status === 'finished'
   const hasCountdownStarted = !['getReady', 'finished'].includes(round.status)
   const prevHasCountdownStarted = usePrevious(hasCountdownStarted)
   const initialTimer = game.settings.time_ms
@@ -56,16 +56,16 @@ export default function PlayingEntry({ navigation }) {
 
   React.useEffect(() => {
     navigation.setOptions({
-      ...headerTheme({ hiddenBorder: isMyTurn || hasStatusFinished }),
+      ...headerTheme({ hiddenBorder: isMyTurn || isRoundFinished }),
       headerTitle: 'Playing',
       headerTintColor: Theme.colors.bg,
       headerRight: function HLB() {
         return <Page.HeaderBtnSettings />
       },
     })
-  }, [isMyTurn, hasStatusFinished])
+  }, [isMyTurn, isRoundFinished])
 
-  if (hasStatusFinished && amIReady) {
+  if (isRoundFinished && amIReady) {
     const nextTurnWho = Papers.getNextTurn()
     const nextRoundIx = round.current + 1
     const turnTeam = nextTurnWho.team
@@ -101,7 +101,7 @@ export default function PlayingEntry({ navigation }) {
 
   return (
     <Page>
-      {hasStatusFinished ? (
+      {isRoundFinished ? (
         <RoundScore />
       ) : isMyTurn ? (
         !hasCountdownStarted ? (

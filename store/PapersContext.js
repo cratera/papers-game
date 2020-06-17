@@ -593,18 +593,6 @@ export class PapersContextProvider extends Component {
     })
   }
 
-  async getTurnLocalState() {
-    console.log('📌 getPaperTurnState()')
-    const storedTurn = await AsyncStorage.getItem('turn')
-    const turnState = JSON.parse(storedTurn) || {
-      current: null, // String - current paper on the screen
-      passed: [], // [String] - papers passed
-      guessed: [], // [String] - papers guessed
-      wordsLeft: this.state.game.round.wordsLeft, // [String] - words left
-    }
-    return turnState
-  }
-
   async setTurnLocalState(turn) {
     console.log('📌 setPaperTurnState()')
     if (turn) {
@@ -618,6 +606,19 @@ export class PapersContextProvider extends Component {
     } else {
       await AsyncStorage.removeItem('turn')
     }
+  }
+
+  async getTurnLocalState() {
+    console.log('📌 getPaperTurnState()')
+    const storedTurn = await AsyncStorage.getItem('turn')
+    const turnState = JSON.parse(storedTurn) || {
+      current: null, // String - current paper on the screen (id)
+      passed: [], // [String] - papers passed
+      guessed: [], // [String] - papers guessed
+      sorted: [], // [Number] - papers guessed/passed sorted chronologically
+      wordsLeft: this.state.game.round.wordsLeft, // [String] - words left
+    }
+    return turnState
   }
 
   async _removeGameFromState() {

@@ -130,16 +130,20 @@ export default StyleSheet.create({
 
   // Turn score:
   tscore_list: {
-    marginBottom: 20,
+    marginBottom: 60,
+    marginRight: -16,
   },
   tscore_item: {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    borderWidth: 0,
+    borderRadius: 0,
     borderBottomWidth: 1,
     borderBottomColor: Theme.colors.grayLight,
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingVertical: 20,
+    backgroundColor: Theme.colors.bg,
   },
 })

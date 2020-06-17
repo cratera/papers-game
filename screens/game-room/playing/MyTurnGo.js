@@ -40,7 +40,6 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
 
   React.useEffect(() => {
     async function getTurnState() {
-      // Turn this into a custom hook.
       const turnState = await Papers.getTurnLocalState()
       setPapersTurn(turnState)
     }
@@ -48,6 +47,8 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
   }, [])
 
   React.useLayoutEffect(() => {
+    // these two effects (before and this one) need some refactor.
+    // Read more below at pickFirstPaper
     if (startedCounting) {
       console.log('useEffect:: startedCounting!')
       pickFirstPaper()
@@ -105,10 +106,12 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
   // TODO/NOTE: pickFirstPaper, pickNextPaper and togglePaper should be on PapersContext
   function pickFirstPaper() {
     setPapersTurn(() => {
+      // TODO/?BUG - This state may colide with papersTurn from getTurnLocalState()...
       const state = {
         current: null,
         passed: [],
         guessed: [],
+        sorted: [],
         wordsLeft: round.wordsLeft,
       }
 
@@ -128,12 +131,16 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
       state.current = nextPaper
       state.wordsLeft = wordsToPick
 
-      Papers.setTurnLocalState(state)
+      // ... but it does not, after some logs (locally) it does not colide. But still
+      // It's a dangerous and probably buggy in slow phones. This needs a refactor for TOMORROW!
+
+      Papers.setTurnLocalState(state) // REVIEW - this is async and a side effect. is it the right place?
+      console.log('first paper:', state.current)
       return state
     })
   }
 
-  function pickNextPaper(hasGuessed = false) {
+  function pickNextPaper(hasGuessed) {
     // OPTIMIZE/NOTE : paper & word mean the same.
     const currentPaper = papersTurn.current
     let wordsToPick = []
@@ -194,6 +201,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
       const newState = {
         ...state,
         ...wordsModified,
+        sorted: [...state.sorted, currentPaper],
         current: nextPaper,
       }
 
