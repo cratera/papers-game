@@ -1,5 +1,10 @@
 import React from 'react'
 
+// !!!! ATTENTION !!!! //
+// When changing this file, in dev mode, make sure to refresh the app.
+// For some weird reason PapersContext gets lost returning state undefined
+// (causing the bug at Lobby.js)
+
 export function createUniqueId(name) {
   // Q: maybe this should be created on server instead.
   // prettier-ignore
@@ -102,16 +107,16 @@ export function confirmLeaveGame(fnToLeave) {
 }
 
 export function mailToSupport() {
-  return (
-    'mailto:a.sandrina.p@gmail.com' +
-    '?subject=The Papers Game Feedback' +
-    '&body=' +
-    '%0D%0A' + // new line
-    '%0D%0A' + // new line
-    '%0D%0A' + // new line
-    '- - - - - - - - - - - - -' +
-    '%0D%0A' + // new line
-    'Please keep this sentence so that we can better help you: ' + // new line
-    '[version] [device] [deviceOS]'
-  ).replace(/\s/g, '%20')
+  // TODO!! before release.
+  return {
+    recipients: ['a.sandrina.p@gmail.com'],
+    subject: 'Papers Game - Feedback',
+    body:
+      '\n' +
+      '\n' +
+      '\n' +
+      '- - - - - - - - - - - - -' +
+      '\n' +
+      'Using [version] [device] [deviceOS]',
+  }
 }

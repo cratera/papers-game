@@ -11,6 +11,7 @@ import {
   Alert,
   Platform,
 } from 'react-native'
+import * as MailComposer from 'expo-mail-composer'
 import { createStackNavigator } from '@react-navigation/stack'
 import PropTypes from 'prop-types'
 import * as Updates from 'expo-updates'
@@ -309,9 +310,8 @@ function SettingsFeedback({ navigation }) {
               id: 'fb',
               title: 'Send Feedback',
               icon: '',
-              onPress: () => {
-                const url = mailToSupport()
-                Linking.openURL(url)
+              onPress: async () => {
+                await MailComposer.composeAsync(mailToSupport())
               },
             },
           ].map(item => (
