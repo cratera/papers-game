@@ -35,14 +35,26 @@ const MyTurnGetReady = ({ description, roundIx, amIWaiting }) => {
         <View style={Styles.header}>
           <Text style={Theme.typography.h2}>Round {roundNr}</Text>
           <View style={StylesIn.illustration}>
-            <IconNonWords style={[StylesIn.icon, StylesIn.faded, place(25, 0, '30deg')]} />
-            <IconNonWords style={[StylesIn.icon, StylesIn.faded, place(120, 0, '30deg')]} />
-            <IconNonWords style={[StylesIn.icon, StylesIn.faded, place(0, 90, '30deg')]} />
-            <IconNonWords style={[StylesIn.icon, StylesIn.faded, place(150, 70, '-15deg')]} />
+            <IconNonWords
+              color={Theme.colors.primaryLight}
+              style={[StylesIn.icon, place(25, 0, '30deg')]}
+            />
+            <IconNonWords
+              color={Theme.colors.primaryLight}
+              style={[StylesIn.icon, place(140, -5, '25deg')]}
+            />
+            <IconNonWords
+              color={Theme.colors.primaryLight}
+              style={[StylesIn.icon, place(0, 90, '30deg')]}
+            />
+            <IconNonWords
+              color={Theme.colors.primaryLight}
+              style={[StylesIn.icon, place(150, 70, '-15deg')]}
+            />
 
-            <IconNonWords style={[StylesIn.icon, place(105, 25, '0deg')]} />
-            <IconNonWords style={[StylesIn.icon, place(30, 50, '18deg'), StylesIn.mirror]} />
-            <IconNonWords style={[StylesIn.icon, place(87, 87, '18deg')]} />
+            <IconNonWords style={[StylesIn.icon, place(107, 30, '0deg')]} />
+            <IconNonWords style={[StylesIn.icon, place(30, 55, '18deg'), StylesIn.mirror]} />
+            <IconNonWords style={[StylesIn.icon, place(87, 92, '18deg')]} />
           </View>
           <Text style={Theme.typography.secondary}>Rules:</Text>
           <Text style={[Theme.typography.bold, Theme.u.center, { marginTop: 8 }]}>
@@ -83,9 +95,6 @@ const StylesIn = StyleSheet.create({
     position: 'absolute',
     width: 90,
     height: 90,
-  },
-  faded: {
-    opacity: 0.3,
   },
   mirror: {
     transform: [{ scaleX: -1 }, { rotate: '18deg' }],
