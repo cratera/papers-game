@@ -63,7 +63,7 @@ export default StyleSheet.create({
   },
   go_paper_word: {
     paddingHorizontal: 4,
-    lineHeight: 32,
+    lineHeight: 34, // enough to hide descenders (j, g, p, ...)
     marginVertical: 3,
   },
   go_paper_blur: {
@@ -74,7 +74,7 @@ export default StyleSheet.create({
     position: 'absolute',
     bottom: 4,
     right: 4,
-    opacity: 0.5,
+    opacity: 0.3,
   },
   go_paper_icon: {
     position: 'absolute',

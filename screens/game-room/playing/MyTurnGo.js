@@ -9,7 +9,7 @@ import Button from '@components/button'
 import Page from '@components/page'
 // import i18n from '@constants/i18n'
 import TurnScore from './TurnScore'
-import { IconEyeClosed, IconEyeOpen, IconCheck, IconArrow, IconTimes } from '@components/icons'
+import { IconEyeClosed, IconEyeOpen, IconCheck, IconTimes } from '@components/icons'
 
 import * as Theme from '@theme'
 import Styles from './PlayingStyles.js'
@@ -380,25 +380,6 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
       </Page.Main>
 
       <Page.CTAs hasOffset blankBg style={Styles.go_ctas}>
-        <Button
-          variant="icon"
-          style={Styles.go_ctas_yes}
-          accessibilityLabel="Got it"
-          isLoading={isPaperChanging && paperAnim === 'gotcha'}
-          onPress={() => !isPaperChanging && handlePaperClick(true)}
-        >
-          <IconCheck size={30} color={Theme.colors.bg} />
-        </Button>
-
-        {isPaperChanging && paperAnim === 'gotcha' && (
-          <View style={{ alignItems: 'center', flexDirection: 'row', marginLeft: 16 }}>
-            <IconCheck size={20} color={Theme.colors.success} />
-            <Text style={{ marginLeft: 4, color: Theme.colors.success }}>Good job!</Text>
-          </View>
-        )}
-
-        <Text style={{ flexGrow: 1 }}>{/* lazyness lvl 99 */}</Text>
-
         {papersTurn.current !== null &&
         !papersTurn.wordsLeft.length &&
         !papersTurn.passed.length ? (
@@ -410,11 +391,6 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
           </Text>
         ) : (
           <>
-            {isPaperChanging && paperAnim === 'nope' && (
-              <View style={{ alignItems: 'center', flexDirection: 'row', marginRight: 16 }}>
-                <Text style={{ color: Theme.colors.grayMedium }}>Damn it!</Text>
-              </View>
-            )}
             <Button
               variant="icon"
               style={Styles.go_ctas_no}
@@ -422,10 +398,33 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
               isLoading={isPaperChanging && paperAnim === 'nope'}
               onPress={() => !isPaperChanging && handlePaperClick(false)}
             >
-              <IconArrow size={30} color={Theme.colors.bg} />
+              <IconTimes size={30} color={Theme.colors.bg} />
             </Button>
+            {isPaperChanging && paperAnim === 'nope' && (
+              <View style={{ alignItems: 'center', flexDirection: 'row', marginLeft: 16 }}>
+                <Text style={{ color: Theme.colors.grayMedium }}>Damn it!</Text>
+              </View>
+            )}
           </>
         )}
+
+        <Text style={{ flexGrow: 1 }}>{/* lazyness lvl 99 */}</Text>
+
+        {isPaperChanging && paperAnim === 'gotcha' && (
+          <View style={{ alignItems: 'center', flexDirection: 'row', marginRight: 16 }}>
+            <IconCheck size={20} color={Theme.colors.success} />
+            <Text style={{ marginLeft: 4, color: Theme.colors.success }}>Good job!</Text>
+          </View>
+        )}
+        <Button
+          variant="icon"
+          style={Styles.go_ctas_yes}
+          accessibilityLabel="Got it"
+          isLoading={isPaperChanging && paperAnim === 'gotcha'}
+          onPress={() => !isPaperChanging && handlePaperClick(true)}
+        >
+          <IconCheck size={30} color={Theme.colors.bg} />
+        </Button>
       </Page.CTAs>
     </Fragment>
   )

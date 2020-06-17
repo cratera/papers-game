@@ -22,16 +22,16 @@ export default StyleSheet.create({
     alignItems: 'center',
   },
   itemStatus: {
-    width: 56,
-    height: 56,
+    width: 45,
+    height: 45,
     marginLeft: 8,
   },
   itemStatus_writting: {
-    paddingLeft: 75 - 56,
-    marginLeft: 8 + (75 - 56),
+    paddingLeft: 60 - 45,
+    marginLeft: 8 + (60 - 45),
   },
   itemStatus_done: {
-    width: 75,
+    width: 60,
   },
   ctas: {
     display: 'flex',
