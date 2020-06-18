@@ -20,7 +20,7 @@ import * as Linking from 'expo-linking'
 import PapersContext from '@store/PapersContext.js'
 import * as Theme from '@theme'
 
-import { mailToSupport } from '@constants/utils'
+import { mailToFeedback, mailToBug } from '@constants/utils'
 import { headerTheme } from '@navigation/headerStuff.js'
 // import { logEvent } from '@store/Firebase.js'
 import Page from '@components/page'
@@ -312,7 +312,15 @@ function SettingsFeedback({ navigation }) {
               title: 'Send Feedback',
               icon: '',
               onPress: async () => {
-                await MailComposer.composeAsync(mailToSupport())
+                await MailComposer.composeAsync(mailToFeedback())
+              },
+            },
+            {
+              id: 'fbug',
+              title: 'Report a bug',
+              icon: '',
+              onPress: async () => {
+                await MailComposer.composeAsync(mailToBug())
               },
             },
           ].map(item => (

@@ -106,11 +106,26 @@ export function confirmLeaveGame(fnToLeave) {
   console.log('hmmmm FORCE Refresh Bug on Lobby.js')
 }
 
-export function mailToSupport() {
+export function mailToFeedback() {
   // TODO!! before release.
   return {
     recipients: ['a.sandrina.p@gmail.com'],
     subject: 'Papers Game - Feedback',
+    body:
+      '\n' +
+      '\n' +
+      '\n' +
+      '- - - - - - - - - - - - -' +
+      '\n' +
+      'Using [version] [device] [deviceOS]',
+  }
+}
+
+export function mailToBug() {
+  // TODO!! before release.
+  return {
+    recipients: ['a.sandrina.p@gmail.com'],
+    subject: 'Papers Game - Bug',
     body:
       '\n' +
       '\n' +

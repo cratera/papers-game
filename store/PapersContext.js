@@ -35,7 +35,7 @@ export class PapersContextProvider extends Component {
       profiles: {}, // List of game players' profiles.
       about: {
         version: '0.2.2', // TODO REVIEW - where should this come from?
-        ota: '06',
+        ota: '07',
       },
     }
 
@@ -93,10 +93,10 @@ export class PapersContextProvider extends Component {
     this.state.socket && this.state.socket.offAll()
 
     console.log(`
-🎲⏳🎲⏳🎲⏳🎲⏳🎲⏳🎲⏳🎲⏳🎲⏳🎲
-:::::::::::::::::::::::::::::::::::
-       ... Refreshing app ...
-:::::::::::::::::::::::::::::::::::`)
+🎲⏳🎲⏳🎲⏳🎲⏳🎲⏳🎲⏳🎲
+::::::::::::::::::::::::::::::
+  ... Refreshing app ...
+:::::::::::::::::::::::::::::`)
   }
 
   render() {
