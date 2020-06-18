@@ -2381,7 +2381,7 @@
     history "^4.7.2"
     query-string "^6.2.0"
 
-"@sentry/browser@^5.15.5":
+"@sentry/browser@^5.15.5", "@sentry/browser@^5.17.0":
   version "5.17.0"
   resolved "https://registry.yarnpkg.com/@sentry/browser/-/browser-5.17.0.tgz#0c3796cb02df3ec8db13341564fae0bc83e148c5"
   integrity sha512-++pXpCHtdek1cRUwVeLvlxUJ2w1s+eiC9qN1N+7+HdAjHpBz2/tA1sKBCqwwVQZ490Cf2GLll9Ao7fuPPmveRQ==

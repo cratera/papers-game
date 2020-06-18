@@ -19,6 +19,7 @@
     "@react-navigation/native": "^5.2.4",
     "@react-navigation/stack": "^5.0.0",
     "@react-navigation/web": "~1.0.0-alpha.9",
+    "@sentry/browser": "^5.17.0",
     "expo": "^37.0.0",
     "expo-asset": "~8.1.5",
     "expo-av": "~8.1.0",

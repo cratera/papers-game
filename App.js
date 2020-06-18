@@ -1,145 +1,37 @@
 import * as React from 'react'
-import { AsyncStorage, Platform, StatusBar, StyleSheet, View, Text } from 'react-native'
-import * as Updates from 'expo-updates'
+import { Platform } from 'react-native'
+import AppFn from './AppFn.js'
+import ErrorCrashed from './screens/misc/ErrorCrashed.js'
 
-import { SplashScreen } from 'expo'
-// import * as Font from 'expo-font';
-// import { Ionicons } from '@expo/vector-icons';
-import { NavigationContainer } from '@react-navigation/native'
-import { createStackNavigator } from '@react-navigation/stack'
+import Sentry from '@constants/Sentry'
+import { SENTRY_CONFIG } from '@constants/constants.js'
 
-// import BottomTabNavigator from './navigation/BottomTabNavigator';
-import useLinking from './navigation/useLinking'
+Sentry.init(SENTRY_CONFIG)
 
-import { PapersContextProvider, loadProfile } from './store/PapersContext.js'
-import Home from './screens/home'
-import GameRoom from './screens/game-room'
-import Settings from './screens/settings'
-import AccessGame from './screens/access-game'
-// import ErrorCrashed from './screens/misc/ErrorCrashed.js'
+// Needed this wrapper to create Error Boundary
+// Every other attempts failed (useErrorBoundary, ErrorUtils, ErrorRecovery, etc...)
+// Hint: On git, blame this line to see the refactor
 
-import * as Sentry from 'sentry-expo'
+export default class App extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = { hasError: false, error: null }
+  }
 
-// if (typeof ErrorUtils !== 'undefined') {
-//   console.log(':: has ErrorUtils')
-//   // TODO this is shitty and I don't understand...
-//   // still figuring out how to do (properly) error handle/recover using Expo.
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error }
+  }
 
-//   // https://docs.expo.io/versions/latest/sdk/error-recovery/
-//   // const defaultHandler =
-//   //   (ErrorUtils.getGlobalHandler && ErrorUtils.getGlobalHandler()) || ErrorUtils._globalHandler
+  componentDidCatch(error, errorInfo) {
+    // logEvent('crash', { message: error.message })
+    Sentry.captureException(error, { tags: { pp_page: 'crash' } })
+  }
 
-//   const customErrorHandler = async (err, isFatal) => {
-//     console.log('handling error...')
-//     const error = await AsyncStorage.getItem('lastError')
-//     if (!error) {
-//       await AsyncStorage.setItem('lastError', JSON.stringify(err, Object.getOwnPropertyNames(err)))
-
-//       if (!__DEV__) {
-//         await Updates.reloadAsync()
-//       }
-//     } else {
-//       // return defaultHandler(err, isFatal)
-//     }
-//   }
-
-//   ErrorUtils.setGlobalHandler(customErrorHandler)
-// }
-
-// import * as ErrorRecovery from 'expo-error-recovery';
-
-Sentry.init({
-  dsn: 'https://9c47ca624c844cefa678401150395766@o409284.ingest.sentry.io/5281445',
-  enableInExpoDevelopment: true,
-  debug: true,
-})
-
-const Stack = createStackNavigator()
-
-const forFade = ({ current, closing }) => ({
-  cardStyle: {
-    opacity: current.progress,
-  },
-})
-
-export default function App(props) {
-  const [initialProfile, setInitialProfile] = React.useState({})
-  const [isLoadingComplete, setLoadingComplete] = React.useState(false)
-  // const [errorRecent, setErrorRecent] = React.useState(false)
-  const [initialNavigationState, setInitialNavigationState] = React.useState()
-  const containerRef = React.useRef()
-  const { getInitialState } = useLinking(containerRef)
-
-  // if(props.errorRecovery) {
-  //   console.log(':: App error::', props.errorRecovery)
-  // }
-  // Load any resources or data that we need prior to rendering the app
-  React.useEffect(() => {
-    async function loadResourcesAndDataAsync() {
-      try {
-        SplashScreen.preventAutoHide()
-
-        // console.log('getting last error...')
-        // if (lastError) {
-        //   setErrorRecent(lastError)
-        // }
-
-        setInitialNavigationState(await getInitialState())
-
-        setInitialProfile(await loadProfile())
-        // // Load fonts REVIEW @mmbotelho
-        // await Font.loadAsync({
-        //   ...Ionicons.font,
-        //   'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf'),
-        // });
-      } catch (e) {
-        // TODO - report this to an external Error log service
-        console.error('App.js loadResourcesAndDataAsync error!', e)
-      } finally {
-        setLoadingComplete(true)
-        SplashScreen.hide()
-      }
+  render() {
+    console.log(':: APP OS', Platform.OS)
+    if (this.state.hasError) {
+      return <ErrorCrashed error={this.state.error} />
     }
-
-    loadResourcesAndDataAsync()
-  }, [])
-
-  // if (errorRecent) {
-  //   return <ErrorCrashed errorStr={errorRecent} />
-  // }
-
-  if (!isLoadingComplete && !props.skipLoadingScreen) {
-    return null
-  } else {
-    return (
-      <PapersContextProvider initialProfile={initialProfile}>
-        {/* // TODO Show loading while fetching game. */}
-        <View style={styles.container}>
-          {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-          <NavigationContainer ref={containerRef} initialState={initialNavigationState}>
-            <Stack.Navigator
-              // initialRouteName="home"
-              screenOptions={{ gestureEnabled: false, headerTitleAlign: 'center' }}
-            >
-              <Stack.Screen name="home" component={Home} />
-              <Stack.Screen name="access-game" component={AccessGame} />
-              <Stack.Screen
-                name="room"
-                component={GameRoom}
-                options={{ cardStyleInterpolator: forFade, headerShown: false }}
-              />
-              <Stack.Screen name="settings" component={Settings} />
-            </Stack.Navigator>
-          </NavigationContainer>
-        </View>
-      </PapersContextProvider>
-    )
+    return <AppFn {...this.props} />
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-})

@@ -1,49 +1,29 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { AsyncStorage, View, Text } from 'react-native'
+import { Platform, View, Text } from 'react-native'
 import * as Updates from 'expo-updates'
 
 import Page from '@components/page'
 import Button from '@components/button'
 import { IconSpin } from '@components/icons'
 import * as Theme from '@theme'
-import { logEvent } from '@store/Firebase.js'
 
-export default function ErrorCrashed({ errorStr }) {
-  const [isReadable, setIsReadable] = React.useState(false) // time enough to read the page before reloading app.
-  const [isReported, setIsReported] = React.useState(false)
-  const [error] = React.useState(JSON.parse(errorStr) || {})
-
-  // REVIEW events analytics prod
+export default function ErrorCrashed({ error }) {
   React.useEffect(() => {
     if (!__DEV__) {
-      reportCrash()
+      setTimeout(() => {
+        Updates.reloadAsync()
+      }, 2500) // Time to user read the page text...
     }
   }, [])
-
-  React.useEffect(() => {
-    setTimeout(() => {
-      setIsReadable(true)
-    }, 500)
-  }, [])
-
-  React.useEffect(() => {
-    if (isReported && isReadable) {
-      reload()
-    }
-  }, [isReported, isReadable])
-
-  async function reportCrash() {
-    try {
-      await logEvent('crash', { message: error.message })
-      await AsyncStorage.removeItem('lastError')
-      setIsReported(true)
-    } catch (e) {}
-  }
 
   async function reload() {
-    Updates.reloadAsync()
+    if (Platform.OS === 'web') {
+      global.location.reload()
+    } else {
+      Updates.reloadAsync()
+    }
   }
 
   return (
@@ -58,20 +38,22 @@ export default function ErrorCrashed({ errorStr }) {
           </Text>
 
           <Text style={[Theme.typography.secondary]}>Something is not right, our head hurts.</Text>
-          <Text style={[Theme.typography.small, { fontSize: 12, marginTop: 8, marginBottom: 24 }]}>
+          <Text style={[Theme.typography.small, { fontSize: 12, marginTop: 8, marginBottom: 32 }]}>
             Hang in there, this will be quick!
-          </Text>
-          <Text style={[Theme.typography.small, { fontSize: 10, marginTop: 8, marginBottom: 24 }]}>
-            {error.message}
           </Text>
           {__DEV__ ? (
             <>
-              <Button variant="light" onPress={reportCrash}>
-                Report the error and reload app
+              <Text
+                style={[Theme.typography.small, { fontSize: 10, marginTop: 8, marginBottom: 24 }]}
+              >
+                {error.message}
+              </Text>
+              <Button variant="light" onPress={reload}>
+                Reload game
               </Button>
             </>
           ) : (
-            <IconSpin size="20" />
+            <IconSpin size="24" />
           )}
         </View>
       </Page.Main>
@@ -80,5 +62,5 @@ export default function ErrorCrashed({ errorStr }) {
 }
 
 ErrorCrashed.propTypes = {
-  errorStr: PropTypes.string.isRequired, // Error
+  error: PropTypes.object.isRequired, // Error
 }

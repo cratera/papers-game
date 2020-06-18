@@ -32,7 +32,7 @@ import { useLeaveGame } from '@components/settings'
 import { IconArrow, IconCamera } from '@components/icons'
 import AudioPreview from './AudioPreview.js'
 import * as StoreReview from 'expo-store-review'
-import * as Sentry from 'sentry-expo'
+import Sentry from '@constants/Sentry'
 
 const Stack = createStackNavigator()
 
@@ -624,7 +624,7 @@ function TestCrashing() {
         Force App crash
       </Button>
       <Button variant="light" onPress={sendExc}>
-        {status === 'exp' ? 'Sent' : 'Send Sentry Exception'}
+        {status === 'exc' ? 'Sent' : 'Send Sentry Exception'}
       </Button>
       <Button variant="light" onPress={sendMsg}>
         {status === 'msg' ? 'Sent' : 'Send Sentry Message'}
