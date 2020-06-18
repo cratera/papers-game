@@ -603,10 +603,10 @@ function TestCrashing() {
 
   return (
     <View>
+      {status.ss.qq === 'error' && <View>Cabbom!!</View>}
       <Button variant="light" onPress={handleCheckClick}>
         Force error crash
       </Button>
-      {status === 'error' && <View>Cabbom!!</View>}
     </View>
   )
 }

@@ -16,35 +16,43 @@ import Home from './screens/home'
 import GameRoom from './screens/game-room'
 import Settings from './screens/settings'
 import AccessGame from './screens/access-game'
-import ErrorCrashed from './screens/misc/ErrorCrashed.js'
+// import ErrorCrashed from './screens/misc/ErrorCrashed.js'
 
-if (typeof ErrorUtils !== 'undefined') {
-  console.log(':: has ErrorUtils')
-  // TODO this is shitty and I don't understand...
-  // still figuring out how to do (properly) error handle/recover using Expo.
+import * as Sentry from 'sentry-expo'
 
-  // https://docs.expo.io/versions/latest/sdk/error-recovery/
-  // const defaultHandler =
-  //   (ErrorUtils.getGlobalHandler && ErrorUtils.getGlobalHandler()) || ErrorUtils._globalHandler
+// if (typeof ErrorUtils !== 'undefined') {
+//   console.log(':: has ErrorUtils')
+//   // TODO this is shitty and I don't understand...
+//   // still figuring out how to do (properly) error handle/recover using Expo.
 
-  const customErrorHandler = async (err, isFatal) => {
-    console.log('handling error...', err)
-    const error = await AsyncStorage.getItem('lastError')
-    if (!error) {
-      await AsyncStorage.setItem('lastError', JSON.stringify(err, Object.getOwnPropertyNames(err)))
+//   // https://docs.expo.io/versions/latest/sdk/error-recovery/
+//   // const defaultHandler =
+//   //   (ErrorUtils.getGlobalHandler && ErrorUtils.getGlobalHandler()) || ErrorUtils._globalHandler
 
-      if (!__DEV__) {
-        await Updates.reloadAsync()
-      }
-    } else {
-      // return defaultHandler(err, isFatal)
-    }
-  }
+//   const customErrorHandler = async (err, isFatal) => {
+//     console.log('handling error...')
+//     const error = await AsyncStorage.getItem('lastError')
+//     if (!error) {
+//       await AsyncStorage.setItem('lastError', JSON.stringify(err, Object.getOwnPropertyNames(err)))
 
-  ErrorUtils.setGlobalHandler(customErrorHandler)
-}
+//       if (!__DEV__) {
+//         await Updates.reloadAsync()
+//       }
+//     } else {
+//       // return defaultHandler(err, isFatal)
+//     }
+//   }
+
+//   ErrorUtils.setGlobalHandler(customErrorHandler)
+// }
 
 // import * as ErrorRecovery from 'expo-error-recovery';
+
+Sentry.init({
+  dsn: 'https://9c47ca624c844cefa678401150395766@o409284.ingest.sentry.io/5281445',
+  enableInExpoDevelopment: true,
+  debug: true,
+})
 
 const Stack = createStackNavigator()
 
@@ -57,24 +65,25 @@ const forFade = ({ current, closing }) => ({
 export default function App(props) {
   const [initialProfile, setInitialProfile] = React.useState({})
   const [isLoadingComplete, setLoadingComplete] = React.useState(false)
-  const [errorRecent, setErrorRecent] = React.useState(false)
+  // const [errorRecent, setErrorRecent] = React.useState(false)
   const [initialNavigationState, setInitialNavigationState] = React.useState()
   const containerRef = React.useRef()
   const { getInitialState } = useLinking(containerRef)
 
-  console.log(':: App errorRecovery::', props.errorRecovery)
+  // if(props.errorRecovery) {
+  //   console.log(':: App error::', props.errorRecovery)
+  // }
   // Load any resources or data that we need prior to rendering the app
   React.useEffect(() => {
     async function loadResourcesAndDataAsync() {
       try {
         SplashScreen.preventAutoHide()
 
-        console.log('getting last error...')
-        const lastError = await AsyncStorage.getItem('lastError')
+        // console.log('getting last error...')
+        // if (lastError) {
+        //   setErrorRecent(lastError)
+        // }
 
-        if (lastError) {
-          setErrorRecent(lastError)
-        }
         setInitialNavigationState(await getInitialState())
 
         setInitialProfile(await loadProfile())
@@ -95,9 +104,9 @@ export default function App(props) {
     loadResourcesAndDataAsync()
   }, [])
 
-  if (errorRecent) {
-    return <ErrorCrashed errorStr={errorRecent} />
-  }
+  // if (errorRecent) {
+  //   return <ErrorCrashed errorStr={errorRecent} />
+  // }
 
   if (!isLoadingComplete && !props.skipLoadingScreen) {
     return null

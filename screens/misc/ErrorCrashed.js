@@ -11,26 +11,40 @@ import * as Theme from '@theme'
 import { logEvent } from '@store/Firebase.js'
 
 export default function ErrorCrashed({ errorStr }) {
+  const [isReadable, setIsReadable] = React.useState(false) // time enough to read the page before reloading app.
+  const [isReported, setIsReported] = React.useState(false)
   const [error] = React.useState(JSON.parse(errorStr) || {})
 
+  // REVIEW events analytics prod
   React.useEffect(() => {
     if (!__DEV__) {
-      reportAndReload()
+      reportCrash()
     }
-  })
+  }, [])
 
-  async function reportAndReload() {
+  React.useEffect(() => {
+    setTimeout(() => {
+      setIsReadable(true)
+    }, 500)
+  }, [])
+
+  React.useEffect(() => {
+    if (isReported && isReadable) {
+      reload()
+    }
+  }, [isReported, isReadable])
+
+  async function reportCrash() {
     try {
       await logEvent('crash', { message: error.message })
       await AsyncStorage.removeItem('lastError')
-      await Updates.reloadAsync()
-    } catch (e) {
-      await AsyncStorage.removeItem('lastError')
-      await Updates.reloadAsync()
-    }
+      setIsReported(true)
+    } catch (e) {}
   }
 
-  console.log(error)
+  async function reload() {
+    Updates.reloadAsync()
+  }
 
   return (
     <Page>
@@ -47,9 +61,12 @@ export default function ErrorCrashed({ errorStr }) {
           <Text style={[Theme.typography.small, { fontSize: 12, marginTop: 8, marginBottom: 24 }]}>
             Hang in there, this will be quick!
           </Text>
+          <Text style={[Theme.typography.small, { fontSize: 10, marginTop: 8, marginBottom: 24 }]}>
+            {error.message}
+          </Text>
           {__DEV__ ? (
             <>
-              <Button variant="light" onPress={reportAndReload}>
+              <Button variant="light" onPress={reportCrash}>
                 Report the error and reload app
               </Button>
             </>

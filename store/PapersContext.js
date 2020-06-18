@@ -158,7 +158,8 @@ export class PapersContextProvider extends Component {
       })
 
       // TODO - Add Global Status accessing game.
-
+      // REVIEW/TODO - What is this?
+      // A: This is the first code written. needs to be refactored
       const hum = await this.accessGame('join', gameId, () => {
         console.log(`Joined to ${gameId} completed!`)
         this.setState({ status: 'inGame' })

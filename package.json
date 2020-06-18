@@ -1,11 +1,11 @@
 {
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "start": "expo start",
+    "start": "SENTRY_AUTH_TOKEN=%SENTRY_AUTH_TOKEN% expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "release:ota": "turtle setup:ios && rm -R dist && expo export --public-url https://papers-native.firebaseapp.com/ && firebase deploy --only hosting:native",
+    "release:ota": "SENTRY_AUTH_TOKEN=%SENTRY_AUTH_TOKEN% turtle setup:ios && rm -R dist && expo export --public-url https://papers-native.firebaseapp.com/ && firebase deploy --only hosting:native",
     "eject": "expo eject",
     "test": "jest --watchAll"
   },
@@ -40,13 +40,15 @@
     "react-native-safe-area-context": "0.7.3",
     "react-native-screens": "~2.2.0",
     "react-native-svg": "11.0.1",
-    "react-native-web": "^0.11.7"
+    "react-native-web": "^0.11.7",
+    "sentry-expo": "^2.1.2"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
     "babel-eslint": "^10.1.0",
     "babel-plugin-module-resolver": "^4.0.0",
     "babel-preset-expo": "^8.1.0",
+    "dotenv": "^8.2.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-prettier": "^3.1.2",

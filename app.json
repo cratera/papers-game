@@ -2,6 +2,7 @@
   "expo": {
     "name": "Papers Game - beta",
     "slug": "papers-game",
+    "description": "The perfect game for your dinner party with friends!",
     "privacy": "public",
     "platforms": ["ios", "android", "web"],
     "version": "0.2.2",
@@ -38,7 +39,17 @@
         }
       }
     },
-    "description": "The perfect game for your dinner party with friends!",
+    "hooks": {
+      "postPublish": [
+        {
+          "file": "sentry-expo/upload-sourcemaps",
+          "config": {
+            "organization": "sandrina-pereira",
+            "project": "papers-game"
+          }
+        }
+      ]
+    },
     "githubUrl": "https://github.com/sandrina-p/papers-game"
   }
 }
