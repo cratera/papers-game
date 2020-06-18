@@ -25,6 +25,7 @@ Here's a list of my learnings while building this mobile game with reac-native.
 - [Troubleshooting turtle-cli](https://github.com/expo/turtle/issues/179). Install node 12.0.0 using `NVM` and try again.
 - [Release Channels](https://docs.expo.io/distribution/release-channels/) - Useful to test diff versions (a.k.a staging) for users before going to production.
 - [HTTP Headers for firebase](https://github.com/expo/expo/issues/4069)
+- [How to use env vars in package.json](https://medium.com/@arrayknight/how-to-use-env-variables-in-package-json-509b9b663867)
 
 ```bash
 

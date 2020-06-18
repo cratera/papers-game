@@ -121,19 +121,6 @@ export default function CreateGame({ navigation }) {
     setCreating(true)
     setState(state => ({ ...state, errorMsg: null }))
 
-    if (state.gameName === 'FOOBAR') {
-      throw Error('Easter egg! Forced an error crash!')
-    }
-    // try {
-    //   if (state.gameName === 'FOOBAR') {
-    //     throw Error('Uh, easter egg, failed to created!')
-    //   }
-    // } catch (e) {
-    //   setCreating(false)
-    //   setState(state => ({ ...state, errorMsg: e.message }))
-    //   return
-    // }
-
     Papers.accessGame('create', state.gameName, (res, err) => {
       if (err) {
         setCreating(false)

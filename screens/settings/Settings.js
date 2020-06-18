@@ -32,6 +32,7 @@ import { useLeaveGame } from '@components/settings'
 import { IconArrow, IconCamera } from '@components/icons'
 import AudioPreview from './AudioPreview.js'
 import * as StoreReview from 'expo-store-review'
+import * as Sentry from 'sentry-expo'
 
 const Stack = createStackNavigator()
 
@@ -597,15 +598,36 @@ function OtaChecker() {
 function TestCrashing() {
   const [status, setstatus] = React.useState('')
 
-  async function handleCheckClick() {
+  async function forceCrash() {
     setstatus('error')
+  }
+
+  async function sendExc() {
+    try {
+      const foo = status.foo.bar
+      console.log(foo)
+    } catch (e) {
+      Sentry.captureException(e)
+      setstatus('exc')
+    }
+  }
+
+  async function sendMsg() {
+    Sentry.captureMessage('Easter egg! Heres a msg')
+    setstatus('msg')
   }
 
   return (
     <View>
-      {status.ss.qq === 'error' && <View>Cabbom!!</View>}
-      <Button variant="light" onPress={handleCheckClick}>
-        Force error crash
+      {status === 'error' && <View>Cabbom!!</View>}
+      <Button variant="light" onPress={forceCrash}>
+        Force App crash
+      </Button>
+      <Button variant="light" onPress={sendExc}>
+        {status === 'exp' ? 'Sent' : 'Send Sentry Exception'}
+      </Button>
+      <Button variant="light" onPress={sendMsg}>
+        {status === 'msg' ? 'Sent' : 'Send Sentry Message'}
       </Button>
     </View>
   )
