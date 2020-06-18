@@ -17,7 +17,7 @@ import { headerTheme } from '@navigation/headerStuff.js'
 
 export default function LobbyJoining({ navigation }) {
   const Papers = React.useContext(PapersContext)
-  const { askToLeaveGame } = useLeaveGame()
+  const { askToLeaveGame } = useLeaveGame({ navigation })
   const { game, profile } = Papers.state || {}
   const hasGame = !!game
   const hasTeams = hasGame && !!game.teams
@@ -26,7 +26,7 @@ export default function LobbyJoining({ navigation }) {
   const profileIsAdmin = creatorId === profileId
   const playersKeys = hasGame ? Object.keys(game.players) : []
   const hasEnoughPlayers = playersKeys.length >= 4
-  const wordsAreStored = !!game.words && !!game.words[profileId]
+  const wordsAreStored = !!game?.words?.[profileId]
 
   React.useEffect(() => {
     navigation.setOptions({
@@ -79,11 +79,14 @@ export default function LobbyJoining({ navigation }) {
     }
   }, [wordsAreStored])
 
+  function goToWritePapers() {
+    navigation.navigate('write-papers')
+  }
+
   if (!game) {
-    console.warn('Lobby: Hot reload bug happened!', Papers)
     // TODO/BUG: This is the weirdest BUG with React.
     // Let me try to explain this and reproduce later...
-    // 1. Create a team a game on IOS. Let another player join.
+    // 1. Create a game on IOS. Let another player join.
     // 2. Open the file utils.js and edit the file (can be anything, ex: confirmLeaveGame)
     // 3. The page will refresh and PapersContext will return empty {}. (if not, repeat step 2.)
     //    But the logs at PapersContext.js show all the data as expected.
@@ -92,13 +95,13 @@ export default function LobbyJoining({ navigation }) {
     // Maybe it's a bug with the hot reload (RN or Expo?) It does not happen on browser.
     // I hope this never happens IRL.
 
-    // TODO report error to server.
-    return (
-      <View>
-        <Text>Ups! Game does not exist...</Text>
-        <Button onPress={() => navigation.navigate('home')}>Go Home</Button>
-      </View>
-    )
+    return null
+    // return (
+    //   <View>
+    //     <Text>Ups! Game does not exist...</Text>
+    //     <Button onPress={() => navigation.navigate('home')}>Go Home</Button>
+    //   </View>
+    // )
   }
 
   return (
@@ -138,28 +141,18 @@ export default function LobbyJoining({ navigation }) {
       </Page.Main>
       <Page.CTAs hasOffset={profileIsAdmin && hasEnoughPlayers}>
         {game.teams && <Button onPress={goToWritePapers}>Write papers</Button>}
-        {game.teams && profileIsAdmin && (
-          <Button variant="danger" onPress={setWordsForEveyone} styleTouch={{ marginTop: 16 }}>
-            {/* eslint-disable-next-line */}
-            💥 Write everyone's papers 💥
+        {__DEV__ && game.teams && profileIsAdmin && (
+          <Button
+            variant="danger"
+            onPress={Papers.setWordsForEveyone}
+            styleTouch={{ marginTop: 16 }}
+          >
+            {"💥 Write everyone's papers 💥"}
           </Button>
         )}
       </Page.CTAs>
     </Page>
   )
-
-  function goToWritePapers() {
-    navigation.navigate('write-papers')
-  }
-
-  async function setWordsForEveyone() {
-    try {
-      await Papers.setWordsForEveyone()
-      console.log('setwords done!')
-    } catch (error) {
-      console.error('setWordsForEveyone failed!', error)
-    }
-  }
 }
 
 LobbyJoining.propTypes = {

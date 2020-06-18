@@ -54,15 +54,15 @@ export default function HomeSigned({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const profile = Papers.state.profile
 
-  if (Papers.status === 'isJoining') {
-    return (
-      <Page>
-        <Page.Main style={Styles.main} blankBg>
-          <Text style={Theme.typography.h2}>Joining {`"${profile.gameId}"`} ⏳</Text>
-        </Page.Main>
-      </Page>
-    )
-  }
+  // if (Papers.status === 'isJoining') {
+  //   return (
+  //     <Page>
+  //       <Page.Main style={Styles.main} blankBg>
+  //         <Text style={Theme.typography.h2}>Joining {`"${profile.gameId}"`} ⏳</Text>
+  //       </Page.Main>
+  //     </Page>
+  //   )
+  // }
 
   return (
     <Fragment>

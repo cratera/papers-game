@@ -73,31 +73,37 @@ export default function CreateGame({ navigation }) {
           keyboardShouldPersistTaps="always"
           style={{ flex: 1, alignSelf: 'stretch' }}
         >
-          <ScrollView>
-            <Text style={[Styles.title, Theme.typography.h3]}>{copy.title}</Text>
-            <Text nativeID="inputNameLabel" style={[Styles.tip, Theme.typography.secondary]}>
-              {copy.description}
+          {isCreating ? (
+            <Text style={[Theme.typography.secondary, Theme.u.center, { marginTop: 150 }]}>
+              Creating game...
             </Text>
-
-            <TextInput
-              style={[Theme.typography.h1, Styles.input]}
-              inputAccessoryViewID="name"
-              autoFocus
-              autoCorrect={false}
-              nativeID="inputNameLabel"
-              onChangeText={handleInputChange}
-            />
-            <Text
-              style={[Theme.typography.small, Styles.hintMsg, state.isInvalid && Styles.errorMsg]}
-            >
-              You can only use letters and numbers.
-            </Text>
-            {state.errorMsg && (
-              <Text style={[Theme.typography.small, Styles.hintMsg, Styles.errorMsg]}>
-                {state.errorMsg}
+          ) : (
+            <ScrollView>
+              <Text style={[Styles.title, Theme.typography.h3]}>{copy.title}</Text>
+              <Text nativeID="inputNameLabel" style={[Styles.tip, Theme.typography.secondary]}>
+                {copy.description}
               </Text>
-            )}
-          </ScrollView>
+
+              <TextInput
+                style={[Theme.typography.h1, Styles.input]}
+                inputAccessoryViewID="name"
+                autoFocus
+                autoCorrect={false}
+                nativeID="inputNameLabel"
+                onChangeText={handleInputChange}
+              />
+              <Text
+                style={[Theme.typography.small, Styles.hintMsg, state.isInvalid && Styles.errorMsg]}
+              >
+                You can only use letters and numbers.
+              </Text>
+              {state.errorMsg && (
+                <Text style={[Theme.typography.small, Styles.hintMsg, Styles.errorMsg]}>
+                  {state.errorMsg}
+                </Text>
+              )}
+            </ScrollView>
+          )}
         </KeyboardAvoidingView>
       </Page.Main>
     </Page>

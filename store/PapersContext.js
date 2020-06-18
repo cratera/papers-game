@@ -422,7 +422,7 @@ export class PapersContextProvider extends Component {
       }
     } catch (e) {
       // TODO - report this to an external Error log service
-      console.error(':: error!', e)
+      console.warn(':: error!', e)
     }
 
     const { id, gameId, ...serverProfile } = profile
@@ -666,7 +666,7 @@ export class PapersContextProvider extends Component {
     try {
       await this.state.socket.leaveGame(opts)
     } catch (err) {
-      console.error(':: error!', err)
+      console.warn(':: error!', err)
       this._removeGameFromState()
     }
   }

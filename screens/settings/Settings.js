@@ -210,7 +210,7 @@ SettingsProfile.propTypes = {
 
 function SettingsGame({ navigation }) {
   const Papers = React.useContext(PapersContext)
-  const { askToLeaveGame } = useLeaveGame()
+  const { askToLeaveGame } = useLeaveGame({ navigation })
   const { game } = Papers.state
 
   if (!game) {

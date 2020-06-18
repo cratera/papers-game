@@ -23,7 +23,7 @@ export default function LobbyWriting({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [errorMsg, setErrorMsg] = React.useState('')
-  const { askToLeaveGame } = useLeaveGame()
+  const { askToLeaveGame } = useLeaveGame({ navigation })
   const { game } = Papers.state || {}
   const gameWords = game?.words
   const didSubmitAllWords = React.useCallback(

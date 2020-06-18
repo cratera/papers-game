@@ -9,6 +9,7 @@ import { NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
 
 import Sentry from '@constants/Sentry'
+// import { SCREEN_FADE } from '@constants/constants'
 
 import useLinking from './navigation/useLinking'
 
@@ -26,7 +27,7 @@ const forFade = ({ current, closing }) => ({
   },
 })
 
-export default function AppFn(props) {
+export default function AppFn({ skipLoadingScreen }) /* eslint-disable-line */ {
   const [initialProfile, setInitialProfile] = React.useState({})
   const [isLoadingComplete, setLoadingComplete] = React.useState(false)
   // const [errorRecent, setErrorRecent] = React.useState(false)
@@ -60,17 +61,17 @@ export default function AppFn(props) {
     loadResourcesAndDataAsync()
   }, [])
 
-  if (!isLoadingComplete && !props.skipLoadingScreen) {
+  if (!isLoadingComplete && !skipLoadingScreen) {
     return null
   }
+
   return (
     <PapersContextProvider initialProfile={initialProfile}>
-      {/* // TODO Show loading while fetching game. */}
-      <View style={styles.container}>
-        {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
+      <View style={Styles.container}>
+        {Platform.OS === 'ios' && <StatusBar barStyle="dark-content" />}
         <NavigationContainer ref={containerRef} initialState={initialNavigationState}>
           <Stack.Navigator
-            // initialRouteName="home"
+            initialRouteName={initialProfile.gameId ? 'room' : 'home'}
             screenOptions={{ gestureEnabled: false, headerTitleAlign: 'center' }}
           >
             <Stack.Screen name="home" component={Home} />
@@ -88,7 +89,7 @@ export default function AppFn(props) {
   )
 }
 
-const styles = StyleSheet.create({
+const Styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',

@@ -3,13 +3,21 @@ import { Alert, Platform } from 'react-native'
 
 import PapersContext from '@store/PapersContext.js'
 
-export default function useLeaveGame() {
+export default function useLeaveGame({ navigation }) {
   const Papers = React.useContext(PapersContext)
+
+  function leaveGame() {
+    if (!navigation) {
+      console.warn('navigation is required!')
+    }
+    navigation.navigate('gate', { goal: 'leave' })
+    Papers.leaveGame()
+  }
 
   const askToLeaveGame = () => {
     if (Platform.OS === 'web') {
       if (window.confirm('Are you sure you want to leave the game?')) {
-        Papers.leaveGame()
+        leaveGame()
       }
     } else {
       Alert.alert(
@@ -18,7 +26,7 @@ export default function useLeaveGame() {
         [
           {
             text: 'Leave Game',
-            onPress: Papers.leaveGame,
+            onPress: leaveGame,
             style: 'destructive',
           },
           {

@@ -13,19 +13,15 @@ export default function AccessGame({ route, navigation }) {
 
   React.useEffect(() => {
     if (!variant) {
-      goHome()
+      navigation.navigate('home')
     }
   }, [variant])
 
   React.useEffect(() => {
     if (gameId) {
-      navigation.navigate('room')
+      navigation.navigate('room', { screen: 'lobby-joining' })
     }
   }, [gameId])
-
-  function goHome() {
-    navigation.navigate('home')
-  }
 
   if (variant === 'join') {
     return <JoinGame navigation={navigation} />
