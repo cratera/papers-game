@@ -144,7 +144,7 @@ export class PapersContextProvider extends Component {
     const socket = this.state.socket
 
     if (socket) {
-      console.error(':: Already connected. Should not happen!')
+      console.warn(':: Already connected. Should not happen!')
     } else {
       const { gameId } = this.state.profile
 
@@ -193,7 +193,7 @@ export class PapersContextProvider extends Component {
 
     socket.signIn({ name, avatar }, (res, error) => {
       if (error) {
-        console.error(':: signIn failed!', error)
+        console.warn(':: signIn failed!', error)
       }
     })
   }
@@ -456,7 +456,7 @@ export class PapersContextProvider extends Component {
         this.state.socket.resetProfile()
       }
     } catch (e) {
-      console.error('PapersContext.js resetProfile error!', e)
+      console.warn('PapersContext.js resetProfile error!', e)
     }
 
     this.setState(state => ({
@@ -572,7 +572,7 @@ export class PapersContextProvider extends Component {
           roundStatus,
         },
         (res, err) => {
-          console.error(':: failed!', err)
+          console.warn(':: failed!', err)
         }
       )
     } catch (error) {

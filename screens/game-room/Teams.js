@@ -102,22 +102,22 @@ export default function Teams({ navigation }) {
     setTeams(getRandomTeams)
   }
 
-  function handleRenameOf(teamId) {
-    try {
-      var name = window.prompt('Choose a sweet name.', tempTeams[teamId].name)
-      if (name !== null) {
-        setTeams(teams => ({
-          ...teams,
-          [teamId]: {
-            ...teams[teamId],
-            name,
-          },
-        }))
-      }
-    } catch {
-      console.warn('TODO rename teams on IOS')
-    }
-  }
+  // function handleRenameOf(teamId) {
+  //   try {
+  //     var name = window.prompt('Choose a sweet name.', tempTeams[teamId].name)
+  //     if (name !== null) {
+  //       setTeams(teams => ({
+  //         ...teams,
+  //         [teamId]: {
+  //           ...teams[teamId],
+  //           name,
+  //         },
+  //       }))
+  //     }
+  //   } catch {
+  //     console.warn('TODO rename teams on IOS')
+  //   }
+  // }
 
   async function handleLockClick() {
     if (isLocking) return false

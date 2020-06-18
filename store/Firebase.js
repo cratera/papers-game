@@ -134,7 +134,7 @@ function signIn({ name, avatar }, cb) {
     .auth()
     .signInAnonymously()
     .catch(function (error) {
-      console.error('signInAnonymously error:', error)
+      console.warn('signInAnonymously error:', error)
       cb(null, error)
     })
 }

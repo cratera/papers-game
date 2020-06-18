@@ -19,9 +19,6 @@ function Button({
   styleTouch,
   ...otherProps
 }) {
-  if (otherProps.hasBlock) {
-    console.error('hasblock is deprecated!')
-  }
   const isIcon = variant === 'icon'
   return (
     <TouchableHighlight

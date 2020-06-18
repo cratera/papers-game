@@ -55,7 +55,7 @@ export default function usePickAvatar() {
     console.log('usePickAvatar', result.cancelled ? 'cancelled' : 'done!')
     return result.cancelled ? null : result.uri
 
-    // We'll go back to this again...
+    // We'll go back to this again one day... or not
     // if (result.uri || result.base64) {
     //   if (result.base64) {
     //     const format = result.uri.match(/\.(jpeg|jpg|gif|png)$/)[1]; // hardcoded solution.
