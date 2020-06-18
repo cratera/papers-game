@@ -6,59 +6,56 @@ import * as Updates from 'expo-updates'
 
 import Page from '@components/page'
 import Button from '@components/button'
-
+import { IconSpin } from '@components/icons'
 import * as Theme from '@theme'
 import { logEvent } from '@store/Firebase.js'
 
 export default function ErrorCrashed({ errorStr }) {
   const [error] = React.useState(JSON.parse(errorStr) || {})
-  const [isLoading, setIsLoading] = React.useState(false)
 
-  async function handleTryAgain() {
-    setIsLoading(true)
+  React.useEffect(() => {
+    if (!__DEV__) {
+      reportAndReload()
+    }
+  })
+
+  async function reportAndReload() {
     try {
-      await logEvent('crash', {
-        screen: 'crash',
-        message: error.message,
-        error: errorStr,
-        memo: 'nop',
-      })
+      await logEvent('crash', { message: error.message })
       await AsyncStorage.removeItem('lastError')
       await Updates.reloadAsync()
     } catch (e) {
       await AsyncStorage.removeItem('lastError')
+      await Updates.reloadAsync()
     }
   }
 
+  console.log(error)
+
   return (
     <Page>
-      <Page.Main style={{ backgroundColor: Theme.colors.danger }}>
-        <View style={{ marginTop: 72 }}>
-          <Text style={[Theme.typography.h2, Theme.u.center, { color: Theme.colors.bg }]}>
-            Ouch, the app crashed! 🥺
+      <Page.Main>
+        <View
+          style={{ marginTop: 200, display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+        >
+          <Text style={[Theme.typography.h1, Theme.u.center]}>😵</Text>
+          <Text style={[Theme.typography.h3, Theme.u.center, { marginTop: 24, marginBottom: 8 }]}>
+            Ouch!
           </Text>
 
-          <Text
-            style={[
-              Theme.typography.body,
-              Theme.u.center,
-              { color: Theme.colors.bg, marginTop: 24 },
-            ]}
-          >
-            {error.message}
+          <Text style={[Theme.typography.secondary]}>Something is not right, our head hurts.</Text>
+          <Text style={[Theme.typography.small, { fontSize: 12, marginTop: 8, marginBottom: 24 }]}>
+            Hang in there, this will be quick!
           </Text>
-          <Text
-            style={[
-              Theme.typography.small,
-              Theme.u.center,
-              { fontSize: 12, color: Theme.colors.bg, marginBottom: 24 },
-            ]}
-          >
-            {(error.componentStack || error.stack || 'unknown error').substring(0, 200)}
-          </Text>
-          <Button variant="light" isLoading={isLoading} onPress={handleTryAgain}>
-            Report the error and reload app
-          </Button>
+          {__DEV__ ? (
+            <>
+              <Button variant="light" onPress={reportAndReload}>
+                Report the error and reload app
+              </Button>
+            </>
+          ) : (
+            <IconSpin size="20" />
+          )}
         </View>
       </Page.Main>
     </Page>

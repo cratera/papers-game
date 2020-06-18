@@ -28,7 +28,7 @@ if (typeof ErrorUtils !== 'undefined') {
   //   (ErrorUtils.getGlobalHandler && ErrorUtils.getGlobalHandler()) || ErrorUtils._globalHandler
 
   const customErrorHandler = async (err, isFatal) => {
-    console.log('handling error...')
+    console.log('handling error...', err)
     const error = await AsyncStorage.getItem('lastError')
     if (!error) {
       await AsyncStorage.setItem('lastError', JSON.stringify(err, Object.getOwnPropertyNames(err)))
