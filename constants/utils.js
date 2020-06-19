@@ -38,8 +38,13 @@ export function getRandomInt(max) {
 }
 
 export function msToSecPretty(ms) {
-  const minutes = Math.floor(ms / 60000)
-  const seconds = ((ms % 60000) / 1000).toFixed(0)
+  let minutes = Math.floor(ms / 60000)
+  let seconds = ((ms % 60000) / 1000).toFixed(0)
+  if (seconds === '60') {
+    // eg: 00:60 -> 1:00
+    seconds = '0'
+    minutes++
+  }
   return (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds
 }
 

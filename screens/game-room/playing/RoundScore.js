@@ -50,7 +50,7 @@ const RoundScore = ({ navigation }) => {
                 {isTie ? 'Stalemate' : isMyTeamWinner ? 'Your team won!' : 'Your team lost!'}
               </Text>
               <Text style={Theme.typography.body}>
-                {isTie ? "It's a tie" : isMyTeamWinner ? 'They new stood a change' : 'Yikes.'}
+                {isTie ? "It's a tie" : isMyTeamWinner ? 'They never stood a chance' : 'Yikes.'}
               </Text>
             </Fragment>
           ) : (
