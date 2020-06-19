@@ -637,7 +637,7 @@ function OtaChecker() {
           <Text style={[Theme.typography.sencondary, Theme.u.center]}>App is already updated!</Text>
         )}
         {errorMsg && <Text style={[Theme.typography.error, Theme.u.center]}>{errorMsg}</Text>}
-        {manifest && <Text style={[Theme.typography.secondary, Theme.u.center]}>{manifest}</Text>}
+        {/* {manifest && <Text style={[Theme.typography.secondary, Theme.u.center]}>{manifest}</Text>} */}
       </View>
     </View>
   )
