@@ -88,7 +88,6 @@ export default function JoinGame({ navigation }) {
           : null,
     })
 
-    console.log('effect', isJoining, didAutoJoin)
     if (hasValidCode && !isJoining && !didAutoJoin) {
       // use didAutoJoin to avoid retry autoJoin in case of failure
       console.log('auto joining...')

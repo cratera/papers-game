@@ -2,13 +2,12 @@ Here's a list of my learnings while building this mobile game with reac-native.
 
 - My best friends for this new journey: [React Native Docs](https://reactnative.dev/docs), [react-navigation docs](https://reactnavigation.org/) and [Expo](https://docs.expo.io/versions/latest/)
 
-## Javascript
-
-- ❓What's the best way to async/wait and try/catch stuff? Component? Context? "Backend"?
-
 ## React Native
 
 - Diff between native ScrollView and react-native-gesture-handler. The 2nd is replacment improved.
+- ❓What's the best way to async/wait and try/catch stuff? Component? Context? "Backend"?
+- Those react-navigation screen animations are hard to understand... still need to learn it
+- 🐛Firefox: width/height must be a number. If it's a string, it does not work. (found when using icons)
 
 ## Expo
 
@@ -16,8 +15,10 @@ Here's a list of my learnings while building this mobile game with reac-native.
 - 🐛 Had to transform a Fn component to a Class, so TextInput would work properly. (HomeSignup). Back in a function component, on each onChangeText, the TextInput would unmount/mount, causing the keyboard to close (and re-open if autoFocus).... have no idea why. Google didn't help :(
 - IOS: shadow doesn't work on elements with overflow:hidden (border-radius). ex: Button.
 - Upload files to Firebase was a nightmare. See `store/Firebase.js _uploadAvatar()` for more info.
-- ❓ Didn't understand how to handle errors [expo ErrorRecovery](https://docs.expo.io/versions/v37.0.0/sdk/error-recovery/)...
+- Didn't understand how to handle errors [expo ErrorRecovery](https://docs.expo.io/versions/v37.0.0/sdk/error-recovery/).
+  - Update 2 days later: Use a React class component with Error Boundary. (App.js -> AppFn.js)
 - Add [firebase-analytics](https://docs.expo.io/versions/latest/sdk/firebase-analytics/)
+- Use [Sentry expo and web](https://github.com/expo/sentry-expo/issues/77)(https://github.com/expo/sentry-expo/issues/77#issuecomment-646099545)
 
 ### Release
 

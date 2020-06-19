@@ -35,7 +35,7 @@ export class PapersContextProvider extends Component {
       profiles: {}, // List of game players' profiles.
       about: {
         version: '0.2.2', // TODO REVIEW - where should this come from?
-        ota: '07',
+        ota: '08',
       },
     }
 
@@ -266,6 +266,11 @@ export class PapersContextProvider extends Component {
       console.log(`:: on.${topic}`, data.game)
       const { game, profiles } = data
       this.setState({ game, profiles })
+
+      if (!game.hasStarted) {
+        // Prevent possible memory leaks from an old game.
+        this.PapersAPI.setTurnLocalState(null)
+      }
     })
 
     socket.on('game.players.added', (topic, data) => {
@@ -625,15 +630,11 @@ export class PapersContextProvider extends Component {
   async _removeGameFromState() {
     console.log('📌 _removeGameFromState()')
 
+    // CONTINUE HEREEE - ASYNC WAIT CATCH
+
+    this.PapersAPI.setTurnLocalState(null)
     await this.PapersAPI.updateProfile({ gameId: null })
-    // window.localStorage.removeItem('turn'); // TODO / REVIEW
-
-    // Leaving room, there is no point in being connected
-    // this.state.socket && this.state.socket.close();
-
-    this.setState(state => ({
-      game: null,
-    }))
+    this.setState(state => ({ game: null }))
   }
 
   recoverGame(socket = this.state.socket) {
@@ -690,7 +691,3 @@ PapersContextProvider.propTypes = {
 }
 
 export default PapersContext
-
-// export const PapersContextProvider = withRouter(PapersContextComp);
-
-// export default PapersContext;

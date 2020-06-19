@@ -53,7 +53,7 @@ export default function ErrorCrashed({ error }) {
               </Button>
             </>
           ) : (
-            <IconSpin size="24" />
+            <IconSpin size={24} />
           )}
         </View>
       </Page.Main>

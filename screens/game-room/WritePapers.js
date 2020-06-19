@@ -138,6 +138,8 @@ export default function WritePapers({ navigation }) {
 
     // Q: Maybe change state only on blur?
     // A: No, parent needs to know the value so "Next paper" works
+    // A2: Can change state only +2 words are guessed.
+    //     - And use refs to store the words. This is slow in old devices.
     setLocalWords(wordsToEdit)
   }
 

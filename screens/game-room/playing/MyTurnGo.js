@@ -274,7 +274,9 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
 
     // Cleanup local papers turn to avoid memory leaks.
     // Ex: Start a new game, the LS may still contain data from prev game
-    // TODO/REVIEW - Maybe do this when game starts. Dunno what's the best place to do it.
+    // Q: Maybe do this when game starts. Dunno what's the best place to do it.
+    // A: Keep this. If the user closes/minimize the app (eg. to go to twitter)
+    //    and comes back later, we guarantee the local state is cleaned.
     Papers.setTurnLocalState(null)
 
     Papers.finishTurn(papersTurn, (res, error) => {

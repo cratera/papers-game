@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react'
 import { View, Text } from 'react-native'
+import PropTypes from 'prop-types'
 
 import PapersContext from '@store/PapersContext.js'
 
@@ -13,7 +14,7 @@ import GameScore from '@components/game-score'
 import * as Theme from '@theme'
 import Styles from './PlayingStyles.js'
 
-const RoundScore = () => {
+const RoundScore = ({ navigation }) => {
   const Papers = React.useContext(PapersContext)
   const { profile, game } = Papers.state
   const round = game.round
@@ -69,7 +70,14 @@ const RoundScore = () => {
       </Page.Main>
       <Page.CTAs blankBg>
         {isFinalRound ? (
-          <Button onPress={Papers.leaveGame}>Go to homepage</Button>
+          <Button
+            onPress={() => {
+              navigation.navigate('gate', { goal: 'leave' })
+              Papers.leaveGame()
+            }}
+          >
+            Go to homepage
+          </Button>
         ) : (
           <Button isLoading={isSubmitting} onPress={handleReadyClick}>
             {`I'm ready for round ${round.current + 1 + 1}!`}
@@ -78,6 +86,10 @@ const RoundScore = () => {
       </Page.CTAs>
     </Fragment>
   )
+}
+
+RoundScore.propTypes = {
+  navigation: PropTypes.object.isRequired,
 }
 
 export default RoundScore

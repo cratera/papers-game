@@ -3,9 +3,7 @@ import PropTypes from 'prop-types'
 // import * as WebBrowser from 'expo-web-browser'; // WHAT'S THIS?
 
 import { createStackNavigator } from '@react-navigation/stack'
-// import { confirmLeaveGame } from '@constants/utils.js'
 import PapersContext from '@store/PapersContext.js'
-import { SCREEN_FADE } from '@constants/constants'
 import Gate from './Gate'
 import LobbyJoining from './LobbyJoining.js'
 import Teams from './Teams.js'
@@ -15,7 +13,7 @@ import Playing from './playing/PlayingEntry'
 
 const Stack = createStackNavigator()
 
-export default function GameRoomEntry({ navigation }) {
+export default function GameRoomEntry({ navigation, route }) {
   const Papers = React.useContext(PapersContext)
   const { profile, game } = Papers.state
   const hasGameIdCached = React.useRef(!!profile.gameId).current
@@ -26,6 +24,7 @@ export default function GameRoomEntry({ navigation }) {
 
   const wordsAreStored = !!game?.words?.[profileId]
   const amIReady = !!game?.players[profileId]?.isReady
+  const isPlaying = game?.hasStarted || amIReady
 
   React.useEffect(() => {
     // Player left / was kicked, or game was deleted, etc...
@@ -52,38 +51,43 @@ export default function GameRoomEntry({ navigation }) {
     }
   }, [hasGameIdCached, profileGameId])
 
+  React.useEffect(() => {
+    // Triggered when the player clicks "I'm Ready" at lobby-writting
+    // Need this to prevent RN redirect to "gate" when isPlaying changes status
+    if (isPlaying) {
+      console.log(':: room -> playing', route)
+      navigation.navigate('playing')
+    }
+  }, [isPlaying])
+
+  // TODO later... learn routing redirect properly.
+  if (!game) {
+    return <Gate />
+  }
+
   return (
     <Stack.Navigator
       screenOptions={{ gestureEnabled: false, headerTitleAlign: 'center' }}
-      initialRouteName={
-        !gameId || !game
-          ? 'gate'
-          : amIReady
-          ? 'playing'
-          : wordsAreStored
-          ? 'lobby-writing'
-          : 'lobby-joining'
-      }
+      initialRouteName={amIReady ? 'playing' : wordsAreStored ? 'lobby-writing' : 'lobby-joining'}
     >
-      <Stack.Screen
-        name="gate"
-        component={Gate}
-        options={{ cardStyleInterpolator: SCREEN_FADE, headerShown: false }}
-      />
-      {game?.hasStarted || amIReady ? (
-        <Stack.Screen name="playing" component={Playing} />
-      ) : gameId ? (
+      {isPlaying ? (
+        <>
+          <Stack.Screen name="playing" headerTitle="Playing" component={Playing} />
+        </>
+      ) : (
         <>
           <Stack.Screen name="lobby-joining" headerTitle="New game" component={LobbyJoining} />
           <Stack.Screen name="teams" headerTitle="Teams" component={Teams} />
           <Stack.Screen name="write-papers" headerTitle="Write papers" component={WritePapers} />
           <Stack.Screen name="lobby-writing" headerTitle="Writting" component={LobbyWriting} />
         </>
-      ) : null}
+      )}
+      <Stack.Screen name="gate" component={Gate} />
     </Stack.Navigator>
   )
 }
 
 GameRoomEntry.propTypes = {
   navigation: PropTypes.object, // ReactNavigation
+  route: PropTypes.object, // ReactNavigation
 }

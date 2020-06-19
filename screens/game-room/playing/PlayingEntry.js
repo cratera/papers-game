@@ -102,7 +102,7 @@ export default function PlayingEntry({ navigation }) {
   return (
     <Page>
       {isRoundFinished ? (
-        <RoundScore />
+        <RoundScore navigation={navigation} />
       ) : isMyTurn ? (
         !hasCountdownStarted ? (
           <MyTurnGetReady description={DESCRIPTIONS[roundIndex]} />

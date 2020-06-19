@@ -1,5 +1,5 @@
 import React from 'react'
-import { Animated, Easing } from 'react-native'
+import { Platform, Animated, Easing } from 'react-native'
 import { Svg, Path, G, Defs, ClipPath } from 'react-native-svg'
 
 import * as Theme from '@theme'
@@ -8,6 +8,9 @@ const colorNeutral = Theme.colors.grayMedium
 const bg = Theme.colors.bg
 
 function useProps(size, color, style) {
+  if (size && typeof size !== 'number') {
+    console.warn(`Icon prop size ${size} must be a Number!`) // Otherwise it won't work on Firefox (web).
+  }
   return {
     styleWithSize: [{ width: size, height: size }, style],
     baseColor: color || colorNeutral,
@@ -99,7 +102,7 @@ export const IconSpin = ({ size, color, style, ...props }) /* eslint-disable-lin
         toValue: 1,
         duration: 2500,
         easing: Easing.inOut(Easing.ease), // Review @mmbotelho
-        useNativeDriver: true,
+        useNativeDriver: Platform.OS !== 'web',
       }),
       { iterations: 50 }
     ).start()

@@ -55,7 +55,7 @@ const OthersTurn = ({
           ? `Waiting for ${thisTurnPlayerName} to finish their turn.`
           : game.teams[teamId].name,
     }
-  }, [isAllWordsGuessed, amIWaiting, isTurnOn])
+  }, [isAllWordsGuessed, amIWaiting, isTurnOn, game.hasStarted])
 
   return (
     <Fragment>

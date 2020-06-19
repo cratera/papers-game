@@ -18,6 +18,7 @@ function areTeamPlayersEqual(teamsOld, teamsNew) {
   const tOld = {}
   const tNew = {}
 
+  // BUG - Review this, I think it's buggy... sometimes we have same team 2x
   for (const ix in teamsNew) {
     tNew[ix] = teamsNew[ix].players
   }
@@ -51,11 +52,11 @@ export default function Teams({ navigation }) {
   }, [])
 
   React.useEffect(() => {
-    // If someone just joined/left, create new teams.
+    // When someone just joined/left...
     generateTeams()
   }, [playersCount])
 
-  // This could be useRandomTeams()
+  // TODO later This could be useRandomTeams()
   function getRandomTeams() {
     const players = Object.keys(game.players)
     const teamsNr = 2 // LATER - Game Setting
@@ -91,7 +92,7 @@ export default function Teams({ navigation }) {
     })
 
     if (areTeamPlayersEqual(tempTeams, newTempTeams)) {
-      console.log('Randomize equal teams. Randomize again.')
+      console.log('Equal teams. Randomize again.')
       return getRandomTeams()
     } else {
       return newTempTeams
