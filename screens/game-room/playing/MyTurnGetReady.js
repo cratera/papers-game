@@ -24,6 +24,7 @@ const MyTurnGetReady = ({ description, roundIx, amIWaiting }) => {
   const { game, profile } = Papers.state
   const round = game.round
   const roundNr = round.current + 1
+  // const crash = round.current[camboom]
 
   function onStartClick() {
     Papers.startTurn()

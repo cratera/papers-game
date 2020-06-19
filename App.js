@@ -15,7 +15,7 @@ Sentry.init(SENTRY_CONFIG)
 export default class App extends React.Component {
   constructor(props) {
     super(props)
-    this.state = { hasError: false, error: null }
+    this.state = { hasError: false, error: null, errorTry: this.props.errorTry }
   }
 
   static getDerivedStateFromError(error) {
@@ -30,8 +30,12 @@ export default class App extends React.Component {
   render() {
     console.log(':: APP OS', Platform.OS)
     if (this.state.hasError) {
-      return <ErrorCrashed error={this.state.error} />
+      return <ErrorCrashed error={this.state.error} errorTry={this.state.errorTry} />
     }
     return <AppFn {...this.props} />
   }
+}
+
+App.defaultProps = {
+  errorTry: 0,
 }

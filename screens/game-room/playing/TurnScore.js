@@ -97,7 +97,7 @@ function ItemToggle(props) {
   }
 
   return (
-    <View style={[props.style]}>
+    <View style={props.style}>
       {props.children}
       <Button variant="light" size="sm" onPress={props.onPress}>
         Change

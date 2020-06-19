@@ -3,15 +3,18 @@ import PropTypes from 'prop-types'
 
 import { Platform, View, Text } from 'react-native'
 import * as Updates from 'expo-updates'
+// import * as ErrorRecovery from 'expo-error-recovery'
 
 import Page from '@components/page'
 import Button from '@components/button'
 import { IconSpin } from '@components/icons'
 import * as Theme from '@theme'
 
-export default function ErrorCrashed({ error }) {
+const AUTO_RELOAD = true // __DEV__
+
+export default function ErrorCrashed({ error, errorTry }) {
   React.useEffect(() => {
-    if (!__DEV__) {
+    if (AUTO_RELOAD) {
       setTimeout(() => {
         Updates.reloadAsync()
       }, 2500) // Time to user read the page text...
@@ -19,6 +22,9 @@ export default function ErrorCrashed({ error }) {
   }, [])
 
   async function reload() {
+    // CONTINUE HERE - Mark this reload count. If +3 force a fatal Error.
+    // ErrorRecovery.setRecoveryProps({ errorTry: errorTry + 1 })
+
     if (Platform.OS === 'web') {
       global.location.reload()
     } else {
@@ -34,14 +40,14 @@ export default function ErrorCrashed({ error }) {
         >
           <Text style={[Theme.typography.h1, Theme.u.center]}>😵</Text>
           <Text style={[Theme.typography.h3, Theme.u.center, { marginTop: 24, marginBottom: 8 }]}>
-            Ouch!
+            Ouch! {this.props.errorTry}
           </Text>
 
           <Text style={[Theme.typography.secondary]}>Something is not right, our head hurts.</Text>
           <Text style={[Theme.typography.small, { fontSize: 12, marginTop: 8, marginBottom: 32 }]}>
             Hang in there, this will be quick!
           </Text>
-          {__DEV__ ? (
+          {!AUTO_RELOAD ? (
             <>
               <Text
                 style={[Theme.typography.small, { fontSize: 10, marginTop: 8, marginBottom: 24 }]}
@@ -62,5 +68,6 @@ export default function ErrorCrashed({ error }) {
 }
 
 ErrorCrashed.propTypes = {
+  errorTry: PropTypes.number,
   error: PropTypes.object.isRequired, // Error
 }
