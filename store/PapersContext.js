@@ -24,7 +24,6 @@ export class PapersContextProvider extends Component {
     this.state = {
       socket: null, // rename to serverAPI?
       profile: {
-        // Our profile
         id: props.initialProfile.id,
         name: props.initialProfile.name,
         avatar: props.initialProfile.avatar,
@@ -146,7 +145,12 @@ export class PapersContextProvider extends Component {
     if (socket) {
       console.warn(':: Already connected. Should not happen!')
     } else {
-      const { gameId } = this.state.profile
+      const { gameId, id } = this.state.profile
+
+      if (!id) {
+        console.log(':: no profile id')
+        return
+      }
 
       if (!gameId) {
         console.log(':: no gameId')
@@ -176,7 +180,8 @@ export class PapersContextProvider extends Component {
     const { name, avatar } = this.state.profile
 
     if (!name) {
-      console.log(`Missing name! ${name}`)
+      // TODO!! Review all of these edge cases.
+      console.warn(`Missing name! ${name}`)
       return false
     }
 
@@ -199,7 +204,7 @@ export class PapersContextProvider extends Component {
   }
 
   async accessGame(variant, gameName, cb) {
-    if (!this.state.socket) {
+    if (!this.state.socket || !this.state.profile.id) {
       console.log('📌 accessGame() - init needed first')
 
       this.initAndSign((res, error) => {

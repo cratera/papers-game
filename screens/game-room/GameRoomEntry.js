@@ -27,6 +27,13 @@ export default function GameRoomEntry({ navigation, route }) {
   const isPlaying = game?.hasStarted || amIReady
 
   React.useEffect(() => {
+    if (!profileId) {
+      // TODO later - info the profile is needed first.
+      navigation.navigate('home')
+    }
+  }, [profileId])
+
+  React.useEffect(() => {
     // Player left / was kicked, or game was deleted, etc...
     if (!profileGameId && !game) {
       console.log(':: room -> home (left)')

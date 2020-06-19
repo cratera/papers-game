@@ -15,7 +15,7 @@ Here's a list of my learnings while building this mobile game with reac-native.
 - 🐛 Had to transform a Fn component to a Class, so TextInput would work properly. (HomeSignup). Back in a function component, on each onChangeText, the TextInput would unmount/mount, causing the keyboard to close (and re-open if autoFocus).... have no idea why. Google didn't help :(
 - IOS: shadow doesn't work on elements with overflow:hidden (border-radius). ex: Button.
 - Upload files to Firebase was a nightmare. See `store/Firebase.js _uploadAvatar()` for more info.
-- Didn't understand how to handle errors [expo ErrorRecovery](https://docs.expo.io/versions/v37.0.0/sdk/error-recovery/).
+- 📝 Didn't understand how to handle errors [expo ErrorRecovery](https://docs.expo.io/versions/v37.0.0/sdk/error-recovery/).
   - Update 2 days later: Use a React class component with Error Boundary. (App.js -> AppFn.js)
 - Add [firebase-analytics](https://docs.expo.io/versions/latest/sdk/firebase-analytics/)
 - Use [Sentry expo and web](https://github.com/expo/sentry-expo/issues/77)(https://github.com/expo/sentry-expo/issues/77#issuecomment-646099545)

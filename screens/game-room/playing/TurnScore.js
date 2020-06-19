@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react'
-import { View, Text } from 'react-native'
+import { Platform, View, Text } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import PropTypes from 'prop-types'
 
@@ -10,6 +10,8 @@ import { IconCheck, IconTimes } from '@components/icons'
 
 import * as Theme from '@theme'
 import Styles from './PlayingStyles.js'
+
+const isWeb = Platform.OS === 'web'
 
 const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, getPaperByKey }) => {
   return (
@@ -37,23 +39,24 @@ const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, getPaperByKey })
                 .map((paper, i) => {
                   const hasGuessed = papersTurn.guessed.includes(paper)
                   const Icon = hasGuessed ? IconCheck : IconTimes
-                  // BUG WEB: On scroll, it clicks on words.
                   return (
-                    <Button
-                      style={[Styles.tscore_item]}
+                    <ItemToggle
                       key={`${i}_${paper}`}
+                      style={[Styles.tscore_item]}
                       onPress={() => onTogglePaper(paper, !hasGuessed)}
                     >
                       <Icon
                         size={20}
                         color={hasGuessed ? Theme.colors.success : null}
-                        style={{ transform: [{ translateY: 4 }] }}
+                        style={{ flexShrink: 0, transform: [{ translateY: 4 }] }}
                       />
-                      <View style={{ width: 8 }}></View> {/* lazyness level 99 */}
+                      <View style={{ width: 8 }}>{/* lazyness level 99 */}</View>
                       <Text
                         style={[
-                          Theme.typography.body,
+                          Theme.typography.bold,
                           {
+                            flexGrow: 1,
+                            paddingRight: 4,
                             color: Theme.colors[hasGuessed ? 'success' : 'grayMedium'],
                             textDecorationLine: hasGuessed ? 'none' : 'line-through',
                           },
@@ -61,7 +64,7 @@ const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, getPaperByKey })
                       >
                         {getPaperByKey(paper)}
                       </Text>
-                    </Button>
+                    </ItemToggle>
                   )
                 })}
             </View>
@@ -86,6 +89,27 @@ TurnScore.propTypes = {
   onTogglePaper: PropTypes.func.isRequired,
   onFinish: PropTypes.func.isRequired,
   getPaperByKey: PropTypes.func.isRequired,
+}
+
+function ItemToggle(props) {
+  if (!isWeb) {
+    return <Button {...props} />
+  }
+
+  return (
+    <View style={[props.style]}>
+      {props.children}
+      <Button variant="light" size="sm" onPress={props.onPress}>
+        Change
+      </Button>
+    </View>
+  )
+}
+
+ItemToggle.propTypes = {
+  children: PropTypes.object.isRequired,
+  onPress: PropTypes.func.isRequired,
+  style: PropTypes.any,
 }
 
 export default TurnScore

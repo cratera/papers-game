@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { Platform, KeyboardAvoidingView, View, TextInput, Text } from 'react-native'
+import { Keyboard, Platform, KeyboardAvoidingView, View, TextInput, Text } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 
 import PapersContext from '@store/PapersContext.js'
@@ -48,7 +48,8 @@ export default function WritePapers({ navigation }) {
   }, [])
 
   React.useEffect(() => {
-    if (isAllWordsDone) {
+    const isMounted = true // TODO avoid a memory leak here caused by isSubmiting (finished)
+    if (isAllWordsDone && isMounted) {
       navigation.setOptions({
         headerRight: function HLB() {
           return (
@@ -74,6 +75,14 @@ export default function WritePapers({ navigation }) {
   React.useEffect(() => {
     if (wordsAreStored) {
       navigation.navigate('lobby-writing')
+    }
+  }, [wordsAreStored])
+
+  React.useEffect(() => {
+    return function closeKb() {
+      // In old/slow phones (iPhone5) the keyboard persited (rarely) after changing
+      // pages. This will make sure it gets closed.
+      Keyboard.dismiss()
     }
   }, [wordsAreStored])
 
