@@ -52,7 +52,15 @@ export default function Settings(props) {
       headerTitle: 'Settings',
       headerLeft: function HLB() {
         return (
-          <Page.HeaderBtn side="left" icon="back" onPress={() => props.navigation.goBack()}>
+          <Page.HeaderBtn
+            side="left"
+            icon="back"
+            onPress={() =>
+              props.navigation.canGoBack()
+                ? props.navigation.goBack()
+                : props.navigation.navigate(game ? 'room' : 'home')
+            }
+          >
             Back
           </Page.HeaderBtn>
         )
@@ -71,7 +79,7 @@ export default function Settings(props) {
         <Stack.Screen name="settings-profile" component={SettingsProfile} />
       )}
       <Stack.Screen name="settings-feedback" component={SettingsFeedback} />
-      <Stack.Screen name="settings-playground" component={SettingsPlayground} />
+      <Stack.Screen name="settings-experimental" component={SettingsExperimental} />
       <Stack.Screen name="settings-credits" component={SettingsCredits} />
     </Stack.Navigator>
   )
@@ -86,7 +94,7 @@ Settings.propTypes = {
 function SettingsProfile({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const [name, setName] = React.useState('')
-  const { profile, about } = Papers.state
+  const { profile } = Papers.state
 
   function handleDeleteAccount() {
     if (Platform.OS === 'web') {
@@ -141,61 +149,17 @@ function SettingsProfile({ navigation }) {
             onChangeText={text => setName(text)}
             onBlur={() => name && Papers.updateProfile({ name })}
           />
-          <View
-            style={{
-              paddingTop: 24,
-              paddingBottom: 16,
-              borderBottomWidth: 1,
-              borderBottomColor: Theme.colors.grayLight,
-            }}
-          >
-            <Text style={[Styles.alignLeft, Theme.typography.small, {}]}>More options</Text>
-          </View>
-          {[
-            {
-              id: 'fb',
-              title: 'Feedback',
-              icon: 'next',
-              onPress: () => navigation.navigate('settings-feedback'),
-            },
-            {
-              id: 'pg',
-              title: 'Playground',
-              icon: 'next',
-              onPress: () => navigation.navigate('settings-playground'),
-            },
-            {
-              id: 'don',
-              title: 'Buy us a coffee', // TODO!! Before release
-              onPress: () => {
-                Linking.openURL('https://www.buymeacoffee.com/sandrinap')
+          <MoreOptions
+            navigation={navigation}
+            list={[
+              {
+                id: 'del',
+                title: 'Delete account',
+                variant: 'danger',
+                onPress: handleDeleteAccount,
               },
-            },
-            {
-              id: 'del',
-              title: 'Delete account',
-              variant: 'danger',
-              onPress: handleDeleteAccount,
-            },
-          ].map(item => (
-            <Item key={item.id} {...item} />
-          ))}
-          <View style={[{ marginTop: 32, marginBottom: 32 }]}>
-            <TouchableOpacity onPress={() => navigation.navigate('settings-credits')}>
-              <Text style={[Theme.typography.small, Theme.u.center]}>
-                You are using version {about.version}.{about.ota}
-              </Text>
-              <Text
-                style={[
-                  Theme.typography.small,
-                  Theme.u.center,
-                  { color: Theme.colors.grayDark, marginTop: 4 },
-                ]}
-              >
-                Acknowledgments
-              </Text>
-            </TouchableOpacity>
-          </View>
+            ]}
+          />
         </ScrollView>
       </Page.Main>
     </Page>
@@ -210,7 +174,7 @@ SettingsProfile.propTypes = {
 
 function SettingsGame({ navigation }) {
   const Papers = React.useContext(PapersContext)
-  const { askToLeaveGame } = useLeaveGame({ navigation })
+  const { askToLeaveGame } = useLeaveGame({ navigation: navigation.dangerouslyGetParent() })
   const { game } = Papers.state
 
   if (!game) {
@@ -220,14 +184,15 @@ function SettingsGame({ navigation }) {
   return (
     <Page>
       <Page.Main>
-        <ScrollView>
+        <ScrollView style={Theme.u.scrollSideOffset}>
           <Text
-            style={[Theme.typography.h2, Theme.u.center, { marginTop: 24, marginBottom: 8 }]}
+            style={[Theme.typography.h2, Theme.u.center, { marginTop: 24 }]}
             accessibilityRole="header"
           >
             {game.name}
           </Text>
           <GameScore
+            id="gs"
             style={{
               paddingBottom: 16,
               marginBottom: 12,
@@ -235,7 +200,6 @@ function SettingsGame({ navigation }) {
               borderBottomColor: Theme.colors.grayLight,
             }}
           />
-          {/* BUG FlatList: https://github.com/GeekyAnts/NativeBase/issues/2947 */}
           {[
             {
               id: 'pl',
@@ -245,15 +209,21 @@ function SettingsGame({ navigation }) {
                 navigation.navigate('settings-players')
               },
             },
-            {
-              id: 'lg',
-              title: 'Leave Game',
-              variant: 'danger',
-              onPress: askToLeaveGame,
-            },
           ].map(item => (
             <Item key={item.id} {...item} />
           ))}
+
+          <MoreOptions
+            navigation={navigation}
+            list={[
+              {
+                id: 'lg',
+                title: 'Leave Game',
+                variant: 'danger',
+                onPress: askToLeaveGame,
+              },
+            ]}
+          />
         </ScrollView>
       </Page.Main>
     </Page>
@@ -263,6 +233,76 @@ function SettingsGame({ navigation }) {
 SettingsGame.propTypes = {
   onMount: PropTypes.object, // react-navigation
   navigation: PropTypes.object.isRequired, // react-navigation
+}
+
+function MoreOptions({ navigation, list }) {
+  const Papers = React.useContext(PapersContext)
+  const { about } = Papers.state
+
+  return (
+    <>
+      <View
+        style={{
+          paddingTop: 32,
+          paddingBottom: 16,
+          borderBottomWidth: 1,
+          borderBottomColor: Theme.colors.grayLight,
+        }}
+      >
+        <Text style={[Styles.alignLeft, Theme.typography.small, {}]}>More options</Text>
+      </View>
+
+      {[
+        {
+          id: 'fb',
+          title: 'Feedback',
+          icon: 'next',
+          onPress: () => navigation.navigate('settings-feedback'),
+        },
+        {
+          id: 'pg',
+          title: 'Experimental',
+          icon: 'next',
+          onPress: () => navigation.navigate('settings-experimental'),
+        },
+        {
+          id: 'don',
+          title: 'Buy us a coffee', // TODO!! Before release
+          onPress: () => {
+            Linking.openURL('https://www.buymeacoffee.com/sandrinap')
+          },
+        },
+        ...list,
+      ].map(item => (
+        <Item key={item.id} {...item} />
+      ))}
+      <View style={[{ marginTop: 32, marginBottom: 32 }]}>
+        <TouchableOpacity onPress={() => navigation.navigate('settings-credits')}>
+          <Text style={[Theme.typography.small, Theme.u.center]}>
+            You are using version {about.version}.{about.ota}
+          </Text>
+          <Text
+            style={[
+              Theme.typography.small,
+              Theme.u.center,
+              { color: Theme.colors.grayDark, marginTop: 4 },
+            ]}
+          >
+            Acknowledgments
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </>
+  )
+}
+
+MoreOptions.defaultProps = {
+  list: [],
+}
+
+MoreOptions.propTypes = {
+  navigation: PropTypes.object,
+  list: PropTypes.array,
 }
 
 // ======
@@ -338,9 +378,9 @@ SettingsFeedback.propTypes = {
 
 // ======
 
-function SettingsPlayground({ navigation }) {
+function SettingsExperimental({ navigation }) {
   React.useEffect(() => {
-    setSubHeader(navigation, 'Playground')
+    setSubHeader(navigation, 'Experimental')
   }, [])
 
   const styleBlock = {
@@ -370,7 +410,7 @@ function SettingsPlayground({ navigation }) {
     </Page>
   )
 }
-SettingsPlayground.propTypes = propTypesCommon
+SettingsExperimental.propTypes = propTypesCommon
 
 // ======
 

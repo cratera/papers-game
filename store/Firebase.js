@@ -670,8 +670,10 @@ async function markMeAsReady(roundStatus) {
   const round = await refGameRound.once('value')
 
   if (!round.exists()) {
-    console.log(':: set roundStatus')
     await refGameRound.set(roundStatus)
+  } else {
+    // To save some kb in data ... I guess. but needs improvement.
+    DB.ref(`games/${gameId}/round/wordsLeft`).set(roundStatus.wordsLeft)
   }
 
   await DB.ref(`games/${gameId}/players/${id}`).update({ isReady: true })

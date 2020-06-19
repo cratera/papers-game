@@ -37,6 +37,7 @@ const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, getPaperByKey })
                 .map((paper, i) => {
                   const hasGuessed = papersTurn.guessed.includes(paper)
                   const Icon = hasGuessed ? IconCheck : IconTimes
+                  // BUG WEB: On scroll, it clicks on words.
                   return (
                     <Button
                       style={[Styles.tscore_item]}

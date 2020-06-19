@@ -17,6 +17,9 @@ const GameScore = ({ BOAT, style }) => {
     []
   )
 
+  // TODO bug "arrayOfTeamsId" sometimes is empty
+  // TODO bug, sometimes the numbers don't match an it can happen a number being submitted by mistake.
+  // dunno how that happened, but it did.
   return (
     <View style={style}>
       {scoreByRound[roundIx].arrayOfTeamsId.sort(sortTeamsByScore).map((teamId, index) => {

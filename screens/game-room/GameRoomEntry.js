@@ -65,10 +65,12 @@ export default function GameRoomEntry({ navigation, route }) {
     return <Gate />
   }
 
+  const initialRouter = amIReady ? 'playing' : wordsAreStored ? 'lobby-writing' : 'lobby-joining'
+
   return (
     <Stack.Navigator
       screenOptions={{ gestureEnabled: false, headerTitleAlign: 'center' }}
-      initialRouteName={amIReady ? 'playing' : wordsAreStored ? 'lobby-writing' : 'lobby-joining'}
+      initialRouteName={initialRouter}
     >
       {isPlaying ? (
         <>

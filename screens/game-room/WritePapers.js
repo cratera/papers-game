@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { KeyboardAvoidingView, View, TextInput, Text } from 'react-native'
+import { Platform, KeyboardAvoidingView, View, TextInput, Text } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 
 import PapersContext from '@store/PapersContext.js'
@@ -12,6 +12,8 @@ import { headerTheme } from '@navigation/headerStuff.js'
 
 import * as Theme from '@theme'
 import Styles from './WritePapersStyles.js'
+
+const isNotWeb = Platform.OS !== 'web'
 
 export default function WritePapers({ navigation }) {
   const Papers = React.useContext(PapersContext)
@@ -96,7 +98,7 @@ export default function WritePapers({ navigation }) {
             {renderSliders()}
           </ScrollView>
           <Page.CTAs style={{ paddingBottom: 80, paddingHorizontal: 0 }} hasOffset>
-            {!isAllWordsDone && (
+            {!isAllWordsDone && isNotWeb && (
               <Button variant="light" onPress={handleClickNext}>
                 Next paper
               </Button>
