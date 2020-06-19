@@ -30,6 +30,9 @@ Here's a list of my learnings while building this mobile game with reac-native.
 
 ```bash
 
+# RELEASE WEB
+yarn release:web -- -m "x.x.x@xx ![release summary]"
+
 # RELEASE IOS
 
 # Update version:
@@ -38,7 +41,7 @@ Here's a list of my learnings while building this mobile game with reac-native.
 
 
 # One command OTA update:
-yarn release:ota -- -m "x.x.x@xx [release summary]"
+yarn release:ota -- -m "x.x.x@xx ![release summary]"
 
 
 # verify everything is okay
@@ -73,10 +76,6 @@ expo upload:ios --path path/to/archive.ipa
 
   # wait 1min... and then wait more ~15 minutes... be patient...
   # After, go to AppStoreConnect. The the new build is there. It will take a few hours to process the build
-
-
-# RELEASE WEB
-expo build:web && firebase deploy --only hosting:web
 ```
 
 ---
