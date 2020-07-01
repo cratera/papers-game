@@ -279,7 +279,7 @@ function MoreOptions({ navigation, list }) {
       <View style={[{ marginTop: 32, marginBottom: 32 }]}>
         <TouchableOpacity onPress={() => navigation.navigate('settings-credits')}>
           <Text style={[Theme.typography.small, Theme.u.center]}>
-            You are using version {about.version}.{about.ota}
+            You are using version {about.version}@{about.ota}
           </Text>
           <Text
             style={[
