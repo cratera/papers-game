@@ -1,24 +1,33 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-
-import { Keyboard, Platform, KeyboardAvoidingView, View, TextInput, Text } from 'react-native'
-import { ScrollView } from 'react-native-gesture-handler'
+import debounce from 'lodash/debounce'
+import {
+  Keyboard,
+  Dimensions,
+  KeyboardAvoidingView,
+  View,
+  TextInput,
+  Text,
+  ScrollView,
+} from 'react-native'
 
 import PapersContext from '@store/PapersContext.js'
 
 import Button from '@components/button'
 import Page from '@components/page'
+import { IconArrow } from '@components/icons'
 import { headerTheme } from '@navigation/headerStuff.js'
-
 import * as Theme from '@theme'
 import Styles from './WritePapersStyles.js'
 
-const isNotWeb = Platform.OS !== 'web'
+const vw = Dimensions.get('window').width / 100 // TODO useDimensions
 
 export default function WritePapers({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const { game, profile } = Papers.state
   const [words, setLocalWords] = React.useState([])
+  const refSlides = React.useRef()
+  const scrollDebounced = React.useRef(debounce(handleScrollPapers, 300)).current
 
   const [errorMsg, setErrorMsg] = React.useState(null)
   const [isSubmiting, setIsSubmiting] = React.useState(false)
@@ -76,9 +85,7 @@ export default function WritePapers({ navigation }) {
     if (wordsAreStored) {
       navigation.navigate('lobby-writing')
     }
-  }, [wordsAreStored])
 
-  React.useEffect(() => {
     return function closeKb() {
       // In old/slow phones (iPhone5) the keyboard persited (rarely) after changing
       // pages. This will make sure it gets closed.
@@ -86,40 +93,74 @@ export default function WritePapers({ navigation }) {
     }
   }, [wordsAreStored])
 
+  React.useEffect(() => {
+    // Ensure slides is scrolled at the right position
+    refSlides.current.scrollTo({ x: vw * 100 * paperIndex })
+  }, [paperIndex])
+
   return (
     <Page>
       <Page.Main>
         <View style={[Styles.header]}>
-          <Text style={[Styles.header_txt, Theme.typography.small, Theme.typography.secondary]}>
+          <Text style={[Theme.typography.body, Theme.u.center]}>
             Fill out the words or sentences you want your friends to guess.
           </Text>
         </View>
-        <View style={Styles.sliderLabels} aria-label="Papers status">
-          <Text>
-            {paperIndex + 1} of {wordsGoal} • {wordsCount} {wordsCount === 1 ? 'paper' : 'papers'}{' '}
-            filled
-          </Text>
-          {errorMsg && <Text style={[Theme.typography.error, { marginTop: 4 }]}>{errorMsg}</Text>}
-        </View>
-
         <KeyboardAvoidingView behavior="padding" style={Styles.scrollKAV}>
-          <ScrollView style={[Styles.slides, Theme.u.scrollSideOffset]}>
-            {renderSliders()}
+          <ScrollView
+            ref={refSlides}
+            pagingEnabled
+            scrollEventThrottle={500}
+            horizontal
+            onScroll={e => {
+              scrollDebounced(e.nativeEvent.contentOffset.x, paperIndex)
+            }}
+            style={[Theme.u.scrollSideOffset, Styles.slides]}
+          >
+            {renderPapers()}
           </ScrollView>
-          <Page.CTAs style={{ paddingBottom: 80, paddingHorizontal: 0 }} hasOffset>
-            {!isAllWordsDone && isNotWeb && (
-              <Button variant="light" onPress={handleClickNext}>
-                Next paper
-              </Button>
-            )}
+
+          <Page.CTAs style={Styles.ctas}>
+            <Button
+              style={[Styles.ctas_btn]}
+              styleTouch={[paperIndex === 0 && Styles.ctas_btn_isHidden]}
+              variant="icon"
+              onPress={handleClickPrev}
+            >
+              <IconArrow
+                size={20}
+                color={Theme.colors.bg}
+                style={{ transform: [{ rotate: '180deg' }] }}
+              />
+            </Button>
+
+            <View style={Styles.status} aria-label="Papers status">
+              <Text style={Theme.u.center}>
+                {wordsCount} out of {wordsGoal} done ({paperIndex})
+              </Text>
+              {errorMsg && (
+                <Text style={[Theme.typography.error, { marginTop: 4 }]}>{errorMsg}</Text>
+              )}
+            </View>
+
+            <Button
+              variant="icon"
+              style={Styles.ctas_btn}
+              styleTouch={[paperIndex === wordsGoal - 1 && Styles.ctas_btn_isHidden]}
+              onPress={handleClickNext}
+            >
+              <IconArrow size={20} color={Theme.colors.bg} />
+            </Button>
           </Page.CTAs>
         </KeyboardAvoidingView>
       </Page.Main>
     </Page>
   )
 
-  function renderSliders() {
-    const papers = []
+  function renderPapers() {
+    const papers = [
+      <View key="ml" style={{ width: 1 }}></View>, // force left margin to work on web
+    ]
     for (let i = 0; i < wordsGoal; i++) {
       const isActive = i === paperIndex
 
@@ -138,6 +179,14 @@ export default function WritePapers({ navigation }) {
     return papers
   }
 
+  function handleScrollPapers(scrollX, curPaper) {
+    const newPaper = Math.round(scrollX / (vw * 100))
+    if (curPaper !== newPaper) {
+      // console.log('handleScrollPapers - update', newPaper)
+      setPaperIndex(newPaper)
+    }
+  }
+
   function handleWordChange(word, index) {
     if (typeof word !== 'string') {
       console.warn('Wow, this is not a word!', word)
@@ -154,13 +203,18 @@ export default function WritePapers({ navigation }) {
     setLocalWords(wordsToEdit)
   }
 
+  function handleClickPrev() {
+    setPaperIndex(Math.max(0, paperIndex - 1))
+  }
+
   function handleClickNext() {
     // Find if any submitted paper was left empty
     const firstEmpty = words.findIndex(word => !word)
     // Go to next paper even if current one is empty
     const nextEmpty = firstEmpty === -1 || firstEmpty === paperIndex ? paperIndex + 1 : firstEmpty
     // Watch out to go back to first paper when reaching the end
-    setPaperIndex(nextEmpty > wordsGoal - 1 ? 0 : nextEmpty)
+    const nextPaperIndex = nextEmpty > wordsGoal - 1 ? 0 : nextEmpty
+    setPaperIndex(nextPaperIndex)
   }
 
   async function handleSubmitClick() {
@@ -196,11 +250,19 @@ const SlidePaper = ({ onChange, isActive, onFocus, onSubmit, i }) => {
   }, [isActive])
 
   return (
-    <View style={[Styles.slide]} data-slide={i + 1}>
+    <View
+      style={[Styles.slide, (isActive || isFocused) && Styles.slide_isActive]}
+      data-slide={i + 1}
+    >
       <TextInput
         ref={elInput}
-        style={[Styles.input, (isActive || isFocused) && Styles.input_isActive]}
-        placeholderTextColor={Theme.colors.grayMedium}
+        style={[
+          Styles.input,
+          Theme.typography.h1,
+          (isActive || isFocused) && Styles.input_isActive,
+        ]}
+        placeholder={`Paper #${i + 1}`}
+        placeholderTextColor={Theme.colors.grayLight}
         blurOnSubmit={false} // onSubmitEnding will handle the focus on the next paper.
         onChangeText={text => onChange(text, i)}
         onBlur={() => setIsFocused(false)}
@@ -210,6 +272,8 @@ const SlidePaper = ({ onChange, isActive, onFocus, onSubmit, i }) => {
           setIsFocused(true)
         }}
         enablesReturnKeyAutomatically
+        caretHidden
+        multiline
       ></TextInput>
     </View>
   )
