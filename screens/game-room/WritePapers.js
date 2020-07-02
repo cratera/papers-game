@@ -136,7 +136,7 @@ export default function WritePapers({ navigation }) {
 
             <View style={Styles.status} aria-label="Papers status">
               <Text style={Theme.u.center}>
-                {wordsCount} out of {wordsGoal} done ({paperIndex})
+                {wordsCount} out of {wordsGoal} done
               </Text>
               {errorMsg && (
                 <Text style={[Theme.typography.error, { marginTop: 4 }]}>{errorMsg}</Text>

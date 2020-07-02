@@ -333,17 +333,16 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
   return (
     <Fragment>
       <Page.Main blankBg>
-        <View>
-          <Text
-            style={[
-              Theme.typography.h1,
-              Styles.go_counting,
-              countdown <= 10500 && { color: Theme.colors.danger },
-            ]}
-          >
-            {msToSecPretty(countdown)}
-          </Text>
-          {/* display paper */}
+        <Text
+          style={[
+            Theme.typography.h1,
+            Styles.go_counting,
+            countdown <= 10500 && { color: Theme.colors.danger },
+          ]}
+        >
+          {msToSecPretty(countdown)}
+        </Text>
+        <View style={Styles.go_zone}>
           <TouchableHighlight
             underlayColor={Theme.colors.bg}
             onPressIn={() => setPaperBlur(false)}
@@ -379,14 +378,14 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
           </TouchableHighlight>
         </View>
 
-        {false && (
+        {/* {true && (
           <View style={{ display: 'block' }}>
             <Text style={{ fontSize: 10, lineHeight: 10 }}>
               {'\n'} - passed: {papersTurn.passed.join(', ')} {'\n'} - guessed:{' '}
               {papersTurn.guessed.join(', ')} {'\n'} - wordsLeft: {papersTurn.wordsLeft.join(', ')}{' '}
             </Text>
           </View>
-        )}
+        )} */}
       </Page.Main>
 
       <Page.CTAs hasOffset blankBg style={Styles.go_ctas}>

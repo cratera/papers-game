@@ -21,7 +21,7 @@ export default StyleSheet.create({
     // flexDirection: 'row',
     marginLeft: -16,
     marginTop: 16,
-    maxHeight: vh * 20 + 8,
+    maxHeight: vh * 20 + 12,
   },
   slide: {
     height: vh * 20,
@@ -30,12 +30,18 @@ export default StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
-    borderColor: Theme.colors.grayLight,
-    borderWidth: 1,
-    paddingHorizontal: 16,
+    backgroundColor: Theme.colors.bg,
+    shadowColor: Theme.colors.grayDark,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 5,
   },
   slide_isActive: {
-    borderColor: Theme.colors.primary,
+    shadowOpacity: 0.5,
   },
   input: {
     borderColor: 'transparent',
@@ -61,6 +67,6 @@ export default StyleSheet.create({
   },
   ctas_btn_isHidden: {
     opacity: 0,
-    pointerEvents: 'none',
+    // pointerEvents: 'none',
   },
 })

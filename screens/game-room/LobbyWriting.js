@@ -97,9 +97,11 @@ export default function LobbyWriting({ navigation }) {
           <Text style={[Theme.typography.error, Theme.u.center, { marginBottom: 8 }]}>
             {errorMsg}
           </Text>
-          <Button onPress={handleReadyClick} isLoading={isSubmitting}>
-            {"I'm ready!"}
-          </Button>
+          {didEveryoneSubmittedTheirWords && (
+            <Button onPress={handleReadyClick} isLoading={isSubmitting}>
+              {"I'm ready!"}
+            </Button>
+          )}
         </Page.CTAs>
       </Page>
     </Fragment>

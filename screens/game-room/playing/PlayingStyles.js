@@ -28,16 +28,23 @@ export default StyleSheet.create({
   go_count321: {
     color: Theme.colors.primary,
     textAlign: 'center',
+    marginTop: 40,
     marginBottom: 24,
   },
   go_counting: {
     color: Theme.colors.grayDark,
     textAlign: 'center',
-    marginBottom: 24,
+    marginTop: 40,
   },
   go_done_msg: {
     textAlign: 'center',
     marginTop: 25 * vh,
+  },
+  go_zone: {
+    flexGrow: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
   },
   go_paper: {
     height: 60 * vw,
@@ -54,6 +61,7 @@ export default StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 4,
     elevation: 5,
+    marginBottom: 40,
   },
   go_paper_sentence: {
     display: 'flex',
@@ -114,7 +122,7 @@ export default StyleSheet.create({
   },
   go_ctas_no: {
     borderWidth: 0,
-    backgroundColor: Theme.colors.primary,
+    backgroundColor: Theme.colors.danger,
   },
 
   // Turn StaTus:

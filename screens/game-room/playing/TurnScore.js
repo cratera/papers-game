@@ -107,7 +107,7 @@ function ItemToggle(props) {
 }
 
 ItemToggle.propTypes = {
-  children: PropTypes.object.isRequired,
+  children: PropTypes.array.isRequired,
   onPress: PropTypes.func.isRequired,
   style: PropTypes.any,
 }

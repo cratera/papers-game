@@ -8,6 +8,7 @@ Here's a list of my learnings while building this mobile game with reac-native.
 - ❓What's the best way to async/wait and try/catch stuff? Component? Context? "Backend"?
 - Those react-navigation screen animations are hard to understand... still need to learn it
 - 🐛Firefox: width/height must be a number. If it's a string, it does not work. (found when using icons)
+- Do a simple carousel/slider (for WritePapers) - based [on this code](https://github.com/catalinmiron/react-native-aiaiai-carousel-animation)
 
 ## Expo
 

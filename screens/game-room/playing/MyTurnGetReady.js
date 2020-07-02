@@ -7,7 +7,6 @@ import PapersContext from '@store/PapersContext.js'
 import Button from '@components/button'
 import Page from '@components/page'
 import { IconNonWords } from '@components/icons'
-import TurnStatus from './TurnStatus'
 
 import * as Theme from '@theme'
 
@@ -21,7 +20,7 @@ const place = (x, y, deg) => ({
 
 const MyTurnGetReady = ({ description, roundIx, amIWaiting }) => {
   const Papers = React.useContext(PapersContext)
-  const { game, profile } = Papers.state
+  const { game } = Papers.state
   const round = game.round
   const roundNr = round.current + 1
   // const crash = round.current[camboom]
@@ -34,7 +33,7 @@ const MyTurnGetReady = ({ description, roundIx, amIWaiting }) => {
     <Fragment>
       <Page.Main blankBg>
         <View style={Styles.header}>
-          <Text style={Theme.typography.h2}>Round {roundNr}</Text>
+          <Text style={Theme.typography.h2}>{`It's your turn!`}</Text>
           <View style={StylesIn.illustration}>
             <IconNonWords
               color={Theme.colors.primaryLight}
@@ -57,24 +56,20 @@ const MyTurnGetReady = ({ description, roundIx, amIWaiting }) => {
             <IconNonWords style={[StylesIn.icon, place(30, 55, '18deg'), StylesIn.mirror]} />
             <IconNonWords style={[StylesIn.icon, place(87, 92, '18deg')]} />
           </View>
-          <Text style={Theme.typography.secondary}>Rules:</Text>
+          <Text style={Theme.typography.secondary}>Round {roundNr}</Text>
           <Text style={[Theme.typography.bold, Theme.u.center, { marginTop: 8 }]}>
             {description}
           </Text>
         </View>
       </Page.Main>
       <Page.CTAs blankBg>
-        <TurnStatus
-          style={{ marginBottom: 16 }}
-          title="Next up"
-          player={{ ...profile, name: 'You!' }}
-          teamName={
-            !game.hasStarted || amIWaiting
-              ? 'Waiting for everyone to say they are ready.'
-              : 'Everyone is ready!'
-          }
-        />
-        {game.hasStarted && !amIWaiting && <Button onPress={onStartClick}>Start turn</Button>}
+        {game.hasStarted && !amIWaiting ? (
+          <Button onPress={onStartClick}>Start turn</Button>
+        ) : (
+          <Text style={[Theme.typography.small, Theme.u.center]}>
+            Waiting for everyone to say they are ready.
+          </Text>
+        )}
       </Page.CTAs>
     </Fragment>
   )
