@@ -88,11 +88,12 @@ export default function ListPlayers({ players, enableKickout, isStatusVisible, .
                       ? 'Creating teams...'
                       : ''
                     : ''}
-                  {isAfk && (
+                  {/* {isAfk && (
+                    // This seems buggy... remove it for now.
                     <Text style={[Theme.typography.small, { color: Theme.colors.primary }]}>
                       Disconnected
                     </Text>
-                  )}
+                  )} */}
                 </Text>
               </View>
             </View>

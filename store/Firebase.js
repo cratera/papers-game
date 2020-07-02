@@ -513,7 +513,8 @@ function _pubGame(gameId) {
   // Prepare in case we get offline.
   const isAfkRef = firebase.database().ref(`users/${LOCAL_PROFILE.id}/isAfk`)
   isAfkRef.onDisconnect().set(true) // TODO subscribe
-  // TODO/BUG isAFK sometimes is a negative positive. dunno why
+  // BUG: isAFK sometimes is a negative positive. dunno why.
+  //    - Workaround: removed it from the UI for now.
 }
 
 /**
