@@ -69,7 +69,7 @@ export default function GameRoomEntry({ navigation, route }) {
 
   // TODO later... learn routing redirect properly.
   if (!game) {
-    return <Gate />
+    return <Gate navigation={navigation} />
   }
 
   const initialRouter = amIReady ? 'playing' : wordsAreStored ? 'lobby-writing' : 'lobby-joining'

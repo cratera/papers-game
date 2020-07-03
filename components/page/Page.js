@@ -1,5 +1,5 @@
 import React from 'react'
-import { View } from 'react-native'
+import { Platform, View, Text } from 'react-native'
 import PropTypes from 'prop-types'
 
 import * as Theme from '@theme'
@@ -7,12 +7,32 @@ import Styles from './PageStyles.js'
 import SettingsToggle from '@components/settings'
 import Button from '@components/button'
 import { IconArrow } from '@components/icons'
+import NetInfo from '@react-native-community/netinfo'
 
 const Page = ({ children, ...otherProps }) => {
+  const [bannerMsg, setBannerMsg] = React.useState(null)
+
+  React.useEffect(() => {
+    if (Platform.OS === 'ios') {
+      // TODO later... this does not seem to work on web...
+      const unsubscribe = NetInfo.addEventListener(state => {
+        setBannerMsg(state.isConnected ? null : 'No internet connection')
+      })
+      return unsubscribe
+    }
+  }, [])
+
   return (
-    <View style={Styles.page} {...otherProps}>
-      {children}
-    </View>
+    <>
+      {bannerMsg && (
+        <View style={Styles.banner}>
+          <Text style={Styles.banner_text}>{bannerMsg}</Text>
+        </View>
+      )}
+      <View style={Styles.page} {...otherProps}>
+        {children}
+      </View>
+    </>
   )
 }
 

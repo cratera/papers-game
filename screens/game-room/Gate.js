@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 
 import PapersContext from '@store/PapersContext.js'
 
+import { headerTheme } from '@navigation/headerStuff.js'
 import Page from '@components/page'
 import { IconSpin } from '@components/icons'
 import * as Theme from '@theme'
@@ -13,6 +14,12 @@ export default function Gate({ navigation, route }) {
   const { profile } = Papers.state
   const profileGameId = profile.gameId || ''
   const goal = route?.params?.goal || 'rejoin' // rejoin || leave
+
+  React.useEffect(() => {
+    navigation.setOptions({
+      ...headerTheme(),
+    })
+  }, [])
 
   // Any "side effect" when gate action is completed (join, left, etc...)
   // is handled by the parent GameRoomEntry. Not sure if it's the best approach

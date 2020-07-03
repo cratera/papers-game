@@ -20,6 +20,15 @@ export default StyleSheet.create({
     paddingHorizontal: gutter,
     alignSelf: 'stretch',
   },
+  banner: {
+    backgroundColor: Theme.colors.grayDark,
+    paddingVertical: 8,
+  },
+  banner_text: {
+    color: Theme.colors.bg,
+    textAlign: 'center',
+    fontSize: 14,
+  },
   ctas: {
     backgroundColor: Theme.colors.bg,
     paddingHorizontal: gutter,
