@@ -78,8 +78,16 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
     // when the component mounts (3, 2, 1...)
     if (!!prevCountdownSec && countdownSec === 0) {
       console.log('useEffect:: timesup!')
+      Papers.playSound('timesup')
       setIsDone(true)
       setTimeout(resetIsDone, 1500)
+    }
+  }, [countdownSec, prevCountdownSec])
+
+  React.useLayoutEffect(() => {
+    // REVIEW - Is this safe? In very slow phones may not work. (eg. 5 -> 3 )
+    if (prevCountdownSec === 5 && countdownSec === 4) {
+      Papers.playSound('bomb')
     }
   }, [countdownSec, prevCountdownSec])
 
@@ -215,6 +223,8 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
     if (isPaperChanging) {
       return
     }
+
+    Papers.playSound(hasGuessed ? 'right' : 'wrong')
 
     setIsPaperChanging(true)
     setPaperAnimation(hasGuessed ? 'gotcha' : 'nope')
@@ -352,9 +362,9 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
               <View style={Styles.go_paper_sentence}>
                 {(getPaperByKey(papersTurnCurrent) || `😱 BUG 😱 ${papersTurnCurrent} (Click pass)`)
                   .split(' ')
-                  .map(word => (
+                  .map((word, i) => (
                     <Text
-                      key={word}
+                      key={`${word}_${i}`}
                       style={[
                         Theme.typography.h2,
                         Styles.go_paper_word,

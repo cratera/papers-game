@@ -44,6 +44,9 @@ export default function LobbyWriting({ navigation }) {
           </Page.HeaderBtn>
         )
       },
+      headerRight: function HLB() {
+        return <Page.HeaderBtnSettings />
+      },
     })
   }, [])
 
@@ -93,16 +96,17 @@ export default function LobbyWriting({ navigation }) {
             <ListTeams isStatusVisible />
           </ScrollView>
         </Page.Main>
-        <Page.CTAs hasOffset>
-          <Text style={[Theme.typography.error, Theme.u.center, { marginBottom: 8 }]}>
-            {errorMsg}
-          </Text>
-          {didEveryoneSubmittedTheirWords && (
+        {didEveryoneSubmittedTheirWords && (
+          <Page.CTAs hasOffset>
+            <Text style={[Theme.typography.error, Theme.u.center, { marginBottom: 8 }]}>
+              {errorMsg}
+            </Text>
+
             <Button onPress={handleReadyClick} isLoading={isSubmitting}>
               {"I'm ready!"}
             </Button>
-          )}
-        </Page.CTAs>
+          </Page.CTAs>
+        )}
       </Page>
     </Fragment>
   )

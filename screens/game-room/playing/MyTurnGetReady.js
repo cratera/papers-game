@@ -26,7 +26,11 @@ const MyTurnGetReady = ({ description, roundIx, amIWaiting }) => {
   // const crash = round.current[camboom]
 
   function onStartClick() {
-    Papers.startTurn()
+    try {
+      Papers.startTurn()
+    } catch (e) {
+      console.warn('start turn failed', e.message)
+    }
   }
 
   return (

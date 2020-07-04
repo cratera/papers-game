@@ -304,6 +304,7 @@ const SlidePaper = ({ onChange, isActive, onFocus, onSubmit, i }) => {
         }}
         caretHidden
         multiline
+        autoCorrect={false}
       ></TextInput>
     </View>
   )

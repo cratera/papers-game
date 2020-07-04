@@ -79,6 +79,7 @@ export default function Settings(props) {
         <Stack.Screen name="settings-profile" component={SettingsProfile} />
       )}
       <Stack.Screen name="settings-feedback" component={SettingsFeedback} />
+      <Stack.Screen name="settings-sound" component={SettingsSound} />
       <Stack.Screen name="settings-experimental" component={SettingsExperimental} />
       <Stack.Screen name="settings-credits" component={SettingsCredits} />
     </Stack.Navigator>
@@ -191,15 +192,17 @@ function SettingsGame({ navigation }) {
           >
             {game.name}
           </Text>
-          <GameScore
-            id="gs"
-            style={{
-              paddingBottom: 16,
-              marginBottom: 12,
-              borderBottomWidth: 1,
-              borderBottomColor: Theme.colors.grayLight,
-            }}
-          />
+          {game.round && (
+            <GameScore
+              id="gs"
+              style={{
+                paddingBottom: 16,
+                marginBottom: 12,
+                borderBottomWidth: 1,
+                borderBottomColor: Theme.colors.grayLight,
+              }}
+            />
+          )}
           {[
             {
               id: 'pl',
@@ -253,6 +256,12 @@ function MoreOptions({ navigation, list }) {
       </View>
 
       {[
+        {
+          id: 'sd',
+          title: 'Sound',
+          icon: 'next',
+          onPress: () => navigation.navigate('settings-sound'),
+        },
         {
           id: 'fb',
           title: 'Feedback',
@@ -397,13 +406,11 @@ function SettingsExperimental({ navigation }) {
           <Text style={[Theme.typography.h3, Theme.u.center]}>🚧 For Devs only. Stay away! 🚧</Text>
 
           <View style={styleBlock}>
-            <TestCrashing />
-          </View>
-          <View style={styleBlock}>
             <OtaChecker />
           </View>
+
           <View style={styleBlock}>
-            <AudioPreview />
+            <TestCrashing />
           </View>
         </ScrollView>
       </Page.Main>
@@ -411,6 +418,23 @@ function SettingsExperimental({ navigation }) {
   )
 }
 SettingsExperimental.propTypes = propTypesCommon
+
+// ======
+
+function SettingsSound({ navigation }) {
+  React.useEffect(() => {
+    setSubHeader(navigation, 'Sound Skins')
+  }, [])
+
+  return (
+    <Page>
+      <Page.Main style={{ paddingTop: 16 }}>
+        <AudioPreview />
+      </Page.Main>
+    </Page>
+  )
+}
+SettingsSound.propTypes = propTypesCommon
 
 // ======
 

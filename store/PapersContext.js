@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 
 import wordsForEveryone from './wordsForEveryone.js'
 import { getNextTurn } from './papersMethods.js'
+import * as PapersSound from './PapersSound.js'
 
 import serverInit from './Firebase.js'
 
@@ -70,6 +71,8 @@ export class PapersContextProvider extends Component {
       setTurnLocalState: this.setTurnLocalState.bind(this),
 
       startNextRound: this.startNextRound.bind(this),
+
+      playSound: this.playSound.bind(this),
     }
   }
 
@@ -86,6 +89,9 @@ export class PapersContextProvider extends Component {
       avatar: avatar ? 'has avatar' : 'no avatar',
     })
     await this.tryToReconnect()
+
+    // REVIEW - Is this the right moment to load the skins?
+    await PapersSound.init()
   }
 
   componentWillUnmount() {
@@ -102,7 +108,7 @@ export class PapersContextProvider extends Component {
     return (
       <PapersContext.Provider
         value={{
-          status: this.state.status,
+          status: this.state.status, // remove this. deprecated
           state: {
             status: this.state.status,
             profile: this.state.profile,
@@ -507,6 +513,7 @@ export class PapersContextProvider extends Component {
       wordsLeft: this.state.game.words._all.map((w, i) => i),
     }
 
+    this.PapersAPI.playSound('ready')
     await this.state.socket.markMeAsReady(roundStatus)
   }
 
@@ -519,6 +526,7 @@ export class PapersContextProvider extends Component {
 
   startTurn() {
     console.log('📌 startTurn()')
+    this.PapersAPI.playSound('turnstart')
     this.state.socket.startTurn()
   }
 
@@ -682,6 +690,10 @@ export class PapersContextProvider extends Component {
     await this.state.socket.removePlayer(playerId)
     // eventually pub on 'players.removed' will be called
     return true
+  }
+
+  playSound(soundId) {
+    PapersSound.play(soundId)
   }
 }
 

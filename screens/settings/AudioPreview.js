@@ -1,68 +1,80 @@
 import React from 'react'
-import { View, Text } from 'react-native'
+import { Platform, TouchableOpacity, Text, View } from 'react-native'
 import { Audio } from 'expo-av'
 
+import PapersContext from '@store/PapersContext.js'
+import Button from '@components/button'
 import * as Theme from '@theme'
 
-import Button from '@components/button'
+// TODO make this dynamic.
+const sounds = ['ready', 'turnstart', 'wrong', 'right', 'bomb', 'fivesl', 'timesup']
 
-const sounds = {
-  default: {
-    startCount: 'https://freesound.org/data/previews/474/474474_7903707-lq.mp3',
-    endCount: 'https://freesound.org/data/previews/434/434888_4042910-lq.mp3',
-  },
-}
 export default function AudioPreview() {
-  const [audioSkin, setAudioSkin] = React.useState('default')
-  const [isLoading, setIsLoading] = React.useState(true)
-  const playset = React.useRef()
+  const Papers = React.useContext(PapersContext)
+  const [onMute, setOnMute] = React.useState(true) // meh.... todo this
 
-  React.useEffect(() => {
+  function toggleMute() {
     Audio.setAudioModeAsync({
-      allowsRecordingIOS: false,
-      staysActiveInBackground: false,
-      interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
-      playsInSilentModeIOS: true,
-      // shouldDuckAndroid: true,
-      // interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
-      // playThroughEarpieceAndroid: false
+      playsInSilentModeIOS: !onMute,
     })
-  }, [])
 
-  React.useEffect(() => {
-    async function loadAudioSkin() {
-      const { sound: startCount, status: s1 } = await Audio.Sound.createAsync(
-        { uri: sounds.default.startCount },
-        { shouldPlay: false }
-      )
-      const { sound: endCount, status: s2 } = await Audio.Sound.createAsync(
-        { uri: sounds.default.endCount },
-        { shouldPlay: false }
-      )
+    setOnMute(!onMute)
+  }
 
-      playset.current = {
-        startCount,
-        endCount,
-      }
-      setIsLoading(false)
-    }
-    loadAudioSkin()
-  }, [audioSkin])
-
-  async function startSound(name) {
-    console.log('on the way....', name)
-
-    await playset.current[name].replayAsync()
+  async function startSound(soundId) {
+    await Papers.playSound(soundId)
   }
 
   return (
     <View>
-      <Button variant="light" onPress={() => startSound('startCount')}>
-        {isLoading ? 'Loading sound...' : 'Start turn 🔉'}
-      </Button>
-      <Button variant="light" onPress={() => startSound('endCount')}>
-        {isLoading ? 'Loading sound...' : 'Finish turn 🔉'}
-      </Button>
+      {Platform.OS === 'ios' ? (
+        <TouchableOpacity
+          variant="light"
+          onPress={toggleMute}
+          style={{
+            borderWidth: 0,
+            borderRadius: 0,
+            borderBottomWidth: 1,
+            borderBottomColor: Theme.colors.grayLight,
+            paddingHorizontal: 8,
+            paddingVertical: 20,
+            marginBottom: 16,
+          }}
+        >
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <Text style={Theme.typography.bold}>Play sounds on mute:</Text>
+            <Text
+              style={[
+                Theme.typography.bold,
+                { color: onMute ? Theme.colors.success : Theme.colors.grayMedium },
+              ]}
+            >
+              {onMute ? 'Yes' : 'No'}
+            </Text>
+          </View>
+        </TouchableOpacity>
+      ) : null}
+      <Text style={[Theme.typography.h3, Theme.u.center, { marginBottom: 8 }]}>
+        Sounds preview:
+      </Text>
+      {sounds.map(soundId => (
+        <Button
+          key={soundId}
+          variant="light"
+          size="sm"
+          onPress={() => startSound(soundId)}
+          style={{ margin: 4 }}
+        >
+          🔉 {soundId}
+        </Button>
+      ))}
     </View>
   )
 }
