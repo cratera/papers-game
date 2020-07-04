@@ -5,6 +5,7 @@ import {
   Keyboard,
   Dimensions,
   KeyboardAvoidingView,
+  Platform,
   View,
   TextInput,
   Text,
@@ -20,12 +21,16 @@ import { headerTheme } from '@navigation/headerStuff.js'
 import * as Theme from '@theme'
 import Styles from './WritePapersStyles.js'
 
+const isWeb = Platform.OS === 'web'
+
 const vw = Dimensions.get('window').width / 100 // TODO useDimensions
+const vh = Dimensions.get('window').height / 100 // TODO useDimensions
 
 export default function WritePapers({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const { game, profile } = Papers.state
   const [words, setLocalWords] = React.useState([])
+  const [keyboardHeight, setKeyboardHeight] = React.useState(0)
   const refSlides = React.useRef()
   const scrollDebounced = React.useRef(debounce(handleScrollPapers, 300)).current
 
@@ -82,6 +87,17 @@ export default function WritePapers({ navigation }) {
   }, [isAllWordsDone, words, isSubmiting])
 
   React.useEffect(() => {
+    const onKeyboardDidShow = e => {
+      setKeyboardHeight(e.endCoordinates.height)
+    }
+
+    Keyboard.addListener('keyboardDidShow', onKeyboardDidShow)
+    return () => {
+      Keyboard.removeListener('keyboardDidShow', onKeyboardDidShow)
+    }
+  }, []) // TODO later useKeyboardHeight?
+
+  React.useEffect(() => {
     if (wordsAreStored) {
       navigation.navigate('lobby-writing')
     }
@@ -115,7 +131,13 @@ export default function WritePapers({ navigation }) {
             onScroll={e => {
               scrollDebounced(e.nativeEvent.contentOffset.x, paperIndex)
             }}
-            style={[Theme.u.scrollSideOffset, Styles.slides]}
+            style={[
+              Theme.u.scrollSideOffset,
+              Styles.slides,
+              {
+                height: 100 * vh - 195 - keyboardHeight, // TODO pixel perfect card height iOS + isWeb
+              },
+            ]}
           >
             {renderPapers()}
           </ScrollView>
@@ -251,7 +273,13 @@ const SlidePaper = ({ onChange, isActive, onFocus, onSubmit, i }) => {
 
   return (
     <View
-      style={[Styles.slide, (isActive || isFocused) && Styles.slide_isActive]}
+      style={[
+        Styles.slide,
+        (isActive || isFocused) && Styles.slide_isActive,
+        isWeb && {
+          height: vw * 70 - 16, // ugly workaround
+        },
+      ]}
       data-slide={i + 1}
     >
       <TextInput
@@ -260,6 +288,9 @@ const SlidePaper = ({ onChange, isActive, onFocus, onSubmit, i }) => {
           Styles.input,
           Theme.typography.h1,
           (isActive || isFocused) && Styles.input_isActive,
+          isWeb && {
+            height: '100%',
+          },
         ]}
         placeholder={`Paper #${i + 1}`}
         placeholderTextColor={Theme.colors.grayLight}
@@ -271,7 +302,6 @@ const SlidePaper = ({ onChange, isActive, onFocus, onSubmit, i }) => {
           onFocus()
           setIsFocused(true)
         }}
-        enablesReturnKeyAutomatically
         caretHidden
         multiline
       ></TextInput>
