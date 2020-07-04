@@ -8,11 +8,15 @@ import Button from '@components/button'
 import Page from '@components/page'
 import { useScores } from '@store/papersMethods'
 
+import { headerTheme } from '@navigation/headerStuff.js'
 import EmojiRain from './EmojiRain'
 import GameScore from '@components/game-score'
 
 import * as Theme from '@theme'
 import Styles from './PlayingStyles.js'
+import i18n from '@constants/i18n'
+
+const DESCRIPTIONS = [i18n.round_0_desc, i18n.round_1_desc, i18n.round_2_desc] // REVIEW this
 
 const RoundScore = ({ navigation }) => {
   const Papers = React.useContext(PapersContext)
@@ -21,10 +25,24 @@ const RoundScore = ({ navigation }) => {
   const roundIx = round.current
   const isFinalRound = roundIx === game.settings.roundsCount - 1
   const [isSubmitting, setIsSubmitting] = React.useState(false)
+  const [isOnRoundIntro, setIsOnRoundIntro] = React.useState(false)
+
   const { isMyTeamWinner, isTie } = React.useMemo(
     () => useScores(game.score, game.teams, profile.id),
     []
   )
+
+  // TODO next - continue hereee
+  // React.useEffect(() => {
+  //   if (isOnRoundIntro) {
+  //     navigation.setOptions({
+  //       ...headerTheme({ dark: true }),
+  //       headerTitleStyle: {
+  //         opacity: 0,
+  //       },
+  //     })
+  //   }
+  // }, [isOnRoundIntro])
 
   async function handleReadyClick() {
     if (isSubmitting === true) {
@@ -39,11 +57,50 @@ const RoundScore = ({ navigation }) => {
     }
   }
 
+  if (isOnRoundIntro) {
+    return (
+      <Page>
+        <Page.Main style={{ backgroundColor: Theme.colors.grayDark }}>
+          <View
+            style={[
+              Styles.header,
+              {
+                marginBottom: 16,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                flexGrow: 1,
+              },
+            ]}
+          >
+            <Text style={[Theme.typography.h1, { color: Theme.colors.bg }]}>
+              Round {roundIx + 1}
+            </Text>
+            <Text
+              style={[
+                Theme.typography.body,
+                Theme.u.center,
+                { width: 225, color: Theme.colors.bg, marginTop: 24 },
+              ]}
+            >
+              {DESCRIPTIONS[roundIx + 1]}
+            </Text>
+          </View>
+        </Page.Main>
+        <Page.CTAs style={{ backgroundColor: Theme.colors.grayDark }}>
+          <Button isLoading={isSubmitting} onPress={handleReadyClick}>
+            {`I'm ready!`}
+          </Button>
+        </Page.CTAs>
+      </Page>
+    )
+  }
+
   return (
-    <Fragment>
+    <Page>
       {!isTie && isFinalRound && <EmojiRain type={isMyTeamWinner ? 'winner' : 'loser'} />}
       <Page.Main blankBg>
-        <View style={[Styles.header, { marginBottom: 16 }]}>
+        <View style={[Styles.header, { marginTop: 40, marginBottom: 16 }]}>
           {isFinalRound ? (
             <Fragment>
               <Text style={Theme.typography.h1}>
@@ -79,12 +136,12 @@ const RoundScore = ({ navigation }) => {
             Go to homepage
           </Button>
         ) : (
-          <Button isLoading={isSubmitting} onPress={handleReadyClick}>
-            {`I'm ready for round ${round.current + 1 + 1}!`}
+          <Button isLoading={isSubmitting} onPress={() => setIsOnRoundIntro(true)}>
+            {`Start round ${round.current + 1 + 1}!`}
           </Button>
         )}
       </Page.CTAs>
-    </Fragment>
+    </Page>
   )
 }
 
