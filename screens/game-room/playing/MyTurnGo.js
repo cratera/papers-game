@@ -213,7 +213,9 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
         current: nextPaper,
       }
 
+      // Hum... side effect inside a setState. ai ai ai...
       Papers.setTurnLocalState(newState)
+
       return newState
     })
     setPaperBlur(false)
@@ -282,19 +284,18 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
     setPaperBlur(false)
     setIsPaperChanging(false)
 
-    // Cleanup local papers turn to avoid memory leaks.
-    // Ex: Start a new game, the LS may still contain data from prev game
-    // Q: Maybe do this when game starts. Dunno what's the best place to do it.
-    // A: Keep this. If the user closes/minimize the app (eg. to go to twitter)
-    //    and comes back later, we guarantee the local state is cleaned.
-    Papers.setTurnLocalState(null)
-
-    Papers.finishTurn(papersTurn, (res, error) => {
-      if (error) {
-        console.warn('finish turn failed', error)
-        setIsFinishingTurn(false)
-      }
-    })
+    try {
+      // Cleanup local papers turn to avoid memory leaks.
+      // Ex: Start a new game, the LS may still contain data from prev game
+      // Q: Maybe do this when game starts. Dunno what's the best place to do it.
+      // A: Keep this. If the user closes/minimize the app (eg. to go to twitter)
+      //    and comes back later, we guarantee the local state is cleaned.
+      Papers.setTurnLocalState(null)
+      Papers.finishTurn(papersTurn)
+    } catch (e) {
+      // TODO later errorMsg
+      setIsFinishingTurn(false)
+    }
   }
 
   if (!papersTurn) {

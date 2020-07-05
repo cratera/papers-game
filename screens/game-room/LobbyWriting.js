@@ -63,16 +63,15 @@ export default function LobbyWriting({ navigation }) {
       return
     }
 
-    if (errorMsg) {
-      setErrorMsg('')
-    }
-
     setIsSubmitting(true)
+    if (errorMsg) {
+      setErrorMsg(null)
+    }
 
     try {
       await Papers.markMeAsReady()
-    } catch (error) {
-      setErrorMsg(`Ups! ${error.message}`)
+    } catch (e) {
+      setErrorMsg(e.message)
       setIsSubmitting(false)
     }
   }

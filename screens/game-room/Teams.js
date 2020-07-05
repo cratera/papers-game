@@ -18,7 +18,6 @@ function areTeamPlayersEqual(teamsOld, teamsNew) {
   const tOld = {}
   const tNew = {}
 
-  // BUG - Review this, I think it's buggy... sometimes we have same team 2x
   for (const ix in teamsNew) {
     tNew[ix] = teamsNew[ix].players
   }
@@ -26,15 +25,17 @@ function areTeamPlayersEqual(teamsOld, teamsNew) {
     tOld[ix] = teamsOld[ix].players
   }
 
-  return JSON.stringify(tOld) === JSON.stringify(tNew)
+  const result = JSON.stringify(tOld) === JSON.stringify(tNew)
+  return result
 }
 
 export default function Teams({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const { game } = Papers.state
   const playersCount = Object.keys(game.players).length
-  const [tempTeams, setTeams] = React.useState(getRandomTeams())
+  const [tempTeams, setTeams] = React.useState(getRandomTeams)
   const [isLocking, setLocking] = React.useState(false)
+  const [errorMsg, setErrorMsg] = React.useState(null)
 
   React.useEffect(() => {
     navigation.setOptions({
@@ -100,7 +101,7 @@ export default function Teams({ navigation }) {
   }
 
   function generateTeams() {
-    setTeams(getRandomTeams)
+    setTeams(getRandomTeams())
   }
 
   // function handleRenameOf(teamId) {
@@ -122,6 +123,7 @@ export default function Teams({ navigation }) {
 
   async function handleLockClick() {
     if (isLocking) return false
+    setErrorMsg(null)
     setLocking(true)
 
     try {
@@ -129,13 +131,14 @@ export default function Teams({ navigation }) {
       navigation.setOptions({ headerRight: null })
       navigation.navigate('write-papers')
     } catch (e) {
-      console.warn('Lock teams failed', e)
+      console.warn('setTeams failed', e)
+      setErrorMsg(e.message)
       setLocking(false)
     }
   }
 
   return (
-    <Page>
+    <Page bannerMsg={errorMsg}>
       <Page.Main>
         <ScrollView style={Theme.u.scrollSideOffset}>
           {Object.keys(tempTeams).map(teamId => {

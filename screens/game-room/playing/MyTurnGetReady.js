@@ -29,6 +29,7 @@ const MyTurnGetReady = ({ description, roundIx, amIWaiting }) => {
     try {
       Papers.startTurn()
     } catch (e) {
+      // TODO - errorMsg on page.
       console.warn('start turn failed', e.message)
     }
   }
@@ -87,7 +88,7 @@ MyTurnGetReady.propTypes = {
 
 const StylesIn = StyleSheet.create({
   illustration: {
-    marginTop: 16,
+    marginTop: 24,
     width: 250,
     height: 200,
   },

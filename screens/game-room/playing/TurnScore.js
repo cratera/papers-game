@@ -13,7 +13,7 @@ import Styles from './PlayingStyles.js'
 
 const isWeb = Platform.OS === 'web'
 
-const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, getPaperByKey }) => {
+const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, isSubmitting, getPaperByKey }) => {
   return (
     <Fragment>
       <Page.Main blankBg>
@@ -76,8 +76,9 @@ const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, getPaperByKey })
         </ScrollView>
       </Page.Main>
       <Page.CTAs blankBg hasOffset>
-        {/* TODO add loading */}
-        <Button onPress={onFinish}>End turn</Button>
+        <Button onPress={onFinish} isLoading={isSubmitting}>
+          End turn
+        </Button>
       </Page.CTAs>
     </Fragment>
   )
@@ -88,6 +89,7 @@ TurnScore.propTypes = {
   type: PropTypes.oneOf(['timesup', 'nowords']).isRequired,
   onTogglePaper: PropTypes.func.isRequired,
   onFinish: PropTypes.func.isRequired,
+  isSubmitting: PropTypes.bool,
   getPaperByKey: PropTypes.func.isRequired,
 }
 

@@ -54,20 +54,10 @@ export default function HomeSigned({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const profile = Papers.state.profile
 
-  // if (Papers.status === 'isJoining') {
-  //   return (
-  //     <Page>
-  //       <Page.Main style={Styles.main} blankBg>
-  //         <Text style={Theme.typography.h2}>Joining {`"${profile.gameId}"`} ⏳</Text>
-  //       </Page.Main>
-  //     </Page>
-  //   )
-  // }
-
   return (
     <Fragment>
       <Page>
-        <Page.Main style={Styles.main} blankBg>
+        <Page.Main style={[Styles.main, { justifyContent: 'center' }]} blankBg>
           <AvatarMeme avatar={profile.avatar} onChange={handleChangeAvatar} />
           <Text style={[Theme.typography.body, Theme.u.center]}>
             Welcome
@@ -75,7 +65,7 @@ export default function HomeSigned({ navigation }) {
             <Text style={Theme.typography.h1}>{profile.name}</Text>
           </Text>
         </Page.Main>
-        <Page.CTAs>
+        <Page.CTAs blankBg>
           <Button onPress={() => openAccessGameModal('create')}>Create Game</Button>
           <Button
             variant="light"

@@ -223,8 +223,8 @@ async function updateProfile(profile) {
 /**
  * Reset profile - delete the profile from the DB.
  */
-function resetProfile(id) {
-  updateProfile({
+async function resetProfile(id) {
+  await updateProfile({
     id: null,
     name: null,
     avatar: null, // TODO - delete avatar from storage
@@ -382,9 +382,9 @@ async function joinGame(gameId) {
   }
 
   // TODO later review all the logic around isAfk and fix false positives.
-  // await DB.ref(`games/${gameId}/players/${id}`).update({
-  //   isAfk: false,
-  // })
+  await DB.ref(`games/${gameId}/players/${id}`).update({
+    isAfk: false,
+  })
 
   // Prevent duplicated game subs
   PubSub.unsubscribe('game')
@@ -443,22 +443,20 @@ function _pubGame(gameId) {
         profile: profile.val(),
       })
 
-      // Not needed for now...
-      // DB.ref(`users/${id}/isAfk`).on('value', data => {
-      //   console.log('⚙️ player is afk!', id, data.val())
-      //   PubSub.publish('game.players.changed', {
-      //     id,
-      //     info: {
-      //       isAfk: data.val(),
-      //     },
-      //   })
-      // })
+      DB.ref(`users/${id}/isAfk`).on('value', data => {
+        console.log('⚙️ player is afk!', id, data.val())
+        PubSub.publish('game.players.changed', {
+          id,
+          info: {
+            isAfk: data.val(),
+          },
+        })
+      })
     })
     DB_PLAYERS.on('child_removed', function (data) {
       const id = data.key
 
-      // Not needed for now...
-      // DB.ref(`users/${id}/isAfk`).off('value')
+      DB.ref(`users/${id}/isAfk`).off('value')
 
       PubSub.publish('game.players.removed', {
         id,
@@ -576,10 +574,10 @@ async function _unsubGame(gameId) {
   DB.ref(`games/${gameId}/round`).off('value')
   DB.ref(`games/${gameId}/score`).off('value')
 
-  // const players = await DB.ref(`games/${gameId}/players`).once('value')
-  // for (const playerId in players.val()) {
-  //   DB.ref(`users/${playerId}/isAfk`).off('value')
-  // }
+  const players = await DB.ref(`games/${gameId}/players`).once('value')
+  for (const playerId in players.val()) {
+    DB.ref(`users/${playerId}/isAfk`).off('value')
+  }
 }
 
 /**
@@ -739,26 +737,22 @@ async function finishTurn({ playerScore, roundStatus }, cb) {
   console.log('⚙️ finishTurn()')
   const gameId = LOCAL_PROFILE.gameId
 
-  try {
-    if (roundStatus.status === 'finished') {
-      // Mark players as not ready for the next round.
-      // Do this before, so that RoundScore UI shows correctly
-      const playersRef = await DB.ref(`games/${gameId}/players`).once('value')
-      const players = playersRef.val()
+  if (roundStatus.status === 'finished') {
+    // Mark players as not ready for the next round.
+    // Do this before, so that RoundScore UI shows correctly
+    const playersRef = await DB.ref(`games/${gameId}/players`).once('value')
+    const players = playersRef.val()
 
-      for (const pId in players) {
-        players[pId].isReady = false
-      }
-
-      await DB.ref(`games/${gameId}/players/`).set(players)
+    for (const pId in players) {
+      players[pId].isReady = false
     }
 
-    await DB.ref(`games/${gameId}/score/${roundStatus.current}`).update(playerScore)
-    await DB.ref(`games/${gameId}/round`).update(roundStatus)
-    await DB.ref(`games/${gameId}/papersGuessed`).set(0)
-  } catch (e) {
-    cb(e)
+    await DB.ref(`games/${gameId}/players/`).set(players)
   }
+
+  await DB.ref(`games/${gameId}/score/${roundStatus.current}`).update(playerScore)
+  await DB.ref(`games/${gameId}/round`).update(roundStatus)
+  await DB.ref(`games/${gameId}/papersGuessed`).set(0)
 }
 
 /**

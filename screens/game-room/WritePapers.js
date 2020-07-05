@@ -115,7 +115,7 @@ export default function WritePapers({ navigation }) {
   }, [paperIndex])
 
   return (
-    <Page>
+    <Page bannerMsg={errorMsg}>
       <Page.Main>
         <View style={[Styles.header]}>
           <Text style={[Theme.typography.body, Theme.u.center]}>
@@ -160,9 +160,6 @@ export default function WritePapers({ navigation }) {
               <Text style={Theme.u.center}>
                 {wordsCount} out of {wordsGoal} done
               </Text>
-              {errorMsg && (
-                <Text style={[Theme.typography.error, { marginTop: 4 }]}>{errorMsg}</Text>
-              )}
             </View>
 
             <Button
@@ -243,13 +240,15 @@ export default function WritePapers({ navigation }) {
     if (isSubmiting === true) {
       return
     }
-
     setIsSubmiting(true)
+    if (errorMsg) {
+      setErrorMsg(null)
+    }
+
     try {
       await Papers.setWords(words)
-    } catch (error) {
-      console.warn('WritePapers submit error:', error)
-      setErrorMsg(`Ups, set papers failed! ${error.message}`)
+    } catch (e) {
+      setErrorMsg(e.message)
     }
     setIsSubmiting(false)
   }

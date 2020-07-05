@@ -53,11 +53,12 @@ const RoundScore = ({ navigation }) => {
     try {
       await Papers.markMeAsReadyForNextRound()
     } catch (error) {
-      console.warn('Ready next round failed', error.message)
+      // TODO errorMsg here
     }
   }
 
   if (isOnRoundIntro) {
+    // TODO make the header dark too...
     return (
       <Page>
         <Page.Main style={{ backgroundColor: Theme.colors.grayDark }}>
@@ -74,7 +75,7 @@ const RoundScore = ({ navigation }) => {
             ]}
           >
             <Text style={[Theme.typography.h1, { color: Theme.colors.bg }]}>
-              Round {roundIx + 1}
+              Round {roundIx + 1 + 1}
             </Text>
             <Text
               style={[

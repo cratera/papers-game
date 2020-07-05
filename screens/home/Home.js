@@ -32,9 +32,13 @@ export default function HomeScreen({ navigation }) {
     }
   }, [gameId])
 
-  function handleUpdateProfile(profile) {
+  async function handleUpdateProfile(profile) {
     // Do this here to take advatange of hooks!
-    Papers.updateProfile(profile)
+    try {
+      await Papers.updateProfile(profile)
+    } catch {
+      // hum... later
+    }
   }
 
   return !profile.name ? (

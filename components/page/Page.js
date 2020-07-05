@@ -1,5 +1,5 @@
 import React from 'react'
-import { Platform, View, Text } from 'react-native'
+import { Platform, SafeAreaView, View, Text } from 'react-native'
 import PropTypes from 'prop-types'
 
 import * as Theme from '@theme'
@@ -9,34 +9,52 @@ import Button from '@components/button'
 import { IconArrow } from '@components/icons'
 import NetInfo from '@react-native-community/netinfo'
 
-const Page = ({ children, ...otherProps }) => {
-  const [bannerMsg, setBannerMsg] = React.useState(null)
+const i18nWifi = 'No internet connection'
+
+const Page = ({ children, blankBg, bannerMsg, ...otherProps }) => {
+  const [bannerText, setBannerText] = React.useState(null)
 
   React.useEffect(() => {
     if (Platform.OS === 'ios') {
-      // TODO later... this does not seem to work on web...
+      // TODO later. this does not seem to work on web...
       const unsubscribe = NetInfo.addEventListener(state => {
-        setBannerMsg(state.isConnected ? null : 'No internet connection')
+        setBannerText(state.isConnected ? '' : i18nWifi)
       })
       return unsubscribe
     }
   }, [])
 
+  React.useEffect(() => {
+    if (bannerText !== i18nWifi) {
+      setBannerText(bannerMsg)
+    }
+  }, [bannerMsg])
+
   return (
     <>
-      {bannerMsg && (
+      {bannerText ? (
         <View style={Styles.banner}>
-          <Text style={Styles.banner_text}>{bannerMsg}</Text>
+          <Text style={Styles.banner_text}>{bannerText}</Text>
         </View>
-      )}
-      <View style={Styles.page} {...otherProps}>
+      ) : null}
+      <SafeAreaView
+        style={[
+          Styles.page,
+          {
+            backgroundColor: Theme.colors[blankBg ? 'bg' : 'grayBg'],
+          },
+        ]}
+        {...otherProps}
+      >
         {children}
-      </View>
+      </SafeAreaView>
     </>
   )
 }
 
 Page.propTypes = {
+  bannerMsg: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
+  blankBg: PropTypes.bool,
   children: PropTypes.node,
 }
 
@@ -94,12 +112,14 @@ HeaderBtn.propTypes = {
 const HeaderBtnSettings = () => <SettingsToggle style={{ marginRight: 8 }} />
 
 const Main = ({ children, style, blankBg, ...otherProps }) => {
+  React.useEffect(() => {})
+
   return (
     <View
       style={[
         Styles.main,
-        !blankBg && {
-          backgroundColor: Theme.colors.grayBg,
+        {
+          backgroundColor: Theme.colors[blankBg ? 'bg' : 'grayBg'],
         },
         style,
       ]}
@@ -123,10 +143,8 @@ const CTAs = ({ children, hasOffset, blankBg, style, ...otherProps }) => {
       style={[
         Styles.ctas,
         {
-          paddingBottom: children ? 40 : 0,
-        },
-        !blankBg && {
-          backgroundColor: Theme.colors.grayBg,
+          paddingBottom: children ? 32 : 0,
+          backgroundColor: Theme.colors[blankBg ? 'bg' : 'grayBg'],
         },
         style,
       ]}

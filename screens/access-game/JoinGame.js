@@ -30,6 +30,7 @@ export default function JoinGame({ navigation }) {
     codePretty: '',
     isInvalid: false,
     errorMsg: null,
+    isUnexError: false,
   })
 
   React.useEffect(() => {
@@ -96,7 +97,7 @@ export default function JoinGame({ navigation }) {
   }, [step, state.gameName, state.code, didAutoJoin, isJoining])
 
   return (
-    <Page>
+    <Page bannerMsg={state.isUnexError && state.errorMsg}>
       <Page.Main>
         <KeyboardAvoidingView
           behavior={'padding'}
@@ -158,7 +159,7 @@ export default function JoinGame({ navigation }) {
                 </>
               )}
 
-              {state.errorMsg && (
+              {state.errorMsg && !state.isUnexError && (
                 <Text style={[Theme.typography.small, Styles.hintMsg, Styles.errorMsg]}>
                   {state.errorMsg}
                 </Text>
@@ -200,10 +201,14 @@ export default function JoinGame({ navigation }) {
     const gameSlugged = slugString(state.gameName)
     const gameId = `${gameSlugged}_${state.code}`
 
-    Papers.accessGame('join', gameId, (res, err) => {
-      if (err) {
+    Papers.accessGame('join', gameId, (res, errorMsg, opts = {}) => {
+      if (errorMsg) {
         setJoining(false)
-        setState(state => ({ ...state, errorMsg: err }))
+        setState(state => ({
+          ...state,
+          errorMsg,
+          isUnexError: opts.isUnexError,
+        }))
       } else {
         // AccessGame.js will detect the new gameId from PapersContext and do the redirect.
       }

@@ -60,7 +60,7 @@ export default function GameRoomEntry({ navigation, route }) {
 
   React.useEffect(() => {
     // Triggered when the player clicks "I'm Ready" at lobby-writting
-    // Need this to prevent RN redirect to "gate" when isPlaying changes status
+    // Need this to prevent RN redirect to "gate" when isPlaying changes
     if (isPlaying) {
       console.log(':: room -> playing', route)
       navigation.navigate('playing')

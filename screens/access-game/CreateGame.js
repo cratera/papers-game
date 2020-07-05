@@ -26,6 +26,7 @@ export default function CreateGame({ navigation }) {
     gameName: null,
     isInvalid: false,
     errorMsg: null,
+    isUnexError: false,
   })
   const hasValidName = !state.isInvalid && state.gameName && state.gameName.length >= 3
 
@@ -66,7 +67,7 @@ export default function CreateGame({ navigation }) {
   }, [hasValidName, state.gameName, isCreating])
 
   return (
-    <Page>
+    <Page bannerMsg={state.isUnexError && state.errorMsg}>
       <Page.Main>
         <KeyboardAvoidingView
           behavior={'padding'}
@@ -90,6 +91,7 @@ export default function CreateGame({ navigation }) {
                 autoFocus
                 autoCorrect={false}
                 nativeID="inputNameLabel"
+                defaultValue={state.gameName}
                 onChangeText={handleInputChange}
               />
               <Text
@@ -97,7 +99,7 @@ export default function CreateGame({ navigation }) {
               >
                 You can only use letters and numbers.
               </Text>
-              {state.errorMsg && (
+              {state.errorMsg && !state.isUnexError && (
                 <Text style={[Theme.typography.small, Styles.hintMsg, Styles.errorMsg]}>
                   {state.errorMsg}
                 </Text>
@@ -127,10 +129,14 @@ export default function CreateGame({ navigation }) {
     setCreating(true)
     setState(state => ({ ...state, errorMsg: null }))
 
-    Papers.accessGame('create', state.gameName, (res, err) => {
-      if (err) {
+    Papers.accessGame('create', state.gameName, (res, errorMsg, opts = {}) => {
+      if (errorMsg) {
         setCreating(false)
-        setState(state => ({ ...state, errorMsg: err.message }))
+        setState(state => ({
+          ...state,
+          errorMsg,
+          isUnexError: opts.isUnexError,
+        }))
       } else {
         // AccessGame.js will detect the new gameId from PapersContext and do the redirect.
       }

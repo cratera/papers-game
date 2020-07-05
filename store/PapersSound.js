@@ -1,4 +1,5 @@
 import { Audio } from 'expo-av'
+import Sentry from '@constants/Sentry'
 
 const SOUNDS = {
   default: {
@@ -74,16 +75,18 @@ export function getSoundInSilent() {
 
 export function play(soundId) {
   if (!isSoundActive) {
-    console.warn(`🔊 play: sound is off.`)
+    // console.warn(`🔊 play: sound is off.`)
     return
   }
   if (playset[soundId]) {
     try {
       playset[soundId].replayAsync()
     } catch (e) {
+      Sentry.captureException(e, { tags: { pp_action: 'PSND_0' } })
       console.warn('🔊 play: failed', e.message)
     }
   } else {
-    console.warn(`🔊 play: "${soundId}" does not exist.`)
+    Sentry.captureMessage(`Sound "${soundId}" does not exist.`)
+    console.warn(`🔊 Sound: "${soundId}" does not exist.`)
   }
 }

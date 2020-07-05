@@ -16,8 +16,8 @@ const sounds = ['ready', 'turnstart', 'wrong', 'right', 'bomb', 'fivesl', 'times
 
 export default function AudioPreview() {
   const Papers = React.useContext(PapersContext)
-  const [isOnSilent, setSoundSilent] = React.useState(getSoundInSilent())
-  const [isSoundActive, setSound] = React.useState(getSoundStatus())
+  const [isOnSilent, setSoundSilent] = React.useState(getSoundInSilent)
+  const [isSoundActive, setSound] = React.useState(getSoundStatus)
 
   function toggleMute() {
     setSoundInSilent(!isOnSilent)

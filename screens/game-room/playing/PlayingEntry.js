@@ -25,7 +25,7 @@ export default function PlayingEntry({ navigation }) {
   const isRoundFinished = round.status === 'finished'
   const hasCountdownStarted = !['getReady', 'finished'].includes(round.status)
   const prevHasCountdownStarted = usePrevious(hasCountdownStarted)
-  const initialTimer = game.settings.time_ms / 4
+  const initialTimer = game.settings.time_ms
   const timerReady = 3400 // 400 - threshold for io connection.
   const [countdown, startCountdown] = useCountdown(hasCountdownStarted ? round.status : null, {
     timer: initialTimer + timerReady,
@@ -74,6 +74,8 @@ export default function PlayingEntry({ navigation }) {
     const isMeNextTurn = turnPlayerId === profile.id
 
     // REVIEW / OPTIMIZE later. I don't like this duplication.
+    // TODO - <Page> should be inside of each view component,
+    // so that it can show errors if needed
     return (
       <Page>
         {isMeNextTurn ? (

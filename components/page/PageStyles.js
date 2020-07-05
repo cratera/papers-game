@@ -11,7 +11,6 @@ export default StyleSheet.create({
     marginHorizontal: 'auto',
     flex: 1,
     alignItems: 'stretch',
-    backgroundColor: Theme.colors.bg,
   },
   main: {
     // paddingTop: headerH, // header is from Navigator
@@ -30,7 +29,7 @@ export default StyleSheet.create({
     fontSize: 14,
   },
   ctas: {
-    backgroundColor: Theme.colors.bg,
+    backgroundColor: '#f000',
     paddingHorizontal: gutter,
   },
 })

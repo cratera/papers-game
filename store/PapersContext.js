@@ -2,11 +2,15 @@ import React, { Component } from 'react'
 import { AsyncStorage } from 'react-native'
 import PropTypes from 'prop-types'
 
+import Sentry from '@constants/Sentry'
+
 import wordsForEveryone from './wordsForEveryone.js'
 import { getNextTurn } from './papersMethods.js'
 import * as PapersSound from './PapersSound.js'
 
 import serverInit from './Firebase.js'
+
+const i18nUnexpectedError = 'Unexpected error. Please try again later.'
 
 const PapersContext = React.createContext({})
 
@@ -52,7 +56,6 @@ export class PapersContextProvider extends Component {
       resetProfile: this.resetProfile.bind(this),
 
       accessGame: this.accessGame.bind(this),
-      recoverGame: this.recoverGame.bind(this),
       leaveGame: this.leaveGame.bind(this),
       removePlayer: this.removePlayer.bind(this),
 
@@ -70,7 +73,7 @@ export class PapersContextProvider extends Component {
       getTurnLocalState: this.getTurnLocalState.bind(this),
       setTurnLocalState: this.setTurnLocalState.bind(this),
 
-      startNextRound: this.startNextRound.bind(this),
+      // _startNextRound: this._startNextRound.bind(this),
 
       playSound: this.playSound.bind(this),
     }
@@ -108,9 +111,8 @@ export class PapersContextProvider extends Component {
     return (
       <PapersContext.Provider
         value={{
-          status: this.state.status, // remove this. deprecated
+          // bannerMsg: this.state.bannerMsg, // Don't do this...
           state: {
-            status: this.state.status,
             profile: this.state.profile,
             game: this.state.game,
             profiles: this.state.profiles,
@@ -137,8 +139,13 @@ export class PapersContextProvider extends Component {
     if (socket) {
       console.warn('init(): Already connected. Please restart...')
     } else {
-      socket = serverInit()
-      this.setState({ socket })
+      try {
+        socket = serverInit()
+        this.setState({ socket })
+      } catch (e) {
+        console.warn(':: error', e)
+        Sentry.captureException(e, { tags: { pp_action: 'INIT_0' } })
+      }
     }
 
     return socket
@@ -163,19 +170,9 @@ export class PapersContextProvider extends Component {
         return
       }
 
-      this.setState({
-        status: 'isJoining',
-      })
-
-      // TODO - Add Global Status accessing game.
-      // REVIEW/TODO - What is this?
-      // A: This is the first code written. needs to be refactored
-      const hum = await this.accessGame('join', gameId, () => {
+      await this.accessGame('join', gameId, () => {
         console.log(`Joined to ${gameId} completed!`)
-        this.setState({ status: 'inGame' })
       })
-
-      console.log('joined log', hum)
     }
   }
 
@@ -221,8 +218,7 @@ export class PapersContextProvider extends Component {
       return
     }
 
-    // TODO/OPTMIZE - Verify the profile is updated.
-
+    // OPTMIZE - Verify the profile is updated.
     console.log('📌 accessGame()', variant, gameName)
 
     if (!gameName) {
@@ -241,18 +237,21 @@ export class PapersContextProvider extends Component {
       cb(gameId)
     } catch (e) {
       const errorMsgMap = {
-        exists: () => 'Choose other name.',
-        notFound: () => 'This game does not exist.',
-        alreadyStarted: () => 'The game already started.',
-        ups: () => `Ups! Error: ${e.message}`,
+        exists: () => 'Choose another name.', // 0.001% probability because code is random.
+        notFound: () => "That name or code don't seem right.",
+        alreadyStarted: () => 'That game already started.',
+        ups: () => i18nUnexpectedError,
       }
 
       const errorMsg = (errorMsgMap[e.message] || errorMsgMap.ups)()
+      const isUnexError = !errorMsgMap[e.message]
       console.warn(':: accessGame failed!', variant, gameName, errorMsg)
 
-      this._removeGameFromState()
-
-      return cb(null, errorMsg)
+      if (isUnexError) {
+        Sentry.captureException(e, { tags: { pp_action: 'AG_0' } })
+      }
+      await this._removeGameFromState()
+      return cb(null, errorMsg, { isUnexError })
     }
   }
 
@@ -437,18 +436,22 @@ export class PapersContextProvider extends Component {
         }
       }
     } catch (e) {
-      // TODO - report this to an external Error log service
-      console.warn(':: error!', e)
+      Sentry.captureException(e, { tags: { pp_action: 'UP_0' } })
     }
 
     const { id, gameId, ...serverProfile } = profile
 
     if (!opts.ignoreSocket && Object.keys(serverProfile).length > 0) {
       if (this.state.socket) {
-        console.log(':: update socket too.')
-        this.state.socket.updateProfile(serverProfile)
+        // console.log(':: update socket too.')
+        try {
+          this.state.socket.updateProfile(serverProfile)
+        } catch (e) {
+          Sentry.captureException(e, { tags: { pp_action: 'UP_1' } })
+          // throw Error(i18nUnexpectedError) // REVIEW later
+        }
       } else {
-        console.log(':: not connected to socket')
+        // console.log(':: not connected to socket')
       }
     }
 
@@ -469,10 +472,11 @@ export class PapersContextProvider extends Component {
       await AsyncStorage.removeItem('profile_groupId')
 
       if (this.state.socket) {
-        this.state.socket.resetProfile()
+        await this.state.socket.resetProfile()
       }
     } catch (e) {
-      console.warn('PapersContext.js resetProfile error!', e)
+      Sentry.captureException(e, { tags: { pp_action: 'RP_0' } })
+      // return Error('Unexpected error. Please try again later')
     }
 
     this.setState(state => ({
@@ -482,7 +486,13 @@ export class PapersContextProvider extends Component {
 
   async setWords(words) {
     console.log('📌 setWords()', words)
-    await this.state.socket.setWords(words)
+    try {
+      await this.state.socket.setWords(words)
+    } catch (e) {
+      console.warn(':: error', e)
+      Sentry.captureException(e, { tags: { pp_action: 'SW_0' } })
+      throw Error(i18nUnexpectedError)
+    }
   }
 
   async setWordsForEveyone() {
@@ -498,7 +508,14 @@ export class PapersContextProvider extends Component {
   }
 
   async setTeams(teams) {
-    await this.state.socket.setTeams(teams)
+    console.log('📌 setTeams()')
+    try {
+      await this.state.socket.setTeams(teams)
+    } catch (e) {
+      console.warn(':: error', e)
+      Sentry.captureException(e, { tags: { pp_action: 'STM_0' } })
+      throw Error(i18nUnexpectedError)
+    }
   }
 
   async markMeAsReady() {
@@ -513,22 +530,41 @@ export class PapersContextProvider extends Component {
       wordsLeft: this.state.game.words._all.map((w, i) => i),
     }
 
-    this.PapersAPI.playSound('ready')
-    await this.state.socket.markMeAsReady(roundStatus)
+    try {
+      this.PapersAPI.playSound('ready')
+      await this.state.socket.markMeAsReady(roundStatus)
+    } catch (e) {
+      Sentry.captureException(e, { tags: { pp_action: 'MMAR_0' } })
+      throw Error(i18nUnexpectedError)
+    }
   }
 
   async markMeAsReadyForNextRound() {
-    this.PapersAPI.playSound('ready')
-    await this.state.socket.markMeAsReadyForNextRound(() => {
-      // Only called if everyone's ready!
-      this.PapersAPI.startNextRound()
-    })
+    console.log('📌 markMeAsReadyForNextRound()')
+
+    try {
+      this.PapersAPI.playSound('ready')
+      await this.state.socket.markMeAsReadyForNextRound(() => {
+        // REVIEW!! this is dangerours... Only called if everyone's ready!
+        this._startNextRound()
+      })
+    } catch (e) {
+      console.warn(':: error', e)
+      Sentry.captureException(e, { tags: { pp_action: 'MMARNR_0' } })
+      throw Error(i18nUnexpectedError)
+    }
   }
 
   startTurn() {
     console.log('📌 startTurn()')
-    this.PapersAPI.playSound('turnstart')
-    this.state.socket.startTurn()
+    try {
+      this.PapersAPI.playSound('turnstart')
+      this.state.socket.startTurn()
+    } catch (e) {
+      console.warn(':: error', e)
+      Sentry.captureException(e, { tags: { pp_action: 'STN_0' } })
+      throw Error(i18nUnexpectedError)
+    }
   }
 
   getNextTurn() {
@@ -583,26 +619,25 @@ export class PapersContextProvider extends Component {
     })
 
     try {
-      await this.state.socket.finishTurn(
-        {
-          playerScore: {
-            [profileId]: allValidWordsGuessed,
-          },
-          roundStatus,
+      await this.state.socket.finishTurn({
+        playerScore: {
+          [profileId]: allValidWordsGuessed,
         },
-        (res, err) => {
-          console.warn(':: failed!', err)
-        }
-      )
-    } catch (error) {
-      cb(null, error)
+        roundStatus,
+      })
+    } catch (e) {
+      console.warn(':: error', e)
+      Sentry.captureException(e, { tags: { pp_action: 'FNTR_0' } })
+      // Do not throw error. UI is not ready for it.
     }
   }
 
-  startNextRound() {
-    console.log('📌 startNextRound()')
+  _startNextRound() {
+    console.log('📌 _startNextRound()')
     const game = this.state.game
 
+    // NOTE: No need for try/catch because it's used in this component
+    // only that already has its own try catch
     this.state.socket.setRound({
       current: game.round.current + 1,
       status: 'getReady',
@@ -614,17 +649,24 @@ export class PapersContextProvider extends Component {
   }
 
   async setTurnLocalState(turn) {
-    console.log('📌 setPaperTurnState()')
-    if (turn) {
-      await AsyncStorage.setItem('turn', JSON.stringify(turn))
-      const papersGuessed = turn.guessed.length
+    console.log('📌 setPaperTurnState()') // a better name perhaps?
 
-      if (papersGuessed !== this.state.game.papersGuessed) {
-        // Send this, so all players know N papers were guessed so far.
-        this.state.socket.setPapersGuessed(papersGuessed)
+    try {
+      if (turn) {
+        await AsyncStorage.setItem('turn', JSON.stringify(turn))
+        const papersGuessed = turn.guessed.length
+
+        if (papersGuessed !== this.state.game.papersGuessed) {
+          // Send this, so all players know N papers were guessed so far.
+          this.state.socket.setPapersGuessed(papersGuessed)
+        }
+      } else {
+        await AsyncStorage.removeItem('turn')
       }
-    } else {
-      await AsyncStorage.removeItem('turn')
+    } catch (e) {
+      console.warn(':: error', e)
+      Sentry.captureException(e, { tags: { pp_action: 'STLS_0' } })
+      // Do not throw error. UI is not ready for it.
     }
   }
 
@@ -644,35 +686,11 @@ export class PapersContextProvider extends Component {
   async _removeGameFromState() {
     console.log('📌 _removeGameFromState()')
 
-    // CONTINUE HEREEE - ASYNC WAIT CATCH
-
+    // Don't add try catch. If this fails, its critical,
+    // so it's better to show the ErrorRecovery page... i guess.
     this.PapersAPI.setTurnLocalState(null)
     await this.PapersAPI.updateProfile({ gameId: null })
     this.setState(state => ({ game: null }))
-  }
-
-  recoverGame(socket = this.state.socket) {
-    socket.emit('recover-game', (err, result) => {
-      if (err) {
-        this._removeGameFromState()
-
-        const errorMsgMap = {
-          notFound: 'recover-game: Does not exist',
-          // dontBelong: 'recover-game: You dont belong to:',
-          empty: 'recover-game: No games stored',
-          ups: `recover-game: Ups!', ${JSON.stringify(err)}`,
-        }
-
-        console.warn(errorMsgMap[err] || errorMsgMap.ups)
-        return
-      }
-
-      console.log('recover-game success:', result.game.name)
-
-      this.setState({
-        game: result.game,
-      })
-    })
   }
 
   async leaveGame(opts) {
@@ -680,17 +698,22 @@ export class PapersContextProvider extends Component {
 
     try {
       await this.state.socket.leaveGame(opts)
-    } catch (err) {
-      console.warn(':: error!', err)
+    } catch (e) {
       this._removeGameFromState()
+      console.warn(':: error', e)
+      Sentry.captureException(e, { tags: { pp_action: 'LVG_0' } })
     }
   }
 
   async removePlayer(playerId) {
     console.log('📌 removePlayer()')
-    await this.state.socket.removePlayer(playerId)
-    // eventually pub on 'players.removed' will be called
-    return true
+    try {
+      await this.state.socket.removePlayer(playerId)
+      // eventually pub on 'players.removed' will be called
+    } catch (e) {
+      console.warn(':: error', e)
+      Sentry.captureException(e, { tags: { pp_action: 'RMP_0' } })
+    }
   }
 
   playSound(soundId) {
