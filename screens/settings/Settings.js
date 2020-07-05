@@ -423,7 +423,7 @@ SettingsExperimental.propTypes = propTypesCommon
 
 function SettingsSound({ navigation }) {
   React.useEffect(() => {
-    setSubHeader(navigation, 'Sound Skins')
+    setSubHeader(navigation, 'Sound Preferences')
   }, [])
 
   return (

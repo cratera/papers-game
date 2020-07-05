@@ -1,7 +1,12 @@
 import React from 'react'
 import { Platform, TouchableOpacity, Text, View } from 'react-native'
-import { Audio } from 'expo-av'
 
+import {
+  setSoundStatus,
+  getSoundStatus,
+  setSoundInSilent,
+  getSoundInSilent,
+} from '@store/PapersSound.js' // meeeh this should be from Papers API
 import PapersContext from '@store/PapersContext.js'
 import Button from '@components/button'
 import * as Theme from '@theme'
@@ -11,14 +16,17 @@ const sounds = ['ready', 'turnstart', 'wrong', 'right', 'bomb', 'fivesl', 'times
 
 export default function AudioPreview() {
   const Papers = React.useContext(PapersContext)
-  const [onMute, setOnMute] = React.useState(true) // meh.... todo this
+  const [isOnSilent, setSoundSilent] = React.useState(getSoundInSilent())
+  const [isSoundActive, setSound] = React.useState(getSoundStatus())
 
   function toggleMute() {
-    Audio.setAudioModeAsync({
-      playsInSilentModeIOS: !onMute,
-    })
+    setSoundInSilent(!isOnSilent)
+    setSoundSilent(!isOnSilent)
+  }
 
-    setOnMute(!onMute)
+  function toggleSoundOn() {
+    setSoundStatus(!isSoundActive)
+    setSound(!isSoundActive)
   }
 
   async function startSound(soundId) {
@@ -27,54 +35,86 @@ export default function AudioPreview() {
 
   return (
     <View>
-      {Platform.OS === 'ios' ? (
-        <TouchableOpacity
-          variant="light"
-          onPress={toggleMute}
-          style={{
-            borderWidth: 0,
-            borderRadius: 0,
-            borderBottomWidth: 1,
-            borderBottomColor: Theme.colors.grayLight,
-            paddingHorizontal: 8,
-            paddingVertical: 20,
-            marginBottom: 16,
-          }}
-        >
-          <View
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            <Text style={Theme.typography.bold}>Play sounds on mute:</Text>
-            <Text
-              style={[
-                Theme.typography.bold,
-                { color: onMute ? Theme.colors.success : Theme.colors.grayMedium },
-              ]}
-            >
-              {onMute ? 'Yes' : 'No'}
-            </Text>
-          </View>
-        </TouchableOpacity>
+      <ItemToggle onPress={toggleSoundOn} isActive={isSoundActive} options={['On', 'Off']}>
+        Sound
+      </ItemToggle>
+      {isSoundActive && Platform.OS === 'ios' ? (
+        <ItemToggle onPress={toggleMute} isActive={isOnSilent} options={['Yes', 'No']}>
+          Sound in silent
+        </ItemToggle>
       ) : null}
-      <Text style={[Theme.typography.h3, Theme.u.center, { marginBottom: 8 }]}>
-        Sounds preview:
-      </Text>
-      {sounds.map(soundId => (
-        <Button
-          key={soundId}
-          variant="light"
-          size="sm"
-          onPress={() => startSound(soundId)}
-          style={{ margin: 4 }}
-        >
-          🔉 {soundId}
-        </Button>
-      ))}
+      {isSoundActive && (
+        <View>
+          <Text style={[Theme.typography.h3, Theme.u.center, { marginVertical: 8 }]}>
+            Sounds preview:
+          </Text>
+          {sounds.map(soundId => (
+            <Button
+              key={soundId}
+              variant="light"
+              size="sm"
+              onPress={() => startSound(soundId)}
+              style={{ margin: 4 }}
+            >
+              🔉 {soundId}
+            </Button>
+          ))}
+        </View>
+      )}
     </View>
   )
+}
+
+function ItemToggle({ onPress, isActive, children, options }) /* eslint-disable-line */ {
+  return (
+    <TouchableOpacity
+      variant="light"
+      onPress={onPress}
+      style={{
+        borderWidth: 0,
+        borderRadius: 0,
+        borderBottomWidth: 1,
+        borderBottomColor: Theme.colors.grayLight,
+        paddingHorizontal: 8,
+        paddingVertical: 20,
+      }}
+    >
+      <View
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        <Text style={Theme.typography.bold}>{children}</Text>
+        <Text
+          style={[
+            Theme.typography.bold,
+            { color: isActive ? Theme.colors.success : Theme.colors.grayMedium },
+          ]}
+        >
+          {isActive ? options[0] : options[1]}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  )
+}
+
+const Styles = {
+  btn: {
+    borderWidth: 0,
+    borderRadius: 0,
+    borderBottomWidth: 1,
+    borderBottomColor: Theme.colors.grayLight,
+    paddingHorizontal: 8,
+    paddingVertical: 20,
+    marginBottom: 16,
+  },
+  btn_inner: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
 }

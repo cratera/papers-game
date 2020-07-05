@@ -19,6 +19,9 @@ const SOUNDS = {
 }
 const playset = {}
 
+let isSoundActive = true
+let isSoundInSilent = true
+
 export async function init() {
   Audio.setAudioModeAsync({
     allowsRecordingIOS: false,
@@ -50,7 +53,30 @@ async function loadAudioSkin() {
   return false
 }
 
+export function setSoundStatus(bool) {
+  isSoundActive = bool
+}
+
+export function getSoundStatus() {
+  return isSoundActive
+}
+
+export function setSoundInSilent(bool) {
+  Audio.setAudioModeAsync({
+    playsInSilentModeIOS: bool,
+  })
+  isSoundInSilent = bool
+}
+
+export function getSoundInSilent() {
+  return isSoundInSilent
+}
+
 export function play(soundId) {
+  if (!isSoundActive) {
+    console.warn(`🔊 play: sound is off.`)
+    return
+  }
   if (playset[soundId]) {
     try {
       playset[soundId].replayAsync()
