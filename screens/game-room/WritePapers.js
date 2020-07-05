@@ -216,7 +216,7 @@ export default function WritePapers({ navigation }) {
     }
 
     const wordsToEdit = [...words]
-    wordsToEdit[index] = word
+    wordsToEdit[index] = word.replace(/[\r\n]+/gm, '')
 
     // Q: Maybe change state only on blur?
     // A: No, parent needs to know the value so "Next paper" works
@@ -294,7 +294,7 @@ const SlidePaper = ({ onChange, isActive, onFocus, onSubmit, i }) => {
         ]}
         placeholder={`Paper #${i + 1}`}
         placeholderTextColor={Theme.colors.grayLight}
-        blurOnSubmit={false} // onSubmitEnding will handle the focus on the next paper.
+        blurOnSubmit={true} // prevent new line
         onChangeText={text => onChange(text, i)}
         onBlur={() => setIsFocused(false)}
         onSubmitEditing={onSubmit}
