@@ -381,9 +381,10 @@ async function joinGame(gameId) {
     throw new Error('alreadyStarted')
   }
 
-  await DB.ref(`games/${gameId}/players/${id}`).update({
-    isAfk: false,
-  })
+  // TODO later review all the logic around isAfk and fix false positives.
+  // await DB.ref(`games/${gameId}/players/${id}`).update({
+  //   isAfk: false,
+  // })
 
   // Prevent duplicated game subs
   PubSub.unsubscribe('game')
@@ -442,20 +443,22 @@ function _pubGame(gameId) {
         profile: profile.val(),
       })
 
-      DB.ref(`users/${id}/isAfk`).on('value', data => {
-        console.log('⚙️ player is afk!', id, data.val())
-        PubSub.publish('game.players.changed', {
-          id,
-          info: {
-            isAfk: data.val(),
-          },
-        })
-      })
+      // Not needed for now...
+      // DB.ref(`users/${id}/isAfk`).on('value', data => {
+      //   console.log('⚙️ player is afk!', id, data.val())
+      //   PubSub.publish('game.players.changed', {
+      //     id,
+      //     info: {
+      //       isAfk: data.val(),
+      //     },
+      //   })
+      // })
     })
     DB_PLAYERS.on('child_removed', function (data) {
       const id = data.key
 
-      DB.ref(`users/${id}/isAfk`).off('value')
+      // Not needed for now...
+      // DB.ref(`users/${id}/isAfk`).off('value')
 
       PubSub.publish('game.players.removed', {
         id,
@@ -511,8 +514,8 @@ function _pubGame(gameId) {
   })
 
   // Prepare in case we get offline.
-  const isAfkRef = firebase.database().ref(`users/${LOCAL_PROFILE.id}/isAfk`)
-  isAfkRef.onDisconnect().set(true) // TODO subscribe
+  // const isAfkRef = firebase.database().ref(`users/${LOCAL_PROFILE.id}/isAfk`)
+  // isAfkRef.onDisconnect().set(true) // TODO subscribe
   // BUG: isAFK sometimes is a negative positive. dunno why.
   //    - Workaround: removed it from the UI for now.
 }
@@ -573,11 +576,10 @@ async function _unsubGame(gameId) {
   DB.ref(`games/${gameId}/round`).off('value')
   DB.ref(`games/${gameId}/score`).off('value')
 
-  const players = await DB.ref(`games/${gameId}/players`).once('value')
-
-  for (const playerId in players.val()) {
-    DB.ref(`users/${playerId}/isAfk`).off('value')
-  }
+  // const players = await DB.ref(`games/${gameId}/players`).once('value')
+  // for (const playerId in players.val()) {
+  //   DB.ref(`users/${playerId}/isAfk`).off('value')
+  // }
 }
 
 /**
