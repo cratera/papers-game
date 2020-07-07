@@ -1,13 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { KeyboardAvoidingView, TextInput, Text, View } from 'react-native'
-import { ScrollView } from 'react-native-gesture-handler'
+import { TextInput, Text, View } from 'react-native'
 
 import * as Theme from '@theme'
 import Styles from './HomeStyles.js'
 
-import { headerTheme } from '@navigation/headerStuff.js'
+import { headerTheme, headerBorder } from '@navigation/headerStuff.js'
 import Page from '@components/page'
 import Button from '@components/button'
 
@@ -39,8 +38,7 @@ export default class HomeSignup extends React.Component {
 
   componentDidMount() {
     this.props.navigation.setOptions({
-      headerTitle: 'Create profile',
-      ...headerTheme(),
+      ...headerTheme({ hiddenTitle: true, hiddenBorder: true }),
       headerLeft: null,
       headerRight: null,
     })
@@ -56,14 +54,12 @@ export default class HomeSignup extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     if (!prevState.name && this.state.name) {
       this.props.navigation.setOptions({
+        // ...headerBorder(true),
         headerRight: () => (
           <Page.HeaderBtn side="right" icon="next" textPrimary onPress={this.goNextStep}>
             Next
           </Page.HeaderBtn>
         ),
-        headerStyle: {
-          borderBottomWidth: 1,
-        },
       })
     } else if (!this.state.name && prevState.name) {
       this.props.navigation.setOptions({
@@ -93,7 +89,7 @@ export default class HomeSignup extends React.Component {
         <Page.Main style={Styles.main} blankBg={state.step === 0}>
           <CurrentStep />
         </Page.Main>
-        <Page.CTAs>
+        <Page.CTAs blankBg={state.step === 0}>
           {state.step === 0 && <Button onPress={this.goNextStep}>Start</Button>}
         </Page.CTAs>
       </Page>
@@ -118,25 +114,19 @@ export default class HomeSignup extends React.Component {
 
   stepName() {
     return (
-      <KeyboardAvoidingView
-        behavior={'padding'}
-        keyboardShouldPersistTaps="always"
-        style={{ flex: 1, alignSelf: 'stretch' }}
-      >
-        <ScrollView>
-          <Text nativeID="inputNameLabel" style={[Styles.label, Theme.typography.body]}>
-            How should we call you?
-          </Text>
-          <TextInput
-            style={[Theme.typography.h1, Styles.input]}
-            inputAccessoryViewID="name"
-            autoFocus
-            nativeID="inputNameLabel"
-            defaultValue={this.state.name}
-            onChangeText={name => this.setState(state => ({ ...state, name }))}
-          />
-        </ScrollView>
-      </KeyboardAvoidingView>
+      <View style={{ flex: 1, alignSelf: 'stretch' }}>
+        <Text nativeID="inputNameLabel" style={[Styles.label, Theme.typography.body]}>
+          What should we call you?
+        </Text>
+        <TextInput
+          style={[Theme.typography.h1, Styles.input]}
+          inputAccessoryViewID="name"
+          autoFocus
+          nativeID="inputNameLabel"
+          defaultValue={this.state.name}
+          onChangeText={name => this.setState(state => ({ ...state, name }))}
+        />
+      </View>
     )
   }
 
@@ -171,6 +161,7 @@ export default class HomeSignup extends React.Component {
 
     if (currentStep === 0) {
       this.props.navigation.setOptions({
+        headerStyle: headerBorder(true),
         headerLeft: () => (
           <Page.HeaderBtn side="left" icon="back" onPress={this.goBackStep}>
             Back
@@ -188,9 +179,6 @@ export default class HomeSignup extends React.Component {
               </Page.HeaderBtn>
             )
           : null,
-        headerStyle: {
-          borderBottomWidth: 1,
-        },
       })
     }
 
@@ -216,12 +204,11 @@ export default class HomeSignup extends React.Component {
       this.props.navigation.setOptions({
         headerLeft: null,
         headerRight: null,
-        headerStyle: {
-          borderBottomWidth: 0,
-        },
+        // ...headerBorder(false),
       })
     } else if (step - 1 === 1) {
       this.props.navigation.setOptions({
+        // ...headerBorder(true),
         headerRight: () => (
           <Page.HeaderBtn
             side="right"
@@ -232,9 +219,6 @@ export default class HomeSignup extends React.Component {
             Next
           </Page.HeaderBtn>
         ),
-        headerStyle: {
-          borderBottomWidth: 0,
-        },
       })
     }
   }

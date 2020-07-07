@@ -131,6 +131,7 @@ export default function LobbyJoining({ navigation }) {
                 </Text>
               )}
               <ListPlayers players={playersKeys} enableKickout />
+              <View style={{ height: 8 /* for android */ }}></View>
             </ScrollView>
           </>
         ) : (

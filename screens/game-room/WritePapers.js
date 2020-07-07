@@ -135,7 +135,7 @@ export default function WritePapers({ navigation }) {
               Theme.u.scrollSideOffset,
               Styles.slides,
               {
-                height: 100 * vh - 195 - keyboardHeight, // TODO pixel perfect card height iOS + isWeb
+                height: 100 * vh - 195 - keyboardHeight, // REVIEW/TODO pixel perfect this height
               },
             ]}
           >
@@ -291,6 +291,10 @@ const SlidePaper = ({ onChange, isActive, onFocus, onSubmit, i }) => {
             height: '100%',
           },
         ]}
+        // caretHidden
+        multiline
+        autoCorrect={false}
+        keyboardType="visible-password" // Remove Android auto-suggestions
         placeholder={`Paper #${i + 1}`}
         placeholderTextColor={Theme.colors.grayLight}
         blurOnSubmit={true} // prevent new line
@@ -301,9 +305,6 @@ const SlidePaper = ({ onChange, isActive, onFocus, onSubmit, i }) => {
           onFocus()
           setIsFocused(true)
         }}
-        caretHidden
-        multiline
-        autoCorrect={false}
       ></TextInput>
     </View>
   )

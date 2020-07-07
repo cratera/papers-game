@@ -1,4 +1,4 @@
-import { Dimensions, StyleSheet } from 'react-native'
+import { Platform, Dimensions, StyleSheet } from 'react-native'
 import * as Theme from '@theme'
 
 const vw = Dimensions.get('window').width / 100
@@ -12,22 +12,21 @@ export default StyleSheet.create({
   },
   scrollKAV: {},
   slides: {
-    // display: 'flex',
-    // flexDirection: 'row',
     marginLeft: -16,
     maxHeight: paperHeight + 12,
   },
   slide: {
     width: vw * 100 - 32,
     marginHorizontal: 16,
-    marginBottom: 12,
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
     backgroundColor: Theme.colors.bg,
-    paddingVertical: 16,
+    paddingVertical: Platform === 'web' ? 16 : 0,
     paddingHorizontal: 16,
     shadowColor: Theme.colors.grayDark,
+    marginTop: 4, // Visible shadows on top (Android)
+    marginBottom: 10,
     shadowOffset: {
       width: 0,
       height: 4,
@@ -43,6 +42,7 @@ export default StyleSheet.create({
     borderColor: 'transparent',
     color: Theme.colors.grayDark,
     textAlign: 'center',
+    height: '100%',
   },
   input_isActive: {
     // outline: none // not supported. TODO later, maybe an external stylesheet?...

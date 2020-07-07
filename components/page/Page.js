@@ -91,7 +91,7 @@ const HeaderBtn = ({ side, icon, style, textPrimary, children, isLoading, ...oth
         {side === 'right' && IconMapped && (
           // it feels like 1998
           <>
-            <View style={{ width: 8 }} />
+            <View style={{ width: 8, height: 1 }} />
             <IconMapped size={16} color={color} style={{ transform: [{ translateY: 3 }] }} />
           </>
         )}

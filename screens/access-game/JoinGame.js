@@ -99,11 +99,12 @@ export default function JoinGame({ navigation }) {
   return (
     <Page bannerMsg={state.isUnexError && state.errorMsg}>
       <Page.Main>
-        <KeyboardAvoidingView
+        {/* <KeyboardAvoidingView
           behavior={'padding'}
           keyboardShouldPersistTaps="always"
           style={{ flex: 1, alignSelf: 'stretch' }}
-        >
+        > */}
+        <View>
           {isJoining ? (
             <Text style={[Theme.typography.secondary, Theme.u.center, { marginTop: 150 }]}>
               Joining game...
@@ -166,7 +167,8 @@ export default function JoinGame({ navigation }) {
               )}
             </ScrollView>
           )}
-        </KeyboardAvoidingView>
+        </View>
+        {/* </KeyboardAvoidingView> */}
       </Page.Main>
     </Page>
   )

@@ -17,7 +17,7 @@ export default function Gate({ navigation, route }) {
 
   React.useEffect(() => {
     navigation.setOptions({
-      ...headerTheme(),
+      ...headerTheme({ hiddenTitle: true, hiddenBorder: true }),
     })
   }, [])
 

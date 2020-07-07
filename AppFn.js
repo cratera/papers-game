@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Platform, StatusBar, StyleSheet, View } from 'react-native'
 import { SplashScreen } from 'expo'
 
-// import * as Font from 'expo-font';
+import * as Font from 'expo-font'
 // import { Ionicons } from '@expo/vector-icons'; // Q: How to remove this from bundle?
 
 import { NavigationContainer } from '@react-navigation/native'
@@ -45,11 +45,11 @@ export default function AppFn({ skipLoadingScreen }) /* eslint-disable-line */ {
 
         setInitialProfile(await loadProfile())
 
-        // // Load fonts REVIEW @mmbotelho
-        // await Font.loadAsync({
-        //   ...Ionicons.font,
-        //   'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf'),
-        // });
+        // Load fonts REVIEW @mmbotelho
+        await Font.loadAsync({
+          // ...Ionicons.font,
+          'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf'),
+        })
       } catch (e) {
         Sentry.captureException(e, { tags: { pp_page: 'AppFn' } })
       } finally {

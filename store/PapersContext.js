@@ -176,22 +176,24 @@ export class PapersContextProvider extends Component {
     }
   }
 
-  initAndSign(doAfterSignIn) {
+  initAndSign(cb) {
     console.log('📌 initAndSign()')
-    const socket = this.init()
-
     const { name, avatar } = this.state.profile
 
     if (!name) {
       // TODO!! Review all of these edge cases.
-      console.warn(`Missing name! ${name}`)
-      return false
+      console.warn(`Missing name!`)
+      Sentry.captureMessage(`initAndSign: Missing name! ${JSON.stringify(this.state.profile)}`)
+      cb(null, 'missing_name') // TODO convert to Error.
+      return
     }
+
+    const socket = this.init()
 
     socket.on('profile.signed', async (topic, id) => {
       console.log('📌 on.profile.signed', id)
       await this.PapersAPI.updateProfile({ id }, { ignoreSocket: true })
-      doAfterSignIn()
+      cb()
     })
 
     socket.on('profile.avatarSet', async (topic, avatar) => {
@@ -210,8 +212,11 @@ export class PapersContextProvider extends Component {
     if (!this.state.socket || !this.state.profile.id) {
       console.log('📌 accessGame() - init needed first')
 
-      this.initAndSign((res, error) => {
-        if (error) return cb(null, error)
+      this.initAndSign((res, errorMsg) => {
+        if (errorMsg) {
+          this._removeGameFromState()
+          return cb(null, errorMsg)
+        }
         this.accessGame(variant, gameName, cb)
       })
 

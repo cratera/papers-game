@@ -19,6 +19,7 @@ export const typography = StyleSheet.create({
     fontWeight: 'bold',
     lineHeight: 48,
     color: colors.grayDark,
+    // fontFamily: 'space-mono', // TODO later
   },
   h2: {
     fontSize: 32,

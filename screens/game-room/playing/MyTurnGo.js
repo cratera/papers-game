@@ -399,7 +399,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
         )} */}
       </Page.Main>
 
-      <Page.CTAs hasOffset blankBg style={Styles.go_ctas}>
+      <Page.CTAs blankBg style={Styles.go_ctas}>
         {papersTurn.current !== null &&
         !papersTurn.wordsLeft.length &&
         !papersTurn.passed.length ? (

@@ -11,7 +11,6 @@ import { MyTurnGetReady, MyTurnGo, OthersTurn, RoundScore } from './index'
 import Page from '@components/page'
 import i18n from '@constants/i18n'
 
-import * as Theme from '@theme'
 // import * as Theme from '@theme'
 // import Styles from './PlayingStyles.js'
 
@@ -56,9 +55,8 @@ export default function PlayingEntry({ navigation }) {
 
   React.useEffect(() => {
     navigation.setOptions({
-      ...headerTheme({ hiddenBorder: isMyTurn || isRoundFinished }),
+      ...headerTheme({ hiddenBorder: isMyTurn || isRoundFinished, hiddenTitle: true }),
       headerTitle: 'Playing',
-      headerTintColor: Theme.colors.bg,
       headerRight: function HLB() {
         return <Page.HeaderBtnSettings />
       },
@@ -101,6 +99,8 @@ export default function PlayingEntry({ navigation }) {
     )
   }
 
+  // BUG - Android (or slow phones?) RoundScore is visible for a few ms
+  // before showing OthersTurn
   return (
     <Page>
       {isRoundFinished ? (

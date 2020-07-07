@@ -50,7 +50,7 @@ const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, isSubmitting, ge
                         color={hasGuessed ? Theme.colors.success : null}
                         style={{ flexShrink: 0, transform: [{ translateY: 4 }] }}
                       />
-                      <View style={{ width: 8 }}>{/* lazyness level 99 */}</View>
+                      <View style={{ width: 8, height: 1 }}>{/* lazyness level 99 */}</View>
                       <Text
                         style={[
                           Theme.typography.bold,

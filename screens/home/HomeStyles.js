@@ -38,6 +38,7 @@ export default StyleSheet.create({
     borderBottomWidth: 1,
     textAlign: 'center',
     marginTop: 48,
+    height: 60,
 
     // ${Theme.bp.xs} {
     //   margin-top: 1.6rem;
@@ -88,7 +89,7 @@ export default StyleSheet.create({
 
   memeContainer: {
     position: 'relative',
-    marginBottom: 48,
+    marginBottom: 32,
 
     // ${Theme.bp.xs} {
     //   margin-bottom: 1.4rem;

@@ -49,7 +49,7 @@ const Sheet = React.memo(function Sheet({ visible, list, onClose }) {
                 style={{ transform: [{ translateY: 4 }] }}
               />
             )}
-            <View style={{ width: 8 }}></View> {/* lazyness level 99 */}
+            <View style={{ width: 8, height: 1 }}></View> {/* lazyness level 99 */}
             <Text style={{ color: variant === 'danger' ? Theme.colors.danger : undefined }}>
               {text}
             </Text>
@@ -57,7 +57,7 @@ const Sheet = React.memo(function Sheet({ visible, list, onClose }) {
         ))}
       </View>
 
-      <Button variant="light" style={{ borderColor: Theme.colors.bg }} onPress={onClose}>
+      <Button variant="light" style={{ borderWidth: 0 }} onPress={onClose}>
         Cancel
       </Button>
     </Modal>

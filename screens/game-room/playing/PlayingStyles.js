@@ -114,7 +114,7 @@ export default StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 24,
+    paddingBottom: 40,
   },
   go_ctas_yes: {
     borderWidth: 0,

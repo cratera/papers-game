@@ -17,6 +17,7 @@ export default StyleSheet.create({
     textAlign: 'center',
     marginTop: 32,
     color: Theme.colors.grayDark,
+    height: 60,
   },
   code: {
     display: 'flex',
