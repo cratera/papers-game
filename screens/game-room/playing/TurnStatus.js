@@ -20,7 +20,7 @@ const TurnStatus = ({ title, player, teamName, style }) => (
   </View>
 )
 
-// TODO - Refactor these naming props...
+// TODO later - Improve these props names (e.g. teamName does not make sense).
 TurnStatus.propTypes = {
   title: PropTypes.string.isRequired,
   style: PropTypes.oneOfType([PropTypes.array, PropTypes.object, PropTypes.number]),

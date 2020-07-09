@@ -767,7 +767,7 @@ async function setRound(roundStatus) {
 
 export async function logEvent(...args) {
   // TODO add support to android.
-  // TODO ask for permission in settings.
+  // TODO!! ask for permission in settings.
   // TODO review "Automatically collected events"
   if (!__DEV__) {
     await Analytics.logEvent(...args)
