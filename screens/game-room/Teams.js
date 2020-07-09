@@ -36,6 +36,11 @@ export default function Teams({ navigation }) {
   const [tempTeams, setTeams] = React.useState(getRandomTeams)
   const [isLocking, setLocking] = React.useState(false)
   const [errorMsg, setErrorMsg] = React.useState(null)
+  const didMountRef = React.useRef(false)
+
+  React.useEffect(() => {
+    didMountRef.current = true
+  }, [])
 
   React.useEffect(() => {
     navigation.setOptions({
@@ -53,8 +58,10 @@ export default function Teams({ navigation }) {
   }, [])
 
   React.useEffect(() => {
-    // When someone just joined/left...
-    generateTeams()
+    if (didMountRef.current) {
+      // When someone just joined/left...
+      generateTeams()
+    }
   }, [playersCount])
 
   // TODO later This could be useRandomTeams()
@@ -140,7 +147,7 @@ export default function Teams({ navigation }) {
   return (
     <Page bannerMsg={errorMsg}>
       <Page.Main>
-        <ScrollView style={Theme.u.scrollSideOffset}>
+        <ScrollView style={Theme.u.scrollSideOffset} contentContainerStyle={{ paddingBottom: 16 }}>
           {Object.keys(tempTeams).map(teamId => {
             const { id, name, players } = tempTeams[teamId]
 
