@@ -123,7 +123,10 @@ export default function LobbyJoining({ navigation }) {
               </View>
             </View>
 
-            <ScrollView style={[Theme.u.scrollSideOffset, Styles.list]}>
+            <ScrollView
+              style={[Theme.u.scrollSideOffset, Styles.list]}
+              contentContainerStyle={{ paddingBottom: 8 }}
+            >
               <Text style={Theme.typography.h3}>Lobby</Text>
               {!hasEnoughPlayers && (
                 <Text style={[Theme.typography.small, { marginTop: 4 }]}>
@@ -131,7 +134,6 @@ export default function LobbyJoining({ navigation }) {
                 </Text>
               )}
               <ListPlayers players={playersKeys} enableKickout />
-              <View style={{ height: 8 /* for android */ }}></View>
             </ScrollView>
           </>
         ) : (

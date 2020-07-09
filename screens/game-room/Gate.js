@@ -38,7 +38,9 @@ export default function Gate({ navigation, route }) {
         <IconSpin size={24} />
 
         <Text style={[Theme.typography.secondary, { marginTop: 16 }]}>
-          {`${goal === 'rejoin' ? 'Rejoining' : 'Leaving'} ${profileGameId.split('_')[0]} game...`}
+          {`${goal === 'rejoin' ? 'Rejoining' : 'Leaving'} "${
+            profileGameId.split('_')[0]
+          }" game...`}
         </Text>
       </Page.Main>
     </Page>

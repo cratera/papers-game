@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import PropTypes from 'prop-types'
 
@@ -18,12 +18,11 @@ const place = (x, y, deg) => ({
   transform: [{ rotate: deg }],
 })
 
-const MyTurnGetReady = ({ description, roundIx, amIWaiting }) => {
+const MyTurnGetReady = ({ description, amIWaiting }) => {
   const Papers = React.useContext(PapersContext)
   const { game } = Papers.state
   const round = game.round
-  const roundNr = round.current + 1
-  // const crash = round.current[camboom]
+  const roundNr = round.current + (amIWaiting ? 2 : 1)
 
   function onStartClick() {
     try {
@@ -35,9 +34,9 @@ const MyTurnGetReady = ({ description, roundIx, amIWaiting }) => {
   }
 
   return (
-    <Fragment>
-      <Page.Main blankBg>
-        <View style={Styles.header}>
+    <Page bgFill={false}>
+      <Page.Main>
+        <View style={[Styles.header, { marginTop: 8 }]}>
           <Text style={Theme.typography.h2}>{`It's your turn!`}</Text>
           <View style={StylesIn.illustration}>
             <IconNonWords
@@ -67,16 +66,16 @@ const MyTurnGetReady = ({ description, roundIx, amIWaiting }) => {
           </Text>
         </View>
       </Page.Main>
-      <Page.CTAs blankBg>
+      <Page.CTAs>
         {game.hasStarted && !amIWaiting ? (
           <Button onPress={onStartClick}>Start turn</Button>
         ) : (
           <Text style={[Theme.typography.small, Theme.u.center]}>
-            Waiting for everyone to say they are ready.
+            Waiting for everyone to be ready.
           </Text>
         )}
       </Page.CTAs>
-    </Fragment>
+    </Page>
   )
 }
 

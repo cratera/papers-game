@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 import { View, Text, TouchableHighlight } from 'react-native'
 import PropTypes from 'prop-types'
 
@@ -299,31 +299,40 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
   }
 
   if (!papersTurn) {
+    // REVIEW Q: When can this scenario happen IRL?
     return (
-      <Text style={[Theme.typography.h3, Theme.u.center, { marginTop: 200 }]}>
-        Loading... hold on! ⏳
-      </Text>
+      <Page bgFill={false}>
+        <Page.Main>
+          <Text style={[Theme.typography.h3, Theme.u.center, { marginTop: 200 }]}>
+            Loading... hold on! ⏳
+          </Text>
+        </Page.Main>
+      </Page>
     )
   }
 
   if (isDone) {
     return (
-      <Page.Main blankBg>
-        <Text style={[Theme.typography.h1, Styles.go_count321, { color: Theme.colors.danger }]}>
-          {msToSecPretty(countdown)}
-        </Text>
-        <Text style={[Theme.typography.h1, Styles.go_done_msg]}>{doneMsg}</Text>
-      </Page.Main>
+      <Page bgFill={false}>
+        <Page.Main>
+          <Text style={[Theme.typography.h1, Styles.go_count321, { color: Theme.colors.danger }]}>
+            {msToSecPretty(countdown)}
+          </Text>
+          <Text style={[Theme.typography.h1, Styles.go_done_msg]}>{doneMsg}</Text>
+        </Page.Main>
+      </Page>
     )
   }
 
   if (isCount321go) {
     return (
-      <Page.Main blankBg style={Styles.go_countMain}>
-        <Text style={[Theme.typography.h1, Styles.go_count321]}>
-          {countdownSec - initialTimerSec}
-        </Text>
-      </Page.Main>
+      <Page bgFill={false}>
+        <Page.Main style={Styles.go_countMain}>
+          <Text style={[Theme.typography.h1, Styles.go_count321]}>
+            {countdownSec - initialTimerSec}
+          </Text>
+        </Page.Main>
+      </Page>
     )
   }
 
@@ -342,8 +351,8 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
   }
 
   return (
-    <Fragment>
-      <Page.Main blankBg>
+    <Page bgFill={false}>
+      <Page.Main>
         <Text
           style={[
             Theme.typography.h1,
@@ -399,7 +408,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
         )} */}
       </Page.Main>
 
-      <Page.CTAs blankBg style={Styles.go_ctas}>
+      <Page.CTAs style={Styles.go_ctas}>
         {papersTurn.current !== null &&
         !papersTurn.wordsLeft.length &&
         !papersTurn.passed.length ? (
@@ -446,7 +455,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
           <IconCheck size={30} color={Theme.colors.bg} />
         </Button>
       </Page.CTAs>
-    </Fragment>
+    </Page>
   )
 }
 

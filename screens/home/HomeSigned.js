@@ -56,8 +56,8 @@ export default function HomeSigned({ navigation }) {
 
   return (
     <Fragment>
-      <Page>
-        <Page.Main style={[Styles.main, { justifyContent: 'center' }]} blankBg>
+      <Page bgFill={false}>
+        <Page.Main style={[Styles.main, { justifyContent: 'center' }]}>
           <AvatarMeme avatar={profile.avatar} onChange={handleChangeAvatar} />
           <Text style={[Theme.typography.body, Theme.u.center]}>
             Welcome
@@ -65,7 +65,7 @@ export default function HomeSigned({ navigation }) {
             <Text style={Theme.typography.h1}>{profile.name}</Text>
           </Text>
         </Page.Main>
-        <Page.CTAs blankBg>
+        <Page.CTAs>
           <Button onPress={() => openAccessGameModal('create')}>Create Game</Button>
           <Button
             variant="light"

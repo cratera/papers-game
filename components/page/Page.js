@@ -11,7 +11,7 @@ import NetInfo from '@react-native-community/netinfo'
 
 const i18nWifi = 'No internet connection'
 
-const Page = ({ children, blankBg, bannerMsg, ...otherProps }) => {
+const Page = ({ children, bgFill, bannerMsg, ...otherProps }) => {
   const [bannerText, setBannerText] = React.useState(null)
 
   React.useEffect(() => {
@@ -41,7 +41,7 @@ const Page = ({ children, blankBg, bannerMsg, ...otherProps }) => {
         style={[
           Styles.page,
           {
-            backgroundColor: Theme.colors[blankBg ? 'bg' : 'grayBg'],
+            backgroundColor: bgFill === false ? Theme.colors.bg : bgFill,
           },
         ]}
         {...otherProps}
@@ -52,9 +52,14 @@ const Page = ({ children, blankBg, bannerMsg, ...otherProps }) => {
   )
 }
 
+Page.defaultProps = {
+  bgFill: Theme.colors.grayBg,
+}
+
 Page.propTypes = {
   bannerMsg: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
-  blankBg: PropTypes.bool,
+  /** By default is `colors.grayBg`. When `false` is `colors.bg` (blank bg). DO NOT pass `true` */
+  bgFill: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
   children: PropTypes.node,
 }
 
@@ -111,40 +116,28 @@ HeaderBtn.propTypes = {
 
 const HeaderBtnSettings = () => <SettingsToggle style={{ marginRight: 8 }} />
 
-const Main = ({ children, style, blankBg, ...otherProps }) => {
+const Main = ({ children, style, ...otherProps }) => {
   React.useEffect(() => {})
 
   return (
-    <View
-      style={[
-        Styles.main,
-        {
-          backgroundColor: Theme.colors[blankBg ? 'bg' : 'grayBg'],
-        },
-        style,
-      ]}
-      {...otherProps}
-    >
+    <View style={[Styles.main, style]} {...otherProps}>
       {children}
     </View>
   )
 }
 
 Main.propTypes = {
-  /** The bg gets white. */
-  blankBg: PropTypes.bool,
   children: PropTypes.node,
   style: PropTypes.oneOfType([PropTypes.array, PropTypes.object, PropTypes.number]),
 }
 
-const CTAs = ({ children, hasOffset, blankBg, style, ...otherProps }) => {
+const CTAs = ({ children, hasOffset, style, ...otherProps }) => {
   return (
     <View
       style={[
         Styles.ctas,
         {
           paddingBottom: children ? 32 : 0,
-          backgroundColor: Theme.colors[blankBg ? 'bg' : 'grayBg'],
         },
         style,
       ]}
@@ -158,8 +151,6 @@ const CTAs = ({ children, hasOffset, blankBg, style, ...otherProps }) => {
 }
 
 CTAs.propTypes = {
-  /** The bg gets white. */
-  blankBg: PropTypes.bool,
   style: PropTypes.oneOfType([PropTypes.array, PropTypes.object, PropTypes.number]),
   hasOffset: PropTypes.bool,
   children: PropTypes.node,

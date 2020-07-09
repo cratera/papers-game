@@ -85,11 +85,11 @@ export default class HomeSignup extends React.Component {
     }[state.step]
 
     return (
-      <Page>
-        <Page.Main style={Styles.main} blankBg={state.step === 0}>
+      <Page bgFill={state.step !== 0}>
+        <Page.Main style={Styles.main}>
           <CurrentStep />
         </Page.Main>
-        <Page.CTAs blankBg={state.step === 0}>
+        <Page.CTAs>
           {state.step === 0 && <Button onPress={this.goNextStep}>Start</Button>}
         </Page.CTAs>
       </Page>

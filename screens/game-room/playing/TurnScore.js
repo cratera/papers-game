@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 import { Platform, View, Text } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import PropTypes from 'prop-types'
@@ -15,8 +15,8 @@ const isWeb = Platform.OS === 'web'
 
 const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, isSubmitting, getPaperByKey }) => {
   return (
-    <Fragment>
-      <Page.Main blankBg>
+    <Page bgFill={false}>
+      <Page.Main>
         <View style={Styles.header}>
           <Text style={Theme.typography.secondary}>
             {type === 'timesup' ? "Time's Up!" : 'All papers guessed!'}
@@ -75,12 +75,12 @@ const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, isSubmitting, ge
           )}
         </ScrollView>
       </Page.Main>
-      <Page.CTAs blankBg hasOffset>
+      <Page.CTAs hasOffset>
         <Button onPress={onFinish} isLoading={isSubmitting}>
           End turn
         </Button>
       </Page.CTAs>
-    </Fragment>
+    </Page>
   )
 }
 

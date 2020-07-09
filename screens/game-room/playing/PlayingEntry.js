@@ -54,14 +54,22 @@ export default function PlayingEntry({ navigation }) {
   }, [startedCounting, startCountdown, round.status])
 
   React.useEffect(() => {
+    setNavigation()
+  }, [isMyTurn, amIReady, isRoundFinished])
+
+  function setNavigation() {
+    // OPTIMIZE - Handle nav options across diff screens in a smarter way.
     navigation.setOptions({
-      ...headerTheme({ hiddenBorder: isMyTurn || isRoundFinished, hiddenTitle: true }),
+      ...headerTheme({
+        hiddenBorder: isMyTurn || (isRoundFinished && amIReady), // bug: should be true if !isMeNextTurn
+        hiddenTitle: true,
+      }),
       headerTitle: 'Playing',
       headerRight: function HLB() {
         return <Page.HeaderBtnSettings />
       },
     })
-  }, [isMyTurn, isRoundFinished])
+  }
 
   if (isRoundFinished && amIReady) {
     const nextTurnWho = Papers.getNextTurn()
@@ -74,62 +82,51 @@ export default function PlayingEntry({ navigation }) {
     // REVIEW / OPTIMIZE later. I don't like this duplication.
     // TODO - <Page> should be inside of each view component,
     // so that it can show errors if needed
-    return (
-      <Page>
-        {isMeNextTurn ? (
-          <MyTurnGetReady
-            description={DESCRIPTIONS[nextRoundIx]}
-            roundIx={nextRoundIx}
-            amIWaiting={true}
-          />
-        ) : (
-          <OthersTurn
-            description={DESCRIPTIONS[nextRoundIx]}
-            thisTurnTeamName={turnTeamName}
-            thisTurnPlayerName={turnPlayer?.name || `? ${turnPlayer} ?`}
-            hasCountdownStarted={false}
-            countdownSec={initialTimerSec}
-            countdown={initialTimer}
-            initialTimerSec={initialTimerSec}
-            initialTimer={initialTimer}
-            amIWaiting={true}
-          />
-        )}
-      </Page>
+    return isMeNextTurn ? (
+      <MyTurnGetReady description={DESCRIPTIONS[nextRoundIx]} amIWaiting={true} />
+    ) : (
+      <OthersTurn
+        roundIx={nextRoundIx}
+        description={DESCRIPTIONS[nextRoundIx]}
+        thisTurnTeamName={turnTeamName}
+        thisTurnPlayerName={turnPlayer?.name || `? ${turnPlayer} ?`}
+        hasCountdownStarted={false}
+        countdownSec={initialTimerSec}
+        countdown={initialTimer}
+        initialTimerSec={initialTimerSec}
+        initialTimer={initialTimer}
+        amIWaiting={true}
+      />
     )
   }
 
   // BUG - Android (or slow phones?) RoundScore is visible for a few ms
   // before showing OthersTurn
-  return (
-    <Page>
-      {isRoundFinished ? (
-        <RoundScore navigation={navigation} />
-      ) : isMyTurn ? (
-        !hasCountdownStarted ? (
-          <MyTurnGetReady description={DESCRIPTIONS[roundIndex]} />
-        ) : (
-          <MyTurnGo
-            startedCounting={startedCounting}
-            initialTimerSec={initialTimerSec}
-            countdown={countdown}
-            countdownSec={countdownSec}
-            isCount321go={isCount321go}
-          />
-        )
-      ) : (
-        <OthersTurn
-          description={DESCRIPTIONS[roundIndex]}
-          thisTurnTeamName={turnTeamName}
-          thisTurnPlayerName={thisTurnPlayer?.name || `? ${turnPlayerId} ?`}
-          hasCountdownStarted={hasCountdownStarted}
-          countdownSec={countdownSec}
-          countdown={countdown}
-          initialTimerSec={initialTimerSec}
-          initialTimer={initialTimer}
-        />
-      )}
-    </Page>
+  return isRoundFinished ? (
+    <RoundScore navigation={navigation} onUnmount={setNavigation} />
+  ) : isMyTurn ? (
+    !hasCountdownStarted ? (
+      <MyTurnGetReady description={DESCRIPTIONS[roundIndex]} />
+    ) : (
+      <MyTurnGo
+        startedCounting={startedCounting}
+        initialTimerSec={initialTimerSec}
+        countdown={countdown}
+        countdownSec={countdownSec}
+        isCount321go={isCount321go}
+      />
+    )
+  ) : (
+    <OthersTurn
+      description={DESCRIPTIONS[roundIndex]}
+      thisTurnTeamName={turnTeamName}
+      thisTurnPlayerName={thisTurnPlayer?.name || `? ${turnPlayerId} ?`}
+      hasCountdownStarted={hasCountdownStarted}
+      countdownSec={countdownSec}
+      countdown={countdown}
+      initialTimerSec={initialTimerSec}
+      initialTimer={initialTimer}
+    />
   )
 }
 

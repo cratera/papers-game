@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { KeyboardAvoidingView, Text, TextInput } from 'react-native'
+import { View, Text, TextInput } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 
 import PapersContext from '@store/PapersContext.js'
@@ -69,11 +69,12 @@ export default function CreateGame({ navigation }) {
   return (
     <Page bannerMsg={state.isUnexError && state.errorMsg}>
       <Page.Main>
-        <KeyboardAvoidingView
+        {/* <KeyboardAvoidingView
           behavior={'padding'}
           keyboardShouldPersistTaps="always"
           style={{ flex: 1, alignSelf: 'stretch' }}
-        >
+        > */}
+        <View>
           {isCreating ? (
             <Text style={[Theme.typography.secondary, Theme.u.center, { marginTop: 150 }]}>
               Creating game...
@@ -94,11 +95,11 @@ export default function CreateGame({ navigation }) {
                 defaultValue={state.gameName}
                 onChangeText={handleInputChange}
               />
-              <Text
-                style={[Theme.typography.small, Styles.hintMsg, state.isInvalid && Styles.errorMsg]}
-              >
-                You can only use letters and numbers.
-              </Text>
+              {state.isInvalid && (
+                <Text style={[Theme.typography.small, Styles.hintMsg, Styles.errorMsg]}>
+                  You can only use letters and numbers.
+                </Text>
+              )}
               {state.errorMsg && !state.isUnexError && (
                 <Text style={[Theme.typography.small, Styles.hintMsg, Styles.errorMsg]}>
                   {state.errorMsg}
@@ -106,7 +107,8 @@ export default function CreateGame({ navigation }) {
               )}
             </ScrollView>
           )}
-        </KeyboardAvoidingView>
+        </View>
+        {/* </KeyboardAvoidingView> */}
       </Page.Main>
     </Page>
   )

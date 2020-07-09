@@ -7,13 +7,11 @@ export default StyleSheet.create({
   page: {
     width: '100%',
     maxWidth: 500,
-    // paddingHorizontal: calc((100vw - 500px) / 2)
     marginHorizontal: 'auto',
     flex: 1,
     alignItems: 'stretch',
   },
   main: {
-    // paddingTop: headerH, // header is from Navigator
     flexGrow: 1,
     flexShrink: 1 /* so it scrolls */,
     paddingHorizontal: gutter,
@@ -29,7 +27,6 @@ export default StyleSheet.create({
     fontSize: 14,
   },
   ctas: {
-    backgroundColor: '#f000',
     paddingHorizontal: gutter,
   },
 })

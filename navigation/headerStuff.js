@@ -3,7 +3,7 @@ import * as Theme from '@theme'
 // TODO rename this file
 
 export const headerTheme = (opts = {}) => ({
-  headerTintColor: Theme.colors[opts.hiddenTitle ? 'bg' : 'grayMedium'],
+  headerTintColor: Theme.colors.grayMedium,
   headerStyle: {
     backgroundColor: Theme.colors[opts.dark ? 'grayDark' : 'bg'],
     ...headerBorder(!opts.hiddenBorder),
@@ -11,6 +11,7 @@ export const headerTheme = (opts = {}) => ({
   },
   headerTitleStyle: {
     fontWeight: 'bold',
+    opacity: opts.hiddenTitle ? 0 : 1,
   },
   headerRight: null,
   headerLeft: null,

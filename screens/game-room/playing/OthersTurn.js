@@ -29,7 +29,7 @@ const OthersTurn = ({
   const isAllWordsGuessed = papersGuessed === game.round.wordsLeft?.length
   const round = game.round
   const turnWho = round?.turnWho || {}
-  const roundNr = round.current + 1
+  const roundNr = round.current + (amIWaiting ? 2 : 1)
   const isTurnOn = !hasCountdownStarted || !!countdownSec // aka: it isn't times up
   const turnStatus = React.useMemo(() => {
     if (isAllWordsGuessed) {
@@ -50,7 +50,7 @@ const OthersTurn = ({
       },
       teamName:
         !game.hasStarted || amIWaiting
-          ? 'Waiting for everyone to say they are ready.'
+          ? 'Waiting for everyone to be ready.'
           : tPlayerId === profile.id // if we are the next one
           ? `Waiting for ${thisTurnPlayerName} to finish their turn.`
           : game.teams[teamId].name,
@@ -58,7 +58,7 @@ const OthersTurn = ({
   }, [isAllWordsGuessed, amIWaiting, isTurnOn, game.hasStarted])
 
   return (
-    <Fragment>
+    <Page>
       <Page.Main>
         <View>
           <View style={[Styles.header, { marginTop: 24 }]}>
@@ -126,7 +126,7 @@ const OthersTurn = ({
           />
         )}
       </Page.CTAs>
-    </Fragment>
+    </Page>
   )
 }
 
@@ -139,7 +139,6 @@ OthersTurn.propTypes = {
   initialTimer: PropTypes.number.isRequired,
   thisTurnTeamName: PropTypes.string,
   thisTurnPlayerName: PropTypes.string.isRequired,
-  /** I am ready, waiting for the next round to start. */
   amIWaiting: PropTypes.bool,
 }
 

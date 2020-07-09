@@ -32,17 +32,12 @@ const RoundScore = ({ navigation }) => {
     []
   )
 
-  // TODO next - continue hereee
-  // React.useEffect(() => {
-  //   if (isOnRoundIntro) {
-  //     navigation.setOptions({
-  //       ...headerTheme({ dark: true }),
-  //       headerTitleStyle: {
-  //         opacity: 0,
-  //       },
-  //     })
-  //   }
-  // }, [isOnRoundIntro])
+  function handleStartRoundClick() {
+    setIsOnRoundIntro(true)
+    navigation.setOptions({
+      ...headerTheme({ dark: true, hiddenBorder: true, hiddenTitle: true }),
+    })
+  }
 
   async function handleReadyClick() {
     if (isSubmitting === true) {
@@ -53,15 +48,14 @@ const RoundScore = ({ navigation }) => {
     try {
       await Papers.markMeAsReadyForNextRound()
     } catch (error) {
-      // TODO errorMsg here
+      // TODO errorMsg
     }
   }
 
   if (isOnRoundIntro) {
-    // TODO make the header dark too...
     return (
-      <Page>
-        <Page.Main style={{ backgroundColor: Theme.colors.grayDark }}>
+      <Page bgFill={Theme.colors.grayDark}>
+        <Page.Main>
           <View
             style={[
               Styles.header,
@@ -98,9 +92,9 @@ const RoundScore = ({ navigation }) => {
   }
 
   return (
-    <Page>
+    <Page bgFill={false}>
       {!isTie && isFinalRound && <EmojiRain type={isMyTeamWinner ? 'winner' : 'loser'} />}
-      <Page.Main blankBg>
+      <Page.Main>
         <View style={[Styles.header, { marginTop: 40, marginBottom: 16 }]}>
           {isFinalRound ? (
             <Fragment>
@@ -126,7 +120,7 @@ const RoundScore = ({ navigation }) => {
 
         <GameScore BOAT={isFinalRound} />
       </Page.Main>
-      <Page.CTAs blankBg>
+      <Page.CTAs>
         {isFinalRound ? (
           <Button
             onPress={() => {
@@ -137,7 +131,7 @@ const RoundScore = ({ navigation }) => {
             Go to homepage
           </Button>
         ) : (
-          <Button isLoading={isSubmitting} onPress={() => setIsOnRoundIntro(true)}>
+          <Button isLoading={isSubmitting} onPress={handleStartRoundClick}>
             {`Start round ${round.current + 1 + 1}!`}
           </Button>
         )}
