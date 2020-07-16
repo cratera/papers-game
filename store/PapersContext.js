@@ -490,7 +490,7 @@ export class PapersContextProvider extends Component {
   }
 
   async setWords(words) {
-    console.log('📌 setWords()', words)
+    console.log('📌 setWords()')
     try {
       await this.state.socket.setWords(words)
     } catch (e) {

@@ -42,7 +42,6 @@ export default StyleSheet.create({
     borderColor: 'transparent',
     color: Theme.colors.grayDark,
     textAlign: 'center',
-    height: '100%',
   },
   input_isActive: {
     // outline: none // not supported. TODO later, maybe an external stylesheet?...

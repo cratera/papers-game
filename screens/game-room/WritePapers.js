@@ -22,6 +22,7 @@ import * as Theme from '@theme'
 import Styles from './WritePapersStyles.js'
 
 const isWeb = Platform.OS === 'web'
+const isAndroid = Platform.OS === 'android'
 
 const vw = Dimensions.get('window').width / 100 // TODO useDimensions
 const vh = Dimensions.get('window').height / 100 // TODO useDimensions
@@ -288,13 +289,13 @@ const SlidePaper = ({ onChange, isActive, onFocus, onSubmit, i }) => {
           Theme.typography.h1,
           (isActive || isFocused) && Styles.input_isActive,
           isWeb && {
-            height: '100%',
+            height: '100px', // ~2 lines
           },
         ]}
         // caretHidden
         multiline
         autoCorrect={false}
-        keyboardType="visible-password" // Remove Android auto-suggestions
+        keyboardType={isAndroid ? 'visible-password' : 'default'} // Remove Android auto-suggestions
         placeholder={`Paper #${i + 1}`}
         placeholderTextColor={Theme.colors.grayLight}
         blurOnSubmit={true} // prevent new line

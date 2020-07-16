@@ -636,6 +636,15 @@ async function setWords(words) {
   */
 
   let wordsAsKeys = null
+  const refPlayerWords = DB.ref(`games/${gameId}/words/${playerId}`)
+  const playerWords = await refPlayerWords.once('value')
+
+  if (playerWords.exists()) {
+    // This might happen when the player submits twice (double click)
+    // Already happened in a slow iphone 5 phone and on iPhone X.
+    // Can't replicate locally though.
+    throw Error('Papers already submitted.')
+  }
 
   await DB.ref(`games/${gameId}/words/_all`).transaction(wordsOnce => {
     const wordsStored = wordsOnce || []
@@ -646,7 +655,7 @@ async function setWords(words) {
     return allWords
   })
 
-  await DB.ref(`games/${gameId}/words/${playerId}`).set(wordsAsKeys)
+  await refPlayerWords.set(wordsAsKeys)
 }
 
 /**
