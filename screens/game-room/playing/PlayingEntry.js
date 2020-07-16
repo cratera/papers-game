@@ -61,7 +61,7 @@ export default function PlayingEntry({ navigation }) {
     // OPTIMIZE - Handle nav options across diff screens in a smarter way.
     navigation.setOptions({
       ...headerTheme({
-        hiddenBorder: isMyTurn || (isRoundFinished && amIReady), // bug: should be true if !isMeNextTurn
+        hiddenBorder: isMyTurn || isRoundFinished, // bug: should be true if !isMeNextTurn
         hiddenTitle: true,
       }),
       headerTitle: 'Playing',
