@@ -33,7 +33,6 @@ const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, isSubmitting, ge
                 .filter(
                   (paper, index) =>
                     // use indexOf to avoid duplicated keys.
-                    // TODO later keep last indexOf instead of first.
                     paper !== undefined && papersTurn.sorted.indexOf(paper) === index
                 )
                 .map((paper, i) => {

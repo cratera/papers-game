@@ -748,7 +748,7 @@ async function finishTurn({ playerScore, roundStatus }, cb) {
 
   if (roundStatus.status === 'finished') {
     // Mark players as not ready for the next round.
-    // Do this before, so that RoundScore UI shows correctly
+    // In RoundScore they'll mark themselves again as ready.
     const playersRef = await DB.ref(`games/${gameId}/players`).once('value')
     const players = playersRef.val()
 

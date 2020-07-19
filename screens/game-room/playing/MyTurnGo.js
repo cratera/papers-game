@@ -289,7 +289,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
       // Ex: Start a new game, the LS may still contain data from prev game
       // Q: Maybe do this when game starts. Dunno what's the best place to do it.
       // A: Keep this. If the user closes/minimize the app (eg. to go to twitter)
-      //    and comes back later, we guarantee the local state is cleaned.
+      //    and comes back when its their turn again, we guarantee the local state is cleaned.
       Papers.setTurnLocalState(null)
       Papers.finishTurn(papersTurn)
     } catch (e) {
@@ -304,7 +304,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
       <Page bgFill={false}>
         <Page.Main>
           <Text style={[Theme.typography.h3, Theme.u.center, { marginTop: 200 }]}>
-            Loading... hold on! ⏳
+            Loading... hold on!
           </Text>
         </Page.Main>
       </Page>

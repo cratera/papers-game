@@ -614,19 +614,33 @@ export class PapersContextProvider extends Component {
     const allValidWordsGuessed = [...wordsSoFar, ...papersTurn.guessed].filter(word => {
       if (word === undefined) {
         console.warn(
-          ':: An undefined word guessed was filtered to avoid DB errors!',
+          ':: Undefined word guessed avoided!', // to avoid DB errors!
           wordsSoFar,
           papersTurn.guessed
         )
+        Sentry.captureMessage('Undefined word guessed avoided!')
         return false
       }
       return true
     })
 
+    const uniqueWordsGuessed = allValidWordsGuessed.filter((paper, index) => {
+      // Avoid submitting duplicated papers. I don't know how,
+      // but already happened IRL and din't understand the cause.
+      // Probably the player clicked twice (in a slow phone) to submit their score
+      // and the UI didn't block the second click? So it submitted twice.
+      const isUnique = papersTurn.sorted.indexOf(paper) === index
+      if (!isUnique) {
+        console.warn(':: Duplicated word guessed avoided!', paper, index)
+        Sentry.captureMessage('Duplicated word guessed avoided!')
+      }
+      return isUnique
+    })
+
     try {
       await this.state.socket.finishTurn({
         playerScore: {
-          [profileId]: allValidWordsGuessed,
+          [profileId]: uniqueWordsGuessed,
         },
         roundStatus,
       })
