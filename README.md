@@ -21,7 +21,7 @@ To report bugs or send dfeedback, get it touch [by e-mail](mailto:a.sandrina.p@g
 
 [![runs with expo](https://img.shields.io/badge/Runs%20with%20Expo-000.svg?style=flat-square&logo=EXPO&labelColor=f3f3f3&logoColor=000)](https://expo.io/)
 
-Make sure a recent version of [Node.js](https://nodejs.org/en/) is installed.
+Requirements: [Node.js](https://nodejs.org/en/), [Expo CLI](https://expo.io/tools#cli) and [Yarn](https://yarnpkg.com/).
 
 - Install dependencies:
 
