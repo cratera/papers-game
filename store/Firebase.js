@@ -536,6 +536,7 @@ async function leaveGame({ wasKicked = false } = {}) {
     throw new Error('notFound')
   }
 
+  // !!TODO something wrong here with FB RULES
   await DB.ref(`games/${gameId}/players/${LOCAL_PROFILE.id}`).remove()
 
   PubSub.publish('game.leave')
