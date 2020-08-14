@@ -23,7 +23,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.nabicas.papers",
-      "googleServicesFile": "./stash/GoogleService-Info.plist"
+      "googleServicesFile": "./secrets/GoogleService-Info.plist"
     },
     "web": {
       "config": {

@@ -13,8 +13,9 @@ dist
 hosting.*
 .env
 
-# personal stuff
-stash
+#
+secrets/**
+!secrets/README.md
 
 # firebase
 firebase-debug.log
