@@ -242,6 +242,7 @@ export class PapersContextProvider extends Component {
       cb(gameId)
     } catch (e) {
       const errorMsgMap = {
+        notSigned: () => 'Cannot find your profile. Please start over.', // I hope this never happens.
         exists: () => 'Choose another name.', // 0.001% probability because code is random.
         notFound: () => "That name or code don't seem right.",
         alreadyStarted: () => 'That game already started.',
@@ -250,7 +251,7 @@ export class PapersContextProvider extends Component {
 
       const errorMsg = (errorMsgMap[e.message] || errorMsgMap.ups)()
       const isUnexError = !errorMsgMap[e.message]
-      console.warn(':: accessGame failed!', variant, gameName, errorMsg)
+      console.warn(':: accessGame failed!', variant, gameName, e, errorMsg)
 
       if (isUnexError) {
         Sentry.captureException(e, { tags: { pp_action: 'AG_0' } })

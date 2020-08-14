@@ -104,11 +104,11 @@ function SettingsProfile({ navigation }) {
       }
     } else {
       Alert.alert(
-        'Delete account',
-        "This will delete your account locally and from Papers' servers",
+        'Delete profile',
+        "This will delete your profile locally and from Papers' servers",
         [
           {
-            text: 'Delete account',
+            text: 'Delete profile',
             onPress: async () => {
               await Papers.resetProfile()
               navigation.dangerouslyGetParent().reset({
@@ -120,7 +120,7 @@ function SettingsProfile({ navigation }) {
           },
           {
             text: 'Cancel',
-            onPress: () => console.log('Delete account cancelled'),
+            onPress: () => console.log('Delete profile cancelled'),
             style: 'cancel',
           },
         ],
@@ -155,7 +155,7 @@ function SettingsProfile({ navigation }) {
             list={[
               {
                 id: 'del',
-                title: 'Delete account',
+                title: 'Delete profile',
                 variant: 'danger',
                 onPress: handleDeleteAccount,
               },

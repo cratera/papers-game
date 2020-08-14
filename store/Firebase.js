@@ -309,6 +309,12 @@ async function createGame(gameName) {
   console.log(`⚙️ createGame: ${gameName}`, { LOCAL_PROFILE })
   const gameNameLower = gameName.toLowerCase()
 
+  // Verify if we can create the game...
+  const id = LOCAL_PROFILE.id
+  if (!id) {
+    throw new Error('notSigned')
+  }
+
   if (slugString(gameName) !== gameNameLower) {
     console.log('::', slugString(gameName), gameNameLower)
     throw new Error('invalid name')
@@ -325,18 +331,12 @@ async function createGame(gameName) {
     throw new Error('exists')
   }
 
-  // Verify if we can create the game...
-  const id = LOCAL_PROFILE.id
-  if (!id) {
-    throw new Error('notSigned')
-  }
-
   // Create the game!
   await DB.ref(`games/${gameId}`).set(
     gameInitialState({
       id: gameId,
       name: gameName,
-      code,
+      code: code.toString(),
       creatorId: LOCAL_PROFILE.id,
     })
   )
