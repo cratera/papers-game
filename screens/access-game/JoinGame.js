@@ -23,7 +23,7 @@ export default function JoinGame({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const [isJoining, setJoining] = React.useState(false)
   const [didAutoJoin, setDidAutoJoin] = React.useState(false)
-  const [step, setStep] = React.useState(0) // TODO create router between steps
+  const [step, setStep] = React.useState(0)
   const [state, setState] = React.useState({
     gameName: '',
     code: '',

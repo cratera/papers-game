@@ -525,20 +525,23 @@ async function leaveGame({ wasKicked = false } = {}) {
   console.log('⚙️ leaveGame()', { wasKicked }, LOCAL_PROFILE.id)
   const gameId = LOCAL_PROFILE.gameId
 
-  if (!gameId) {
-    throw new Error('gameIdMissing')
+  // already excluded from game, no need to remove again...
+  if (!wasKicked) {
+    const gameRef = DB.ref(`games/${gameId}`)
+    const game = await gameRef.once('value')
+
+    if (Object.keys(game.val().players).length === 1) {
+      console.log(':: last player - remove game')
+      DB.ref(`games/${gameId}`).remove()
+    } else {
+      console.log(':: removing')
+      await DB.ref(`games/${gameId}/players/${LOCAL_PROFILE.id}`).remove()
+    }
   }
 
-  const gameRef = DB.ref(`games/${gameId}`)
-  const game = await gameRef.once('value')
-
-  if (!game.exists()) {
-    throw new Error('notFound')
-  }
-
-  // !!TODO something wrong here with FB RULES
-  await DB.ref(`games/${gameId}/players/${LOCAL_PROFILE.id}`).remove()
-
+  // ...just leave/unsb it.
+  // REFACTOR: When leaving the game, this is called twice (see logs).
+  // Not ideally but better twice than never.
   PubSub.publish('game.leave')
 
   await _unsubGame(gameId)
@@ -546,13 +549,6 @@ async function leaveGame({ wasKicked = false } = {}) {
   setTimeout(() => {
     console.log('⚙️ Unsubscribe game')
     PubSub.unsubscribe('game')
-
-    // A kicked-out player cannot remove the game.
-    // It means there's still someone left.
-    if (!wasKicked && Object.keys(game.val().players).length === 1) {
-      console.log(':: last player - remove game')
-      DB.ref(`games/${gameId}`).remove()
-    }
   }, 0) // Q: Why did I use timeout here?
 }
 
@@ -587,10 +583,6 @@ async function _unsubGame(gameId) {
 async function removePlayer(playerId) {
   const gameId = LOCAL_PROFILE.gameId
   console.log('⚙️ removePlayer()', gameId, playerId)
-
-  if (!gameId) {
-    throw new Error('gameIdMissing')
-  }
 
   const gameRef = DB.ref(`games/${gameId}`)
   const game = await gameRef.once('value')
