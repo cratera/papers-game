@@ -35,11 +35,11 @@ export class PapersContextProvider extends Component {
         // the last game this player tried to access
         gameId: props.initialProfile.gameId,
       },
-      game: null, // see Firebase.js to see structure.
+      game: null, // see Firebase.js for structure.
       profiles: {}, // List of game players' profiles.
       about: {
-        version: '0.2.2', // TODO REVIEW - where should this come from?
-        ota: '19',
+        version: '0.2.3',
+        ota: '00',
       },
     }
 

@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Papers Game",
+    "name": "Papers - The Game",
     "slug": "papers-game",
-    "description": "The perfect game for your dinner party with friends!",
+    "description": "The perfect game for your game night with friends or family!",
     "privacy": "public",
     "platforms": ["ios", "android", "web"],
-    "version": "0.2.2",
+    "version": "0.2.3",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
