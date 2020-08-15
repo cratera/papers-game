@@ -1,6 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import * as Analytics from '@constants/analytics.js'
+
 import PapersContext from '@store/PapersContext.js'
 
 import { headerTheme } from '@navigation/headerStuff.js'
@@ -16,6 +18,14 @@ export default function HomeScreen({ navigation }) {
   const gameId = game?.id
 
   React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      Analytics.setCurrentScreen(profile.name ? 'home' : 'profile_creation')
+    })
+
+    return unsubscribe
+  }, [navigation])
+
+  React.useEffect(() => {
     navigation.setOptions({
       ...headerTheme({ hiddenBorder: true, hiddenTitle: true }),
       headerTitle: profile.name ? 'Home' : 'Create Profile',
@@ -23,6 +33,8 @@ export default function HomeScreen({ navigation }) {
         return profile.name ? <Page.HeaderBtnSettings /> : null
       },
     })
+    // Bug, on mount this is called twice
+    Analytics.setCurrentScreen(profile.name ? 'home' : 'profile_creation')
   }, [profile.name])
 
   React.useEffect(() => {

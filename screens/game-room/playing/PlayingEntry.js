@@ -2,6 +2,8 @@ import React from 'react'
 // import { Text } from 'react-native'
 import PropTypes from 'prop-types'
 
+import * as Analytics from '@constants/analytics.js'
+
 import { useCountdown, usePrevious } from '@constants/utils'
 import PapersContext from '@store/PapersContext.js'
 import { headerTheme } from '@navigation/headerStuff.js'
@@ -44,6 +46,10 @@ export default function PlayingEntry({ navigation }) {
   const startedCounting = prevHasCountdownStarted === false && hasCountdownStarted
 
   const amIReady = game.players[profile.id].isReady
+
+  React.useEffect(() => {
+    Analytics.setCurrentScreen(`game_playing_round${roundIndex + 1}`)
+  }, [roundIndex])
 
   React.useEffect(() => {
     // use false to avoid undefined on first render

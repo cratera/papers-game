@@ -1,6 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import * as Analytics from '@constants/analytics.js'
+
 import PapersContext from '@store/PapersContext.js'
 import CreateGame from './CreateGame.js'
 import JoinGame from './JoinGame.js'
@@ -14,6 +16,8 @@ export default function AccessGame({ route, navigation }) {
   React.useEffect(() => {
     if (!variant) {
       navigation.navigate('home')
+    } else {
+      Analytics.setCurrentScreen(`${variant}_game`) // join_game || create_game
     }
   }, [variant])
 

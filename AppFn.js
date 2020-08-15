@@ -2,6 +2,8 @@ import * as React from 'react'
 import { Platform, StatusBar, StyleSheet, View } from 'react-native'
 import { SplashScreen } from 'expo'
 
+// import * as Analytics from '@constants/analytics.js'
+
 import * as Font from 'expo-font'
 // import { Ionicons } from '@expo/vector-icons'; // Q: How to remove this from bundle?
 
@@ -32,8 +34,9 @@ export default function AppFn({ skipLoadingScreen }) /* eslint-disable-line */ {
   const [isLoadingComplete, setLoadingComplete] = React.useState(false)
   // const [errorRecent, setErrorRecent] = React.useState(false)
   const [initialNavigationState, setInitialNavigationState] = React.useState()
-  const containerRef = React.useRef()
-  const { getInitialState } = useLinking(containerRef)
+  const navigationRef = React.useRef()
+  // const routeNameRef = React.useRef()
+  const { getInitialState } = useLinking(navigationRef)
 
   // Load any resources or data that we need prior to rendering the app
   React.useEffect(() => {
@@ -69,7 +72,7 @@ export default function AppFn({ skipLoadingScreen }) /* eslint-disable-line */ {
     <PapersContextProvider initialProfile={initialProfile}>
       <View style={Styles.container}>
         {Platform.OS === 'ios' && <StatusBar barStyle="dark-content" />}
-        <NavigationContainer ref={containerRef} initialState={initialNavigationState}>
+        <NavigationContainer ref={navigationRef} initialState={initialNavigationState}>
           <Stack.Navigator
             initialRouteName={initialProfile.gameId ? 'room' : 'home'}
             screenOptions={{ gestureEnabled: false, headerTitleAlign: 'center' }}

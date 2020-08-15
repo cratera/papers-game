@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 import { View, Text } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 
+import * as Analytics from '@constants/analytics.js'
+
 import PapersContext from '@store/PapersContext.js'
 
 import * as Theme from '@theme'
@@ -40,6 +42,7 @@ export default function LobbyJoining({ navigation }) {
         )
       },
     })
+    Analytics.setCurrentScreen('game_lobby_joining')
   }, [])
 
   React.useEffect(() => {

@@ -17,12 +17,13 @@ import PropTypes from 'prop-types'
 import * as Updates from 'expo-updates'
 import * as Linking from 'expo-linking'
 
+import * as Analytics from '@constants/analytics.js'
+
 import PapersContext from '@store/PapersContext.js'
 import * as Theme from '@theme'
 
 import { mailToFeedback, mailToBug } from '@constants/utils'
 import { headerTheme } from '@navigation/headerStuff.js'
-// import { logEvent } from '@store/Firebase.js'
 import Page from '@components/page'
 import ListTeams from '@components/list-teams'
 import GameScore from '@components/game-score'
@@ -66,6 +67,7 @@ export default function Settings(props) {
         )
       },
     })
+    Analytics.setCurrentScreen('settings')
   }, [])
 
   return (
@@ -278,6 +280,7 @@ function MoreOptions({ navigation, list }) {
           id: 'don',
           title: 'Buy us a coffee', // TODO!! Before release
           onPress: () => {
+            Analytics.logEvent('settings', { action: 'buycoffee' })
             Linking.openURL('https://www.buymeacoffee.com/sandrinap')
           },
         },

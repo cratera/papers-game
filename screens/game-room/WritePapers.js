@@ -12,6 +12,8 @@ import {
   ScrollView,
 } from 'react-native'
 
+import * as Analytics from '@constants/analytics.js'
+
 import PapersContext from '@store/PapersContext.js'
 
 import Button from '@components/button'
@@ -60,6 +62,7 @@ export default function WritePapers({ navigation }) {
         )
       },
     })
+    Analytics.setCurrentScreen(`game_write_papers`)
   }, [])
 
   React.useEffect(() => {

@@ -33,7 +33,6 @@ export default class App extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    // logEvent('crash', { message: error.message })
     Sentry.captureException(error, { tags: { pp_page: 'crash' } })
   }
 

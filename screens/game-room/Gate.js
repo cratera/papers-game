@@ -2,6 +2,8 @@ import React from 'react'
 import { Text } from 'react-native'
 import PropTypes from 'prop-types'
 
+import * as Analytics from '@constants/analytics.js'
+
 import PapersContext from '@store/PapersContext.js'
 
 import { headerTheme } from '@navigation/headerStuff.js'
@@ -19,6 +21,7 @@ export default function Gate({ navigation, route }) {
     navigation.setOptions({
       ...headerTheme({ hiddenTitle: true, hiddenBorder: true }),
     })
+    Analytics.setCurrentScreen('game_gate')
   }, [])
 
   // Any "side effect" when gate action is completed (join, left, etc...)

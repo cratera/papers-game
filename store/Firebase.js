@@ -6,7 +6,6 @@ import 'firebase/database'
 import 'firebase/storage'
 
 import PubSub from 'pubsub-js'
-import * as Analytics from 'expo-firebase-analytics'
 
 import { slugString } from '@constants/utils.js'
 
@@ -55,8 +54,6 @@ const PUBLIC_API = {
   setPapersGuessed,
   finishTurn,
   setRound,
-
-  logEvent,
 }
 
 // export function serverReconnect({ id, name, gameId }) {
@@ -765,13 +762,4 @@ async function setRound(roundStatus) {
   const gameId = LOCAL_PROFILE.gameId
 
   await DB.ref(`games/${gameId}/round`).set(roundStatus)
-}
-
-export async function logEvent(...args) {
-  // TODO add support to android.
-  // TODO!! ask for permission in settings.
-  // TODO review "Automatically collected events"
-  if (!__DEV__) {
-    await Analytics.logEvent(...args)
-  }
 }
