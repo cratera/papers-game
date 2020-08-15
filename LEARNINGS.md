@@ -21,52 +21,56 @@ Here's a list of my learnings while building this mobile game with reac-native.
 - 📝 Didn't understand how to handle errors [expo ErrorRecovery](https://docs.expo.io/versions/v37.0.0/sdk/error-recovery/).
   - Update 2 days later: Use a React class component with Error Boundary. (App.js -> AppFn.js)
 - Add [firebase-analytics](https://docs.expo.io/versions/latest/sdk/firebase-analytics/)
-- Use [Sentry expo and web](https://github.com/expo/sentry-expo/issues/77)(https://github.com/expo/sentry-expo/issues/77#issuecomment-646099545)
+- Use [Sentry expo and web](https://github.com/expo/sentry-expo/issues/77#issuecomment-646099545)
 
 ### Release
 
 - [Upload apps](https://docs.expo.io/distribution/uploading-apps/#2-start-the-upload)
 - [Troubleshooting turtle-cli](https://github.com/expo/turtle/issues/179). Install node 12.0.0 using `NVM` and try again.
+- [Change owner access node modules - to install turtle](https://stackoverflow.com/questions/48910876/error-eacces-permission-denied-access-usr-local-lib-node-modules-react)
+- [Change between node versions using nvm](https://stackoverflow.com/questions/47763783/cant-uninstall-global-npm-packages-after-installing-nvm)
 - [Release Channels](https://docs.expo.io/distribution/release-channels/) - Useful to test diff versions (a.k.a staging) for users before going to production.
 - [HTTP Headers for firebase](https://github.com/expo/expo/issues/4069)
-- [How to use env vars in package.json](https://medium.com/@arrayknight/how-to-use-env-variables-in-package-json-509b9b663867)
+- [How to use dotenv (.env vars) in package.json](https://medium.com/@arrayknight/how-to-use-env-variables-in-package-json-509b9b663867)
 
 ```bash
-
 # RELEASE WEB
 yarn release:web -- -m "x.x.x@xx ![release summary]"
+```
 
+```bash
 # RELEASE IOS
 
-# Update version:
+## Update version:
   ## If it's a release to App Store, update "version" at `app.json`.
   ## Update "about" version and/or OTA at `PapersContext.js`.
 
+## Requirements:
+  ### - XCode. (App Store)
+  ###   - If 1st time, make sure to "Run on iOS simulator" on Expo at least once.
+  ### - fastlane: $ brew install fastlane
+  ### - turtle-cli: $ npm install -g turtle-cli (DO NOT use sudo)
+  ### - Firebase: $ sudo npm install -g firebase-tools
+  ### - If 1st time create manually a /dist in the root project
+  ### -  1st time, connect firebase target (similar to git setupstream): $ firebase target:apply hosting native papers-native
 
-# One command OTA update:
+# OTA update:
+## A single command. Under the wood it:
+### - Sets the Sentry auth token
+### - Run turtle ios to ensure all's fine
+### - Exports expo project to firebase CDN endpoint
+### - Deploys the IOS app to firebase
 yarn release:ota -- -m "x.x.x@xx ![release summary]"
 
+# App Store build
+## build a local standalone app IPA ready for Apple App Store
 
-# verify everything is okay
-turtle setup:ios
-
-# export app with explicit CDN endpoint
-rm -R dist && expo export --public-url https://papers-native.firebaseapp.com/
-
-# deploy the IOS app to firebase
-
-  ## do this only first time to apply (like git setupstream, I guess?)
-  ### firebase target:apply hosting native papers-native
-
-  # deploy
-  firebase deploy --only hosting:native -m "[description]"
-
-# build a local standalone app IPA ready for Apple App Store
-  # fetch the certificates made by expo previously (only first time)
+  ## 1º time in a new mac, fetch the certificates made by expo.
   ## expo fetch:ios:certs
 
-  # build it
-  EXPO_IOS_DIST_P12_PASSWORD=<pass> turtle build:ios --public-url https://papers-native.firebaseapp.com/ios-index.json --team-id <teamid> --dist-p12-path papers-game_dist.p12 --provisioning-profile-path papers-game.mobileprovision
+  # build everything
+  # This isn't working on my new computer :( [See bug](https://github.com/expo/turtle/issues/247)
+  EXPO_IOS_DIST_P12_PASSWORD=<PASS> turtle build:ios --public-url https://papers-native.firebaseapp.com/ios-index.json --team-id <TEAMID> --dist-p12-path secrets/papers-game_dist.p12 --provisioning-profile-path secrets/papers-game.mobileprovision
 
   # a build path is shown in the last lines of log... something like:
   ## /Users/sandrina-p/expo-apps/@anonymous__papers-game-....8-archive.ipa
