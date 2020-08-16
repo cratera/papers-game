@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { AsyncStorage } from 'react-native'
 import PropTypes from 'prop-types'
 
+import * as Analytics from '@constants/analytics.js'
 import Sentry from '@constants/Sentry'
 
 import wordsForEveryone from './wordsForEveryone.js'
@@ -39,7 +40,7 @@ export class PapersContextProvider extends Component {
       profiles: {}, // List of game players' profiles.
       about: {
         version: '0.2.3',
-        ota: '00',
+        ota: '01',
       },
     }
 
@@ -72,8 +73,6 @@ export class PapersContextProvider extends Component {
 
       getTurnLocalState: this.getTurnLocalState.bind(this),
       setTurnLocalState: this.setTurnLocalState.bind(this),
-
-      // _startNextRound: this._startNextRound.bind(this),
 
       playSound: this.playSound.bind(this),
     }
@@ -239,6 +238,7 @@ export class PapersContextProvider extends Component {
       const gameId = await this.state.socket[`${variant}Game`](gameName)
       this._subscribeGame(gameId)
       this.PapersAPI.updateProfile({ gameId })
+      Analytics.logEvent(`${variant}_game`, { count: 1 }) // TODO count
       cb(gameId)
     } catch (e) {
       const errorMsgMap = {
@@ -369,7 +369,9 @@ export class PapersContextProvider extends Component {
     socket.on('game.hasStarted', (topic, data) => {
       console.log(`:: on.${topic}`, data)
       const hasStarted = data
-
+      if (hasStarted) {
+        Analytics.logEvent('game_started')
+      }
       setGame(game => ({
         hasStarted,
       }))
@@ -514,6 +516,7 @@ export class PapersContextProvider extends Component {
     console.log('📌 setTeams()')
     try {
       await this.state.socket.setTeams(teams)
+      Analytics.logEvent('game_setTeams', { playersNr: this.state.game.players.length }) // TODO
     } catch (e) {
       console.warn(':: error', e)
       Sentry.captureException(e, { tags: { pp_action: 'STM_0' } })
@@ -662,6 +665,10 @@ export class PapersContextProvider extends Component {
       turnCount: 0,
       // all words by key to save space // dry across file
       wordsLeft: game.words._all.map((w, i) => i),
+    })
+    Analytics.logEvent('game_startRound', {
+      round: game.round.current,
+      playersCount: game.players.length,
     })
   }
 

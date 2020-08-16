@@ -64,6 +64,7 @@ yarn release:ota -- -m "x.x.x@xx ![release summary]"
 
 # App Store build
 ## build a local standalone app IPA ready for Apple App Store
+  ## Run the release:ota first
 
   ## 1º time in a new mac, fetch the certificates made by expo.
   ## expo fetch:ios:certs
@@ -75,8 +76,8 @@ yarn release:ota -- -m "x.x.x@xx ![release summary]"
   # a build path is shown in the last lines of log... something like:
   ## /Users/sandrina-p/expo-apps/@anonymous__papers-game-....8-archive.ipa
 
-# upload to test flight
-expo upload:ios --path path/to/archive.ipa
+  # upload to test flight
+  expo upload:ios --path path/to/archive.ipa
 
   # after a few seconds it asks for app-specific password
   https://appleid.apple.com/account/manage

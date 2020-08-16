@@ -686,7 +686,7 @@ async function markMeAsReady(roundStatus) {
   const isEveryoneReady = Object.keys(players).every(pId => players[pId].isReady)
 
   if (isEveryoneReady) {
-    console.log(':: everyones ready. Start Game!')
+    console.log(':: everyones ready. Start game!')
     await DB.ref(`games/${gameId}/hasStarted`).set(true)
   }
 }
