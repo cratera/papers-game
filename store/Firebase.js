@@ -559,6 +559,7 @@ async function _unsubGame(gameId) {
   DB_PLAYERS.off('child_removed')
   DB_PLAYERS.off('child_changed')
 
+  DB.ref(`games/${gameId}/papersGuessed`).off('value')
   DB.ref(`games/${gameId}/teams`).off('value')
 
   DB.ref(`games/${gameId}/words`).off('child_added')
@@ -699,6 +700,7 @@ async function markMeAsReadyForNextRound(everyonesReadyCb) {
 
   // REVIEW: Is this the right place?
   // It's a side effect, I never know what's the best place for it.
+  // TODO/BUG - Use transaction here to make sure isEveryoneReady for real
   const playersRef = await DB.ref(`games/${gameId}/players`).once('value')
   const players = playersRef.val()
   const isEveryoneReady = Object.keys(players).every(pId => players[pId].isReady)
