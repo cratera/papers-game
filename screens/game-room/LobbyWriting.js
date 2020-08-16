@@ -50,7 +50,9 @@ export default function LobbyWriting({ navigation }) {
         return <Page.HeaderBtnSettings />
       },
     })
-    Analytics.setCurrentScreen('game_lobby_writing')
+    if (game.teams) {
+      Analytics.setCurrentScreen('game_lobby_writing')
+    }
   }, [])
 
   React.useEffect(() => {

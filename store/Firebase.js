@@ -701,6 +701,7 @@ async function markMeAsReadyForNextRound(everyonesReadyCb) {
   // REVIEW: Is this the right place?
   // It's a side effect, I never know what's the best place for it.
   // TODO/BUG - Use transaction here to make sure isEveryoneReady for real
+  // Workaround: Add "Start anyway" feature to frontend.
   const playersRef = await DB.ref(`games/${gameId}/players`).once('value')
   const players = playersRef.val()
   const isEveryoneReady = Object.keys(players).every(pId => players[pId].isReady)

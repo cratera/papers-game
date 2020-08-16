@@ -74,6 +74,7 @@ export class PapersContextProvider extends Component {
 
       markMeAsReady: this.markMeAsReady.bind(this),
       markMeAsReadyForNextRound: this.markMeAsReadyForNextRound.bind(this),
+      forceStartNextRound: this.forceStartNextRound.bind(this),
 
       startTurn: this.startTurn.bind(this),
       getNextTurn: this.getNextTurn.bind(this),
@@ -460,15 +461,12 @@ export class PapersContextProvider extends Component {
 
     if (!opts.ignoreSocket && Object.keys(serverProfile).length > 0) {
       if (this.state.socket) {
-        // console.log(':: update socket too.')
         try {
           this.state.socket.updateProfile(serverProfile)
         } catch (e) {
           Sentry.captureException(e, { tags: { pp_action: 'UP_1' } })
           // throw Error(i18nUnexpectedError) // REVIEW later
         }
-      } else {
-        // console.log(':: not connected to socket')
       }
     }
 
@@ -551,6 +549,7 @@ export class PapersContextProvider extends Component {
     try {
       this.PapersAPI.playSound('ready')
       await this.state.socket.markMeAsReady(roundStatus)
+      this.config.roundDuration = Date.now()
       Analytics.logEvent('game_imReady')
     } catch (e) {
       Sentry.captureException(e, { tags: { pp_action: 'MMAR_0' } })
@@ -563,14 +562,15 @@ export class PapersContextProvider extends Component {
     const game = this.state.game
 
     Analytics.logEvent(`game_finishRound_${game.round.current + 1}`, {
-      players: game.players.length,
+      players: Object.keys(game.players).length,
       turns: game.round.turnCount,
+      duration: Math.round((Date.now() - this.config.roundDuration) / 1000),
     })
+    this.config.roundDuration = Date.now()
 
     try {
       this.PapersAPI.playSound('ready')
       await this.state.socket.markMeAsReadyForNextRound(() => {
-        // REVIEW!! this is dangerours... Only called if everyone's ready!
         this._startNextRound()
       })
       Analytics.logEvent(`game_imReadyToRound_${this.state.game.round.current + 2}`)
@@ -668,7 +668,7 @@ export class PapersContextProvider extends Component {
       Analytics.logEvent('finish_turn', {
         round: roundCurrent + 1,
         turnCount: round.turnCount + 1,
-        teamsSize: game.teams[this.config.myTeamId]?.players.length || 0,
+        teamSize: game.teams[this.config.myTeamId]?.players.length || 0,
         yes: papersTurn.guessed.length,
         no: papersTurn.passed.length,
         toggled_to_yes: papersTurn.toggled_to_yes,
@@ -683,18 +683,24 @@ export class PapersContextProvider extends Component {
   }
 
   _storeMyTeam() {
-    console.log('📌 _storeMyTeam()')
-    const { game, profile } = this.state
+    const teams = this.state.game.teams
     let myTeamId
-    for (const teamId in game.teams) {
-      const isMyTeam = Object.keys(game.teams[teamId].players).some(pId => pId === profile.id)
+
+    for (const teamId in teams) {
+      const isMyTeam = teams[teamId].players.some(pId => pId === this.state.profile.id)
       if (isMyTeam) {
         myTeamId = teamId
         break
       }
     }
 
+    console.log('📌 _storeMyTeam()', myTeamId)
     this.config.myTeamId = myTeamId
+  }
+
+  forceStartNextRound() {
+    Sentry.captureMessage('Force start next round.')
+    this._startNextRound()
   }
 
   _startNextRound() {
@@ -767,11 +773,26 @@ export class PapersContextProvider extends Component {
     )
   }
 
-  async leaveGame(opts) {
-    console.log('📌 leaveGame()')
+  async leaveGame(opts = {}) {
+    console.log('📌 leaveGame()', opts)
 
     try {
+      const game = this.state.game
       await this.state.socket.leaveGame(opts)
+
+      if (!opts.wasKicked) {
+        let gameStatus
+        if (!game.teams) {
+          gameStatus = 'new'
+        } else if (!game.round) {
+          gameStatus = 'writing'
+        } else {
+          const roundNr = game.round.current
+          gameStatus =
+            roundNr === 2 && game.round.status === 'finished' ? 'finished' : `round_${roundNr}`
+        }
+        Analytics.logEvent('leave_game', { status: gameStatus })
+      }
     } catch (e) {
       this._removeGameFromState()
       console.warn(':: error', e)
@@ -783,7 +804,7 @@ export class PapersContextProvider extends Component {
     console.log('📌 removePlayer()')
     try {
       await this.state.socket.removePlayer(playerId)
-      // eventually pub on 'players.removed' will be called
+      Analytics.logEvent('remove_player')
     } catch (e) {
       console.warn(':: error', e)
       Sentry.captureException(e, { tags: { pp_action: 'RMP_0' } })
