@@ -61,6 +61,12 @@ export default function LobbyJoining({ navigation }) {
           )
         },
       })
+    } else if (hasTeams) {
+      navigation.setOptions({
+        headerRight: function HLB() {
+          return <Page.HeaderBtnSettings />
+        },
+      })
     } else {
       navigation.setOptions({
         headerRight: null,

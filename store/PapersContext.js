@@ -27,8 +27,16 @@ export const loadProfile = async () => {
 export class PapersContextProvider extends Component {
   constructor(props) {
     super(props)
+
+    this.config = {
+      // myTeamId: Number,
+    }
+
     this.state = {
       socket: null, // rename to serverAPI?
+      toggle_features: {
+        soundSkins: null, // TODO connect & disable this
+      },
       profile: {
         id: props.initialProfile.id,
         name: props.initialProfile.name,
@@ -266,7 +274,7 @@ export class PapersContextProvider extends Component {
 
     const socket = this.state.socket
 
-    const setGame = cb => {
+    const setGame = (cb, afterUpdate) => {
       this.setState(state => {
         if (!state.game) return {}
         return {
@@ -275,7 +283,7 @@ export class PapersContextProvider extends Component {
             ...cb(state.game),
           },
         }
-      })
+      }, afterUpdate)
     }
 
     socket.on('game.set', (topic, data) => {
@@ -285,6 +293,7 @@ export class PapersContextProvider extends Component {
 
       if (!game.hasStarted) {
         // Prevent possible memory leaks from an old game.
+        this.config = {}
         this.PapersAPI.setTurnLocalState(null)
       }
     })
@@ -348,10 +357,12 @@ export class PapersContextProvider extends Component {
     socket.on('game.teams.set', (topic, data) => {
       console.log(`:: on.${topic}`, data)
       const teams = data
-
-      setGame(game => ({
-        teams,
-      }))
+      setGame(
+        game => ({
+          teams,
+        }),
+        () => this._storeMyTeam()
+      )
     })
 
     socket.on('game.words.set', (topic, data) => {
@@ -516,7 +527,7 @@ export class PapersContextProvider extends Component {
     console.log('📌 setTeams()')
     try {
       await this.state.socket.setTeams(teams)
-      Analytics.logEvent('game_setTeams', { playersNr: this.state.game.players.length }) // TODO
+      Analytics.logEvent('game_setTeams', { players: this.state.game.players.length })
     } catch (e) {
       console.warn(':: error', e)
       Sentry.captureException(e, { tags: { pp_action: 'STM_0' } })
@@ -539,6 +550,7 @@ export class PapersContextProvider extends Component {
     try {
       this.PapersAPI.playSound('ready')
       await this.state.socket.markMeAsReady(roundStatus)
+      Analytics.logEvent('game_imReady')
     } catch (e) {
       Sentry.captureException(e, { tags: { pp_action: 'MMAR_0' } })
       throw Error(i18nUnexpectedError)
@@ -547,6 +559,12 @@ export class PapersContextProvider extends Component {
 
   async markMeAsReadyForNextRound() {
     console.log('📌 markMeAsReadyForNextRound()')
+    const game = this.state.game
+
+    Analytics.logEvent(`game_finishRound_${game.round.current + 1}`, {
+      players: game.players.length,
+      turns: game.round.turnCount,
+    })
 
     try {
       this.PapersAPI.playSound('ready')
@@ -554,6 +572,7 @@ export class PapersContextProvider extends Component {
         // REVIEW!! this is dangerours... Only called if everyone's ready!
         this._startNextRound()
       })
+      Analytics.logEvent(`game_imReadyToRound_${this.state.game.round.current + 2}`)
     } catch (e) {
       console.warn(':: error', e)
       Sentry.captureException(e, { tags: { pp_action: 'MMARNR_0' } })
@@ -627,12 +646,12 @@ export class PapersContextProvider extends Component {
 
     const uniqueWordsGuessed = allValidWordsGuessed.filter((paper, index) => {
       // Avoid submitting duplicated papers. I don't know how,
-      // but already happened IRL and din't understand the cause.
+      // but already happened IRL and I din't understand the cause.
       // Probably the player clicked twice (in a slow phone) to submit their score
-      // and the UI didn't block the second click? So it submitted twice.
-      const isUnique = papersTurn.sorted.indexOf(paper) === index
+      // and the UI didn't block the second click? So it submitted each paper twice.
+      const isUnique = allValidWordsGuessed.indexOf(paper) === index
       if (!isUnique) {
-        console.warn(':: Duplicated word guessed avoided!', paper, index)
+        console.warn(':: Duplicated word guessed avoided!', allValidWordsGuessed, paper, index)
         Sentry.captureMessage('Duplicated word guessed avoided!')
       }
       return isUnique
@@ -645,11 +664,36 @@ export class PapersContextProvider extends Component {
         },
         roundStatus,
       })
+      Analytics.logEvent('finish_turn', {
+        round: roundCurrent + 1,
+        turnCount: round.turnCount + 1,
+        teamsSize: game.teams[this.config.myTeamId]?.players.length || 0,
+        yes: papersTurn.guessed.length,
+        no: papersTurn.passed.length,
+        toggled_to_yes: papersTurn.toggled_to_yes,
+        toggled_to_no: papersTurn.toggled_to_no,
+        revealed: papersTurn.revealed,
+      })
     } catch (e) {
       console.warn(':: error', e)
       Sentry.captureException(e, { tags: { pp_action: 'FNTR_0' } })
       // Do not throw error. UI is not ready for it.
     }
+  }
+
+  _storeMyTeam() {
+    console.log('📌 _storeMyTeam()')
+    const { game, profile } = this.state
+    let myTeamId
+    for (const teamId in game.teams) {
+      const isMyTeam = Object.keys(game.teams[teamId].players).some(pId => pId === profile.id)
+      if (isMyTeam) {
+        myTeamId = teamId
+        break
+      }
+    }
+
+    this.config.myTeamId = myTeamId
   }
 
   _startNextRound() {
@@ -665,10 +709,6 @@ export class PapersContextProvider extends Component {
       turnCount: 0,
       // all words by key to save space // dry across file
       wordsLeft: game.words._all.map((w, i) => i),
-    })
-    Analytics.logEvent('game_startRound', {
-      round: game.round.current,
-      playersCount: game.players.length,
     })
   }
 
@@ -703,6 +743,10 @@ export class PapersContextProvider extends Component {
       guessed: [], // [String] - papers guessed
       sorted: [], // [Number] - papers guessed/passed sorted chronologically
       wordsLeft: this.state.game.round.wordsLeft, // [String] - words left
+      // For analytics purposes only
+      toggled_to_yes: 0,
+      toggled_to_no: 0,
+      revealed: 0,
     }
     return turnState
   }
@@ -714,7 +758,12 @@ export class PapersContextProvider extends Component {
     // so it's better to show the ErrorRecovery page... i guess.
     this.PapersAPI.setTurnLocalState(null)
     await this.PapersAPI.updateProfile({ gameId: null })
-    this.setState(state => ({ game: null }))
+    this.setState(
+      state => ({ game: null }),
+      () => {
+        this.config = {}
+      }
+    )
   }
 
   async leaveGame(opts) {

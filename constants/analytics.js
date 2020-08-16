@@ -5,15 +5,15 @@ import * as Analytics from 'expo-firebase-analytics'
 // TODO review "Automatically collected events"
 
 export async function logEvent(...args) {
-  if (true || !__DEV__) {
+  console.log('📡 logEvent', ...args)
+  if (!__DEV__) {
     await Analytics.logEvent(...args)
-    console.log('📡 logEvent', ...args)
   }
 }
 
 export async function setCurrentScreen(...args) {
-  if (true || !__DEV__) {
+  console.log('📡 setCurrentScreen', ...args)
+  if (!__DEV__) {
     await Analytics.setCurrentScreen(...args)
-    console.log('📡 setCurrentScreen', ...args)
   }
 }

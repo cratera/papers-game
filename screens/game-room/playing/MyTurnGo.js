@@ -113,14 +113,18 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
 
   // TODO/NOTE: pickFirstPaper, pickNextPaper and togglePaper should be on PapersContext
   function pickFirstPaper() {
-    setPapersTurn(() => {
+    setPapersTurn(realState => {
+      console.log('PICK_FIRST', realState)
       // TODO/?BUG - This state may colide with papersTurn from getTurnLocalState()...
-      const state = {
+      const state = realState || {
         current: null,
         passed: [],
         guessed: [],
         sorted: [],
         wordsLeft: round.wordsLeft,
+        toggled_to_yes: 0,
+        toggled_to_no: 0,
+        revealed: 0,
       }
 
       if (round.wordsLeft.length === 0) {
@@ -250,6 +254,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
 
         wordsModified.guessed = [...state.guessed, paper]
         wordsModified.passed = wordsToPick
+        wordsModified.toggled_to_yes = state.toggled_to_yes + 1
       } else {
         const wordsToPick = [...state.guessed]
         console.log('wordsToPick:', wordsToPick)
@@ -264,6 +269,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
           wordsModified.passed = [...state.passed, paper]
         }
         wordsModified.guessed = wordsToPick
+        wordsModified.toggled_to_no = state.toggled_to_no + 1
       }
 
       const newState = {
@@ -365,7 +371,13 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
         <View style={Styles.go_zone}>
           <TouchableHighlight
             underlayColor={Theme.colors.bg}
-            onPressIn={() => setPaperBlur(false)}
+            onPressIn={() => {
+              setPapersTurn(state => ({
+                ...state,
+                revealed: state.revealed + 1,
+              }))
+              setPaperBlur(false)
+            }}
             onPressOut={() => setPaperBlur(true)}
           >
             <View style={[Styles.go_paper, Styles[`go_paper_${paperAnim}`]]}>

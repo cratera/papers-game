@@ -21,7 +21,7 @@ export default function Gate({ navigation, route }) {
     navigation.setOptions({
       ...headerTheme({ hiddenTitle: true, hiddenBorder: true }),
     })
-    Analytics.setCurrentScreen('game_gate')
+    Analytics.setCurrentScreen('game_gate', { goal })
   }, [])
 
   // Any "side effect" when gate action is completed (join, left, etc...)

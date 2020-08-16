@@ -35,7 +35,7 @@ export default function WritePapers({ navigation }) {
   const [words, setLocalWords] = React.useState([])
   const [keyboardHeight, setKeyboardHeight] = React.useState(0)
   const refSlides = React.useRef()
-  const scrollDebounced = React.useRef(debounce(handleScrollPapers, 300)).current
+  const scrollDebounced = React.useRef(debounce(handleScrollPapers, 150)).current
 
   const [errorMsg, setErrorMsg] = React.useState(null)
   const [isSubmiting, setIsSubmiting] = React.useState(false)
