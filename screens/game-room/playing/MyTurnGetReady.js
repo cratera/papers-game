@@ -23,6 +23,17 @@ const MyTurnGetReady = ({ description, amIWaiting }) => {
   const { game } = Papers.state
   const round = game.round
   const roundNr = round.current + (amIWaiting ? 2 : 1)
+  const [startForced, setStartForced] = React.useState(0)
+
+  React.useEffect(() => {
+    const timeout = setTimeout(() => {
+      setStartForced(true) // TODO @mmbotelho Show in the UI
+    }, 10000)
+
+    return () => {
+      clearTimeout(timeout)
+    }
+  })
 
   function onStartClick() {
     try {
@@ -70,9 +81,21 @@ const MyTurnGetReady = ({ description, amIWaiting }) => {
         {game.hasStarted && !amIWaiting ? (
           <Button onPress={onStartClick}>Start turn</Button>
         ) : (
-          <Text style={[Theme.typography.small, Theme.u.center]}>
-            Waiting for everyone to be ready.
-          </Text>
+          <>
+            {startForced ? (
+              <Button
+                variant="flat"
+                textColor={Theme.colors.primary}
+                onPress={Papers.forceStartNextRound}
+              >
+                Start anyway?
+              </Button>
+            ) : null}
+            <Text style={[Theme.typography.small, Theme.u.center]}>
+              Waiting for everyone to be ready.
+            </Text>
+            <View style={{ marginTop: 8 }} />
+          </>
         )}
       </Page.CTAs>
     </Page>
