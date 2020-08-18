@@ -99,10 +99,14 @@ function SettingsProfile({ navigation }) {
   const [name, setName] = React.useState('')
   const { profile } = Papers.state
 
-  function handleDeleteAccount() {
+  async function handleDeleteAccount() {
     if (Platform.OS === 'web') {
-      if (window.confirm('Are you sure you want to leave the game?')) {
-        Papers.leaveGame()
+      if (window.confirm(`This will delete your profile locally and from Papers' servers?`)) {
+        await Papers.resetProfile()
+        navigation.dangerouslyGetParent().reset({
+          index: 0,
+          routes: [{ name: 'home' }],
+        })
       }
     } else {
       Alert.alert(
