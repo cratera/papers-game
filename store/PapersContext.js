@@ -251,6 +251,7 @@ export class PapersContextProvider extends Component {
       const gameId = await this.state.socket[`${variant}Game`](gameName)
       this._subscribeGame(gameId)
       this.PapersAPI.updateProfile({ gameId })
+      // REVIEW - This is called on page refresh. It shouldn't
       Analytics.logEvent(`${variant}_game`, { count: 1 }) // TODO count
       cb(gameId)
     } catch (e) {
@@ -386,6 +387,7 @@ export class PapersContextProvider extends Component {
       console.log(`:: on.${topic}`, data)
       const hasStarted = data
       if (hasStarted) {
+        // REVIEW - This is called on page refresh. it shouldn't happen.
         Analytics.logEvent('game_started', {
           players: Object.keys(this.state.game.players).length,
         })
@@ -536,7 +538,7 @@ export class PapersContextProvider extends Component {
     console.log('📌 setTeams()')
     try {
       await this.state.socket.setTeams(teams)
-      Analytics.logEvent('game_setTeams', { players: this.state.game.players.length })
+      Analytics.logEvent('game_setTeams', { players: Object.keys(this.state.game.players).length })
     } catch (e) {
       console.warn(':: error', e)
       Sentry.captureException(e, { tags: { pp_action: 'STM_0' } })
@@ -676,7 +678,7 @@ export class PapersContextProvider extends Component {
       })
       Analytics.logEvent('finish_turn', {
         round: roundCurrent + 1,
-        turnCount: round.turnCount + 1,
+        turn: round.turnCount + 1,
         teamSize: game.teams[this.config.myTeamId]?.players.length || 0,
         yes: papersTurn.guessed.length,
         no: papersTurn.passed.length,
@@ -833,16 +835,16 @@ export class PapersContextProvider extends Component {
         Analytics.logEvent(`game_finishRound_${game.round.current + 1}`, {
           players: Object.keys(game.players).length,
           turns: game.round.turnCount,
-          duration: Math.round((Date.now() - this.config.roundDuration) / 1000) || 0,
+          duration: Math.round((Date.now() - this.config.roundDuration) / 60000) || 0, // in minutes
           score: opts.arrayOfScores.join('-'),
         })
         this.config.roundDuration = undefined
 
-        if (totalScore !== Object(game.teams).length * 10) {
-          console.warn('Wrong score!', game)
+        if (totalScore !== Object.keys(game.players).length * 10) {
+          console.warn('Wrong score!!', totalScore, game)
           Sentry.withScope(scope => {
-            scope.setExtra('response', game)
-            Sentry.captureException('Wrong score!')
+            scope.setExtra('response', JSON.stringify(game))
+            Sentry.captureException(Error('Wrong score!'))
           })
         }
         break

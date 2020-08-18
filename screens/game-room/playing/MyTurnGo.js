@@ -114,7 +114,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
   // TODO/NOTE: pickFirstPaper, pickNextPaper and togglePaper should be on PapersContext
   function pickFirstPaper() {
     setPapersTurn(realState => {
-      console.log('PICK_FIRST', realState)
+      // console.log('PICK_FIRST', realState) // realState is null cause LS wasn't ready yet
       // TODO/?BUG - This state may colide with papersTurn from getTurnLocalState()...
       const state = realState || {
         current: null,
@@ -257,7 +257,6 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
         wordsModified.toggled_to_yes = state.toggled_to_yes + 1
       } else {
         const wordsToPick = [...state.guessed]
-        console.log('wordsToPick:', wordsToPick)
         const wordIndex = wordsToPick.indexOf(paper)
         wordsToPick.splice(wordIndex, 1)
 

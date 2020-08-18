@@ -48,7 +48,7 @@ export default function PlayingEntry({ navigation }) {
   const amIReady = game.players[profile.id].isReady
 
   React.useEffect(() => {
-    Analytics.setCurrentScreen(`game_playing_round${roundIndex + 1}`)
+    Analytics.setCurrentScreen(`game_playing_round_${roundIndex + 1}`)
   }, [roundIndex])
 
   React.useEffect(() => {

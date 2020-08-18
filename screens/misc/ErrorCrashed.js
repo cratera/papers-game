@@ -52,9 +52,9 @@ export default function ErrorCrashed({ error }) {
   async function deleteAndReload() {
     // A fresh start...
     try {
-      await AsyncStorage.removeItem('profile_id')
-      await AsyncStorage.removeItem('profile_name')
-      await AsyncStorage.removeItem('profile_avatar')
+      // await AsyncStorage.removeItem('profile_id')
+      // await AsyncStorage.removeItem('profile_name')
+      // await AsyncStorage.removeItem('profile_avatar')
       await AsyncStorage.removeItem('profile_gameId')
       await AsyncStorage.removeItem('recover_attempt')
     } catch {
