@@ -28,8 +28,10 @@ export class PapersContextProvider extends Component {
   constructor(props) {
     super(props)
 
+    // TODO save this on localStorage
     this.config = {
       // myTeamId: Number,
+      // roundDuration: Number
     }
 
     this.state = {
@@ -557,8 +559,11 @@ export class PapersContextProvider extends Component {
     try {
       this.PapersAPI.playSound('ready')
       await this.state.socket.markMeAsReady(roundStatus)
+
       this.config.roundDuration = Date.now()
-      Analytics.logEvent(`game_imReadyToRound_1`)
+      Analytics.logEvent(`game_imReadyToRound_1`, {
+        players: Object.keys(this.state.game.players).length,
+      })
     } catch (e) {
       Sentry.captureException(e, { tags: { pp_action: 'MMAR_0' } })
       throw Error(i18nUnexpectedError)
@@ -568,14 +573,16 @@ export class PapersContextProvider extends Component {
   async markMeAsReadyForNextRound() {
     console.log('📌 markMeAsReadyForNextRound()')
 
-    this.config.roundDuration = Date.now()
-
     try {
       this.PapersAPI.playSound('ready')
       await this.state.socket.markMeAsReadyForNextRound(() => {
         this._startNextRound()
       })
-      Analytics.logEvent(`game_imReadyToRound_${this.state.game.round.current + 2}`)
+
+      this.config.roundDuration = Date.now()
+      Analytics.logEvent(`game_imReadyToRound_${this.state.game.round.current + 2}`, {
+        players: Object.keys(this.state.game.players).length,
+      })
     } catch (e) {
       console.warn(':: error', e)
       Sentry.captureException(e, { tags: { pp_action: 'MMARNR_0' } })
@@ -826,9 +833,10 @@ export class PapersContextProvider extends Component {
         Analytics.logEvent(`game_finishRound_${game.round.current + 1}`, {
           players: Object.keys(game.players).length,
           turns: game.round.turnCount,
-          duration: Math.round((Date.now() - this.config.roundDuration) / 1000),
+          duration: Math.round((Date.now() - this.config.roundDuration) / 1000) || 0,
           score: opts.arrayOfScores.join('-'),
         })
+        this.config.roundDuration = undefined
 
         if (totalScore !== Object(game.teams).length * 10) {
           console.warn('Wrong score!', game)
