@@ -48,7 +48,7 @@ export class PapersContextProvider extends Component {
       profiles: {}, // List of game players' profiles.
       about: {
         version: '0.2.3',
-        ota: '02',
+        ota: '03',
       },
     }
 
@@ -84,6 +84,8 @@ export class PapersContextProvider extends Component {
       setTurnLocalState: this.setTurnLocalState.bind(this),
 
       playSound: this.playSound.bind(this),
+
+      sendTracker: this.sendTracker.bind(this),
     }
   }
 
@@ -382,7 +384,9 @@ export class PapersContextProvider extends Component {
       console.log(`:: on.${topic}`, data)
       const hasStarted = data
       if (hasStarted) {
-        Analytics.logEvent('game_started')
+        Analytics.logEvent('game_started', {
+          players: Object.keys(this.state.game.players).length,
+        })
       }
       setGame(game => ({
         hasStarted,
@@ -487,6 +491,11 @@ export class PapersContextProvider extends Component {
 
       if (this.state.socket) {
         await this.state.socket.resetProfile()
+        this.state.socket.offAll()
+        this.setState(state => ({
+          ...state,
+          socket: null,
+        }))
       }
     } catch (e) {
       Sentry.captureException(e, { tags: { pp_action: 'RP_0' } })
@@ -549,7 +558,7 @@ export class PapersContextProvider extends Component {
       this.PapersAPI.playSound('ready')
       await this.state.socket.markMeAsReady(roundStatus)
       this.config.roundDuration = Date.now()
-      Analytics.logEvent('game_imReady')
+      Analytics.logEvent(`game_imReadyToRound_1`)
     } catch (e) {
       Sentry.captureException(e, { tags: { pp_action: 'MMAR_0' } })
       throw Error(i18nUnexpectedError)
@@ -558,13 +567,7 @@ export class PapersContextProvider extends Component {
 
   async markMeAsReadyForNextRound() {
     console.log('📌 markMeAsReadyForNextRound()')
-    const game = this.state.game
 
-    Analytics.logEvent(`game_finishRound_${game.round.current + 1}`, {
-      players: Object.keys(game.players).length,
-      turns: game.round.turnCount,
-      duration: Math.round((Date.now() - this.config.roundDuration) / 1000),
-    })
     this.config.roundDuration = Date.now()
 
     try {
@@ -812,6 +815,33 @@ export class PapersContextProvider extends Component {
 
   playSound(soundId) {
     PapersSound.play(soundId)
+  }
+
+  sendTracker(trackName, opts) {
+    switch (trackName) {
+      case 'game_finishRound': {
+        const game = this.state.game
+        const totalScore = opts.arrayOfScores.reduce((acc, cur) => acc + cur, 0)
+
+        Analytics.logEvent(`game_finishRound_${game.round.current + 1}`, {
+          players: Object.keys(game.players).length,
+          turns: game.round.turnCount,
+          duration: Math.round((Date.now() - this.config.roundDuration) / 1000),
+          score: opts.arrayOfScores.join('-'),
+        })
+
+        if (totalScore !== Object(game.teams).length * 10) {
+          console.warn('Wrong score!', game)
+          Sentry.withScope(scope => {
+            scope.setExtra('response', game)
+            Sentry.captureException('Wrong score!')
+          })
+        }
+        break
+      }
+      default:
+        break
+    }
   }
 }
 

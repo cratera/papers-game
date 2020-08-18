@@ -27,10 +27,16 @@ const RoundScore = ({ navigation }) => {
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [isOnRoundIntro, setIsOnRoundIntro] = React.useState(false)
 
-  const { isMyTeamWinner, isTie } = React.useMemo(
+  const { isMyTeamWinner, isTie, scoreByRound } = React.useMemo(
     () => useScores(game.score, game.teams, profile.id),
     []
   )
+
+  React.useEffect(() => {
+    Papers.sendTracker('game_finishRound', {
+      arrayOfScores: scoreByRound[roundIx].arrayOfScores,
+    })
+  }, [])
 
   function handleStartRoundClick() {
     setIsOnRoundIntro(true)

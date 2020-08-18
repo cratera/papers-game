@@ -160,7 +160,6 @@ async function _uploadAvatar({ path, fileName, avatar }) {
   const blob = await response.blob()
   const ref = await firebase.storage().ref(path).child(fileName)
   const task = ref.put(blob) //, metadata);
-  console.log('::::::', blob.size)
 
   return new Promise((resolve, reject) => {
     task.on(
@@ -232,7 +231,6 @@ async function resetProfile(id) {
     gameId: null,
   })
   Analytics.resetAnalyticsData()
-  firebase.auth().signOut()
 }
 
 /**
