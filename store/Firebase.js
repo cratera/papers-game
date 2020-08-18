@@ -7,6 +7,7 @@ import 'firebase/storage'
 
 import PubSub from 'pubsub-js'
 
+import * as Analytics from '@constants/analytics.js'
 import { slugString } from '@constants/utils.js'
 
 // Fixing a bug with firebase file upload put() _uploadAvatar()
@@ -88,6 +89,7 @@ export default function init(options) {
       console.log('⚙️ Signed!', LOCAL_PROFILE.id)
 
       await updateProfile(LOCAL_PROFILE)
+      await Analytics.setUserId(LOCAL_PROFILE.id)
       PubSub.publish('profile.signed', LOCAL_PROFILE.id)
     } else {
       // User is signed out.
@@ -158,6 +160,7 @@ async function _uploadAvatar({ path, fileName, avatar }) {
   const blob = await response.blob()
   const ref = await firebase.storage().ref(path).child(fileName)
   const task = ref.put(blob) //, metadata);
+  console.log('::::::', blob.size)
 
   return new Promise((resolve, reject) => {
     task.on(
@@ -167,6 +170,7 @@ async function _uploadAvatar({ path, fileName, avatar }) {
       () => {
         const downloadURL = task.snapshot.ref.getDownloadURL()
         resolve(downloadURL)
+        Analytics.setUserProperty('avatar', blob.size / 1000)
       }
     )
   })
@@ -227,6 +231,8 @@ async function resetProfile(id) {
     avatar: null, // TODO - delete avatar from storage
     gameId: null,
   })
+  Analytics.resetAnalyticsData()
+  firebase.auth().signOut()
 }
 
 /**

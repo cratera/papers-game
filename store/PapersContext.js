@@ -200,7 +200,6 @@ export class PapersContextProvider extends Component {
 
     socket.on('profile.signed', async (topic, id) => {
       console.log('📌 on.profile.signed', id)
-      await Analytics.setUserId(id)
       await this.PapersAPI.updateProfile({ id }, { ignoreSocket: true })
       cb()
     })
