@@ -1,4 +1,5 @@
 import * as Device from 'expo-device'
+import { Platform } from 'react-native'
 import * as Analytics from 'expo-firebase-analytics'
 
 // TODO add support to android.
@@ -25,5 +26,16 @@ export async function setUserId(id) {
   })
   if (!__DEV__) {
     await Analytics.setUserId(id)
+    await Analytics.setUserProperty('os', `${Platform.OS} - ${Device.osName} - ${Device.osVersion}`)
   }
+}
+
+export async function setUserProperty(...args) {
+  console.log('📡 setUserProperty', ...args)
+  await Analytics.setUserProperty(args)
+}
+
+export async function resetAnalyticsData() {
+  console.log('📡 resetAnalyticsData')
+  await Analytics.resetAnalyticsData()
 }

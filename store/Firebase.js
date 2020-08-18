@@ -166,10 +166,12 @@ async function _uploadAvatar({ path, fileName, avatar }) {
       'state_changed',
       snapshot => {},
       error => reject(error),
-      () => {
+      async () => {
         const downloadURL = task.snapshot.ref.getDownloadURL()
+        try {
+          await Analytics.setUserProperty('avatar', (blob.size / 1000).toString())
+        } catch {}
         resolve(downloadURL)
-        Analytics.setUserProperty('avatar', blob.size / 1000)
       }
     )
   })
