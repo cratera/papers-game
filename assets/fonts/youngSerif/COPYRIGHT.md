@@ -1,0 +1,1 @@
+Copyright (c) 2019 by Noir Blanc Rouge. https://noirblancrouge.com | <contact@noirblancrouge.com> | YoungSerif.
