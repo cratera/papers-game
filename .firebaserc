@@ -5,6 +5,9 @@
   "targets": {
     "papers-game": {
       "hosting": {
+        "landing": [
+          "papersgame"
+        ],
         "web": [
           "papers-game"
         ],

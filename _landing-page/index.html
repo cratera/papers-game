@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Papers - The Game</title>
+  </head>
+  <style>
+    @font-face {
+      font-family: 'YoungSerif';
+      src: url('YoungSerif-Regular.woff2');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'Karla';
+      src: url('Karla-Regular.ttf');
+      font-weight: normal;
+      font-style: normal;
+    }
+    html {
+      box-sizing: border-box;
+    }
+    * {
+      box-sizing: inherit;
+    }
+
+    .sr-only {
+      clip: rect(0 0 0 0);
+      clip-path: inset(50%);
+      height: 1px;
+      overflow: hidden;
+      position: absolute;
+      white-space: nowrap;
+      width: 1px;
+    }
+    body {
+      margin: 0;
+      background-color: #c299c4;
+      font-family: 'Karla';
+    }
+    main {
+      height: 100vh;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 1rem;
+    }
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .title {
+      font-family: 'YoungSerif';
+      font-size: 2.75rem;
+      margin: 0;
+    }
+
+    .sub {
+      margin: 1rem 0 3rem;
+    }
+
+    .btn {
+      display: inline-block;
+      width: 100%;
+      max-width: 21rem;
+      font-family: 'YoungSerif';
+      text-decoration: none;
+      color: #000;
+      background-color: #fff;
+      font-size: 1rem;
+      border: 2px solid #000000;
+      padding: 1.5rem;
+    }
+
+    .link {
+      color: inherit;
+      text-decoration-color: #fff;
+    }
+  </style>
+  <body>
+    <main>
+      <div>
+        <h1 class="title">Papers</h1>
+        <p class="sub">Friends & family game night</p>
+        <a class="btn" href="https://papers-game.web.app/">Play game</a>
+      </div>
+    </main>
+    <footer>
+      <p>
+        Being
+        <a class="link" href="https://github.com/sandrina-p/papers-game" rel="noreferrer"
+          >made with love</a
+        >
+        by Sandy and Maggie 😎
+      </p>
+      <p class="sr-only">
+        The game is not accessible for people with low vision who use Screen Readers. I'm sorry 😢
+      </p>
+    </footer>
+  </body>
+</html>

@@ -13,7 +13,7 @@ In development... We hope to release it the v1.0 this summer. See our [Public ro
 The current released version is in very early stage (beta).
 
 - **iPhone:** get it touch and we'll send you a beta tester link.
-- **Browser (mobile)**: Go to [the website](https://papers-game.firebaseapp.com/).
+- **Browser (mobile)**: Go to [the website](http://papersgame.com/).
 
 To report bugs or send dfeedback, get it touch [by e-mail](mailto:a.sandrina.p@gmail.com) or [open an issue](https://github.com/sandrina-p/papers-game/issues/new).
 

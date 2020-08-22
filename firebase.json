@@ -4,6 +4,16 @@
   },
   "hosting": [
     {
+      "target": "landing",
+      "public": "_landing-page",
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ]
+    },
+    {
       "target": "web",
       "public": "web-build",
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
