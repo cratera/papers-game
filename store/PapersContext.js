@@ -68,6 +68,7 @@ export class PapersContextProvider extends Component {
 
       accessGame: this.accessGame.bind(this),
       leaveGame: this.leaveGame.bind(this),
+      abortGameGate: this.abortGameGate.bind(this),
       removePlayer: this.removePlayer.bind(this),
 
       setTeams: this.setTeams.bind(this),
@@ -150,13 +151,14 @@ export class PapersContextProvider extends Component {
 
     if (socket) {
       console.warn('init(): Already connected. Please restart...')
+      Sentry.captureMessage('Warn: Init - Socket already connected.')
     } else {
       try {
         socket = serverInit()
         this.setState({ socket })
       } catch (e) {
         console.warn(':: error', e)
-        Sentry.captureException(e, { tags: { pp_action: 'INIT_0' } })
+        Sentry.captureException(e, { tags: { pp_action: 'INIT_02' } })
       }
     }
 
@@ -169,6 +171,7 @@ export class PapersContextProvider extends Component {
 
     if (socket) {
       console.warn(':: Already connected. Should not happen!')
+      Sentry.captureMessage('Warn: tR Socket already connected.')
     } else {
       const { gameId, id } = this.state.profile
 
@@ -809,6 +812,13 @@ export class PapersContextProvider extends Component {
       console.warn(':: error', e)
       Sentry.captureException(e, { tags: { pp_action: 'LVG_0' } })
     }
+  }
+
+  async abortGameGate() {
+    try {
+      await this.state.socket.leaveGame()
+    } catch (e) {}
+    this._removeGameFromState()
   }
 
   async removePlayer(playerId) {
