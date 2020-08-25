@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 
 import { usePrevious, msToSecPretty, getRandomInt } from '@constants/utils'
 import PapersContext from '@store/PapersContext.js'
+import Sentry from '@constants/Sentry'
 
 import Button from '@components/button'
 import Page from '@components/page'
@@ -50,14 +51,12 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
     // these two effects (before and this one) need some refactor.
     // Read more below at pickFirstPaper
     if (startedCounting) {
-      console.log('useEffect:: startedCounting!')
       pickFirstPaper()
     }
   }, [startedCounting])
 
   React.useEffect(() => {
     if (!isCount321go) {
-      console.log('useEffect:: 1º blur paper')
       setPaperBlur(false)
       clearTimeout(blurTimeout.current)
       blurTimeout.current = setTimeout(() => setPaperBlur(true), blurTime)
@@ -66,7 +65,6 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
 
   React.useEffect(() => {
     if (!isCount321go && papersTurnCurrent !== null) {
-      console.log('useEffect:: timeout blur paper')
       setPaperBlur(false)
       clearTimeout(blurTimeout.current)
       blurTimeout.current = setTimeout(() => setPaperBlur(true), blurTime)
@@ -77,7 +75,6 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
     // Use prevCountdownSec to avoid a false positive
     // when the component mounts (3, 2, 1...)
     if (!!prevCountdownSec && countdownSec === 0) {
-      console.log('useEffect:: timesup!')
       Papers.playSound('timesup')
       setIsDone(true)
       setTimeout(resetIsDone, 1500)
@@ -93,7 +90,6 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
 
   React.useLayoutEffect(() => {
     if (!stillHasWords) {
-      console.log('useEffect:: all papers guessed!')
       setIsDone(true)
       setTimeout(resetIsDone, 1500)
     }
@@ -106,7 +102,11 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
   function getPaperByKey(key) {
     const paper = game.words._all[key]
     if (!paper) {
-      console.warn(`key "${key}" does not match a paper!`)
+      if (__DEV__) console.warn(`key "${key}" does not match a paper!`)
+      Sentry.withScope(scope => {
+        scope.setExtra('response', JSON.stringify(game))
+        Sentry.captureException(Error(`PapersByKey ${key} failed.`))
+      })
     }
     return paper
   }
@@ -147,7 +147,6 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
       // It's a dangerous and probably buggy in slow phones. This needs a refactor for TOMORROW!
 
       Papers.setTurnLocalState(state) // REVIEW - this is async and a side effect. is it the right place?
-      console.log('first paper:', state.current)
       return state
     })
   }
@@ -175,11 +174,17 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
       let nextPaper = wordsEnded ? null : wordsToPick[wordIndex]
 
       if (nextPaper === undefined) {
-        console.warn('nextPaper undefined!', { wordsToPick, wordIndex })
+        Sentry.withScope(scope => {
+          scope.setExtra('response', JSON.stringify(papersTurn))
+          Sentry.captureException(Error('setPapersTurn() - nextPapers undefined'))
+        })
       }
 
       if (!wordsEnded && nextPaper === null) {
-        console.warn('Ups nextPaper!', wordIndex, wordsToPick)
+        Sentry.withScope(scope => {
+          scope.setExtra('response', JSON.stringify(papersTurn))
+          Sentry.captureException(Error('setPapersTurn() - Ups nextPaper'))
+        })
       }
 
       if (!wordsEnded) {

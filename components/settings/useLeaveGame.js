@@ -39,7 +39,7 @@ export default function useLeaveGame({ navigation }) {
           },
           {
             text: 'Cancel',
-            onPress: () => console.log('Leave game cancelled'),
+            onPress: () => true,
             style: 'cancel',
           },
         ],

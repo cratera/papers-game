@@ -71,7 +71,7 @@ const iconsMap = {
 }
 
 const HeaderBtn = ({ side, icon, style, textPrimary, children, isLoading, ...otherProps }) => {
-  if (style) {
+  if (__DEV__ && style) {
     // TODO later this...
     console.warn('HeaderBtn - style is used:', children)
   }

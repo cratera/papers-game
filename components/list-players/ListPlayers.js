@@ -83,7 +83,7 @@ export default function ListPlayers({ players, enableKickout, isStatusVisible, .
         const wordsSubmitted = game.words && game.words[playerId]
         const status = isStatusVisible && (!wordsSubmitted ? 'writting' : 'done')
         const imgInfo = status && imgMap[status]
-        const canKickOut = enableKickout && playerId !== profileId && (!hasTeams || profileIsAdmin)
+        const canKickOut = enableKickout && playerId !== profileId && (hasTeams || profileIsAdmin)
         return (
           <TouchableHighlight
             underlayColor={Theme.colors.bg}

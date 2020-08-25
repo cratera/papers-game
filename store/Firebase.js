@@ -7,6 +7,7 @@ import 'firebase/storage'
 
 import PubSub from 'pubsub-js'
 
+import Sentry from '@constants/Sentry'
 import * as Analytics from '@constants/analytics.js'
 import { slugString } from '@constants/utils.js'
 
@@ -57,25 +58,11 @@ const PUBLIC_API = {
   setRound,
 }
 
-// export function serverReconnect({ id, name, gameId }) {
-//   if (firebase.apps.length > 0) {
-//     // Let's REVIEW this odd scenario later...
-//     console.log('⚙️ serverReconnect(), already connected!')
-//     return { socket: PUBLIC_API }
-//   }
-
-//   console.log('⚙️ serverReconnect() - doesnt exist!', LOCAL_PROFILE.id, id)
-
-//   const API = init()
-
-//   return API
-// }
-
 export default function init(options) {
-  console.log('⚙️ init()')
+  if (__DEV__) console.log('⚙️ init()')
 
   if (firebase.apps.length > 0) {
-    console.log('Already initialized!')
+    if (__DEV__) console.log('Already initialized!')
   } else {
     firebase.initializeApp(firebaseConfig)
   }
@@ -86,7 +73,7 @@ export default function init(options) {
     if (user) {
       LOCAL_PROFILE.id = user.uid
       LOCAL_PROFILE.isAfk = false
-      console.log('⚙️ Signed!', LOCAL_PROFILE.id)
+      if (__DEV__) console.log('⚙️ Signed!', LOCAL_PROFILE.id)
 
       await updateProfile(LOCAL_PROFILE)
       await Analytics.setUserId(LOCAL_PROFILE.id)
@@ -110,13 +97,13 @@ export default function init(options) {
  * - (id) - the userid from firebase.
  */
 function on(topic, cb) {
-  console.log('⚙️ on()', topic)
+  if (__DEV__) console.log('⚙️ on()', topic)
   PubSub.subscribe(topic, cb)
 }
 
 async function offAll() {
   const gameId = LOCAL_PROFILE.gameId
-  console.log('⚙️ offAll(), Firebase disconnecting!', gameId)
+  if (__DEV__) console.log('⚙️ offAll(), Firebase disconnecting!', gameId)
   PubSub.clearAllSubscriptions()
   _unsubGame(gameId)
 }
@@ -139,7 +126,7 @@ function signIn({ name, avatar }, cb) {
 }
 
 async function _uploadAvatar({ path, fileName, avatar }) {
-  console.log(':: _uploadAvatar', path, fileName)
+  if (__DEV__) console.log(':: _uploadAvatar', path, fileName)
 
   // const base64Match = avatar.match(/image\/(jpeg|jpg|gif|png)/);
   // const imgMatched = avatar.match(/\.(jpeg|jpg|gif|png)/);
@@ -186,13 +173,13 @@ async function _uploadAvatar({ path, fileName, avatar }) {
  * @param {Object} profile.gameId - The last gameid they tried to access
  */
 async function updateProfile(profile) {
-  console.log('⚙️ updateProfile()', profile)
+  if (__DEV__) console.log('⚙️ updateProfile()', profile)
   const { avatar, ...theProfile } = profile
 
   try {
     const isHTTPLink = avatar && avatar.indexOf('https://') === 0
     if (avatar && isHTTPLink) {
-      console.log(':: avatar ignored because it is a link')
+      if (__DEV__) console.log(':: avatar ignored because it is a link')
     }
     if (avatar && !isHTTPLink) {
       try {
@@ -203,10 +190,11 @@ async function updateProfile(profile) {
         })
         theProfile.avatar = downloadURL
         LOCAL_PROFILE.avatar = downloadURL
-        console.log(':: avatar uploaded!', downloadURL)
+        if (__DEV__) console.log(':: avatar uploaded!', downloadURL)
         PubSub.publish('profile.avatarSet', downloadURL)
       } catch (error) {
         console.warn(':: avatar upload failed!', error)
+        Sentry.captureException(error)
         theProfile.avatar = null // delete. Maybe save base64 as fallback?
       }
     }
@@ -217,6 +205,7 @@ async function updateProfile(profile) {
     DB.ref('users/' + LOCAL_PROFILE.id).update(theProfile)
   } catch (error) {
     console.warn('⚙️ updateProfile failed!', error)
+    Sentry.captureException(error)
   }
 
   return theProfile
@@ -239,7 +228,7 @@ async function resetProfile(id) {
  *
  */
 function getUser(userId) {
-  console.log('⚙️ getUser()', LOCAL_PROFILE.id, userId)
+  if (__DEV__) console.log('⚙️ getUser()', LOCAL_PROFILE.id, userId)
 
   // var userId = firebase.auth().currentUser.uid;
   // return firebase
@@ -247,7 +236,7 @@ function getUser(userId) {
   //   .ref('/users/' + userId)
   //   .once('value')
   //   .then(function(snapshot) {
-  //     console.log('GET USER!', snapshot.val());
+  //     if (__DEV__) console.log('GET USER!', snapshot.val());
   //   });
 }
 
@@ -309,7 +298,7 @@ const gameInitialState = ({ id, name, code, creatorId }) => ({
  */
 async function createGame(gameName) {
   // TODO later - "Play again" feature? create game with predefined teams?
-  console.log(`⚙️ createGame: ${gameName}`, { LOCAL_PROFILE })
+  if (__DEV__) console.log(`⚙️ createGame: ${gameName}`, { LOCAL_PROFILE })
   const gameNameLower = gameName.toLowerCase()
 
   // Verify if we can create the game...
@@ -319,7 +308,7 @@ async function createGame(gameName) {
   }
 
   if (slugString(gameName) !== gameNameLower) {
-    console.log('::', slugString(gameName), gameNameLower)
+    if (__DEV__) console.log('::', slugString(gameName), gameNameLower)
     throw new Error('invalid name')
   }
 
@@ -359,7 +348,7 @@ async function createGame(gameName) {
  * gameId = gameSlugged_code
  */
 async function joinGame(gameId) {
-  console.log(`⚙️ joinGame: ${gameId}`)
+  if (__DEV__) console.log(`⚙️ joinGame: ${gameId}`)
 
   // Verify if we can access the game...
   const id = LOCAL_PROFILE.id
@@ -406,7 +395,7 @@ async function joinGame(gameId) {
  */
 function _pubGame(gameId) {
   LOCAL_PROFILE.gameId = gameId
-  console.log('⚙️ _pubGame', gameId)
+  if (__DEV__) console.log('⚙️ _pubGame', gameId)
 
   // Subscribe to initial game set!
   DB.ref(`games/${gameId}`).once('value', async function (data) {
@@ -427,7 +416,7 @@ function _pubGame(gameId) {
     }
 
     // Set the initial state of the game.
-    console.log('⚙️ pub.game.set')
+    if (__DEV__) console.log('⚙️ pub.game.set')
     PubSub.publish('game.set', { game, profiles })
 
     const DB_PLAYERS = DB.ref(`games/${gameId}/players`)
@@ -447,7 +436,7 @@ function _pubGame(gameId) {
       })
 
       DB.ref(`users/${id}/isAfk`).on('value', data => {
-        console.log('⚙️ player is afk!', id, data.val())
+        if (__DEV__) console.log('⚙️ player is afk!', id, data.val())
         PubSub.publish('game.players.changed', {
           id,
           info: {
@@ -525,7 +514,7 @@ function _pubGame(gameId) {
  *
  */
 async function leaveGame({ wasKicked = false } = {}) {
-  console.log('⚙️ leaveGame()', { wasKicked }, LOCAL_PROFILE.id)
+  if (__DEV__) console.log('⚙️ leaveGame()', { wasKicked }, LOCAL_PROFILE.id)
   const gameId = LOCAL_PROFILE.gameId
 
   // already excluded from game, no need to remove again...
@@ -534,10 +523,10 @@ async function leaveGame({ wasKicked = false } = {}) {
     const game = await gameRef.once('value')
 
     if (Object.keys(game.val().players).length === 1) {
-      console.log(':: last player - remove game')
+      if (__DEV__) console.log(':: last player - remove game')
       DB.ref(`games/${gameId}`).remove()
     } else {
-      console.log(':: removing')
+      if (__DEV__) console.log(':: removing')
       await DB.ref(`games/${gameId}/players/${LOCAL_PROFILE.id}`).remove()
     }
   }
@@ -550,13 +539,13 @@ async function leaveGame({ wasKicked = false } = {}) {
   await _unsubGame(gameId)
 
   setTimeout(() => {
-    console.log('⚙️ Unsubscribe game')
+    if (__DEV__) console.log('⚙️ Unsubscribe game')
     PubSub.unsubscribe('game')
   }, 0) // Q: Why did I use timeout here?
 }
 
 async function _unsubGame(gameId) {
-  console.log('⚙️ _unsubGame()', gameId)
+  if (__DEV__) console.log('⚙️ _unsubGame()', gameId)
 
   // Disconnect from group
   const DB_PLAYERS = DB.ref(`games/${gameId}/players`)
@@ -586,7 +575,7 @@ async function _unsubGame(gameId) {
  */
 async function removePlayer(playerId) {
   const gameId = LOCAL_PROFILE.gameId
-  console.log('⚙️ removePlayer()', gameId, playerId)
+  if (__DEV__) console.log('⚙️ removePlayer()', gameId, playerId)
 
   const gameRef = DB.ref(`games/${gameId}`)
   const game = await gameRef.once('value')
@@ -595,14 +584,14 @@ async function removePlayer(playerId) {
     throw new Error('notFound')
   }
 
-  console.log(':: removing player')
+  if (__DEV__) console.log(':: removing player')
   await DB.ref(`games/${gameId}/players/${playerId}`).remove()
 }
 /**
  *
  */
 async function setTeams(teams) {
-  console.log('⚙️ setTeams()')
+  if (__DEV__) console.log('⚙️ setTeams()')
   const gameId = LOCAL_PROFILE.gameId
 
   await DB.ref(`games/${gameId}/teams`).set(teams)
@@ -617,7 +606,7 @@ async function setTeams(teams) {
  *
  */
 async function setWords(words) {
-  console.log('⚙️ setWords()', words)
+  if (__DEV__) console.log('⚙️ setWords()', words)
   const gameId = LOCAL_PROFILE.gameId
   const playerId = LOCAL_PROFILE.id
 
@@ -659,7 +648,7 @@ async function setWords(words) {
  * a shortcut for dev only.
  */
 async function setWordsForEveryone(allWords) {
-  console.log('⚙️ setWordsForEveyone()')
+  if (__DEV__) console.log('⚙️ setWordsForEveyone()')
   const gameId = LOCAL_PROFILE.gameId
 
   await DB.ref(`games/${gameId}/words`).set(allWords)
@@ -669,7 +658,7 @@ async function setWordsForEveryone(allWords) {
  *
  */
 async function markMeAsReady(roundStatus) {
-  console.log('⚙️ markMeAsReady()')
+  if (__DEV__) console.log('⚙️ markMeAsReady()')
   const { gameId, id } = LOCAL_PROFILE
 
   // REVIEW/TODO: Maybe round update should be done before, once teams are created.
@@ -693,13 +682,13 @@ async function markMeAsReady(roundStatus) {
   const isEveryoneReady = Object.keys(players).every(pId => players[pId].isReady)
 
   if (isEveryoneReady) {
-    console.log(':: everyones ready. Start game!')
+    if (__DEV__) console.log(':: everyones ready. Start game!')
     await DB.ref(`games/${gameId}/hasStarted`).set(true)
   }
 }
 
 async function markMeAsReadyForNextRound(everyonesReadyCb) {
-  console.log('⚙️ markMeAsReadyForNextRound()')
+  if (__DEV__) console.log('⚙️ markMeAsReadyForNextRound()')
   const { gameId, id } = LOCAL_PROFILE
 
   await DB.ref(`games/${gameId}/players/${id}`).update({ isReady: true })
@@ -713,7 +702,7 @@ async function markMeAsReadyForNextRound(everyonesReadyCb) {
   const isEveryoneReady = Object.keys(players).every(pId => players[pId].isReady)
 
   if (isEveryoneReady) {
-    console.log(':: everyones ready. Start next round!')
+    if (__DEV__) console.log(':: everyones ready. Start next round!')
     // REVIEW: Should this be responsability of context or firebase?
     everyonesReadyCb()
   }
@@ -723,7 +712,7 @@ async function markMeAsReadyForNextRound(everyonesReadyCb) {
  *
  */
 async function startTurn(words) {
-  console.log('⚙️ startTurn()')
+  if (__DEV__) console.log('⚙️ startTurn()')
   const gameId = LOCAL_PROFILE.gameId
 
   // The client is responsible for the countdown and then
@@ -732,7 +721,7 @@ async function startTurn(words) {
 }
 
 function setPapersGuessed(count) {
-  console.log('⚙️ setPapersGuessed()', count)
+  if (__DEV__) console.log('⚙️ setPapersGuessed()', count)
   const gameId = LOCAL_PROFILE.gameId
 
   DB.ref(`games/${gameId}/papersGuessed`).set(count)
@@ -742,7 +731,7 @@ function setPapersGuessed(count) {
  *
  */
 async function finishTurn({ playerScore, roundStatus }, cb) {
-  console.log('⚙️ finishTurn()')
+  if (__DEV__) console.log('⚙️ finishTurn()')
   const gameId = LOCAL_PROFILE.gameId
 
   if (roundStatus.status === 'finished') {
@@ -767,7 +756,7 @@ async function finishTurn({ playerScore, roundStatus }, cb) {
  *
  */
 async function setRound(roundStatus) {
-  console.log('⚙️ startNextRound()')
+  if (__DEV__) console.log('⚙️ startNextRound()')
   const gameId = LOCAL_PROFILE.gameId
 
   await DB.ref(`games/${gameId}/round`).set(roundStatus)

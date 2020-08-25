@@ -18,8 +18,8 @@ export default function usePickAvatar() {
             'Camera denied',
             'Sorry, we need camera roll permissions to make this work!',
             [
-              { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
-              { text: 'OK', onPress: () => console.log('OK Pressed') },
+              { text: 'Cancel', onPress: () => true, style: 'cancel' },
+              { text: 'OK', onPress: () => true },
             ],
             { cancelable: false }
           )
@@ -52,7 +52,7 @@ export default function usePickAvatar() {
       })
     }
 
-    console.log('usePickAvatar', result.cancelled ? 'cancelled' : 'done!')
+    if (__DEV__) console.log('usePickAvatar', result.cancelled ? 'cancelled' : 'done!')
     return result.cancelled ? null : result.uri
 
     // We'll go back to this again one day... or not

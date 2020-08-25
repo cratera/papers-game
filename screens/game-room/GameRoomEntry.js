@@ -36,7 +36,6 @@ export default function GameRoomEntry({ navigation, route }) {
   React.useEffect(() => {
     // Player left / was kicked, or game was deleted, etc...
     if (!profileGameId && !game) {
-      console.log(':: room -> home (left)')
       navigation.navigate('home')
     }
   }, [profileGameId, game])
@@ -45,7 +44,6 @@ export default function GameRoomEntry({ navigation, route }) {
     // Loaded cached game with success
     if (hasGameIdCached && gameId) {
       const redirect = amIReady ? 'playing' : wordsAreStored ? 'lobby-writing' : 'lobby-joining'
-      console.log(':: room -> room:' + redirect)
       navigation.navigate('room', { screen: redirect })
     }
   }, [hasGameIdCached, gameId])
@@ -53,7 +51,6 @@ export default function GameRoomEntry({ navigation, route }) {
   React.useEffect(() => {
     // Tried to load cached game but without success
     if (hasGameIdCached && !profileGameId) {
-      console.log(':: room -> home (not found)')
       navigation.navigate('home')
     }
   }, [hasGameIdCached, profileGameId])
@@ -62,7 +59,6 @@ export default function GameRoomEntry({ navigation, route }) {
     // Triggered when the player clicks "I'm Ready" at lobby-writting
     // Need this to prevent RN redirect to "gate" when isPlaying changes
     if (isPlaying) {
-      console.log(':: room -> playing', route)
       navigation.navigate('playing')
     }
   }, [isPlaying])

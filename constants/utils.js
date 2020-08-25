@@ -80,7 +80,6 @@ export function useCountdown(initialDate, options = {}) {
   }
 
   React.useEffect(() => {
-    console.log('useEffect - countdown')
     const startedTimeLeft = getTimeLeftCb(dateStarted)
     if (startedTimeLeft === 0) {
       // useCountdown was called with a dateStarted already expired.

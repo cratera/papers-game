@@ -54,7 +54,6 @@ export default function PlayingEntry({ navigation }) {
   React.useEffect(() => {
     // use false to avoid undefined on first render
     if (startedCounting) {
-      console.log('useEffect:: hasCountdownStarted')
       startCountdown(round.status)
     }
   }, [startedCounting, startCountdown, round.status])

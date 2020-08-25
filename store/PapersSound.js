@@ -46,10 +46,9 @@ async function loadAudioSkin() {
       )
       playset[soundId] = sound
     }
-    console.log('🔊 Loaded success')
     return true
   } catch (e) {
-    console.warn('🔊 Loaded failed', e)
+    Sentry.captureException(e, { tags: { pp_page: 'loadAudio' } })
   }
   return false
 }
@@ -83,10 +82,8 @@ export function play(soundId) {
       playset[soundId].replayAsync()
     } catch (e) {
       Sentry.captureException(e, { tags: { pp_action: 'PSND_0' } })
-      console.warn('🔊 play: failed', e.message)
     }
   } else {
     Sentry.captureMessage(`Sound "${soundId}" does not exist.`)
-    console.warn(`🔊 Sound: "${soundId}" does not exist.`)
   }
 }

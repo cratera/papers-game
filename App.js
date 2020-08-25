@@ -37,7 +37,6 @@ export default class App extends React.Component {
   }
 
   render() {
-    console.log(':: APP OS', Platform.OS)
     if (this.state.hasError) {
       return <ErrorCrashed error={this.state.error} />
     }

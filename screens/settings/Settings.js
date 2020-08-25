@@ -126,7 +126,7 @@ function SettingsProfile({ navigation }) {
           },
           {
             text: 'Cancel',
-            onPress: () => console.log('Delete profile cancelled'),
+            onPress: () => true,
             style: 'cancel',
           },
         ],
@@ -653,7 +653,6 @@ function OtaChecker() {
       setstatus('error')
       setErrorMsg(e.message)
     }
-    console.log('Result', status)
   }
 
   async function handleReloadClick() {
@@ -690,7 +689,6 @@ function TestCrashing() {
   async function sendExc() {
     try {
       const foo = status.foo.bar
-      console.log(foo)
     } catch (e) {
       Sentry.captureException(e)
       setstatus('exc')

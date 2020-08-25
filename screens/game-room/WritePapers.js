@@ -11,6 +11,7 @@ import {
   Text,
   ScrollView,
 } from 'react-native'
+import Sentry from '@constants/Sentry'
 
 import * as Analytics from '@constants/analytics.js'
 
@@ -205,14 +206,16 @@ export default function WritePapers({ navigation }) {
   function handleScrollPapers(scrollX, curPaper) {
     const newPaper = Math.round(scrollX / (vw * 100))
     if (curPaper !== newPaper) {
-      // console.log('handleScrollPapers - update', newPaper)
       setPaperIndex(newPaper)
     }
   }
 
   function handleWordChange(word, index) {
     if (typeof word !== 'string') {
-      console.warn('Wow, this is not a word!', word)
+      Sentry.withScope(scope => {
+        scope.setExtra('response', JSON.stringify(word))
+        Sentry.captureException(Error('handleWordChange - not a word!'))
+      })
       return
     }
 

@@ -97,13 +97,13 @@ export default function Teams({ navigation }) {
       }
 
       if (index === 1 && newTempTeams[1].name === newTempTeams[0].name) {
-        console.log('Teams with same name. Get new one.')
+        if (__DEV__) console.log('Teams with same name. Get new one.')
         newTempTeams[1].name = teamNames[getRandomInt(teamNames.length - 1)]
       }
     })
 
     if (areTeamPlayersEqual(tempTeams, newTempTeams)) {
-      console.log('Equal teams. Randomize again.')
+      if (__DEV__) console.log('Equal teams. Randomize again.')
       return getRandomTeams()
     } else {
       return newTempTeams
@@ -141,7 +141,6 @@ export default function Teams({ navigation }) {
       navigation.setOptions({ headerRight: null })
       navigation.navigate('write-papers')
     } catch (e) {
-      console.warn('setTeams failed', e)
       setErrorMsg(e.message)
       setLocking(false)
     }
