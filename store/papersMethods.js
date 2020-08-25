@@ -137,3 +137,19 @@ export function useScores(gameScore, gameTeams, profileId) {
     getBestPlayer,
   }
 }
+
+// -------------------------------------------------------------
+
+export function getTeamId(playerId, teams) {
+  let theTeamId
+
+  for (const teamId in teams) {
+    const isOnTeam = teams[teamId].players.some(pId => pId === playerId)
+    if (isOnTeam) {
+      theTeamId = teamId
+      break
+    }
+  }
+
+  return theTeamId
+}

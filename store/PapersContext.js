@@ -86,6 +86,8 @@ export class PapersContextProvider extends Component {
       getTurnLocalState: this.getTurnLocalState.bind(this),
       setTurnLocalState: this.setTurnLocalState.bind(this),
 
+      deleteGame: this.deleteGame.bind(this),
+
       playSound: this.playSound.bind(this),
 
       sendTracker: this.sendTracker.bind(this),
@@ -794,7 +796,7 @@ export class PapersContextProvider extends Component {
       const game = this.state.game
       await this.state.socket.leaveGame(opts)
 
-      if (!opts.wasKicked) {
+      if (!opts.wasKicked || !opts.gameDeleted) {
         let gameStatus
         if (!game.teams) {
           gameStatus = 'new'
@@ -830,6 +832,15 @@ export class PapersContextProvider extends Component {
       console.warn(':: error', e)
       Sentry.captureException(e, { tags: { pp_action: 'RMP_0' } })
     }
+  }
+
+  async deleteGame() {
+    for (const playerId in this.state.game.players) {
+      if (playerId !== this.state.profile.id) {
+        await this.state.socket.removePlayer(playerId)
+      }
+    }
+    await this.leaveGame({ gameDeleted: true })
   }
 
   playSound(soundId) {
