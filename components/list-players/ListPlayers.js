@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Alert, View, Text, Image, Platform } from 'react-native'
+import { Alert, View, Text, Image, Platform, TouchableHighlight } from 'react-native'
 
 import PapersContext from '@store/PapersContext.js'
 
@@ -8,6 +8,7 @@ import { getTeamId } from '@store/papersMethods.js'
 
 import Button from '@components/button'
 import Avatar from '@components/avatar'
+import Sheet from '@components/sheet'
 
 import Styles from './ListPlayersStyles'
 import * as Theme from '@theme'
@@ -30,6 +31,7 @@ const imgMap = {
 
 export default function ListPlayers({ players, enableKickout, isStatusVisible, ...otherProps }) {
   const Papers = React.useContext(PapersContext)
+  const [isClicked, setIsClicked] = React.useState(null) // playerId
   const [isKicking, setIsKicking] = React.useState(null) // playerId
   const [isDeleting, setIsDeleting] = React.useState(false) // playerId
   const { profile, profiles, game } = Papers.state
@@ -81,60 +83,78 @@ export default function ListPlayers({ players, enableKickout, isStatusVisible, .
         const wordsSubmitted = game.words && game.words[playerId]
         const status = isStatusVisible && (!wordsSubmitted ? 'writting' : 'done')
         const imgInfo = status && imgMap[status]
-
+        const canKickOut = enableKickout && playerId !== profileId && (!hasTeams || profileIsAdmin)
         return (
-          <View key={playerId} style={[Styles.item, isLastChild && Styles.item_isLast]}>
-            <View style={Styles.who}>
-              <Avatar src={avatar} hasMargin alt="" />
-              <View>
-                <Text style={Theme.typography.body}>
-                  {name}
-                  {playerId === profileId && <Text> (you)</Text>}
-                </Text>
-                <Text style={[Theme.typography.small, Theme.typography.seconday]}>
-                  {playerId === game.creatorId
-                    ? playerId === profileId
-                      ? ''
-                      : game.hasStarted
-                      ? ''
-                      : !hasEnoughPlayers
-                      ? 'Creating game...'
-                      : !game.teams
-                      ? 'Creating teams...'
-                      : ''
-                    : ''}
-                  {/* {isAfk && (
+          <TouchableHighlight
+            underlayColor={Theme.colors.bg}
+            onPress={() => (canKickOut ? setIsClicked(playerId) : true)}
+            key={playerId}
+          >
+            <View key={playerId} style={[Styles.item, isLastChild && Styles.item_isLast]}>
+              <View style={Styles.who}>
+                <Avatar src={avatar} hasMargin alt="" />
+                <View>
+                  <Text style={Theme.typography.body}>
+                    {name}
+                    {playerId === profileId && <Text> (you)</Text>}
+                  </Text>
+                  <Text style={[Theme.typography.small, Theme.typography.seconday]}>
+                    {playerId === game.creatorId
+                      ? playerId === profileId
+                        ? ''
+                        : game.hasStarted
+                        ? ''
+                        : !hasEnoughPlayers
+                        ? 'Creating game...'
+                        : !game.teams
+                        ? 'Creating teams...'
+                        : ''
+                      : ''}
+                    {/* {isAfk && (
                     // This seems buggy... remove it for now.
                     <Text style={[Theme.typography.small, { color: Theme.colors.primary }]}>
                       Disconnected
                     </Text>
                   )} */}
-                </Text>
+                  </Text>
+                </View>
+              </View>
+              <View style={Styles.ctas}>
+                {canKickOut && Platform.OS === 'web' && (
+                  <Button
+                    variant="light"
+                    size="sm"
+                    isLoading={isKicking === playerId}
+                    onPress={() => handleKickOut(playerId)}
+                  >
+                    Kick
+                  </Button>
+                )}
+                {imgInfo && (
+                  <Image
+                    style={[Styles.itemStatus, Styles[`itemStatus_${status}`]]}
+                    source={{ uri: imgInfo.src }}
+                    accessibilityLabel={imgInfo.alt}
+                  />
+                )}
               </View>
             </View>
-            <View style={Styles.ctas}>
-              {/* TODO make same as design. */}
-              {enableKickout && playerId !== profileId && (hasTeams || profileIsAdmin) && (
-                <Button
-                  variant="light"
-                  size="sm"
-                  isLoading={isKicking === playerId}
-                  onPress={() => handleKickOut(playerId)}
-                >
-                  Kick
-                </Button>
-              )}
-              {imgInfo && (
-                <Image
-                  style={[Styles.itemStatus, Styles[`itemStatus_${status}`]]}
-                  source={{ uri: imgInfo.src }}
-                  accessibilityLabel={imgInfo.alt}
-                />
-              )}
-            </View>
-          </View>
+          </TouchableHighlight>
         )
       })}
+
+      <Sheet
+        visible={!!isClicked}
+        onClose={() => setIsClicked(null)}
+        list={[
+          {
+            text: isClicked ? `❌ Remove "${profiles[isClicked].name}"` : '',
+            onPress: () => {
+              handleKickOut(isKicking)
+            },
+          },
+        ]}
+      />
     </View>
   )
 
@@ -151,6 +171,7 @@ export default function ListPlayers({ players, enableKickout, isStatusVisible, .
         setIsKicking(playerId)
         await Papers.removePlayer(playerId)
         setIsKicking(null)
+        setIsClicked(null)
       } else {
         setIsDeleting(true)
         await Papers.deleteGame()
