@@ -49,7 +49,7 @@ yarn release:web -- -m "x.x.x@xx ![release summary]"
   ### - XCode. (App Store)
   ###   - If 1st time, make sure to "Run on iOS simulator" on Expo at least once.
   ### - fastlane: $ brew install fastlane
-  ### - turtle-cli: $ npm install -g turtle-cli (DO NOT use sudo)
+  ### - turtle-cli: $ npm install -g turtle-cli (DO NOT use sudo) [Read bug](https://github.com/expo/turtle/issues/247)
   ### - Firebase: $ sudo npm install -g firebase-tools
   ### - If 1st time create manually a /dist in the root project
   ### -  1st time, connect firebase target (similar to git setupstream): $ firebase target:apply hosting native papers-native
@@ -70,7 +70,6 @@ yarn release:ota -- -m "x.x.x@xx ![release summary]"
   ## expo fetch:ios:certs
 
   # build everything
-  # This isn't working on my new computer :( [See bug](https://github.com/expo/turtle/issues/247)
   EXPO_IOS_DIST_P12_PASSWORD=<PASS> turtle build:ios --public-url https://papers-native.firebaseapp.com/ios-index.json --team-id <TEAMID> --dist-p12-path secrets/papers-game_dist.p12 --provisioning-profile-path secrets/papers-game.mobileprovision
 
   # a build path is shown in the last lines of log... something like:
@@ -80,7 +79,7 @@ yarn release:ota -- -m "x.x.x@xx ![release summary]"
   expo upload:ios --path path/to/archive.ipa
 
   # after a few seconds it asks for app-specific password
-  https://appleid.apple.com/account/manage
+  # Go to secrets or https://appleid.apple.com/account/manage
 
   # wait 1min... and then wait more ~15 minutes... be patient...
   # After, go to AppStoreConnect. The the new build is there. It will take a few hours to process the build

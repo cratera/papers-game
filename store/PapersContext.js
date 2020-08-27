@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { AsyncStorage } from 'react-native'
 import PropTypes from 'prop-types'
 
-import * as Analytics from '@constants/analytics.js'
 import Sentry from '@constants/Sentry'
 
 import wordsForEveryone from './wordsForEveryone.js'
@@ -10,6 +9,7 @@ import { getNextTurn } from './papersMethods.js'
 import * as PapersSound from './PapersSound.js'
 
 import serverInit from './Firebase.js'
+import * as Analytics from '@constants/analytics.js'
 
 const i18nUnexpectedError = 'Unexpected error. Please try again later.'
 
