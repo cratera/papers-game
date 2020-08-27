@@ -20,7 +20,7 @@ Here's a list of my learnings while building this mobile game with reac-native.
 - Upload files to Firebase was a nightmare. See `store/Firebase.js _uploadAvatar()` for more info.
 - 📝 Didn't understand how to handle errors [expo ErrorRecovery](https://docs.expo.io/versions/v37.0.0/sdk/error-recovery/).
   - Update 2 days later: Use a React class component with Error Boundary. (App.js -> AppFn.js)
-- Add [firebase-analytics](https://docs.expo.io/versions/latest/sdk/firebase-analytics/)
+- Add [firebase-analytics](https://docs.expo.io/versions/latest/sdk/firebase-analytics/). Update. Do NOT forget to [release a iOS build to TestFlight](https://github.com/expo/expo/issues/8277)
 - Use [Sentry expo and web](https://github.com/expo/sentry-expo/issues/77#issuecomment-646099545)
 
 ### Release
