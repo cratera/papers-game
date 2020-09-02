@@ -14,8 +14,16 @@ import {
 import * as MailComposer from 'expo-mail-composer'
 import { createStackNavigator } from '@react-navigation/stack'
 import PropTypes from 'prop-types'
+
 import * as Updates from 'expo-updates'
 import * as Linking from 'expo-linking'
+import {
+  AdMobBanner,
+  AdMobInterstitial,
+  PublisherBanner,
+  AdMobRewarded,
+  setTestDeviceIDAsync,
+} from 'expo-ads-admob'
 
 import * as Analytics from '@constants/analytics.js'
 
@@ -403,6 +411,11 @@ SettingsFeedback.propTypes = {
 function SettingsExperimental({ navigation }) {
   React.useEffect(() => {
     setSubHeader(navigation, 'Experimental')
+    async function setAd() {
+      await setTestDeviceIDAsync('EMULATOR')
+    }
+
+    setAd()
   }, [])
 
   const styleBlock = {
@@ -414,8 +427,8 @@ function SettingsExperimental({ navigation }) {
   }
   return (
     <Page>
-      <Page.Main style={{ paddingTop: 16 }}>
-        <ScrollView>
+      <Page.Main>
+        <ScrollView style={{ paddingTop: 32, marginHorizontal: -16 }}>
           <Text style={[Theme.typography.h3, Theme.u.center]}>🚧 For Devs only. Stay away! 🚧</Text>
 
           <View style={styleBlock}>
@@ -424,6 +437,49 @@ function SettingsExperimental({ navigation }) {
 
           <View style={styleBlock}>
             <TestCrashing />
+          </View>
+
+          <View style={styleBlock}>
+            <Text style={[Theme.typography.h3, Theme.u.center, { marginBottom: 16 }]}>
+              AdMob tests
+            </Text>
+
+            <AdMobBanner
+              bannerSize="largeBanner"
+              adUnitID="ca-app-pub-3940256099942544/6300978111" // Test ID, Replace with your-admob-unit-id
+              // servePersonalizedAds // need permission to be true!
+              onDidFailToReceiveAdWithError={errorMsg => {
+                console.warn('banner failed!', errorMsg)
+              }}
+            />
+            <Text>{'\n'}</Text>
+            <Button
+              onPress={async () => {
+                await AdMobInterstitial.setAdUnitID('ca-app-pub-3940256099942544/1033173712') // Test ID, Replace with your-admob-unit-id
+                await AdMobInterstitial.requestAdAsync({ servePersonalizedAds: false })
+                await AdMobInterstitial.showAdAsync()
+              }}
+            >
+              Trigger AdMobInterstitial
+            </Button>
+            <Text>{'\n'}</Text>
+
+            <Button
+              onPress={async () => {
+                await AdMobRewarded.setAdUnitID('ca-app-pub-3940256099942544/5224354917') // Test ID, Replace with your-admob-unit-id
+                await AdMobRewarded.requestAdAsync()
+                await AdMobRewarded.showAdAsync()
+                AdMobRewarded.addEventListener('rewardedVideoDidRewardUser', reward => {
+                  console.log(':: rewarded DidReward', reward)
+                })
+                AdMobRewarded.addEventListener('rewardedVideoDidClose', reward => {
+                  console.log(':: rewarded Closeed', reward)
+                })
+              }}
+            >
+              Trigger AdMobReward
+            </Button>
+            <Text>{'\n\n'}</Text>
           </View>
         </ScrollView>
       </Page.Main>

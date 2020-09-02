@@ -40,6 +40,8 @@ export default function AppFn({ skipLoadingScreen }) /* eslint-disable-line */ {
 
   // Load any resources or data that we need prior to rendering the app
   React.useEffect(() => {
+    StatusBar.setHidden(true, 'none')
+
     async function loadResourcesAndDataAsync() {
       try {
         SplashScreen.preventAutoHide()

@@ -24,7 +24,10 @@
       "buildNumber": "1",
       "supportsTablet": true,
       "bundleIdentifier": "com.nabicas.papers",
-      "googleServicesFile": "./secrets/GoogleService-Info.plist"
+      "googleServicesFile": "./secrets/GoogleService-Info.plist",
+      "config": {
+        "googleMobileAdsAppId": "ca-app-pub-1775448949464327~4971155922"
+      }
     },
     "web": {
       "config": {
