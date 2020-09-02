@@ -204,7 +204,7 @@ async function updateProfile(profile) {
     }
     DB.ref('users/' + LOCAL_PROFILE.id).update(theProfile)
   } catch (error) {
-    console.warn('⚙️ updateProfile failed!', error)
+    console.warn(':: updateProfile failed!', error)
     Sentry.captureException(error)
   }
 

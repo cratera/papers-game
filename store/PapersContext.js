@@ -160,6 +160,7 @@ export class PapersContextProvider extends Component {
         socket = serverInit()
         this.setState({ socket })
       } catch (e) {
+        console.warn('error init', e)
         Sentry.captureException(e, { tags: { pp_action: 'INIT_02' } })
       }
     }
@@ -269,8 +270,8 @@ export class PapersContextProvider extends Component {
 
       const errorMsg = (errorMsgMap[e.message] || errorMsgMap.ups)()
       const isUnexError = !errorMsgMap[e.message]
-      console.warn(':: accessGame failed!', variant, gameName, e, errorMsg)
 
+      console.warn(':: accessGame failed!', variant, gameName, e, errorMsg)
       if (isUnexError) {
         Sentry.captureException(e, { tags: { pp_action: 'AG_0' } })
       }
@@ -452,6 +453,7 @@ export class PapersContextProvider extends Component {
         }
       }
     } catch (e) {
+      console.warn('error: updateProfile AS', e)
       Sentry.captureException(e, { tags: { pp_action: 'UP_0' } })
     }
 
@@ -462,6 +464,7 @@ export class PapersContextProvider extends Component {
         try {
           this.state.socket.updateProfile(serverProfile)
         } catch (e) {
+          console.warn('error: updateProfile socket', e)
           Sentry.captureException(e, { tags: { pp_action: 'UP_1' } })
           // throw Error(i18nUnexpectedError) // REVIEW later
         }
@@ -493,6 +496,7 @@ export class PapersContextProvider extends Component {
         }))
       }
     } catch (e) {
+      console.warn('error: resetProfile', e)
       Sentry.captureException(e, { tags: { pp_action: 'RP_0' } })
       // return Error('Unexpected error. Please try again later')
     }
@@ -507,6 +511,7 @@ export class PapersContextProvider extends Component {
     try {
       await this.state.socket.setWords(words)
     } catch (e) {
+      console.warn('error: setWords', e)
       Sentry.captureException(e, { tags: { pp_action: 'SW_0' } })
       throw Error(i18nUnexpectedError)
     }
@@ -530,6 +535,7 @@ export class PapersContextProvider extends Component {
       await this.state.socket.setTeams(teams)
       Analytics.logEvent('game_setTeams', { players: Object.keys(this.state.game.players).length })
     } catch (e) {
+      console.warn('error: setTeams', e)
       Sentry.captureException(e, { tags: { pp_action: 'STM_0' } })
       throw Error(i18nUnexpectedError)
     }
@@ -556,6 +562,7 @@ export class PapersContextProvider extends Component {
         players: Object.keys(this.state.game.players).length,
       })
     } catch (e) {
+      console.warn('error: markMeAsReady', e)
       Sentry.captureException(e, { tags: { pp_action: 'MMAR_0' } })
       throw Error(i18nUnexpectedError)
     }
@@ -575,6 +582,7 @@ export class PapersContextProvider extends Component {
         players: Object.keys(this.state.game.players).length,
       })
     } catch (e) {
+      console.warn('error: markMeAsReadyForNextRound', e)
       Sentry.captureException(e, { tags: { pp_action: 'MMARNR_0' } })
       throw Error(i18nUnexpectedError)
     }
@@ -586,6 +594,7 @@ export class PapersContextProvider extends Component {
       this.PapersAPI.playSound('turnstart')
       this.state.socket.startTurn()
     } catch (e) {
+      console.warn('error: startTurn', e)
       Sentry.captureException(e, { tags: { pp_action: 'STN_0' } })
       throw Error(i18nUnexpectedError)
     }
@@ -632,12 +641,11 @@ export class PapersContextProvider extends Component {
 
     const allValidWordsGuessed = [...wordsSoFar, ...papersTurn.guessed].filter(word => {
       if (word === undefined) {
-        if (__DEV__)
-          console.warn(
-            ':: Undefined word guessed avoided!', // to avoid DB errors!
-            wordsSoFar,
-            papersTurn.guessed
-          )
+        console.warn(
+          ':: Undefined word guessed avoided!', // to avoid DB errors!
+          wordsSoFar,
+          papersTurn.guessed
+        )
         Sentry.captureMessage('Undefined word guessed avoided!')
         return false
       }
@@ -651,8 +659,7 @@ export class PapersContextProvider extends Component {
       // and the UI didn't block the second click? So it submitted each paper twice.
       const isUnique = allValidWordsGuessed.indexOf(paper) === index
       if (!isUnique) {
-        if (__DEV__)
-          console.warn(':: Duplicated word guessed avoided!', allValidWordsGuessed, paper, index)
+        console.warn(':: Duplicated word guessed avoided!', allValidWordsGuessed, paper, index)
         Sentry.captureMessage('Duplicated word guessed avoided!')
       }
       return isUnique
@@ -676,6 +683,7 @@ export class PapersContextProvider extends Component {
         revealed: papersTurn.revealed,
       })
     } catch (e) {
+      console.warn('error: finishTurn', e)
       Sentry.captureException(e, { tags: { pp_action: 'FNTR_0' } })
       // Do not throw error. UI is not ready for it.
     }
@@ -734,6 +742,7 @@ export class PapersContextProvider extends Component {
         await AsyncStorage.removeItem('turn')
       }
     } catch (e) {
+      console.warn('error: setTurnLocalState', e)
       Sentry.captureException(e, { tags: { pp_action: 'STLS_0' } })
       // Do not throw error. UI is not ready for it.
     }
@@ -793,6 +802,7 @@ export class PapersContextProvider extends Component {
       }
     } catch (e) {
       this._removeGameFromState()
+      console.warn('error: leaveGame', e)
       Sentry.captureException(e, { tags: { pp_action: 'LVG_0' } })
     }
   }
@@ -810,6 +820,7 @@ export class PapersContextProvider extends Component {
       await this.state.socket.removePlayer(playerId)
       Analytics.logEvent('remove_player')
     } catch (e) {
+      console.warn('error: removePlayer', e)
       Sentry.captureException(e, { tags: { pp_action: 'RMP_0' } })
     }
   }
