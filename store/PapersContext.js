@@ -49,8 +49,8 @@ export class PapersContextProvider extends Component {
       game: null, // see Firebase.js for structure.
       profiles: {}, // List of game players' profiles.
       about: {
-        version: '0.2.4',
-        ota: '01',
+        version: '0.2.5',
+        ota: '00',
       },
     }
 
