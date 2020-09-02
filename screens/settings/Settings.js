@@ -532,11 +532,26 @@ const AvatarSquare = ({ avatar, style, onChange }) => {
         onPress={() => setIsPickerVisible(true)}
       >
         {avatar ? (
-          <Image
-            style={[StylesAv.place, StylesAv.img]}
-            source={{ uri: avatar }}
-            accessibilityLabel="Your uploaded avatar"
-          />
+          <>
+            <View>
+              <Image
+                style={[
+                  StylesAv.place,
+                  StylesAv.img,
+                  {
+                    tintColor: 'red',
+                  },
+                ]}
+                source={{ uri: avatar }}
+                accessibilityLabel=""
+              />
+              <Image
+                style={[StylesAv.place, StylesAv.img, { position: 'absolute', opacity: 0.3 }]}
+                source={{ uri: avatar }}
+                accessibilityLabel="Profile photo"
+              />
+            </View>
+          </>
         ) : (
           <View style={[StylesAv.place]} />
         )}
