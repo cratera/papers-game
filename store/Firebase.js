@@ -11,7 +11,7 @@ import Sentry from '@constants/Sentry'
 import * as Analytics from '@constants/analytics.js'
 import { slugString } from '@constants/utils.js'
 
-// Fixing a bug with firebase file upload put() _uploadAvatar()
+// Fixing a bug with firebase file upload put() _avatarUpload()
 // https://forums.expo.io/t/imagepicker-base64-to-firebase-storage-problem/1415/11
 // import Base64 from 'base-64';
 // global.atob = Base64.encode;
@@ -125,8 +125,8 @@ function signIn({ name, avatar }, cb) {
     })
 }
 
-async function _uploadAvatar({ path, fileName, avatar }) {
-  if (__DEV__) console.log(':: _uploadAvatar', path, fileName)
+async function _avatarUpload({ path, fileName, avatar }) {
+  if (__DEV__) console.log('⚙️ _avatarUpload', path, fileName)
 
   // const base64Match = avatar.match(/image\/(jpeg|jpg|gif|png)/);
   // const imgMatched = avatar.match(/\.(jpeg|jpg|gif|png)/);
@@ -152,16 +152,44 @@ async function _uploadAvatar({ path, fileName, avatar }) {
     task.on(
       'state_changed',
       snapshot => {},
-      error => reject(error),
+      error => {
+        Sentry.withScope(scope => {
+          scope.setExtra('response', JSON.stringify(error))
+          Sentry.captureException(Error('uploadAvatar failed'))
+        })
+        return reject(error)
+      },
       async () => {
         const downloadURL = task.snapshot.ref.getDownloadURL()
         try {
           await Analytics.setUserProperty('avatar', (blob.size / 1000).toString())
-        } catch {}
+        } catch (e) {
+          console.warn(':: Analytics/avatar failed', e)
+          Sentry.captureException(e)
+        }
         resolve(downloadURL)
       }
     )
   })
+}
+
+async function _avatarDelete({ path, fileName }) {
+  if (__DEV__) console.log('⚙️ _avatarDelete', path, fileName)
+  try {
+    const userFolder = await firebase.storage().ref(path)
+
+    const res = await userFolder.listAll()
+
+    for (const index in res.items) {
+      await res.items[index].delete()
+    }
+  } catch (e) {
+    console.warn(':: _avatarDelete failed', e)
+    Sentry.withScope(scope => {
+      scope.setExtra('response', JSON.stringify(e))
+      Sentry.captureException(Error('uploadAvatar failed'))
+    })
+  }
 }
 
 /**
@@ -183,7 +211,7 @@ async function updateProfile(profile) {
     }
     if (avatar && !isHTTPLink) {
       try {
-        const downloadURL = await _uploadAvatar({
+        const downloadURL = await _avatarUpload({
           path: `users/${LOCAL_PROFILE.id}/`,
           fileName: 'avatar',
           avatar,
@@ -200,6 +228,10 @@ async function updateProfile(profile) {
     }
     if (avatar === null) {
       theProfile.avatar = null // so avatar can be deleted from DB
+      await _avatarDelete({
+        path: `users/${LOCAL_PROFILE.id}/`,
+        fileName: 'avatar',
+      })
       // TODO - delete avatar from storage.
     }
     DB.ref('users/' + LOCAL_PROFILE.id).update(theProfile)
