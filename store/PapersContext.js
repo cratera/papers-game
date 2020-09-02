@@ -798,7 +798,7 @@ export class PapersContextProvider extends Component {
           gameStatus =
             roundNr === 2 && game.round.status === 'finished' ? 'finished' : `round_${roundNr}`
         }
-        Analytics.logEvent('leave_game', { status: gameStatus })
+        Analytics.logEvent('game_leave', { status: gameStatus })
       }
     } catch (e) {
       this._removeGameFromState()
@@ -831,6 +831,7 @@ export class PapersContextProvider extends Component {
         await this.state.socket.removePlayer(playerId)
       }
     }
+    Analytics.logEvent('game_delete')
     await this.leaveGame({ gameDeleted: true })
   }
 
