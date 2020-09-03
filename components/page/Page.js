@@ -66,8 +66,8 @@ Page.propTypes = {
 // const isIOS = Platform.OS === 'ios'
 
 const iconsMap = {
-  back: IconArrow,
-  next: IconArrow,
+  back: () => <Text>☜ </Text>, // IconArrow
+  next: () => <Text> ☞</Text>, // IconArrow
 }
 
 const HeaderBtn = ({ side, icon, style, textPrimary, children, isLoading, ...otherProps }) => {

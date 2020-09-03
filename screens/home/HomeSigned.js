@@ -72,7 +72,7 @@ export default function HomeSigned({ navigation }) {
             style={{ marginTop: 16 }}
             onPress={() => openAccessGameModal('join')}
           >
-            Join Game
+            Join
           </Button>
         </Page.CTAs>
       </Page>

@@ -79,7 +79,12 @@ export default function AppFn({ skipLoadingScreen }) /* eslint-disable-line */ {
         <NavigationContainer ref={navigationRef} initialState={initialNavigationState}>
           <Stack.Navigator
             initialRouteName={initialProfile.gameId ? 'room' : 'home'}
-            screenOptions={{ gestureEnabled: false, headerTitleAlign: 'center' }}
+            screenOptions={{
+              headerStatusBarHeight: 10,
+
+              gestureEnabled: false,
+              headerTitleAlign: 'center',
+            }}
           >
             <Stack.Screen name="home" component={Home} />
             <Stack.Screen name="access-game" component={AccessGame} />

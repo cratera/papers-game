@@ -13,10 +13,10 @@ import { slugString } from '@constants/utils.js'
 import * as Theme from '@theme'
 import Styles from './AccessGameStyles.js'
 
-const copy = {
-  headerTitle: 'Create',
-  title: 'Give this party a name!',
-  description: 'Your friends will use it to join the game.',
+const i18n = {
+  headerTitle: 'New game',
+  title: 'Give this party a name',
+  description: 'Your friends will use this to join.',
 }
 
 export default function CreateGame({ navigation }) {
@@ -33,7 +33,7 @@ export default function CreateGame({ navigation }) {
   React.useEffect(() => {
     navigation.setOptions({
       ...headerTheme(),
-      headerTitle: copy.headerTitle,
+      headerTitle: i18n.headerTitle,
       headerLeft: function HLB() {
         return (
           <Page.HeaderBtn side="left" onPress={goHome}>
@@ -58,7 +58,7 @@ export default function CreateGame({ navigation }) {
                 isLoading={isCreating}
                 onPress={submit}
               >
-                Add Friends
+                Next
               </Page.HeaderBtn>
             )
           }
@@ -81,18 +81,16 @@ export default function CreateGame({ navigation }) {
             </Text>
           ) : (
             <ScrollView>
-              <Text style={[Styles.title, Theme.typography.h3]}>{copy.title}</Text>
-              <Text nativeID="inputNameLabel" style={[Styles.tip, Theme.typography.secondary]}>
-                {copy.description}
-              </Text>
+              <Text style={[Styles.title, Theme.typography.body]}>{i18n.title}</Text>
 
               <TextInput
-                style={[Theme.typography.h1, Styles.input]}
+                style={[Theme.typography.h2, Styles.input]}
                 inputAccessoryViewID="name"
                 autoFocus
                 autoCorrect={false}
                 nativeID="inputNameLabel"
                 defaultValue={state.gameName}
+                placeholder="Choose a name..."
                 onChangeText={handleInputChange}
               />
               {state.isInvalid && (
@@ -105,6 +103,9 @@ export default function CreateGame({ navigation }) {
                   {state.errorMsg}
                 </Text>
               )}
+              <Text nativeID="inputNameLabel" style={[Styles.tip, Theme.typography.secondary]}>
+                {i18n.description}
+              </Text>
             </ScrollView>
           )}
         </View>

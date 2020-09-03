@@ -8,16 +8,16 @@ export default StyleSheet.create({
   },
   tip: {
     textAlign: 'center',
-    marginTop: 8,
+    marginTop: 24,
     marginBottom: 0,
   },
   input: {
-    borderBottomColor: Theme.colors.grayLight,
-    borderBottomWidth: 1,
+    borderBottomColor: Theme.colors.grayDark,
+    borderBottomWidth: 2,
     textAlign: 'center',
-    marginTop: 32,
+    marginTop: 4,
     color: Theme.colors.grayDark,
-    height: 60,
+    height: 76,
   },
   code: {
     display: 'flex',
@@ -37,6 +37,8 @@ export default StyleSheet.create({
   code_maskDigit: {
     textAlign: 'center',
     width: 25,
+    fontFamily: 'karla-regular',
+    // fontVariantNumeric: 'tabular-nums',
   },
   code_maskPlaceholder: {
     color: Theme.colors.grayMedium,

@@ -12,7 +12,7 @@ import { slugString } from '@constants/utils.js'
 import * as Theme from '@theme'
 import Styles from './AccessGameStyles.js'
 
-const copy = {
+const i18n = {
   headerTitle: 'Join',
   nameLabel: 'Enter the party name',
   codeLabel: 'Access code',
@@ -36,7 +36,7 @@ export default function JoinGame({ navigation }) {
   React.useEffect(() => {
     navigation.setOptions({
       ...headerTheme(),
-      headerTitle: copy.headerTitle,
+      headerTitle: i18n.headerTitle,
       headerLeft: function HLB() {
         return (
           <Page.HeaderBtn side="left" onPress={goHome}>
@@ -113,10 +113,10 @@ export default function JoinGame({ navigation }) {
             <ScrollView keyboardShouldPersistTaps="always">
               {step === 0 ? (
                 <>
-                  <Text style={[Styles.title, Theme.typography.h3]}>{copy.nameLabel}</Text>
+                  <Text style={[Styles.title, Theme.typography.body]}>{i18n.nameLabel}</Text>
                   <TextInput
                     key="name"
-                    style={[Theme.typography.h1, Styles.input]}
+                    style={[Theme.typography.h2, Styles.input]}
                     inputAccessoryViewID="name"
                     nativeID="inputNameLabel"
                     autoFocus
@@ -127,7 +127,7 @@ export default function JoinGame({ navigation }) {
                 </>
               ) : (
                 <>
-                  <Text style={[Styles.title, Theme.typography.h3]}>{copy.codeLabel}</Text>
+                  <Text style={[Styles.title, Theme.typography.h3]}>{i18n.codeLabel}</Text>
                   <View style={Styles.code} accessibilityLabel={`Code: ${state.code}`}>
                     {[0, 0, 0, 0].map((c, index) => (
                       <View key={index} style={Styles.code}>
