@@ -81,7 +81,7 @@ yarn release:ota -- -m "x.x.x@xx ![release summary]"
   # after a few seconds it asks for app-specific password
   # Go to secrets or https://appleid.apple.com/account/manage
 
-  # wait 1min... and then wait more ~15 minutes... be patient...
+  # wait 2min... and then wait more ~20 minutes... be patient...
   # After, go to AppStoreConnect. The the new build is there. It will take a few hours to process the build
 ```
 
