@@ -595,17 +595,17 @@ const AvatarSquare = ({ avatar, style, onChange }) => {
                   StylesAv.place,
                   StylesAv.img,
                   {
-                    tintColor: 'red',
+                    // tintColor: Theme.colors.yellow,
                   },
                 ]}
                 source={{ uri: avatar }}
                 accessibilityLabel=""
               />
-              <Image
+              {/* <Image
                 style={[StylesAv.place, StylesAv.img, { position: 'absolute', opacity: 0.3 }]}
                 source={{ uri: avatar }}
                 accessibilityLabel="Profile photo"
-              />
+              /> */}
             </View>
           </>
         ) : (

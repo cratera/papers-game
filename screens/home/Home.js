@@ -10,7 +10,7 @@ import Page from '@components/page'
 import HomeSigned from './HomeSigned.js'
 import HomeSignup from './HomeSignup.js'
 
-// import * as Theme from '@theme'
+import * as Theme from '@theme'
 
 export default function HomeScreen({ navigation }) {
   const Papers = React.useContext(PapersContext)
@@ -27,7 +27,11 @@ export default function HomeScreen({ navigation }) {
 
   React.useEffect(() => {
     navigation.setOptions({
-      ...headerTheme({ hiddenBorder: true, hiddenTitle: true }),
+      ...headerTheme({
+        hiddenBorder: true,
+        hiddenTitle: true,
+        bgColor: profile.name ? Theme.colors.purple : Theme.colors.bg,
+      }),
       headerTitle: profile.name ? 'Home' : 'Create Profile',
       headerRight: function HBS() {
         return profile.name ? <Page.HeaderBtnSettings /> : null

@@ -4,8 +4,9 @@ import * as Theme from '@theme'
 
 export const headerTheme = (opts = {}) => ({
   headerTintColor: Theme.colors.grayMedium,
+  // headerTransparent: true,
   headerStyle: {
-    backgroundColor: Theme.colors[opts.dark ? 'grayDark' : 'bg'],
+    backgroundColor: opts.bgColor || Theme.colors.bg,
     ...headerBorder(!opts.hiddenBorder),
     // height: 80, // Don't add height, otherwise screens will jump. meh.
   },

@@ -56,9 +56,9 @@ export default function HomeSigned({ navigation }) {
 
   return (
     <Fragment>
-      <Page bgFill={false}>
+      <Page bgFill={Theme.colors.purple}>
         <Page.Main style={[Styles.main, { justifyContent: 'center' }]}>
-          <AvatarMeme avatar={profile.avatar} onChange={handleChangeAvatar} />
+          {/* <AvatarMeme avatar={profile.avatar} onChange={handleChangeAvatar} /> */}
           <Text style={[Theme.typography.body, Theme.u.center]}>
             Welcome
             {'\n'}

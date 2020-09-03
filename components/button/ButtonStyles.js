@@ -3,8 +3,8 @@ import * as Theme from '@theme'
 
 const variants = {
   primary: {
-    bg: Theme.colors.primary,
-    text: Theme.colors.bg,
+    bg: Theme.colors.bg,
+    text: Theme.colors.grayDark,
   },
   success: {
     bg: Theme.colors.success,
@@ -15,7 +15,7 @@ const variants = {
     text: Theme.colors.bg,
   },
   light: {
-    bg: Theme.colors.bg,
+    bg: 'transparent',
     text: Theme.colors.grayDark,
   },
   flat: {
@@ -33,9 +33,9 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   base: {
-    minHeight: 44,
-    borderRadius: 22,
-    paddingHorizontal: 24,
+    minHeight: 52,
+    borderRadius: 4,
+    // paddingHorizontal: 36,
     overflow: 'hidden', // so borderRadius works.
     display: 'flex',
     flexDirection: 'row',
@@ -46,8 +46,8 @@ const styles = StyleSheet.create({
   // ------- variants
 
   primary: {
-    borderWidth: 1,
-    borderColor: Theme.colors.primary,
+    borderWidth: 2,
+    borderColor: Theme.colors.grayDark,
   },
   icon: {
     width: 44,
@@ -69,14 +69,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
   },
   light: {
-    borderWidth: 1,
-    borderColor: Theme.colors.grayMedium,
+    borderWidth: 2,
+    borderColor: Theme.colors.grayDark,
   },
 
   // --------- sizes
   sm: {
     minHeight: 34,
-    borderRadius: 17,
+    // borderRadius: 17,
     paddingVertical: 5,
     paddingHorizontal: 15,
   },
@@ -107,6 +107,7 @@ export const btnWrapper = ({ variant, size, place, bgColor }) => {
 
 export const btnText = ({ variant, size, color }) => {
   return {
+    fontFamily: 'youngSerif-regular',
     fontSize: stylesSize[size],
     color: color || variants[variant].text,
   }
