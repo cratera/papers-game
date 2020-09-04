@@ -71,12 +71,8 @@ const iconsMap = {
 }
 
 const HeaderBtn = ({ side, icon, style, textPrimary, children, isLoading, ...otherProps }) => {
-  if (__DEV__ && style) {
-    // TODO later this...
-    console.warn('HeaderBtn - style is used:', children)
-  }
   const IconMapped = iconsMap[icon]
-  const color = textPrimary ? Theme.colors.primary : Theme.colors.grayMedium
+  const color = textPrimary ? Theme.colors.grayDark : Theme.colors.grayMedium
   return (
     <Button
       variant="flat"

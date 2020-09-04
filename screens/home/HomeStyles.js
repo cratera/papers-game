@@ -29,16 +29,12 @@ export default StyleSheet.create({
     textAlign: 'center',
     // margin: 80 auto;
   },
-  label: {
-    textAlign: 'center',
-    color: Theme.colors.grayMedium,
-  },
   input: {
-    borderBottomColor: Theme.colors.grayLight,
-    borderBottomWidth: 1,
+    borderBottomColor: Theme.colors.grayDark,
+    borderBottomWidth: 2,
     textAlign: 'center',
-    marginTop: 48,
-    height: 60,
+    marginTop: 4,
+    height: 76,
 
     // ${Theme.bp.xs} {
     //   margin-top: 1.6rem;
@@ -56,7 +52,9 @@ export default StyleSheet.create({
     width: 256,
     height: 256,
     borderRadius: 140,
-    backgroundColor: Theme.colors.primaryLight,
+    // backgroundColor: Theme.colors.purple,
+    borderColor: Theme.colors.grayDark,
+    borderWidth: 2,
     alignSelf: 'center',
   },
   avatarPlaceContent: {
@@ -77,7 +75,7 @@ export default StyleSheet.create({
   },
   avatarTxt: {
     fontSize: 16,
-    color: Theme.colors.primary,
+    color: Theme.colors.grayDark,
   },
 
   feedback: {

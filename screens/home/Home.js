@@ -30,7 +30,7 @@ export default function HomeScreen({ navigation }) {
       ...headerTheme({
         hiddenBorder: true,
         hiddenTitle: true,
-        bgColor: profile.name ? Theme.colors.purple : Theme.colors.bg,
+        bgColor: Theme.colors.purple,
       }),
       headerTitle: profile.name ? 'Home' : 'Create Profile',
       headerRight: function HBS() {

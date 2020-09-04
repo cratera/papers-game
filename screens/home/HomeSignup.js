@@ -38,7 +38,7 @@ export default class HomeSignup extends React.Component {
 
   componentDidMount() {
     this.props.navigation.setOptions({
-      ...headerTheme({ hiddenTitle: true, hiddenBorder: true }),
+      ...headerTheme({ hiddenTitle: true, hiddenBorder: true, bgColor: Theme.colors.purple }),
       headerLeft: null,
       headerRight: null,
     })
@@ -85,13 +85,10 @@ export default class HomeSignup extends React.Component {
     }[state.step]
 
     return (
-      <Page bgFill={state.step !== 0}>
+      <Page bgFill={state.step === 0 ? Theme.colors.purple : Theme.colors.bg}>
         <Page.Main style={Styles.main}>
           <CurrentStep />
         </Page.Main>
-        <Page.CTAs>
-          {state.step === 0 && <Button onPress={this.goNextStep}>Start</Button>}
-        </Page.CTAs>
       </Page>
     )
   }
@@ -99,15 +96,10 @@ export default class HomeSignup extends React.Component {
   stepWelcome() {
     return (
       <View style={Styles.content}>
-        <Text style={[Theme.typography.h1, Theme.u.center]}>Welcome!</Text>
-        <Text style={[Theme.typography.secondary, Styles.paragraph]}>
-          Papers is the perfect game for your{' '}
-          <Text style={Theme.typography.secondary} numberOfLines={1}>
-            dinner party.
-          </Text>
-          {'\n'}
-          <Text style={Theme.typography.secondary}>Made with love by Maggie and Sandy.</Text>
-        </Text>
+        <Text style={[Theme.typography.h1, Theme.u.center]}>Papers</Text>
+        <View style={{ width: 280, marginTop: 48 }}>
+          <Button onPress={this.goNextStep}>Play game</Button>
+        </View>
       </View>
     )
   }
@@ -115,11 +107,11 @@ export default class HomeSignup extends React.Component {
   stepName() {
     return (
       <View style={{ flex: 1, alignSelf: 'stretch' }}>
-        <Text nativeID="inputNameLabel" style={[Styles.label, Theme.typography.body]}>
-          What should we call you?
+        <Text nativeID="inputNameLabel" style={[Theme.typography.body, Theme.u.center]}>
+          What's your name?
         </Text>
         <TextInput
-          style={[Theme.typography.h1, Styles.input]}
+          style={[Theme.typography.h2, Styles.input]}
           inputAccessoryViewID="name"
           autoFocus
           nativeID="inputNameLabel"
@@ -162,6 +154,7 @@ export default class HomeSignup extends React.Component {
     if (currentStep === 0) {
       this.props.navigation.setOptions({
         headerStyle: headerBorder(true),
+        // ...headerTheme({ hiddenTitle: true, hiddenBorder: true, bgColor: Theme.colors.bg }),
         headerLeft: () => (
           <Page.HeaderBtn side="left" icon="back" onPress={this.goBackStep}>
             Back
