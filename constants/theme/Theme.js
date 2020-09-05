@@ -1,8 +1,8 @@
 import { StyleSheet } from 'react-native'
 
 export const colors = {
-  grayDark: '#000',
-  grayMedium: '#7F848E',
+  grayDark: '#000000',
+  grayMedium: 'rgba(0, 0, 0, 0.5)',
   grayLight: '#E5E6E8',
   grayBg: '#F7F8FA',
   primary: '#FF8F50',
@@ -79,6 +79,9 @@ export const typography = StyleSheet.create({
 export const u = StyleSheet.create({
   center: {
     textAlign: 'center',
+  },
+  cardEdge: {
+    marginHorizontal: -16,
   },
   scrollSideOffset: {
     // move scrollbar to the edge.

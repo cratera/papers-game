@@ -2,11 +2,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import { View, Text, TextInput } from 'react-native'
-import { ScrollView } from 'react-native-gesture-handler'
 
 import PapersContext from '@store/PapersContext.js'
 import Page from '@components/page'
-// import Button from '@components/button'
+import LoadingBadge from '@components/LoadingBadge.js'
 import { headerTheme } from '@navigation/headerStuff.js'
 import { slugString } from '@constants/utils.js'
 
@@ -76,11 +75,9 @@ export default function CreateGame({ navigation }) {
         > */}
         <View>
           {isCreating ? (
-            <Text style={[Theme.typography.secondary, Theme.u.center, { marginTop: 150 }]}>
-              Creating game...
-            </Text>
+            <LoadingBadge>Creating game</LoadingBadge>
           ) : (
-            <ScrollView>
+            <>
               <Text style={[Styles.title, Theme.typography.body]}>{i18n.title}</Text>
 
               <TextInput
@@ -106,7 +103,7 @@ export default function CreateGame({ navigation }) {
               <Text nativeID="inputNameLabel" style={[Styles.tip, Theme.typography.secondary]}>
                 {i18n.description}
               </Text>
-            </ScrollView>
+            </>
           )}
         </View>
         {/* </KeyboardAvoidingView> */}

@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { View, Text } from 'react-native'
+import { Animated, Easing, Platform, Dimensions, StyleSheet, View, Text } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 
 import * as Analytics from '@constants/analytics.js'
@@ -17,6 +17,84 @@ import ListTeams from '@components/list-teams'
 import { useLeaveGame } from '@components/settings'
 import { headerTheme } from '@navigation/headerStuff.js'
 
+const height = Dimensions.get('window').height
+const width = Dimensions.get('window').width
+
+const StylesBubble = StyleSheet.create({
+  bg: {
+    position: 'absolute',
+    width: width,
+    height: height,
+    overflow: 'hidden',
+    zIndex: 3,
+  },
+  bubble: {
+    top: height / 2,
+    left: width / 2,
+    width: height,
+    height: height,
+    borderRadius: height / 2,
+  },
+})
+
+const Bubbling = () => {
+  const scaleGrow = React.useRef(new Animated.Value(0)).current
+
+  React.useEffect(() => {
+    Animated.timing(scaleGrow, {
+      toValue: 1,
+      duration: 1500,
+      easing: Easing.bezier(0, 0.5, 0.6, 1),
+      useNativeDriver: Platform.OS !== 'web',
+    }).start()
+  }, [])
+
+  return (
+    <Animated.View
+      pointerEvents="none"
+      style={[
+        StylesBubble.bg,
+        {
+          backgroundColor: Theme.colors.bg,
+          opacity: scaleGrow.interpolate({
+            inputRange: [0, 0.8, 0.9, 1],
+            outputRange: [1, 1, 0, 0],
+          }),
+        },
+      ]}
+    >
+      <Animated.View
+        style={[
+          StylesBubble.bubble,
+
+          {
+            backgroundColor: Theme.colors.yellow,
+
+            transform: [
+              {
+                translateX: height / -2,
+              },
+              {
+                translateY: height / -1.5,
+              },
+              // {
+              //   scale: 1.5,
+              // },
+              {
+                scale: scaleGrow.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, 2],
+                }),
+              },
+              { perspective: 1000 },
+            ],
+          },
+        ]}
+      />
+    </Animated.View>
+  )
+}
+
 export default function LobbyJoining({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const { askToLeaveGame } = useLeaveGame({ navigation })
@@ -27,13 +105,13 @@ export default function LobbyJoining({ navigation }) {
   const creatorId = hasGame && game.creatorId
   const profileIsAdmin = creatorId === profileId
   const playersKeys = hasGame ? Object.keys(game.players) : []
-  const hasEnoughPlayers = playersKeys.length >= 4
+  const neededPlayers = 4 - playersKeys.length
   const wordsAreStored = !!game?.words?.[profileId]
 
   React.useEffect(() => {
     navigation.setOptions({
-      ...headerTheme(),
-      headerTitle: 'New game',
+      // ...headerTheme({ hiddenBorder: false }),
+      // headerTitle: 'New game',
       headerLeft: function HLB() {
         return (
           <Page.HeaderBtn side="left" onPress={askToLeaveGame}>
@@ -46,7 +124,7 @@ export default function LobbyJoining({ navigation }) {
   }, [])
 
   React.useEffect(() => {
-    if (profileIsAdmin && hasEnoughPlayers && !hasTeams) {
+    if (profileIsAdmin && !neededPlayers && !hasTeams) {
       navigation.setOptions({
         headerRight: function HLB() {
           return (
@@ -72,7 +150,7 @@ export default function LobbyJoining({ navigation }) {
         headerRight: null,
       })
     }
-  }, [profileIsAdmin, hasEnoughPlayers, hasTeams])
+  }, [profileIsAdmin, neededPlayers, hasTeams])
 
   React.useEffect(() => {
     if (hasTeams) {
@@ -103,46 +181,35 @@ export default function LobbyJoining({ navigation }) {
     // Analysis: It seems this component stops receiving new updates from context.
     // Maybe it's a bug with the hot reload (RN or Expo?) It does not happen on browser.
     // I hope this never happens IRL.
-
+    // Update September: This probably is a hotreload bug. never happened in prod, not even once.
     return null
-    // return (
-    //   <View>
-    //     <Text>Ups! Game does not exist...</Text>
-    //     <Button onPress={() => navigation.navigate('home')}>Go Home</Button>
-    //   </View>
-    // )
   }
 
   return (
-    <Page>
+    <Page bgFill={Theme.colors.yellow}>
+      <Bubbling />
       <Page.Main>
         {!game.teams ? (
           <>
-            <View style={Styles.header}>
-              <Text style={[Theme.typography.small]}>Ask your friends to join:</Text>
-              <View style={Styles.header_title}>
-                <Text style={[Theme.typography.h1]}>{game.name}</Text>
-                {/* TODO Later - Share game. */}
-              </View>
-              <View>
-                <Text style={[Theme.typography.small, { marginBottom: 4 }]}>Access code</Text>
-                <Text style={[Theme.typography.body]} accessibilityLabel={game.code.toString()}>
-                  {game.code.toString().split('').join('・')}
-                </Text>
-              </View>
+            <View style={[Styles.header, Theme.u.cardEdge]}>
+              <Text style={[Theme.typography.secondary]}>Ask your friends to join</Text>
+              <Text style={[Styles.header_title, Theme.typography.h1]}>{game.name}</Text>
+              <Text style={[Theme.typography.body]} accessibilityLabel={game.code.toString()}>
+                {game.code.toString().split('').join('・')}
+              </Text>
             </View>
 
             <ScrollView
               style={[Theme.u.scrollSideOffset, Styles.list]}
               contentContainerStyle={{ paddingBottom: 8 }}
             >
-              <Text style={Theme.typography.h3}>Lobby</Text>
-              {!hasEnoughPlayers && (
-                <Text style={[Theme.typography.small, { marginTop: 4 }]}>
-                  Waiting for your friends to join (4 minimum)
-                </Text>
-              )}
               <ListPlayers players={playersKeys} enableKickout />
+
+              {neededPlayers ? (
+                <Text style={[Theme.typography.secondary, Theme.u.center, { marginTop: 16 }]}>
+                  Need {neededPlayers} more
+                </Text>
+              ) : null}
             </ScrollView>
           </>
         ) : (
@@ -151,9 +218,9 @@ export default function LobbyJoining({ navigation }) {
           </ScrollView>
         )}
       </Page.Main>
-      <Page.CTAs hasOffset={profileIsAdmin && hasEnoughPlayers}>
-        {game.teams && <Button onPress={goToWritePapers}>Write papers</Button>}
-        {__DEV__ && game.teams && profileIsAdmin && (
+      <Page.CTAs hasOffset={profileIsAdmin && !neededPlayers}>
+        {game.teams ? <Button onPress={goToWritePapers}>Write papers</Button> : null}
+        {/* {__DEV__ && game.teams && profileIsAdmin && (
           <Button
             variant="danger"
             onPress={Papers.setWordsForEveyone}
@@ -161,7 +228,7 @@ export default function LobbyJoining({ navigation }) {
           >
             {"💥 Write everyone's papers 💥"}
           </Button>
-        )}
+        )} */}
       </Page.CTAs>
     </Page>
   )

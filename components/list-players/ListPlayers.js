@@ -84,6 +84,18 @@ export default function ListPlayers({ players, enableKickout, isStatusVisible, .
         const status = isStatusVisible && (!wordsSubmitted ? 'writting' : 'done')
         const imgInfo = status && imgMap[status]
         const canKickOut = enableKickout && playerId !== profileId && (hasTeams || profileIsAdmin)
+        const playerDescription =
+          playerId === game.creatorId
+            ? playerId === profileId
+              ? ''
+              : game.hasStarted
+              ? ''
+              : !hasEnoughPlayers
+              ? 'Creating game...'
+              : !game.teams
+              ? 'Creating teams...'
+              : ''
+            : ''
         return (
           <TouchableHighlight
             underlayColor={Theme.colors.bg}
@@ -98,25 +110,17 @@ export default function ListPlayers({ players, enableKickout, isStatusVisible, .
                     {name}
                     {playerId === profileId && <Text> (you)</Text>}
                   </Text>
-                  <Text style={[Theme.typography.small, Theme.typography.seconday]}>
-                    {playerId === game.creatorId
-                      ? playerId === profileId
-                        ? ''
-                        : game.hasStarted
-                        ? ''
-                        : !hasEnoughPlayers
-                        ? 'Creating game...'
-                        : !game.teams
-                        ? 'Creating teams...'
-                        : ''
-                      : ''}
-                    {/* {isAfk && (
+                  {playerDescription ? (
+                    <Text style={[Theme.typography.small, Theme.typography.seconday]}>
+                      {playerDescription}{' '}
+                    </Text>
+                  ) : null}
+                  {/* {isAfk && (
                     // This seems buggy... remove it for now.
                     <Text style={[Theme.typography.small, { color: Theme.colors.primary }]}>
                       Disconnected
                     </Text>
                   )} */}
-                  </Text>
                 </View>
               </View>
               <View style={Styles.ctas}>

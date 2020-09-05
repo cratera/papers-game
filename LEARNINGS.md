@@ -11,6 +11,7 @@ Here's a list of my learnings while building this mobile game with reac-native.
 - Do a simple carousel/slider (for WritePapers) - based [on this code](https://github.com/catalinmiron/react-native-aiaiai-carousel-animation)
 - Android: `<Views/>` inside `<Text/>` must have explicit width and height.
 - Android: Use `keyboardType="visible-password"` in `TextInput` to remove auto suggestions (gif, photo, etc...)
+- Custom header height - [avoid screen jumps](https://github.com/react-navigation/react-navigation/issues/5936)
 
 ## Expo
 

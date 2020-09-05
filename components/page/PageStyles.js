@@ -6,10 +6,17 @@ const gutter = 16
 export default StyleSheet.create({
   page: {
     width: '100%',
-    maxWidth: 500,
-    marginHorizontal: 'auto',
     flex: 1,
     alignItems: 'stretch',
+  },
+  pageInner: {
+    width: '100%',
+    paddingTop: 70, // header height
+    maxWidth: 500,
+    marginHorizontal: 'auto',
+    flexGrow: 1,
+    flexShrink: 1 /* so it scrolls */,
+    alignSelf: 'stretch',
   },
   main: {
     flexGrow: 1,

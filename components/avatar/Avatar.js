@@ -40,6 +40,8 @@ Avatar.propTypes = {
 const Styles = StyleSheet.create({
   avatar: {
     backgroundColor: Theme.colors.primaryLight,
+    borderColor: Theme.colors.grayDark,
+    borderWidth: 2,
   },
   margin: {
     marginRight: 16,
@@ -47,11 +49,11 @@ const Styles = StyleSheet.create({
   size_md: {
     width: 40,
     height: 40,
-    borderRadius: 24,
+    // borderRadius: 24,
   },
   size_lg: {
     width: 56,
     height: 56,
-    borderRadius: 28,
+    // borderRadius: 28,
   },
 })

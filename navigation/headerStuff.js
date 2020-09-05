@@ -4,13 +4,14 @@ import * as Theme from '@theme'
 
 export const headerTheme = (opts = {}) => ({
   headerTintColor: Theme.colors.grayMedium,
-  // headerTransparent: true,
-  // headerStatusBarHeight: 20,
-  headerStyle: {
-    backgroundColor: opts.bgColor || Theme.colors.bg,
-    ...headerBorder(!opts.hiddenBorder),
-    // height: 80, // Don't add height, otherwise screens will jump. meh.
-  },
+  headerStatusBarHeight: 20,
+  headerTransparent: true, // Do globally to avoid jumps in screens
+  headerTitleAlign: 'center',
+
+  // headerStyle: {
+  //   backgroundColor: opts.bgColor || Theme.colors.bg,
+  //   ...headerBorder(!opts.hiddenBorder),
+  // },
   headerTitleStyle: {
     fontFamily: 'karla-regular',
     opacity: opts.hiddenTitle ? 0 : 1,

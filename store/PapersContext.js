@@ -271,8 +271,8 @@ export class PapersContextProvider extends Component {
       const errorMsg = (errorMsgMap[e.message] || errorMsgMap.ups)()
       const isUnexError = !errorMsgMap[e.message]
 
-      console.warn(':: accessGame failed!', variant, gameName, e, errorMsg)
       if (isUnexError) {
+        console.warn(':: accessGame failed!', variant, gameName, e, errorMsg)
         Sentry.captureException(e, { tags: { pp_action: 'AG_0' } })
       }
       await this._removeGameFromState()

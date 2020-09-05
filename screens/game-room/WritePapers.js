@@ -49,8 +49,6 @@ export default function WritePapers({ navigation }) {
 
   React.useEffect(() => {
     navigation.setOptions({
-      ...headerTheme(),
-      headerTitle: 'Write papers',
       headerLeft: function HLB() {
         return (
           <Page.HeaderBtn

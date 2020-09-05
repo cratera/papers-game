@@ -110,7 +110,7 @@ export default function JoinGame({ navigation }) {
               Joining game...
             </Text>
           ) : (
-            <ScrollView keyboardShouldPersistTaps="always">
+            <View keyboardShouldPersistTaps="always">
               {step === 0 ? (
                 <>
                   <Text style={[Styles.title, Theme.typography.body]}>{i18n.nameLabel}</Text>
@@ -165,7 +165,7 @@ export default function JoinGame({ navigation }) {
                   {state.errorMsg}
                 </Text>
               )}
-            </ScrollView>
+            </View>
           )}
         </View>
         {/* </KeyboardAvoidingView> */}

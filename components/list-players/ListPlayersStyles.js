@@ -3,14 +3,14 @@ import { StyleSheet } from 'react-native'
 
 export default StyleSheet.create({
   list: {
-    marginTop: 16,
+    marginTop: 0,
   },
   item: {
     display: 'flex',
     flexDirection: 'row',
     flexWrap: 'nowrap',
     alignItems: 'center',
-    marginBottom: 16 /* 2.4 too big */,
+    marginBottom: 24,
     justifyContent: 'space-between',
   },
   item_isLast: {

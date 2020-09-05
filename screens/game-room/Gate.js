@@ -1,5 +1,4 @@
 import React from 'react'
-import { Text } from 'react-native'
 import PropTypes from 'prop-types'
 
 import Sentry from '@constants/Sentry'
@@ -8,10 +7,10 @@ import * as Analytics from '@constants/analytics.js'
 import PapersContext from '@store/PapersContext.js'
 
 import { headerTheme } from '@navigation/headerStuff.js'
+
 import Page from '@components/page'
 import Button from '@components/button'
-import { IconSpin } from '@components/icons'
-import * as Theme from '@theme'
+import LoadingBadge from '@components/LoadingBadge'
 
 export default function Gate({ navigation, route }) {
   const Papers = React.useContext(PapersContext)
@@ -65,18 +64,19 @@ export default function Gate({ navigation, route }) {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          paddingTop: 200,
         }}
       >
-        <IconSpin size={24} />
-
-        <Text style={[Theme.typography.secondary, { marginTop: 16, marginBottom: 40 }]}>
+        <LoadingBadge>
           {`${goal === 'rejoin' ? 'Rejoining' : 'Leaving'} "${
             profileGameId.split('_')[0]
           }" game...`}
-        </Text>
+        </LoadingBadge>
 
-        {isSlow ? <Button onPress={handleCancel}>Go to homepage</Button> : null}
+        {isSlow ? (
+          <Button style={{ marginTop: 40 }} onPress={handleCancel}>
+            Go to homepage
+          </Button>
+        ) : null}
       </Page.Main>
     </Page>
   )

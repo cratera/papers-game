@@ -46,14 +46,14 @@ const Page = ({ children, bgFill, bannerMsg, ...otherProps }) => {
         ]}
         {...otherProps}
       >
-        {children}
+        <View style={Styles.pageInner}>{children}</View>
       </SafeAreaView>
     </>
   )
 }
 
 Page.defaultProps = {
-  bgFill: Theme.colors.grayBg,
+  bgFill: Theme.colors.bg,
 }
 
 Page.propTypes = {
@@ -85,6 +85,7 @@ const HeaderBtn = ({ side, icon, style, textPrimary, children, isLoading, ...oth
         {side === 'left' && IconMapped && (
           <IconMapped
             size={16}
+            color={Theme.colors.grayMedium}
             style={{ transform: [{ rotate: '180deg' }, { translateY: -2 }, { translateX: 3 }] }}
           />
         )}

@@ -1,9 +1,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+
 // import * as WebBrowser from 'expo-web-browser'; // WHAT'S THIS?
 
 import { createStackNavigator } from '@react-navigation/stack'
 import PapersContext from '@store/PapersContext.js'
+
+import { headerTheme } from '@navigation/headerStuff.js'
+import { cardForFade } from '@constants/animations'
+
 import Gate from './Gate'
 import LobbyJoining from './LobbyJoining.js'
 import Teams from './Teams.js'
@@ -72,22 +77,44 @@ export default function GameRoomEntry({ navigation, route }) {
 
   return (
     <Stack.Navigator
-      screenOptions={{ gestureEnabled: false, headerTitleAlign: 'center' }}
+      screenOptions={{
+        gestureEnabled: false,
+
+        // headerStyleInterpolator: headerFor,
+        cardStyleInterpolator: cardForFade,
+        // animationEnabled: false,
+        ...headerTheme(),
+      }}
       initialRouteName={initialRouter}
     >
       {isPlaying ? (
         <>
-          <Stack.Screen name="playing" headerTitle="Playing" component={Playing} />
+          <Stack.Screen name="playing" component={Playing} headerTitle="Playing" />
         </>
       ) : (
         <>
-          <Stack.Screen name="lobby-joining" headerTitle="New game" component={LobbyJoining} />
-          <Stack.Screen name="teams" headerTitle="Teams" component={Teams} />
-          <Stack.Screen name="write-papers" headerTitle="Write papers" component={WritePapers} />
-          <Stack.Screen name="lobby-writing" headerTitle="Writting" component={LobbyWriting} />
+          <Stack.Screen
+            name="lobby-joining"
+            component={LobbyJoining}
+            options={{ headerTitle: 'New game' }}
+          />
+          <Stack.Screen name="teams" component={Teams} />
+          <Stack.Screen
+            name="write-papers"
+            component={WritePapers}
+            options={{ headerTitle: 'Write Papers' }}
+          />
+          <Stack.Screen name="lobby-writing" component={LobbyWriting} />
         </>
       )}
-      <Stack.Screen name="gate" component={Gate} />
+      <Stack.Screen
+        name="gate"
+        component={Gate}
+        options={{
+          title: '',
+          headerShown: false,
+        }}
+      />
     </Stack.Navigator>
   )
 }

@@ -8,13 +8,13 @@ import * as Font from 'expo-font'
 // import { Ionicons } from '@expo/vector-icons'; // Q: How to remove this from bundle?
 
 import { NavigationContainer } from '@react-navigation/native'
-import { createStackNavigator } from '@react-navigation/stack'
+import { HeaderStyleInterpolators, createStackNavigator } from '@react-navigation/stack'
 
 import Sentry from '@constants/Sentry'
 // import { SCREEN_FADE } from '@constants/constants'
 
 import useLinking from './navigation/useLinking'
-
+import { headerForFade, cardForFade } from './constants/animations'
 import { PapersContextProvider, loadProfile } from './store/PapersContext.js'
 import Home from './screens/home'
 import GameRoom from './screens/game-room'
@@ -22,12 +22,6 @@ import Settings from './screens/settings'
 import AccessGame from './screens/access-game'
 
 const Stack = createStackNavigator()
-
-const forFade = ({ current, closing }) => ({
-  cardStyle: {
-    opacity: current.progress,
-  },
-})
 
 export default function AppFn({ skipLoadingScreen }) /* eslint-disable-line */ {
   const [initialProfile, setInitialProfile] = React.useState({})
@@ -80,18 +74,30 @@ export default function AppFn({ skipLoadingScreen }) /* eslint-disable-line */ {
           <Stack.Navigator
             initialRouteName={initialProfile.gameId ? 'room' : 'home'}
             screenOptions={{
-              headerStatusBarHeight: 10,
-
               gestureEnabled: false,
+              headerStatusBarHeight: 20,
+              headerTransparent: true, // Do globally to avoid jumps in screens
               headerTitleAlign: 'center',
+              // headerStyleInterpolator: HeaderStyleInterpolators.forFade,
+              cardStyleInterpolator: cardForFade,
+              // animationEnabled: false,
             }}
           >
-            <Stack.Screen name="home" component={Home} />
-            <Stack.Screen name="access-game" component={AccessGame} />
+            <Stack.Screen name="home" component={Home} options={{ title: '' }} />
+            <Stack.Screen
+              name="access-game"
+              component={AccessGame}
+              options={{
+                title: '',
+                headerLeft: null,
+              }}
+            />
             <Stack.Screen
               name="room"
               component={GameRoom}
-              options={{ cardStyleInterpolator: forFade, headerShown: false }}
+              options={{
+                headerShown: false,
+              }}
             />
             <Stack.Screen name="settings" component={Settings} />
           </Stack.Navigator>
@@ -104,6 +110,5 @@ export default function AppFn({ skipLoadingScreen }) /* eslint-disable-line */ {
 const Styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
 })

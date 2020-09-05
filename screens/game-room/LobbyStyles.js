@@ -5,17 +5,21 @@ export default StyleSheet.create({
   header: {
     display: 'flex',
     flexDirection: 'column',
+    alignItems: 'center',
     paddingTop: 24,
-    paddingBottom: 32,
-    marginBottom: 8, // + 24 from lobby below
-    borderBottomColor: Theme.colors.grayLight,
+    paddingBottom: 24,
+    // #fakeHeaderBorder
+    borderTopColor: Theme.colors.grayDark,
+    borderTopWidth: 1,
+
+    borderBottomColor: Theme.colors.grayDark,
     borderBottomWidth: 1,
   },
   header_title: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    marginTop: 6,
-    marginBottom: 10,
+    // display: 'flex',
+    // justifyContent: 'space-between',
+    marginTop: 16,
+    marginBottom: 16,
   },
 
   // Header in Writting
