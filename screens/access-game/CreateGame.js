@@ -67,7 +67,7 @@ export default function CreateGame({ navigation }) {
 
   return (
     <Page bannerMsg={state.isUnexError && state.errorMsg}>
-      <Page.Main>
+      <Page.Main headerDivider>
         {/* <KeyboardAvoidingView
           behavior={'padding'}
           keyboardShouldPersistTaps="always"

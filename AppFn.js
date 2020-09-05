@@ -8,13 +8,12 @@ import * as Font from 'expo-font'
 // import { Ionicons } from '@expo/vector-icons'; // Q: How to remove this from bundle?
 
 import { NavigationContainer } from '@react-navigation/native'
-import { HeaderStyleInterpolators, createStackNavigator } from '@react-navigation/stack'
+import { createStackNavigator } from '@react-navigation/stack'
 
 import Sentry from '@constants/Sentry'
-// import { SCREEN_FADE } from '@constants/constants'
-
+import { headerTheme } from './navigation/headerStuff.js'
 import useLinking from './navigation/useLinking'
-import { headerForFade, cardForFade } from './constants/animations'
+import { cardForFade } from './constants/animations'
 import { PapersContextProvider, loadProfile } from './store/PapersContext.js'
 import Home from './screens/home'
 import GameRoom from './screens/game-room'
@@ -75,12 +74,8 @@ export default function AppFn({ skipLoadingScreen }) /* eslint-disable-line */ {
             initialRouteName={initialProfile.gameId ? 'room' : 'home'}
             screenOptions={{
               gestureEnabled: false,
-              headerStatusBarHeight: 20,
-              headerTransparent: true, // Do globally to avoid jumps in screens
-              headerTitleAlign: 'center',
-              // headerStyleInterpolator: HeaderStyleInterpolators.forFade,
+              ...headerTheme(),
               cardStyleInterpolator: cardForFade,
-              // animationEnabled: false,
             }}
           >
             <Stack.Screen name="home" component={Home} options={{ title: '' }} />
@@ -89,7 +84,6 @@ export default function AppFn({ skipLoadingScreen }) /* eslint-disable-line */ {
               component={AccessGame}
               options={{
                 title: '',
-                headerLeft: null,
               }}
             />
             <Stack.Screen
@@ -99,7 +93,13 @@ export default function AppFn({ skipLoadingScreen }) /* eslint-disable-line */ {
                 headerShown: false,
               }}
             />
-            <Stack.Screen name="settings" component={Settings} />
+            <Stack.Screen
+              name="settings"
+              component={Settings}
+              options={{
+                title: '',
+              }}
+            />
           </Stack.Navigator>
         </NavigationContainer>
       </View>

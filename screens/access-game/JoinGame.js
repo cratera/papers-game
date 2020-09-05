@@ -2,12 +2,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import { View, Text, TextInput } from 'react-native'
-import { ScrollView } from 'react-native-gesture-handler'
+
+import { slugString } from '@constants/utils.js'
 
 import PapersContext from '@store/PapersContext.js'
 import Page from '@components/page'
-import { headerTheme } from '@navigation/headerStuff.js'
-import { slugString } from '@constants/utils.js'
+import LoadingBadge from '@components/LoadingBadge.js'
 
 import * as Theme from '@theme'
 import Styles from './AccessGameStyles.js'
@@ -35,7 +35,6 @@ export default function JoinGame({ navigation }) {
 
   React.useEffect(() => {
     navigation.setOptions({
-      ...headerTheme(),
       headerTitle: i18n.headerTitle,
       headerLeft: function HLB() {
         return (
@@ -98,17 +97,10 @@ export default function JoinGame({ navigation }) {
 
   return (
     <Page bannerMsg={state.isUnexError && state.errorMsg}>
-      <Page.Main>
-        {/* <KeyboardAvoidingView
-          behavior={'padding'}
-          keyboardShouldPersistTaps="always"
-          style={{ flex: 1, alignSelf: 'stretch' }}
-        > */}
+      <Page.Main headerDivider>
         <View>
           {isJoining ? (
-            <Text style={[Theme.typography.secondary, Theme.u.center, { marginTop: 150 }]}>
-              Joining game...
-            </Text>
+            <LoadingBadge>Joining game</LoadingBadge>
           ) : (
             <View keyboardShouldPersistTaps="always">
               {step === 0 ? (
@@ -168,7 +160,6 @@ export default function JoinGame({ navigation }) {
             </View>
           )}
         </View>
-        {/* </KeyboardAvoidingView> */}
       </Page.Main>
     </Page>
   )

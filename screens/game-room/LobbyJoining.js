@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Animated, Easing, Platform, Dimensions, StyleSheet, View, Text } from 'react-native'
+import { View, Text } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 
 import * as Analytics from '@constants/analytics.js'
@@ -10,90 +10,12 @@ import PapersContext from '@store/PapersContext.js'
 import * as Theme from '@theme'
 import Styles from './LobbyStyles.js'
 
+import Bubbling from '@components/bubbling'
 import Page from '@components/page'
 import Button from '@components/button'
 import ListPlayers from '@components/list-players'
 import ListTeams from '@components/list-teams'
 import { useLeaveGame } from '@components/settings'
-import { headerTheme } from '@navigation/headerStuff.js'
-
-const height = Dimensions.get('window').height
-const width = Dimensions.get('window').width
-
-const StylesBubble = StyleSheet.create({
-  bg: {
-    position: 'absolute',
-    width: width,
-    height: height,
-    overflow: 'hidden',
-    zIndex: 3,
-  },
-  bubble: {
-    top: height / 2,
-    left: width / 2,
-    width: height,
-    height: height,
-    borderRadius: height / 2,
-  },
-})
-
-const Bubbling = () => {
-  const scaleGrow = React.useRef(new Animated.Value(0)).current
-
-  React.useEffect(() => {
-    Animated.timing(scaleGrow, {
-      toValue: 1,
-      duration: 1500,
-      easing: Easing.bezier(0, 0.5, 0.6, 1),
-      useNativeDriver: Platform.OS !== 'web',
-    }).start()
-  }, [])
-
-  return (
-    <Animated.View
-      pointerEvents="none"
-      style={[
-        StylesBubble.bg,
-        {
-          backgroundColor: Theme.colors.bg,
-          opacity: scaleGrow.interpolate({
-            inputRange: [0, 0.8, 0.9, 1],
-            outputRange: [1, 1, 0, 0],
-          }),
-        },
-      ]}
-    >
-      <Animated.View
-        style={[
-          StylesBubble.bubble,
-
-          {
-            backgroundColor: Theme.colors.yellow,
-
-            transform: [
-              {
-                translateX: height / -2,
-              },
-              {
-                translateY: height / -1.5,
-              },
-              // {
-              //   scale: 1.5,
-              // },
-              {
-                scale: scaleGrow.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [0, 2],
-                }),
-              },
-              { perspective: 1000 },
-            ],
-          },
-        ]}
-      />
-    </Animated.View>
-  )
-}
 
 export default function LobbyJoining({ navigation }) {
   const Papers = React.useContext(PapersContext)
@@ -187,8 +109,8 @@ export default function LobbyJoining({ navigation }) {
 
   return (
     <Page bgFill={Theme.colors.yellow}>
-      <Bubbling />
-      <Page.Main>
+      <Bubbling bgStart={Theme.colors.bg} bgEnd={Theme.colors.yellow} />
+      <Page.Main headerDivider>
         {!game.teams ? (
           <>
             <View style={[Styles.header, Theme.u.cardEdge]}>

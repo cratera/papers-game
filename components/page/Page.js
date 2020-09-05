@@ -72,7 +72,7 @@ const iconsMap = {
 
 const HeaderBtn = ({ side, icon, style, textPrimary, children, isLoading, ...otherProps }) => {
   const IconMapped = iconsMap[icon]
-  const color = textPrimary ? Theme.colors.grayDark : Theme.colors.grayMedium
+  const color = Theme.colors.grayDark // textPrimary ? Theme.colors.grayDark : Theme.colors.grayMedium
   return (
     <Button
       variant="flat"
@@ -113,11 +113,18 @@ HeaderBtn.propTypes = {
 
 const HeaderBtnSettings = () => <SettingsToggle style={{ marginRight: 8 }} />
 
-const Main = ({ children, style, ...otherProps }) => {
+const Main = ({ children, style, headerDivider, ...otherProps }) => {
   React.useEffect(() => {})
 
   return (
-    <View style={[Styles.main, style]} {...otherProps}>
+    <View
+      style={[
+        Styles.main,
+        style,
+        headerDivider && { borderTopColor: Theme.colors.grayDark, borderTopWidth: 1 },
+      ]}
+      {...otherProps}
+    >
       {children}
     </View>
   )
@@ -125,6 +132,7 @@ const Main = ({ children, style, ...otherProps }) => {
 
 Main.propTypes = {
   children: PropTypes.node,
+  headerDivider: PropTypes.bool,
   style: PropTypes.oneOfType([PropTypes.array, PropTypes.object, PropTypes.number]),
 }
 

@@ -53,7 +53,7 @@ export default LoadingBadge
 
 const Styles = StyleSheet.create({
   container: {
-    marginTop: 120,
+    marginTop: 160,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',

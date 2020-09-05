@@ -4,6 +4,8 @@ import { View, StyleSheet, Text } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 
 import * as Analytics from '@constants/analytics.js'
+import Bubbling from '@components/bubbling'
+import LoadingBadge from '@components/LoadingBadge.js'
 
 import { getRandomInt } from '@constants/utils'
 import PapersContext from '@store/PapersContext.js'
@@ -31,6 +33,9 @@ function areTeamPlayersEqual(teamsOld, teamsNew) {
   return result
 }
 
+const bgStart = Theme.colors.yellow
+const bgEnd = Theme.colors.pink
+
 export default function Teams({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const { game } = Papers.state
@@ -39,9 +44,20 @@ export default function Teams({ navigation }) {
   const [isLocking, setLocking] = React.useState(false)
   const [errorMsg, setErrorMsg] = React.useState(null)
   const didMountRef = React.useRef(false)
+  const [isFakingLoading, setIsFakingLoading] = React.useState(true) // useFakeLoading
+
+  React.useEffect(() => {
+    setTimeout(() => {
+      if (didMountRef.current) setIsFakingLoading(false)
+    }, 1500)
+  }, [])
 
   React.useEffect(() => {
     didMountRef.current = true
+
+    return () => {
+      didMountRef.current = false
+    }
   }, [])
 
   React.useEffect(() => {
@@ -146,9 +162,20 @@ export default function Teams({ navigation }) {
     }
   }
 
+  if (isFakingLoading) {
+    return (
+      <Page bannerMsg={errorMsg} bgFill={bgStart}>
+        <Page.Main headerDivider>
+          <LoadingBadge>Creating teams</LoadingBadge>
+        </Page.Main>
+      </Page>
+    )
+  }
+
   return (
-    <Page bannerMsg={errorMsg}>
-      <Page.Main>
+    <Page bannerMsg={errorMsg} bgFill={bgEnd}>
+      <Bubbling bgStart={bgStart} bgEnd={bgEnd} />
+      <Page.Main headerDivider>
         <ScrollView style={Theme.u.scrollSideOffset} contentContainerStyle={{ paddingBottom: 16 }}>
           {Object.keys(tempTeams).map(teamId => {
             const { id, name, players } = tempTeams[teamId]

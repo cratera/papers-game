@@ -8,10 +8,6 @@ export default StyleSheet.create({
     alignItems: 'center',
     paddingTop: 24,
     paddingBottom: 24,
-    // #fakeHeaderBorder
-    borderTopColor: Theme.colors.grayDark,
-    borderTopWidth: 1,
-
     borderBottomColor: Theme.colors.grayDark,
     borderBottomWidth: 1,
   },
