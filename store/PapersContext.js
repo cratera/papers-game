@@ -50,7 +50,7 @@ export class PapersContextProvider extends Component {
       profiles: {}, // List of game players' profiles.
       about: {
         version: '0.2.5',
-        ota: '01',
+        ota: '03',
       },
     }
 
@@ -117,7 +117,6 @@ export class PapersContextProvider extends Component {
 
     if (__DEV__)
       console.log(`
-🎲⏳🎲⏳🎲⏳🎲⏳🎲⏳🎲⏳🎲
 ::::::::::::::::::::::::::::::
   ... Refreshing app ...
 :::::::::::::::::::::::::::::`)
