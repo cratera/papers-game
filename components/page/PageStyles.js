@@ -1,7 +1,10 @@
 import { StyleSheet } from 'react-native'
+
+import { hasNotch, isWeb } from '@constants/layout'
+
 import * as Theme from '@theme'
 
-const gutter = 16
+const edgeGutter = 16
 
 export default StyleSheet.create({
   page: {
@@ -11,7 +14,7 @@ export default StyleSheet.create({
   },
   pageInner: {
     width: '100%',
-    paddingTop: 70, // header height
+    paddingTop: isWeb ? 75 : hasNotch ? 35 : 45, // safe area
     maxWidth: 500,
     marginHorizontal: 'auto',
     flexGrow: 1,
@@ -21,7 +24,7 @@ export default StyleSheet.create({
   main: {
     flexGrow: 1,
     flexShrink: 1 /* so it scrolls */,
-    paddingHorizontal: gutter,
+    paddingHorizontal: edgeGutter,
     alignSelf: 'stretch',
   },
   banner: {
@@ -34,6 +37,10 @@ export default StyleSheet.create({
     fontSize: 14,
   },
   ctas: {
-    paddingHorizontal: gutter,
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: edgeGutter,
   },
 })

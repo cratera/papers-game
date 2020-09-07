@@ -88,7 +88,11 @@ export const u = StyleSheet.create({
     // marginLeft: -16,
     // paddingLeft: 16, // REVIEW this later
     marginRight: -16,
-    paddingRight: 16,
+    paddingHorizontal: 16,
+    marginLeft: -16,
+  },
+  CTASafeArea: {
+    height: 80,
   },
   text_danger: { color: colors.danger },
   text_success: { color: colors.success },

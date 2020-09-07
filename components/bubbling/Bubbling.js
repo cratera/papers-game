@@ -1,9 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Animated, Easing, Platform, Dimensions, StyleSheet } from 'react-native'
+import { Animated, Easing, Platform, StyleSheet } from 'react-native'
+import Constants from 'expo-constants'
 
-const height = Dimensions.get('window').height
-const width = Dimensions.get('window').width
+import { window } from '@constants/layout'
 
 const Bubbling = ({ bgStart, bgEnd }) => {
   const scaleGrow = React.useRef(new Animated.Value(0)).current
@@ -40,10 +40,10 @@ const Bubbling = ({ bgStart, bgEnd }) => {
 
             transform: [
               {
-                translateX: height / -2,
+                translateX: window.height / -2,
               },
               {
-                translateY: height / -1.75,
+                translateY: window.height / -1.75,
               },
               // {
               //   scale: 1.5,
@@ -73,16 +73,18 @@ export default Bubbling
 const StylesBubble = StyleSheet.create({
   bg: {
     position: 'absolute',
-    width: width,
-    height: height,
+    top: Constants.statusBarHeight * -1,
+    left: 0,
+    width: window.width,
+    height: window.height,
     overflow: 'hidden',
     zIndex: 3,
   },
   bubble: {
-    top: height / 2,
-    left: width / 2,
-    width: height,
-    height: height,
-    borderRadius: height / 2,
+    top: window.height / 2,
+    left: window.width / 2,
+    width: window.height,
+    height: window.height,
+    borderRadius: window.height / 2,
   },
 })

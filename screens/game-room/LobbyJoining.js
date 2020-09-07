@@ -142,7 +142,7 @@ export default function LobbyJoining({ navigation }) {
       </Page.Main>
       <Page.CTAs hasOffset={profileIsAdmin && !neededPlayers}>
         {game.teams ? <Button onPress={goToWritePapers}>Write papers</Button> : null}
-        {/* {__DEV__ && game.teams && profileIsAdmin && (
+        {__DEV__ && game.teams && profileIsAdmin && (
           <Button
             variant="danger"
             onPress={Papers.setWordsForEveyone}
@@ -150,7 +150,7 @@ export default function LobbyJoining({ navigation }) {
           >
             {"💥 Write everyone's papers 💥"}
           </Button>
-        )} */}
+        )}
       </Page.CTAs>
     </Page>
   )

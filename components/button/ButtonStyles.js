@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
   base: {
     minHeight: 52,
     borderRadius: 4,
-    paddingHorizontal: 24,
+    paddingHorizontal: 16,
     overflow: 'hidden', // so borderRadius works.
     display: 'flex',
     flexDirection: 'row',

@@ -176,35 +176,47 @@ export default function Teams({ navigation }) {
     <Page bannerMsg={errorMsg} bgFill={bgEnd}>
       <Bubbling bgStart={bgStart} bgEnd={bgEnd} />
       <Page.Main headerDivider>
-        <ScrollView style={Theme.u.scrollSideOffset} contentContainerStyle={{ paddingBottom: 16 }}>
+        <ScrollView
+          style={[Theme.u.scrollSideOffset]}
+          contentContainerStyle={{ paddingBottom: 16 }}
+        >
           {Object.keys(tempTeams).map(teamId => {
             const { id, name, players } = tempTeams[teamId]
 
-            // REVIEW DESIGN - Small flickr when changing teams.
             return (
               <View key={id} style={Styles.team}>
-                <View style={Styles.headerTeam}>
-                  <Text style={Theme.typography.h2}>{name}</Text>
-                  {/* <Button
-                    variant="icon"
-                    accessibilityLabel="Rename team"
-                    onPress={() => handleRenameOf(id)}
-                  >
-                    ✏️
-                  </Button> */}
+                <View style={[Styles.teamHeader, Theme.u.cardEdge]}>
+                  <Text style={Theme.typography.secondary}>Team {'0' + (+teamId + 1)}</Text>
+                  <View style={Styles.teamHeader_title}>
+                    <Text style={Theme.typography.h2}>{name}</Text>
+                    {/* <Button
+                        variant="icon"
+                        accessibilityLabel="Rename team"
+                        onPress={() => handleRenameOf(id)}
+                      >
+                        ✏️
+                      </Button> */}
+                  </View>
                 </View>
                 <ListPlayers players={players} />
               </View>
             )
           })}
+          <View style={Theme.u.CTASafeArea} />
         </ScrollView>
       </Page.Main>
-      <Page.CTAs hasOffset>
-        <Button variant="light" onPress={generateTeams} styleTouch={{ marginBottom: 16 }}>
-          Randomize teams
+      <Page.CTAs hasOffset style={Styles.ctas}>
+        <Button
+          variant="icon"
+          style={Styles.ctas_random}
+          accessibilityLabel="Randomize teams"
+          onPress={generateTeams}
+          styleTouch={{ marginBottom: 16 }}
+        >
+          <Text>🎲</Text>
         </Button>
-        <Button onPress={handleLockClick} isLoading={isLocking}>
-          Lock teams
+        <Button style={Styles.ctas_submit} onPress={handleLockClick} isLoading={isLocking}>
+          Use these teams
         </Button>
       </Page.CTAs>
     </Page>
@@ -234,22 +246,32 @@ const Styles = StyleSheet.create({
     fontSize: 16,
     color: Theme.colors.primary,
   },
-  headerTeam: {
+  teamHeader: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    paddingVertical: 16,
+    borderBottomColor: Theme.colors.grayDark,
+    borderBottomWidth: 1,
+    marginBottom: 16,
+  },
+  teamHeader_title: {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 16,
   },
-  // btnEdit: {
-  //   color: Theme.colors.primary,
-  //   textAlign: 'center',
-  // },
-  // btnEdit_icon: {
-  //   width: 17,
-  //   height: 17,
-  //   position: 'absolute',
-  //   top: 10,
-  //   left: 10,
-  // },
+  ctas: {
+    display: 'flex',
+    flexDirection: 'row',
+  },
+  ctas_random: {
+    backgroundColor: Theme.colors.bg,
+    borderColor: Theme.colors.grayDark,
+    borderWidth: 2,
+    width: 50,
+    marginRight: 8,
+  },
+  ctas_submit: {
+    width: '100%',
+  },
 })

@@ -47,13 +47,6 @@ export default StyleSheet.create({
     paddingBottom: 32,
   },
   // same as TeamsStyles
-  headerTeam: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    marginBottom: 16,
-  },
-  // same as TeamsStyles
   team: {
     marginTop: 8,
     marginBottom: 40,

@@ -1,10 +1,10 @@
 import * as Theme from '@theme'
 
-// TODO rename this file
+import { hasNotch } from '@constants/layout'
 
 export const headerTheme = (opts = {}) => ({
   headerTintColor: Theme.colors.grayMedium,
-  headerStatusBarHeight: 20,
+  headerStatusBarHeight: hasNotch ? 30 : 20,
   headerTransparent: true, // Do globally to avoid jumps in screens
   headerTitleAlign: 'center',
 
