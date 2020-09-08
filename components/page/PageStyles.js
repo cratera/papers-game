@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native'
+import Constants from 'expo-constants'
 
-import { hasNotch, isWeb } from '@constants/layout'
+import { isWeb } from '@constants/layout'
 
 import * as Theme from '@theme'
 
@@ -14,7 +15,9 @@ export default StyleSheet.create({
   },
   pageInner: {
     width: '100%',
-    paddingTop: isWeb ? 75 : hasNotch ? 35 : 45, // safe area
+    // Safe area for transparent header, // take into account devices
+    // with top notch - Tested in iPhones SE, X and 11
+    paddingTop: isWeb ? 55 : Math.max(45, Constants.statusBarHeight),
     maxWidth: 500,
     marginHorizontal: 'auto',
     flexGrow: 1,
@@ -23,9 +26,9 @@ export default StyleSheet.create({
   },
   main: {
     flexGrow: 1,
-    flexShrink: 1 /* so it scrolls */,
-    paddingHorizontal: edgeGutter,
+    flexShrink: 1,
     alignSelf: 'stretch',
+    paddingHorizontal: edgeGutter,
   },
   banner: {
     backgroundColor: Theme.colors.grayDark,

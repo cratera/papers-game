@@ -1,10 +1,10 @@
 import * as Theme from '@theme'
 
-import { hasNotch } from '@constants/layout'
+import Constants from 'expo-constants'
 
 export const headerTheme = (opts = {}) => ({
   headerTintColor: Theme.colors.grayMedium,
-  headerStatusBarHeight: hasNotch ? 30 : 20,
+  headerStatusBarHeight: Constants.statusBarHeight,
   headerTransparent: true, // Do globally to avoid jumps in screens
   headerTitleAlign: 'center',
 
