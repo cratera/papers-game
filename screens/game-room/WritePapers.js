@@ -1,16 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import debounce from 'lodash/debounce'
-import {
-  Keyboard,
-  Dimensions,
-  KeyboardAvoidingView,
-  Platform,
-  View,
-  TextInput,
-  Text,
-  ScrollView,
-} from 'react-native'
+import { Keyboard, KeyboardAvoidingView, View, TextInput, Text, ScrollView } from 'react-native'
 import Sentry from '@constants/Sentry'
 
 import * as Analytics from '@constants/analytics.js'
@@ -20,15 +11,12 @@ import PapersContext from '@store/PapersContext.js'
 import Button from '@components/button'
 import Page from '@components/page'
 import { IconArrow } from '@components/icons'
-import { headerTheme } from '@navigation/headerStuff.js'
 import * as Theme from '@theme'
 import Styles from './WritePapersStyles.js'
 
-const isWeb = Platform.OS === 'web'
-const isAndroid = Platform.OS === 'android'
+import { window, isWeb, isAndroid } from '@constants/layout'
 
-const vw = Dimensions.get('window').width / 100 // TODO useDimensions
-const vh = Dimensions.get('window').height / 100 // TODO useDimensions
+const { vw, vh } = window
 
 export default function WritePapers({ navigation }) {
   const Papers = React.useContext(PapersContext)
@@ -36,7 +24,7 @@ export default function WritePapers({ navigation }) {
   const [words, setLocalWords] = React.useState([])
   const [keyboardHeight, setKeyboardHeight] = React.useState(0)
   const refSlides = React.useRef()
-  const scrollDebounced = React.useRef(debounce(handleScrollPapers, 300)).current // <300 fucks up scroll on iOS
+  const scrollDebounced = React.useRef(debounce(handleScrollPapers, 450)).current // <300 fucks up scroll on iOS
 
   const [errorMsg, setErrorMsg] = React.useState(null)
   const [isSubmiting, setIsSubmiting] = React.useState(false)
@@ -83,11 +71,21 @@ export default function WritePapers({ navigation }) {
       })
     } else {
       navigation.setOptions({
-        headerRight: null,
+        headerRight: function HLB() {
+          return (
+            <View>
+              <Text>
+                {Math.round((100 * wordsCount) / wordsGoal)}% done
+                {/* Quickest way to create a white space. marginRight/with didn't worked */}
+                <Text style={{ color: 'transparent' }}>__</Text>
+              </Text>
+            </View>
+          )
+        },
       })
     }
     // Pass words as dependency so that "Finish" has the most recent words on submit.
-  }, [isAllWordsDone, words, isSubmiting])
+  }, [isAllWordsDone, words, wordsGoal, wordsCount, isSubmiting])
 
   React.useEffect(() => {
     const onKeyboardDidShow = e => {
@@ -119,13 +117,21 @@ export default function WritePapers({ navigation }) {
 
   return (
     <Page bannerMsg={errorMsg}>
-      <Page.Main>
+      <Page.Main headerDivider>
         <View style={[Styles.header]}>
-          <Text style={[Theme.typography.body, Theme.u.center]}>
+          <Text style={[Theme.typography.secondary, Theme.u.center]}>
             Fill out the words or sentences you want your friends to guess.
           </Text>
         </View>
-        <KeyboardAvoidingView behavior="padding" style={Styles.scrollKAV}>
+        <KeyboardAvoidingView
+          behavior="padding"
+          style={[
+            Styles.scrollKAV,
+            {
+              opacity: keyboardHeight ? 1 : 0, // TODO fadein?
+            },
+          ]}
+        >
           <ScrollView
             ref={refSlides}
             pagingEnabled
@@ -145,7 +151,7 @@ export default function WritePapers({ navigation }) {
             {renderPapers()}
           </ScrollView>
 
-          <Page.CTAs style={Styles.ctas}>
+          <View style={Styles.ctas}>
             <Button
               style={[Styles.ctas_btn]}
               styleTouch={[paperIndex === 0 && Styles.ctas_btn_isHidden]}
@@ -154,16 +160,12 @@ export default function WritePapers({ navigation }) {
             >
               <IconArrow
                 size={20}
-                color={Theme.colors.bg}
+                color={Theme.colors.grayDark}
                 style={{ transform: [{ rotate: '180deg' }] }}
               />
             </Button>
 
-            <View style={Styles.status} aria-label="Papers status">
-              <Text style={Theme.u.center}>
-                {wordsCount} out of {wordsGoal} done
-              </Text>
-            </View>
+            <View style={Styles.status} />
 
             <Button
               variant="icon"
@@ -171,9 +173,9 @@ export default function WritePapers({ navigation }) {
               styleTouch={[paperIndex === wordsGoal - 1 && Styles.ctas_btn_isHidden]}
               onPress={handleClickNext}
             >
-              <IconArrow size={20} color={Theme.colors.bg} />
+              <IconArrow size={20} color={Theme.colors.grayDark} />
             </Button>
-          </Page.CTAs>
+          </View>
         </KeyboardAvoidingView>
       </Page.Main>
     </Page>
@@ -290,7 +292,7 @@ const SlidePaper = ({ onChange, isActive, onFocus, onSubmit, i }) => {
         ref={elInput}
         style={[
           Styles.input,
-          Theme.typography.h1,
+          Theme.typography.h2,
           (isActive || isFocused) && Styles.input_isActive,
           isWeb && {
             height: '100px', // ~2 lines

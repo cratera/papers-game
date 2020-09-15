@@ -1,8 +1,9 @@
-import { Platform, Dimensions, StyleSheet } from 'react-native'
+import { Platform, StyleSheet } from 'react-native'
 import * as Theme from '@theme'
 
-const vw = Dimensions.get('window').width / 100
-// const vh = Dimensions.get('window').height / 100
+import { window } from '@constants/layout'
+
+const { vw } = window
 
 const paperHeight = vw * 70
 
@@ -12,8 +13,8 @@ export default StyleSheet.create({
   },
   scrollKAV: {},
   slides: {
-    marginLeft: -16,
     maxHeight: paperHeight + 12,
+    paddingHorizontal: 0,
   },
   slide: {
     width: vw * 100 - 32,
@@ -22,21 +23,14 @@ export default StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center',
     backgroundColor: Theme.colors.bg,
+    borderWidth: 2,
+    borderColor: Theme.colors.grayMedium,
     paddingVertical: Platform === 'web' ? 16 : 0,
     paddingHorizontal: 16,
-    shadowColor: Theme.colors.grayDark,
-    marginTop: 4, // Visible shadows on top (Android)
     marginBottom: 10,
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 5,
   },
   slide_isActive: {
-    shadowOpacity: 0.5,
+    borderColor: Theme.colors.grayDark,
   },
   input: {
     borderColor: 'transparent',
@@ -58,7 +52,7 @@ export default StyleSheet.create({
     paddingBottom: 8,
   },
   ctas_btn: {
-    backgroundColor: Theme.colors.primary,
+    // backgroundColor: Theme.colors.primary,
   },
   ctas_btn_isHidden: {
     opacity: 0,

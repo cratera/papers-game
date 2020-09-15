@@ -6,7 +6,7 @@ import * as Theme from '@theme'
 import Styles from './PageStyles.js'
 import SettingsToggle from '@components/settings'
 import Button from '@components/button'
-import { IconArrow } from '@components/icons'
+// import { IconArrow } from '@components/icons'
 import NetInfo from '@react-native-community/netinfo'
 
 const i18nWifi = 'No internet connection'

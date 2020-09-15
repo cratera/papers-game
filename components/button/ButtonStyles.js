@@ -52,13 +52,14 @@ const styles = StyleSheet.create({
   icon: {
     width: 44,
     height: 44,
+    minHeight: 'auto',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 0,
     paddingHorizontal: 0,
-    borderWidth: 1,
-    borderColor: Theme.colors.grayLight,
+    borderColor: Theme.colors.grayDark,
+    borderWidth: 2,
   },
   flat: {
     borderRadius: 0,
