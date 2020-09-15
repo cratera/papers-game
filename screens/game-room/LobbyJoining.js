@@ -32,8 +32,6 @@ export default function LobbyJoining({ navigation }) {
 
   React.useEffect(() => {
     navigation.setOptions({
-      // ...headerTheme({ hiddenBorder: false }),
-      // headerTitle: 'New game',
       headerLeft: function HLB() {
         return (
           <Page.HeaderBtn side="left" onPress={askToLeaveGame}>

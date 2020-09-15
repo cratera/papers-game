@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native'
-import * as Theme from '@theme'
+// import * as Theme from '@theme'
 
 export default StyleSheet.create({
   header: {
@@ -8,8 +8,6 @@ export default StyleSheet.create({
     alignItems: 'center',
     paddingTop: 24,
     paddingBottom: 24,
-    borderBottomColor: Theme.colors.grayDark,
-    borderBottomWidth: 1,
   },
   header_title: {
     // display: 'flex',

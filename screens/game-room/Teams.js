@@ -251,8 +251,6 @@ const Styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     paddingVertical: 16,
-    borderBottomColor: Theme.colors.grayDark,
-    borderBottomWidth: 1,
     marginBottom: 16,
   },
   teamHeader_title: {

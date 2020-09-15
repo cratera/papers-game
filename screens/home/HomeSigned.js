@@ -52,15 +52,12 @@ AvatarMeme.propTypes = {
 
 export default function HomeSigned({ navigation }) {
   const Papers = React.useContext(PapersContext)
-  const profile = Papers.state.profile
 
   return (
     <Fragment>
       <Page bgFill={Theme.colors.purple}>
         <Page.Main style={[Styles.main, { justifyContent: 'center' }]}>
-          {/* <AvatarMeme avatar={profile.avatar} onChange={handleChangeAvatar} /> */}
-          <Text style={[Theme.typography.body, Theme.u.center, { marginBottom: 8 }]}>Welcome</Text>
-          <Text style={Theme.typography.h1}>{profile.name}</Text>
+          <Text style={[Theme.typography.h1, { marginBottom: 120 }]}>Papers</Text>
         </Page.Main>
         <Page.CTAs>
           <Button onPress={() => openAccessGameModal('create')}>Create Game</Button>

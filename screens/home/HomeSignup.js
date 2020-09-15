@@ -107,8 +107,8 @@ export default class HomeSignup extends React.Component {
   stepName() {
     return (
       <View style={{ flex: 1, alignSelf: 'stretch' }}>
-        <Text nativeID="inputNameLabel" style={[Theme.typography.body, Theme.u.center]}>
-          What's your name?
+        <Text nativeID="inputNameLabel" style={[Theme.typography.secondary, Theme.u.center]}>
+          How should we call you?
         </Text>
         <TextInput
           style={[Theme.typography.h2, Styles.input]}

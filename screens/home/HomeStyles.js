@@ -10,7 +10,7 @@ export default StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'flex-start',
     alignItems: 'center',
-    paddingTop: 40,
+    paddingVertical: 40,
   },
   content: {
     display: 'flex',
@@ -49,19 +49,10 @@ export default StyleSheet.create({
     textAlign: 'center',
   },
   avatarPlace: {
-    width: 256,
-    height: 256,
-    borderRadius: 140,
-    // backgroundColor: Theme.colors.purple,
+    width: 160,
+    height: 160,
     borderColor: Theme.colors.grayDark,
     borderWidth: 2,
-    alignSelf: 'center',
-  },
-  avatarPlaceContent: {
-    flex: 1,
-    alignItems: 'center',
-    flexDirection: 'column',
-    justifyContent: 'center',
     alignSelf: 'center',
   },
   avatarSvg: {

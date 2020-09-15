@@ -73,6 +73,14 @@ export const typography = StyleSheet.create({
     fontSize: 14,
     color: colors.danger,
   },
+  badge: {
+    fontFamily: 'karla-regular',
+    fontSize: 14,
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    lineHeight: 14,
+    paddingVertical: 6,
+    paddingHorizontal: 4,
+  },
 })
 
 // Utils

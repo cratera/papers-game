@@ -84,16 +84,16 @@ export default function ListPlayers({ players, enableKickout, isStatusVisible, .
         const status = isStatusVisible && (!wordsSubmitted ? 'writting' : 'done')
         const imgInfo = status && imgMap[status]
         const canKickOut = enableKickout && playerId !== profileId && (hasTeams || profileIsAdmin)
-        const playerDescription =
+        const playerStatus =
           playerId === game.creatorId
             ? playerId === profileId
               ? ''
               : game.hasStarted
               ? ''
               : !hasEnoughPlayers
-              ? 'Creating game...'
+              ? 'creating' // creating game...
               : !game.teams
-              ? 'Creating teams...'
+              ? 'creating' // creating teams...
               : ''
             : ''
         return (
@@ -105,15 +105,13 @@ export default function ListPlayers({ players, enableKickout, isStatusVisible, .
             <View key={playerId} style={[Styles.item, isLastChild && Styles.item_isLast]}>
               <View style={Styles.who}>
                 <Avatar src={avatar} hasMargin alt="" />
-                <View>
+                <View style={Styles.who_text}>
                   <Text style={Theme.typography.body}>
                     {name}
                     {playerId === profileId && <Text> (you)</Text>}
                   </Text>
-                  {playerDescription ? (
-                    <Text style={[Theme.typography.small, Theme.typography.seconday]}>
-                      {playerDescription}{' '}
-                    </Text>
+                  {playerStatus ? (
+                    <Text style={[Theme.typography.badge]}>{playerStatus} </Text>
                   ) : null}
                   {/* {isAfk && (
                     // This seems buggy... remove it for now.

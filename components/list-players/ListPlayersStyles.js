@@ -20,6 +20,13 @@ export default StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
+    flexGrow: 1,
+  },
+  who_text: {
+    display: 'flex',
+    flexGrow: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   itemStatus: {
     width: 45,
