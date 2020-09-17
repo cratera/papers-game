@@ -63,7 +63,17 @@ export default function JoinGame({ navigation }) {
             }
           : function btnBack() {
               return (
-                <Page.HeaderBtn side="left" icon="back" onPress={() => setStep(0)}>
+                <Page.HeaderBtn
+                  side="left"
+                  icon="back"
+                  onPress={() => {
+                    setState(state => ({
+                      ...state,
+                      errorMsg: null,
+                    }))
+                    setStep(0)
+                  }}
+                >
                   Back
                 </Page.HeaderBtn>
               )
@@ -153,9 +163,11 @@ export default function JoinGame({ navigation }) {
               )}
 
               {state.errorMsg && !state.isUnexError && (
-                <Text style={[Theme.typography.small, Styles.hintMsg, Styles.errorMsg]}>
-                  {state.errorMsg}
-                </Text>
+                <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+                  <Text style={[Theme.typography.small, Styles.hintMsg, Styles.errorMsg]}>
+                    {state.errorMsg || 'hello error'}
+                  </Text>
+                </View>
               )}
             </View>
           )}

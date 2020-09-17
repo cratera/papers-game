@@ -5,7 +5,7 @@ import { window } from '@constants/layout'
 
 const { vw } = window
 
-const paperHeight = vw * 70
+const paperHeight = vw * 65
 
 export default StyleSheet.create({
   header: {
@@ -48,7 +48,7 @@ export default StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 0,
-    paddingTop: 4,
+    paddingTop: 8,
     paddingBottom: 8,
   },
   ctas_btn: {

@@ -5,7 +5,7 @@ import Constants from 'expo-constants'
 
 import { window } from '@constants/layout'
 
-const Bubbling = ({ bgStart, bgEnd }) => {
+const Bubbling = ({ bgStart, bgEnd, fromBehind }) => {
   const scaleGrow = React.useRef(new Animated.Value(0)).current
 
   React.useEffect(() => {
@@ -24,10 +24,14 @@ const Bubbling = ({ bgStart, bgEnd }) => {
         StylesBubble.bg,
         {
           backgroundColor: bgStart,
-          opacity: scaleGrow.interpolate({
-            inputRange: [0, 0.8, 0.9, 1],
-            outputRange: [1, 1, 0, 0],
-          }),
+          // opacity: 1,
+          opacity: fromBehind
+            ? 1
+            : scaleGrow.interpolate({
+                inputRange: [0, 0.8, 0.9, 1],
+                outputRange: [1, 1, 0, 0],
+              }),
+          zIndex: fromBehind ? 0 : 1,
         },
       ]}
     >
@@ -66,6 +70,7 @@ const Bubbling = ({ bgStart, bgEnd }) => {
 Bubbling.propTypes = {
   bgStart: PropTypes.string.isRequired,
   bgEnd: PropTypes.string.isRequired,
+  fromBehind: PropTypes.bool,
 }
 
 export default Bubbling
@@ -78,7 +83,6 @@ const StylesBubble = StyleSheet.create({
     width: window.width,
     height: window.height,
     overflow: 'hidden',
-    zIndex: 3,
   },
   bubble: {
     top: window.height / 2,

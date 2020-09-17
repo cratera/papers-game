@@ -22,7 +22,7 @@ export default function WritePapers({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const { game, profile } = Papers.state
   const [words, setLocalWords] = React.useState([])
-  const [keyboardHeight, setKeyboardHeight] = React.useState(0)
+  const [keyboardHeight, setKeyboardHeight] = React.useState(null)
   const refSlides = React.useRef()
   const scrollDebounced = React.useRef(debounce(handleScrollPapers, 450)).current // <300 fucks up scroll on iOS
 
@@ -74,7 +74,7 @@ export default function WritePapers({ navigation }) {
         headerRight: function HLB() {
           return (
             <View>
-              <Text>
+              <Text style={{ color: Theme.colors.grayLight }}>
                 {Math.round((100 * wordsCount) / wordsGoal)}% done
                 {/* Quickest way to create a white space. marginRight/with didn't worked */}
                 <Text style={{ color: 'transparent' }}>__</Text>
@@ -92,11 +92,16 @@ export default function WritePapers({ navigation }) {
       setKeyboardHeight(e.endCoordinates.height)
     }
 
+    const KBfallback = setTimeout(() => {
+      if (!keyboardHeight) setKeyboardHeight(0)
+    }, 1500)
+
     Keyboard.addListener('keyboardDidShow', onKeyboardDidShow)
     return () => {
+      clearTimeout(KBfallback)
       Keyboard.removeListener('keyboardDidShow', onKeyboardDidShow)
     }
-  }, []) // TODO later useKeyboardHeight?
+  }, [keyboardHeight]) // TODO later useKeyboardHeight?
 
   React.useEffect(() => {
     if (wordsAreStored) {
@@ -128,7 +133,7 @@ export default function WritePapers({ navigation }) {
           style={[
             Styles.scrollKAV,
             {
-              opacity: keyboardHeight ? 1 : 0, // TODO fadein?
+              opacity: keyboardHeight !== null ? 1 : 0, // TODO fadein?
             },
           ]}
         >
@@ -153,10 +158,11 @@ export default function WritePapers({ navigation }) {
 
           <View style={Styles.ctas}>
             <Button
+              variant="icon"
+              size="lg"
               style={[Styles.ctas_btn]}
               styleTouch={[paperIndex === 0 && Styles.ctas_btn_isHidden]}
-              variant="icon"
-              onPress={handleClickPrev}
+              onPress={() => paperIndex !== 0 && handleClickPrev()}
             >
               <IconArrow
                 size={20}
@@ -169,9 +175,10 @@ export default function WritePapers({ navigation }) {
 
             <Button
               variant="icon"
+              size="lg"
               style={Styles.ctas_btn}
               styleTouch={[paperIndex === wordsGoal - 1 && Styles.ctas_btn_isHidden]}
-              onPress={handleClickNext}
+              onPress={() => paperIndex !== wordsGoal - 1 && handleClickNext()}
             >
               <IconArrow size={20} color={Theme.colors.grayDark} />
             </Button>
@@ -234,6 +241,7 @@ export default function WritePapers({ navigation }) {
   }
 
   function handleClickNext() {
+    console.log('clicked next')
     // Find if any submitted paper was left empty
     const firstEmpty = words.findIndex(word => !word)
     // Go to next paper even if current one is empty

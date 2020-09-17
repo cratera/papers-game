@@ -10,6 +10,7 @@ import * as Theme from '@theme'
 export default function ListTeams({ isStatusVisible, enableKickout, ...otherProps }) {
   const Papers = React.useContext(PapersContext)
   const { game } = Papers.state
+  const didSubmitAllWords = plId => game.words[plId]
 
   if (!game) {
     // TODO add global warning.
@@ -31,9 +32,20 @@ export default function ListTeams({ isStatusVisible, enableKickout, ...otherProp
     <View {...otherProps}>
       {Object.keys(game.teams).map(teamId => {
         const { id, name, players } = game.teams[teamId]
+        const playersList = isStatusVisible && Object.values(players)
+        const total = isStatusVisible && playersList.length
+        console.log('hum', playersList)
+        const done = isStatusVisible && playersList.filter(didSubmitAllWords).length
         return (
           <View key={id} style={Styles.team}>
-            <Text style={Theme.typography.h3}>{name}</Text>
+            <View style={[Styles.header]}>
+              <Text style={Theme.typography.h3}>{name}</Text>
+              {isStatusVisible && (
+                <Text style={Theme.typography.secondary}>
+                  {done}/{total}
+                </Text>
+              )}
+            </View>
             <ListPlayers
               players={players}
               enableKickout={enableKickout}
@@ -53,7 +65,13 @@ ListTeams.propTypes = {
 
 const Styles = StyleSheet.create({
   team: {
-    marginTop: 8,
-    marginBottom: 40,
+    marginBottom: 24,
+  },
+  header: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+    marginBottom: 20,
   },
 })

@@ -34,6 +34,7 @@ const styles = StyleSheet.create({
   },
   base: {
     minHeight: 52,
+    // maxWidth: 800,
     borderRadius: 4,
     paddingHorizontal: 16,
     overflow: 'hidden', // so borderRadius works.
@@ -80,6 +81,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
 
+  lg: {
+    minWidth: 58,
+    minHeight: 58,
+  },
+
   // --------- place
   edgeKeyboard: {
     marginBottom: 16,
@@ -89,6 +95,7 @@ const styles = StyleSheet.create({
 const stylesSize = {
   default: 16,
   sm: 14,
+  // lg: 18,
 }
 
 // TODO Later - This code is 💩...

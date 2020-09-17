@@ -9,25 +9,33 @@ import { getTeamId } from '@store/papersMethods.js'
 import Button from '@components/button'
 import Avatar from '@components/avatar'
 import Sheet from '@components/sheet'
+// import LoadingBadge from '@components/LoadingBadge'
 
 import Styles from './ListPlayersStyles'
 import * as Theme from '@theme'
 
-const imgWritting =
-  'https://firebasestorage.googleapis.com/v0/b/papers-game.appspot.com/o/game%2Fwritting.gif?alt=media&token=4f14b37a-370e-4c8d-8902-15a658cde869'
-const imgDone =
-  'https://firebasestorage.googleapis.com/v0/b/papers-game.appspot.com/o/game%2Fdone.gif?alt=media&token=ffa86784-aa18-414c-95e6-3ae5fcb15ed5'
-
-const imgMap = {
-  writting: {
-    src: imgWritting,
-    alt: 'Stil writting papers',
-  },
-  done: {
-    src: imgDone,
-    alt: 'All papers done',
-  },
-}
+const LoadingStatic = () => (
+  <View
+    style={{
+      width: 40,
+      height: 40,
+      marginRight: 16,
+      paddingTop: 8,
+      paddingLeft: 8,
+    }}
+  >
+    {/* <LoadingBadge style={{}} /> */}
+    <View
+      style={{
+        width: 24,
+        height: 24,
+        borderWidth: 2,
+        borderColor: Theme.colors.grayDark,
+        transform: [{ rotate: '45deg' }],
+      }}
+    />
+  </View>
+)
 
 export default function ListPlayers({ players, enableKickout, isStatusVisible, ...otherProps }) {
   const Papers = React.useContext(PapersContext)
@@ -58,13 +66,14 @@ export default function ListPlayers({ players, enableKickout, isStatusVisible, .
       {playersSorted.map((playerId, i) => {
         const isLastChild = i === players.length
 
+        // User left the game, we don't have profile access about them anymore
+        // TODO/UX - What should we do in this case? @mmbotelho
         if (!game.players[playerId]) {
-          // TODO/UX - What should we do in this case? @mmbotelho
-          const playerName = profiles[playerId]?.name || playerId
+          const playerName = profiles[playerId]?.name || 'Ex-player' // playerId
           return (
             <View key={playerId} style={[Styles.item, isLastChild && Styles.item_isLast]}>
               <View style={Styles.who}>
-                <Avatar hasMargin alt="" />
+                <LoadingStatic />
                 <View>
                   <Text style={[Theme.typography.body, { color: Theme.colors.grayMedium }]}>
                     {playerName}
@@ -81,8 +90,6 @@ export default function ListPlayers({ players, enableKickout, isStatusVisible, .
         const { avatar, name } = profiles[playerId] || {}
         // const { isAfk } = game.players[playerId]
         const wordsSubmitted = game.words && game.words[playerId]
-        const status = isStatusVisible && (!wordsSubmitted ? 'writting' : 'done')
-        const imgInfo = status && imgMap[status]
         const canKickOut = enableKickout && playerId !== profileId && (hasTeams || profileIsAdmin)
         const playerStatus =
           playerId === game.creatorId
@@ -96,15 +103,16 @@ export default function ListPlayers({ players, enableKickout, isStatusVisible, .
               ? 'creating' // creating teams...
               : ''
             : ''
+
         return (
           <TouchableHighlight
-            underlayColor={Theme.colors.bg}
+            underlayColor={canKickOut ? Theme.colors.grayLight : 'transparent'}
             onPress={() => (canKickOut ? setIsClicked(playerId) : true)}
             key={playerId}
           >
             <View key={playerId} style={[Styles.item, isLastChild && Styles.item_isLast]}>
               <View style={Styles.who}>
-                <Avatar src={avatar} hasMargin alt="" />
+                {wordsSubmitted ? <Avatar src={avatar} hasMargin alt="" /> : <LoadingStatic />}
                 <View style={Styles.who_text}>
                   <Text style={Theme.typography.body}>
                     {name}
@@ -131,13 +139,6 @@ export default function ListPlayers({ players, enableKickout, isStatusVisible, .
                   >
                     Kick
                   </Button>
-                )}
-                {imgInfo && (
-                  <Image
-                    style={[Styles.itemStatus, Styles[`itemStatus_${status}`]]}
-                    source={{ uri: imgInfo.src }}
-                    accessibilityLabel={imgInfo.alt}
-                  />
                 )}
               </View>
             </View>

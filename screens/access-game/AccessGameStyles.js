@@ -36,20 +36,24 @@ export default StyleSheet.create({
   },
   code_maskDigit: {
     textAlign: 'center',
-    width: 25,
-    fontFamily: 'karla-regular',
+    width: 30,
+    fontFamily: 'youngSerif-regular',
     // fontVariantNumeric: 'tabular-nums',
   },
   code_maskPlaceholder: {
     color: Theme.colors.grayMedium,
     textAlign: 'center',
-    width: 25,
+    width: 30,
   },
   hintMsg: {
-    marginVertical: 8,
+    marginVertical: 16,
     textAlign: 'center',
   },
   errorMsg: {
-    color: Theme.colors.danger,
+    fontSize: 14,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    backgroundColor: Theme.colors.yellow,
+    color: Theme.colors.grayDark,
   },
 })

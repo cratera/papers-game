@@ -262,7 +262,7 @@ export class PapersContextProvider extends Component {
       const errorMsgMap = {
         notSigned: () => 'Cannot find your profile. Please start over.', // I hope this never happens.
         exists: () => 'Choose another name.', // 0.001% probability because code is random.
-        notFound: () => "That name or code don't seem right.",
+        notFound: () => `Wrong code for ${gameName.split('_')[0]}.`,
         alreadyStarted: () => 'That game already started.',
         ups: () => i18nUnexpectedError,
       }

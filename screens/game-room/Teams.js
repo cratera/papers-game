@@ -208,6 +208,7 @@ export default function Teams({ navigation }) {
       <Page.CTAs hasOffset style={Styles.ctas}>
         <Button
           variant="icon"
+          size="lg"
           style={Styles.ctas_random}
           accessibilityLabel="Randomize teams"
           onPress={generateTeams}
@@ -215,7 +216,12 @@ export default function Teams({ navigation }) {
         >
           <Text>🎲</Text>
         </Button>
-        <Button style={Styles.ctas_submit} onPress={handleLockClick} isLoading={isLocking}>
+        <Button
+          size="lg"
+          styleTouch={Styles.ctas_submit}
+          onPress={handleLockClick}
+          isLoading={isLocking}
+        >
           Use these teams
         </Button>
       </Page.CTAs>
@@ -257,6 +263,7 @@ const Styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 4,
   },
   ctas: {
     display: 'flex',
@@ -266,10 +273,9 @@ const Styles = StyleSheet.create({
     backgroundColor: Theme.colors.bg,
     borderColor: Theme.colors.grayDark,
     borderWidth: 2,
-    width: 50,
     marginRight: 8,
   },
   ctas_submit: {
-    width: '100%',
+    flexGrow: 1,
   },
 })

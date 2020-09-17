@@ -5,12 +5,16 @@ export default StyleSheet.create({
   list: {
     marginTop: 0,
   },
+  itemArea: {
+    paddingVertical: 8,
+  },
   item: {
     display: 'flex',
     flexDirection: 'row',
     flexWrap: 'nowrap',
     alignItems: 'center',
-    marginBottom: 24,
+    paddingVertical: 16,
+    // paddingHorizontal: 16,
     justifyContent: 'space-between',
   },
   item_isLast: {

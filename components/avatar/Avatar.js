@@ -49,11 +49,9 @@ const Styles = StyleSheet.create({
   size_md: {
     width: 40,
     height: 40,
-    // borderRadius: 24,
   },
   size_lg: {
     width: 56,
     height: 56,
-    // borderRadius: 28,
   },
 })

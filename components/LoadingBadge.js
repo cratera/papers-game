@@ -7,7 +7,7 @@ import * as Theme from '@theme'
 // import * as Theme from '@theme'
 // import Styles from './PlayingStyles.js'
 
-const LoadingBadge = ({ children }) => {
+const LoadingBadge = ({ children, ...otherProps }) => {
   const animSpin = React.useRef(new Animated.Value(0)).current
 
   React.useEffect(() => {
@@ -23,7 +23,7 @@ const LoadingBadge = ({ children }) => {
   }, [])
 
   return (
-    <View style={Styles.container}>
+    <View style={Styles.container} {...otherProps}>
       <Animated.View
         style={[
           Styles.loader,
