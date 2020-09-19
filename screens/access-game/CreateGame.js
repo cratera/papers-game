@@ -5,7 +5,7 @@ import { View, Text, TextInput } from 'react-native'
 
 import PapersContext from '@store/PapersContext.js'
 import Page from '@components/page'
-import LoadingBadge from '@components/LoadingBadge.js'
+import { LoadingBadge } from '@components/loading'
 import { headerTheme } from '@navigation/headerStuff.js'
 import { slugString } from '@constants/utils.js'
 

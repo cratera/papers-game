@@ -9,7 +9,7 @@ import { getTeamId } from '@store/papersMethods.js'
 import Button from '@components/button'
 import Avatar from '@components/avatar'
 import Sheet from '@components/sheet'
-// import LoadingBadge from '@components/LoadingBadge'
+// import { LoadingBadge } from '@components/loading'
 
 import Styles from './ListPlayersStyles'
 import * as Theme from '@theme'

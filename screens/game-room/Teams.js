@@ -5,7 +5,7 @@ import { ScrollView } from 'react-native-gesture-handler'
 
 import * as Analytics from '@constants/analytics.js'
 import Bubbling from '@components/bubbling'
-import LoadingBadge from '@components/LoadingBadge.js'
+import { LoadingBadge } from '@components/loading'
 
 import { getRandomInt } from '@constants/utils'
 import PapersContext from '@store/PapersContext.js'

@@ -7,7 +7,7 @@ import { slugString } from '@constants/utils.js'
 
 import PapersContext from '@store/PapersContext.js'
 import Page from '@components/page'
-import LoadingBadge from '@components/LoadingBadge.js'
+import { LoadingBadge } from '@components/loading'
 
 import * as Theme from '@theme'
 import Styles from './AccessGameStyles.js'

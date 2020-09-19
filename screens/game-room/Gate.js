@@ -10,7 +10,7 @@ import { headerTheme } from '@navigation/headerStuff.js'
 
 import Page from '@components/page'
 import Button from '@components/button'
-import LoadingBadge from '@components/LoadingBadge'
+import { LoadingBadge } from '@components/loading'
 
 export default function Gate({ navigation, route }) {
   const Papers = React.useContext(PapersContext)

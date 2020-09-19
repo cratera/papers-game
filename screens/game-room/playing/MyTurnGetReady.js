@@ -8,7 +8,7 @@ import Bubbling from '@components/bubbling'
 import Button from '@components/button'
 import Page from '@components/page'
 import { IllustrationStars } from '@components/icons'
-import LoadingBadge from '@components/LoadingBadge'
+import { LoadingBadge } from '@components/loading'
 import * as Theme from '@theme'
 
 import Styles from './PlayingStyles.js'

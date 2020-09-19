@@ -6,6 +6,7 @@ import { usePrevious, msToSecPretty, getRandomInt } from '@constants/utils'
 import PapersContext from '@store/PapersContext.js'
 import Sentry from '@constants/Sentry'
 
+import { LoadingBadge } from '@components/loading'
 import Button from '@components/button'
 import Page from '@components/page'
 // import i18n from '@constants/i18n'
@@ -309,13 +310,10 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
   }
 
   if (!papersTurn) {
-    // REVIEW Q: When can this scenario happen IRL?
     return (
-      <Page bgFill={false}>
+      <Page>
         <Page.Main>
-          <Text style={[Theme.typography.h3, Theme.u.center, { marginTop: 200 }]}>
-            Loading... hold on!
-          </Text>
+          <LoadingBadge>Loading...</LoadingBadge>
         </Page.Main>
       </Page>
     )
@@ -323,7 +321,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
 
   if (isDone) {
     return (
-      <Page bgFill={false}>
+      <Page>
         <Page.Main>
           <Text style={[Theme.typography.h1, Styles.go_count321, { color: Theme.colors.danger }]}>
             {msToSecPretty(countdown)}
@@ -336,7 +334,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
 
   if (isCount321go) {
     return (
-      <Page bgFill={false}>
+      <Page>
         <Page.Main style={Styles.go_countMain}>
           <Text style={[Theme.typography.h1, Styles.go_count321]}>
             {countdownSec - initialTimerSec}
@@ -361,7 +359,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
   }
 
   return (
-    <Page bgFill={false}>
+    <Page>
       <Page.Main>
         <Text
           style={[
