@@ -49,8 +49,12 @@ const PUBLIC_API = {
   setWords,
   setWordsForEveryone,
 
+  startGame,
+
   markMeAsReady,
   markMeAsReadyForNextRound,
+
+  pingReadyStatus,
 
   startTurn,
   setPapersGuessed,
@@ -686,10 +690,32 @@ async function setWordsForEveryone(allWords) {
   await DB.ref(`games/${gameId}/words`).set(allWords)
 }
 
+// ====================================
+
+async function startGame() {
+  if (__DEV__) console.log('⚙️ startGame()')
+  const { gameId } = LOCAL_PROFILE
+
+  await DB.ref(`games/${gameId}/hasStarted`).set(true)
+}
+
+async function _getIsEveryoneReady(gameId) {
+  const playersRef = await DB.ref(`games/${gameId}/players`).once('value')
+  const players = playersRef.val()
+  const isEveryoneReady = Object.keys(players).every(pId => players[pId].isReady)
+
+  if (!isEveryoneReady) {
+    if (__DEV__) console.log(':: everyone is ready: NO')
+    return false
+  }
+
+  if (__DEV__) console.log(':: everyone is ready: YES')
+  return true
+}
 /**
  *
  */
-async function markMeAsReady(roundStatus) {
+async function markMeAsReady(roundStatus, everyonesReadyCb) {
   if (__DEV__) console.log('⚙️ markMeAsReady()')
   const { gameId, id } = LOCAL_PROFILE
 
@@ -708,14 +734,10 @@ async function markMeAsReady(roundStatus) {
 
   // REVIEW: Is this the right place?
   // It's a side effect, I never know what's the best place for it.
-  // TODO/BUG - Use transaction here to make sure isEveryoneReady for real
-  const playersRef = await DB.ref(`games/${gameId}/players`).once('value')
-  const players = playersRef.val()
-  const isEveryoneReady = Object.keys(players).every(pId => players[pId].isReady)
-
-  if (isEveryoneReady) {
-    if (__DEV__) console.log(':: everyones ready. Start game!')
-    await DB.ref(`games/${gameId}/hasStarted`).set(true)
+  // TODO/POSSIBLE BUG - Use transaction here to make sure isEveryoneReady for real
+  if (await _getIsEveryoneReady(gameId)) {
+    // Should this be responsability of context or firebase?
+    everyonesReadyCb()
   }
 }
 
@@ -725,21 +747,21 @@ async function markMeAsReadyForNextRound(everyonesReadyCb) {
 
   await DB.ref(`games/${gameId}/players/${id}`).update({ isReady: true })
 
-  // REVIEW: Is this the right place?
-  // It's a side effect, I never know what's the best place for it.
-  // TODO/BUG - Use transaction here to make sure isEveryoneReady for real
-  // Workaround: Add "Start anyway" feature to frontend.
-  const playersRef = await DB.ref(`games/${gameId}/players`).once('value')
-  const players = playersRef.val()
-  const isEveryoneReady = Object.keys(players).every(pId => players[pId].isReady)
-
-  if (isEveryoneReady) {
-    if (__DEV__) console.log(':: everyones ready. Start next round!')
-    // REVIEW: Should this be responsability of context or firebase?
+  // Same concern as markMeAsReady
+  if (await _getIsEveryoneReady(gameId)) {
     everyonesReadyCb()
   }
 }
 
+/**
+ * Use this to prevent bugs related to markMeAsReady* calls
+ */
+async function pingReadyStatus() {
+  if (__DEV__) console.log('⚙️ pingReadyStatus()')
+  const { gameId } = LOCAL_PROFILE
+
+  return _getIsEveryoneReady(gameId)
+}
 /**
  *
  */

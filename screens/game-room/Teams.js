@@ -166,7 +166,7 @@ export default function Teams({ navigation }) {
     return (
       <Page bannerMsg={errorMsg} bgFill={bgStart}>
         <Page.Main headerDivider>
-          <LoadingBadge>Creating teams</LoadingBadge>
+          <LoadingBadge variant="page">Creating teams</LoadingBadge>
         </Page.Main>
       </Page>
     )

@@ -13,7 +13,7 @@ export default StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'nowrap',
     alignItems: 'center',
-    paddingVertical: 16,
+    paddingVertical: 12,
     // paddingHorizontal: 16,
     justifyContent: 'space-between',
   },

@@ -110,7 +110,7 @@ export default function JoinGame({ navigation }) {
       <Page.Main headerDivider>
         <View>
           {isJoining ? (
-            <LoadingBadge>Joining game</LoadingBadge>
+            <LoadingBadge variant="page">Joining game</LoadingBadge>
           ) : (
             <View keyboardShouldPersistTaps="always">
               {step === 0 ? (

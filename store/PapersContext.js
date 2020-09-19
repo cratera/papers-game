@@ -78,7 +78,7 @@ export class PapersContextProvider extends Component {
 
       markMeAsReady: this.markMeAsReady.bind(this),
       markMeAsReadyForNextRound: this.markMeAsReadyForNextRound.bind(this),
-      forceStartNextRound: this.forceStartNextRound.bind(this),
+      pingReadyStatus: this.pingReadyStatus.bind(this),
 
       startTurn: this.startTurn.bind(this),
       getNextTurn: this.getNextTurn.bind(this),
@@ -555,8 +555,9 @@ export class PapersContextProvider extends Component {
 
     try {
       this.PapersAPI.playSound('ready')
-      await this.state.socket.markMeAsReady(roundStatus)
-
+      await this.state.socket.markMeAsReady(roundStatus, () => {
+        this.state.socket.startGame()
+      })
       this.config.roundDuration = Date.now()
       Analytics.logEvent(`game_imReadyToRound_1`, {
         players: Object.keys(this.state.game.players).length,
@@ -585,6 +586,27 @@ export class PapersContextProvider extends Component {
       console.warn('error: markMeAsReadyForNextRound', e)
       Sentry.captureException(e, { tags: { pp_action: 'MMARNR_0' } })
       throw Error(i18nUnexpectedError)
+    }
+  }
+
+  async pingReadyStatus() {
+    if (__DEV__) console.log('📌 pingReadyStatus()')
+    try {
+      const isAllReady = await this.state.socket.pingReadyStatus()
+
+      if (!isAllReady) return
+
+      if (!this.state.game.hasStarted) {
+        console.log(':: start game!')
+        this.state.socket.startGame()
+      } else {
+        console.log(':: start next round!')
+        this._startNextRound()
+      }
+    } catch (e) {
+      console.warn('error: pingReadyStatus', e)
+      Sentry.captureException(e, { tags: { pp_action: 'ping_0' } })
+      throw Error('Unable to check other players status')
     }
   }
 
@@ -705,18 +727,13 @@ export class PapersContextProvider extends Component {
     this.config.myTeamId = myTeamId
   }
 
-  forceStartNextRound() {
-    Sentry.captureMessage('Force start next round.')
-    this._startNextRound()
-  }
-
-  _startNextRound() {
+  async _startNextRound() {
     if (__DEV__) console.log('📌 _startNextRound()')
     const game = this.state.game
 
     // NOTE: No need for try/catch because it's used in this component
     // only that already has its own try catch
-    this.state.socket.setRound({
+    await this.state.socket.setRound({
       current: game.round.current + 1,
       status: 'getReady',
       turnWho: this.getNextTurn(),

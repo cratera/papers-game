@@ -36,6 +36,7 @@ export default class App extends React.Component {
     Sentry.captureException(error, { tags: { pp_page: 'crash' } })
   }
 
+  // TODO!! In web prevent direct opening URLs !== root
   render() {
     if (this.state.hasError) {
       return <ErrorCrashed error={this.state.error} />

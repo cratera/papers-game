@@ -75,7 +75,7 @@ export default function CreateGame({ navigation }) {
         > */}
         <View>
           {isCreating ? (
-            <LoadingBadge>Creating game</LoadingBadge>
+            <LoadingBadge variant="page">Creating game</LoadingBadge>
           ) : (
             <>
               <Text style={[Styles.title, Theme.typography.body]}>{i18n.title}</Text>

@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Alert, View, Text, Image, Platform, TouchableHighlight } from 'react-native'
+import { Alert, View, Text, Platform, TouchableHighlight } from 'react-native'
 
 import PapersContext from '@store/PapersContext.js'
 
@@ -112,7 +112,11 @@ export default function ListPlayers({ players, enableKickout, isStatusVisible, .
           >
             <View key={playerId} style={[Styles.item, isLastChild && Styles.item_isLast]}>
               <View style={Styles.who}>
-                {wordsSubmitted ? <Avatar src={avatar} hasMargin alt="" /> : <LoadingStatic />}
+                {!isStatusVisible || (isStatusVisible && wordsSubmitted) ? (
+                  <Avatar src={avatar} hasMargin alt="" />
+                ) : (
+                  <LoadingStatic />
+                )}
                 <View style={Styles.who_text}>
                   <Text style={Theme.typography.body}>
                     {name}

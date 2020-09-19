@@ -66,7 +66,7 @@ export default function Gate({ navigation, route }) {
           alignItems: 'center',
         }}
       >
-        <LoadingBadge>
+        <LoadingBadge variant="page">
           {`${goal === 'rejoin' ? 'Rejoining' : 'Leaving'} "${
             profileGameId.split('_')[0]
           }" game...`}

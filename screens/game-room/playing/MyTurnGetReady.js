@@ -1,41 +1,40 @@
 import React from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import { Image, View, Text, StyleSheet } from 'react-native'
 import PropTypes from 'prop-types'
 
 import PapersContext from '@store/PapersContext.js'
 
+import Bubbling from '@components/bubbling'
 import Button from '@components/button'
 import Page from '@components/page'
-import { IconNonWords } from '@components/icons'
-
+import { IllustrationStars } from '@components/icons'
+import LoadingBadge from '@components/LoadingBadge'
 import * as Theme from '@theme'
 
 import Styles from './PlayingStyles.js'
 
-const place = (x, y, deg) => ({
-  left: x,
-  top: y,
-  transform: [{ rotate: deg }],
-})
-
 const MyTurnGetReady = ({ description, amIWaiting }) => {
   const Papers = React.useContext(PapersContext)
-  const { game } = Papers.state
+  const { game, profile } = Papers.state
   const round = game.round
   const roundNr = round.current + (amIWaiting ? 2 : 1)
-  const [startForced, setStartForced] = React.useState(0)
+  const isAllReady = game.hasStarted && !amIWaiting
 
   React.useEffect(() => {
-    const timeout = setTimeout(() => {
-      setStartForced(true) // TODO @mmbotelho Show in the UI
-    }, 10000)
+    const pingReadyStatus =
+      !isAllReady &&
+      setInterval(() => {
+        try {
+          Papers.pingReadyStatus()
+        } catch {}
+      }, 4000)
 
     return () => {
-      clearTimeout(timeout)
+      clearTimeout(pingReadyStatus)
     }
-  })
+  }, [isAllReady])
 
-  function onStartClick() {
+  async function onStartClick() {
     try {
       Papers.startTurn()
     } catch (e) {
@@ -45,56 +44,33 @@ const MyTurnGetReady = ({ description, amIWaiting }) => {
   }
 
   return (
-    <Page bgFill={false}>
-      <Page.Main>
-        <View style={[Styles.header, { marginTop: 8 }]}>
-          <Text style={Theme.typography.h2}>{`It's your turn!`}</Text>
+    <Page>
+      {isAllReady && <Bubbling fromBehind bgStart={Theme.colors.bg} bgEnd={Theme.colors.green} />}
+      <Page.Main headerDivider>
+        <View style={[Styles.header, { paddingTop: 32 }]}>
+          <Text style={Theme.typography.h1}>{`It's your turn!`}</Text>
           <View style={StylesIn.illustration}>
-            <IconNonWords
-              color={Theme.colors.primaryLight}
-              style={[StylesIn.icon, place(25, 0, '30deg')]}
+            <IllustrationStars style={StylesIn.svg} width="229" height="273" />
+            <Image
+              style={[StylesIn.avatar]}
+              source={{ uri: profile.avatar }}
+              accessibilityLabel=""
             />
-            <IconNonWords
-              color={Theme.colors.primaryLight}
-              style={[StylesIn.icon, place(140, -5, '25deg')]}
-            />
-            <IconNonWords
-              color={Theme.colors.primaryLight}
-              style={[StylesIn.icon, place(0, 90, '30deg')]}
-            />
-            <IconNonWords
-              color={Theme.colors.primaryLight}
-              style={[StylesIn.icon, place(150, 70, '-15deg')]}
-            />
-
-            <IconNonWords style={[StylesIn.icon, place(107, 30, '0deg')]} />
-            <IconNonWords style={[StylesIn.icon, place(30, 55, '18deg'), StylesIn.mirror]} />
-            <IconNonWords style={[StylesIn.icon, place(87, 92, '18deg')]} />
           </View>
           <Text style={Theme.typography.secondary}>Round {roundNr}</Text>
-          <Text style={[Theme.typography.bold, Theme.u.center, { marginTop: 8 }]}>
+          <Text style={[Theme.typography.body, Theme.u.center, { marginTop: 12, maxWidth: 300 }]}>
             {description}
           </Text>
         </View>
       </Page.Main>
       <Page.CTAs>
-        {game.hasStarted && !amIWaiting ? (
+        {isAllReady ? (
           <Button onPress={onStartClick}>Start turn</Button>
         ) : (
           <>
-            {startForced ? (
-              <Button
-                variant="flat"
-                textColor={Theme.colors.primary}
-                onPress={Papers.forceStartNextRound}
-              >
-                Start anyway?
-              </Button>
-            ) : null}
-            <Text style={[Theme.typography.small, Theme.u.center]}>
-              Waiting for everyone to be ready.
-            </Text>
-            <View style={{ marginTop: 8 }} />
+            <LoadingBadge size="sm" style={{ marginBottom: 16 }}>
+              Waiting for other players...
+            </LoadingBadge>
           </>
         )}
       </Page.CTAs>
@@ -110,14 +86,23 @@ MyTurnGetReady.propTypes = {
 
 const StylesIn = StyleSheet.create({
   illustration: {
-    marginTop: 24,
-    width: 250,
-    height: 200,
+    width: 229,
+    height: 273, // illustration svg size
+    marginVertical: 24,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  icon: {
+  svg: {
     position: 'absolute',
-    width: 90,
-    height: 90,
+    top: 0,
+    left: 0,
+  },
+  avatar: {
+    width: 100,
+    height: 100,
+    borderColor: Theme.colors.grayDark,
+    borderWidth: 2,
   },
   mirror: {
     transform: [{ scaleX: -1 }, { rotate: '18deg' }],

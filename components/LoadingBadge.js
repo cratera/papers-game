@@ -7,7 +7,7 @@ import * as Theme from '@theme'
 // import * as Theme from '@theme'
 // import Styles from './PlayingStyles.js'
 
-const LoadingBadge = ({ children, ...otherProps }) => {
+const LoadingBadge = ({ children, size, variant, style, ...otherProps }) => {
   const animSpin = React.useRef(new Animated.Value(0)).current
 
   React.useEffect(() => {
@@ -23,10 +23,20 @@ const LoadingBadge = ({ children, ...otherProps }) => {
   }, [])
 
   return (
-    <View style={Styles.container} {...otherProps}>
+    <View
+      style={[
+        Styles.container,
+        variant === 'page' && {
+          marginTop: 160,
+        },
+        style,
+      ]}
+      {...otherProps}
+    >
       <Animated.View
         style={[
           Styles.loader,
+          Styles[`size_${size}`],
           {
             transform: [
               {
@@ -40,31 +50,49 @@ const LoadingBadge = ({ children, ...otherProps }) => {
           },
         ]}
       />
-      <Text style={[Theme.typography.secondary, Styles.text]}>{children}</Text>
+      <Text
+        style={[
+          Theme.typography.secondary,
+          {
+            marginTop: variant === 'page' ? 24 : 12,
+          },
+        ]}
+      >
+        {children}
+      </Text>
     </View>
   )
 }
 
+LoadingBadge.defaultProps = {
+  size: 'md',
+}
+
 LoadingBadge.propTypes = {
   children: PropTypes.string,
+  size: PropTypes.oneOf(['sm', 'md']),
+  variant: PropTypes.oneOf(['page']),
+  style: PropTypes.any,
 }
 
 export default LoadingBadge
 
 const Styles = StyleSheet.create({
   container: {
-    marginTop: 160,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
   },
   loader: {
-    width: 24,
-    height: 24,
     borderWidth: 1,
     borderColor: Theme.colors.grayDark,
   },
-  text: {
-    marginTop: 24,
+  size_sm: {
+    width: 16,
+    height: 16,
+  },
+  size_md: {
+    width: 24,
+    height: 24,
   },
 })

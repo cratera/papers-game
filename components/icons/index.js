@@ -1,6 +1,6 @@
 import React from 'react'
 import { Platform, Animated, Easing } from 'react-native'
-import { Svg, Path, G, Defs, ClipPath } from 'react-native-svg'
+import { Svg, Circle, ClipPath, Defs, G, Path } from 'react-native-svg'
 
 import * as Theme from '@theme'
 
@@ -154,3 +154,15 @@ export const IconLibrary = ({ size, color, style, ...props }) /* eslint-disable-
     </Svg>
   )
 }
+
+export const IllustrationStars = props =>
+  // prettier-ignore
+  <Svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 229 273" {...props}>
+    <Path fill="#000" d="M192 71.598l35.502-35.502 1.414 1.415-35.502 35.501zM191 206.414l26.624 26.624 1.414-1.414L192.414 205zM1.63 41.398L39.2 72.075l-1.265 1.55L.366 42.946zM19.718 226.284l22.943-26.55-.948-.82-22.943 26.55zM113 56V0h2v56zM113 217v56h2v-56z"/>
+    <Circle cx="171.5" cy="38.5" r="2.5" fill="#000" />
+    <Circle cx="194.5" cy="133.5" r="2.5" fill="#000" />
+    <Circle cx="21.5" cy="134.5" r="2.5" fill="#000" />
+    <Circle cx="59.5" cy="30.5" r="2.5" fill="#000" />
+    <Circle cx="166.5" cy="235.5" r="2.5" fill="#000" />
+    <Circle cx="54.5" cy="233.5" r="2.5" fill="#000" />
+  </Svg>
