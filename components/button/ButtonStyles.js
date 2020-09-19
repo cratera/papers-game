@@ -90,12 +90,23 @@ const styles = StyleSheet.create({
   edgeKeyboard: {
     marginBottom: 16,
   },
+
+  place_float: {
+    shadowColor: Theme.colors.grayDark,
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 1,
+  },
 })
 
 const stylesSize = {
   default: 16,
   sm: 14,
-  // lg: 18,
+  lg: 16,
 }
 
 // TODO Later - This code is 💩...
@@ -120,3 +131,5 @@ export const btnText = ({ variant, size, color }) => {
 }
 
 export const touch = styles.touch
+
+export const place_float = styles.place_float // eslint-disable-line

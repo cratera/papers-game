@@ -23,7 +23,7 @@ function Button({
   return (
     <TouchableHighlight
       {...otherProps}
-      style={[Styles.touch, styleTouch]}
+      style={[Styles.touch, styleTouch, place === 'float' && Styles.place_float]}
       underlayColor={'transparent'}
       {...(isLoading ? { disabled: true } : {})}
     >
@@ -56,7 +56,7 @@ Button.defaultProps = {
 Button.propTypes = {
   variant: PropTypes.oneOf(['primary', 'success', 'danger', 'light', 'flat', 'icon']),
   size: PropTypes.oneOf(['default', 'sm', 'lg']),
-  place: PropTypes.oneOf(['edgeKeyboard']),
+  place: PropTypes.oneOf(['edgeKeyboard', 'float']),
   isLoading: PropTypes.bool,
   children: PropTypes.node,
   numberOfLines: PropTypes.number,

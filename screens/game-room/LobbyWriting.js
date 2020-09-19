@@ -92,7 +92,7 @@ export default function LobbyWriting({ navigation }) {
             {errorMsg}
           </Text>
 
-          <Button onPress={handleReadyClick} isLoading={isSubmitting}>
+          <Button place="float" isLoading={isSubmitting} onPress={handleReadyClick}>
             {"I'm ready!"}
           </Button>
         </Page.CTAs>

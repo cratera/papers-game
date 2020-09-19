@@ -6,8 +6,9 @@ import { usePrevious, msToSecPretty, getRandomInt } from '@constants/utils'
 import PapersContext from '@store/PapersContext.js'
 import Sentry from '@constants/Sentry'
 
-import { LoadingBadge } from '@components/loading'
+import { BubblingCorner } from '@components/bubbling'
 import Button from '@components/button'
+import { LoadingBadge } from '@components/loading'
 import Page from '@components/page'
 // import i18n from '@constants/i18n'
 import TurnScore from './TurnScore'
@@ -16,7 +17,20 @@ import { IconEyeClosed, IconEyeOpen, IconCheck, IconTimes } from '@components/ic
 import * as Theme from '@theme'
 import Styles from './PlayingStyles.js'
 
-const ANIM_PAPER_NEXT = 500
+const ANIM_PAPER_NEXT = 800
+
+const BUB_CONFIG_PROPS = {
+  nope: {
+    corner: 'bottom-left',
+    bgStart: Theme.colors.bg,
+    bgEnd: Theme.colors.grayLight,
+  },
+  gotcha: {
+    corner: 'bottom-right',
+    bgStart: Theme.colors.bg,
+    bgEnd: Theme.colors.green,
+  },
+}
 
 const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, isCount321go }) => {
   const Papers = React.useContext(PapersContext)
@@ -323,7 +337,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
     return (
       <Page>
         <Page.Main>
-          <Text style={[Theme.typography.h1, Styles.go_count321, { color: Theme.colors.danger }]}>
+          <Text style={[Theme.typography.body, Styles.go_count321, { color: Theme.colors.danger }]}>
             {msToSecPretty(countdown)}
           </Text>
           <Text style={[Theme.typography.h1, Styles.go_done_msg]}>{doneMsg}</Text>
@@ -336,7 +350,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
     return (
       <Page>
         <Page.Main style={Styles.go_countMain}>
-          <Text style={[Theme.typography.h1, Styles.go_count321]}>
+          <Text style={[Theme.typography.body, Styles.go_count321]}>
             {countdownSec - initialTimerSec}
           </Text>
         </Page.Main>
@@ -360,12 +374,13 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
 
   return (
     <Page>
+      {paperAnim && <BubblingCorner duration={ANIM_PAPER_NEXT} {...BUB_CONFIG_PROPS[paperAnim]} />}
       <Page.Main>
         <Text
           style={[
-            Theme.typography.h1,
-            Styles.go_counting,
-            countdown <= 10500 && { color: Theme.colors.danger },
+            Theme.typography.body,
+            Styles.go_count321,
+            // countdown <= 4500 && { color: Theme.colors.danger },
           ]}
         >
           {msToSecPretty(countdown)}
@@ -382,7 +397,12 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
             }}
             onPressOut={() => setPaperBlur(true)}
           >
-            <View style={[Styles.go_paper, Styles[`go_paper_${paperAnim}`]]}>
+            <View
+              style={[
+                Styles.go_paper,
+                // Styles[`go_paper_${paperAnim}`]
+              ]}
+            >
               <View style={Styles.go_paper_sentence}>
                 {(getPaperByKey(papersTurnCurrent) || `😱 BUG 😱 ${papersTurnCurrent} (Click pass)`)
                   .split(' ')
@@ -403,9 +423,9 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
               <Text style={Styles.go_paper_key}>{String(papersTurnCurrent)}</Text>
               <View style={Styles.go_paper_icon} accessible={false}>
                 {isPaperBlur && !isPaperChanging ? (
-                  <IconEyeClosed style={Styles.go_paper_iconSvg} color={Theme.colors.grayMedium} />
+                  <IconEyeClosed style={Styles.go_paper_iconSvg} color={Theme.colors.grayDark} />
                 ) : (
-                  <IconEyeOpen style={Styles.go_paper_iconSvg} color={Theme.colors.grayMedium} />
+                  <IconEyeOpen style={Styles.go_paper_iconSvg} color={Theme.colors.grayDark} />
                 )}
               </View>
             </View>
@@ -436,37 +456,31 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
           <>
             <Button
               variant="icon"
+              size="lg"
               style={Styles.go_ctas_no}
               accessibilityLabel="Pass"
               isLoading={isPaperChanging && paperAnim === 'nope'}
               onPress={() => !isPaperChanging && handlePaperClick(false)}
             >
-              <IconTimes size={30} color={Theme.colors.bg} />
+              <IconTimes size={24} color={Theme.colors.bg} />
             </Button>
-            {isPaperChanging && paperAnim === 'nope' && (
-              <View style={{ alignItems: 'center', flexDirection: 'row', marginLeft: 16 }}>
-                <Text style={{ color: Theme.colors.grayMedium }}>Damn it!</Text>
-              </View>
-            )}
           </>
         )}
 
-        <Text style={{ flexGrow: 1 }}>{/* lazyness lvl 99 */}</Text>
-
-        {isPaperChanging && paperAnim === 'gotcha' && (
-          <View style={{ alignItems: 'center', flexDirection: 'row', marginRight: 16 }}>
-            <IconCheck size={20} color={Theme.colors.success} />
-            <Text style={{ marginLeft: 4, color: Theme.colors.success }}>Good job!</Text>
-          </View>
+        {isPaperChanging && paperAnim && (
+          <Text style={Theme.typography.body}>
+            {paperAnim === 'gotcha' ? 'Good job!' : 'Damn it...'}
+          </Text>
         )}
         <Button
           variant="icon"
+          size="lg"
           style={Styles.go_ctas_yes}
           accessibilityLabel="Got it"
           isLoading={isPaperChanging && paperAnim === 'gotcha'}
           onPress={() => !isPaperChanging && handlePaperClick(true)}
         >
-          <IconCheck size={30} color={Theme.colors.bg} />
+          <IconCheck size={24} color={Theme.colors.bg} />
         </Button>
       </Page.CTAs>
     </Page>

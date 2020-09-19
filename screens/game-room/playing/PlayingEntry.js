@@ -6,7 +6,6 @@ import * as Analytics from '@constants/analytics.js'
 
 import { useCountdown, usePrevious } from '@constants/utils'
 import PapersContext from '@store/PapersContext.js'
-import { headerTheme } from '@navigation/headerStuff.js'
 
 import { MyTurnGetReady, MyTurnGo, OthersTurn, RoundScore } from './index'
 
@@ -65,9 +64,6 @@ export default function PlayingEntry({ navigation }) {
   function setNavigation() {
     // OPTIMIZE - Handle nav options across diff screens in a smarter way.
     navigation.setOptions({
-      ...headerTheme({
-        hiddenTitle: true,
-      }),
       headerTitle: 'Playing',
       headerRight: function HLB() {
         return <Page.HeaderBtnSettings />

@@ -219,6 +219,7 @@ export default function Teams({ navigation }) {
         <Button
           size="lg"
           styleTouch={Styles.ctas_submit}
+          place="float"
           onPress={handleLockClick}
           isLoading={isLocking}
         >

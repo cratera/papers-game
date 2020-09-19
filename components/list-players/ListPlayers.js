@@ -6,34 +6,17 @@ import PapersContext from '@store/PapersContext.js'
 
 import { getTeamId } from '@store/papersMethods.js'
 
+import { LoadingBadge } from '@components/loading'
 import Button from '@components/button'
 import Avatar from '@components/avatar'
 import Sheet from '@components/sheet'
-// import { LoadingBadge } from '@components/loading'
 
 import Styles from './ListPlayersStyles'
 import * as Theme from '@theme'
 
-const LoadingStatic = () => (
-  <View
-    style={{
-      width: 40,
-      height: 40,
-      marginRight: 16,
-      paddingTop: 8,
-      paddingLeft: 8,
-    }}
-  >
-    {/* <LoadingBadge style={{}} /> */}
-    <View
-      style={{
-        width: 24,
-        height: 24,
-        borderWidth: 2,
-        borderColor: Theme.colors.grayDark,
-        transform: [{ rotate: '45deg' }],
-      }}
-    />
+const LoadingAvatar = () => (
+  <View style={Styles.loading}>
+    <LoadingBadge size="sm" />
   </View>
 )
 
@@ -73,7 +56,7 @@ export default function ListPlayers({ players, enableKickout, isStatusVisible, .
           return (
             <View key={playerId} style={[Styles.item, isLastChild && Styles.item_isLast]}>
               <View style={Styles.who}>
-                <LoadingStatic />
+                <LoadingAvatar />
                 <View>
                   <Text style={[Theme.typography.body, { color: Theme.colors.grayMedium }]}>
                     {playerName}
@@ -115,7 +98,7 @@ export default function ListPlayers({ players, enableKickout, isStatusVisible, .
                 {!isStatusVisible || (isStatusVisible && wordsSubmitted) ? (
                   <Avatar src={avatar} hasMargin alt="" />
                 ) : (
-                  <LoadingStatic />
+                  <LoadingAvatar />
                 )}
                 <View style={Styles.who_text}>
                   <Text style={Theme.typography.body}>

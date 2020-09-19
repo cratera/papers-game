@@ -32,6 +32,13 @@ export default StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
+  loading: {
+    width: 40,
+    height: 40,
+    marginRight: 16,
+    paddingTop: 12,
+    paddingLeft: 4,
+  },
   itemStatus: {
     width: 45,
     height: 45,

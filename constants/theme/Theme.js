@@ -88,6 +88,12 @@ export const u = StyleSheet.create({
   center: {
     textAlign: 'center',
   },
+  middle: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   cardEdge: {
     marginHorizontal: -16,
   },

@@ -7,7 +7,6 @@ export const headerTheme = (opts = {}) => ({
   headerStatusBarHeight: Constants.statusBarHeight,
   headerTransparent: true, // Do globally to avoid jumps in screens
   headerTitleAlign: 'center',
-  backgroundColor: 'red',
 
   // headerStyle: {
   //   backgroundColor: opts.bgColor || Theme.colors.bg,

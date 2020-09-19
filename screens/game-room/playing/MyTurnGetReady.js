@@ -101,6 +101,7 @@ const StylesIn = StyleSheet.create({
   avatar: {
     width: 100,
     height: 100,
+    backgroundColor: Theme.colors.grayMedium,
     borderColor: Theme.colors.grayDark,
     borderWidth: 2,
   },

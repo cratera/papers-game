@@ -15,13 +15,13 @@ const isWeb = Platform.OS === 'web'
 
 const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, isSubmitting, getPaperByKey }) => {
   return (
-    <Page bgFill={false}>
+    <Page>
       <Page.Main>
         <View style={Styles.header}>
-          <Text style={Theme.typography.secondary}>
+          {/* <Text style={Theme.typography.secondary}>
             {type === 'timesup' ? "Time's Up!" : 'All papers guessed!'}
-          </Text>
-          <Text style={[Theme.typography.h2, Theme.u.center]}>
+          </Text> */}
+          <Text style={[Theme.typography.h2, Theme.u.center, { maxWidth: 300 }]}>
             Your team got <Text>{papersTurn.guessed.length}</Text> papers right!
           </Text>
         </View>
@@ -38,25 +38,35 @@ const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, isSubmitting, ge
                 .map((paper, i) => {
                   const hasGuessed = papersTurn.guessed.includes(paper)
                   const Icon = hasGuessed ? IconCheck : IconTimes
+
                   return (
                     <ItemToggle
                       key={`${i}_${paper}`}
                       style={[Styles.tscore_item]}
                       onPress={() => onTogglePaper(paper, !hasGuessed)}
                     >
-                      <Icon
-                        size={20}
-                        color={hasGuessed ? Theme.colors.success : null}
-                        style={{ flexShrink: 0, transform: [{ translateY: 4 }] }}
+                      <View
+                        style={[
+                          Styles.tscore_iconArea,
+                          Theme.u.middle,
+                          {
+                            backgroundColor: hasGuessed ? Theme.colors.grayDark : Theme.colors.bg,
+                          },
+                        ]}
+                      >
+                        <Icon
+                          size={28}
+                          color={hasGuessed ? Theme.colors.bg : Theme.colors.grayDark}
+                        />
+                      </View>
+                      <View
+                        style={{ width: 16, height: 1 }} // lazyness level 99
                       />
-                      <View style={{ width: 8, height: 1 }}>{/* lazyness level 99 */}</View>
                       <Text
                         style={[
                           Theme.typography.bold,
                           {
-                            flexGrow: 1,
-                            paddingRight: 4,
-                            color: Theme.colors[hasGuessed ? 'success' : 'grayMedium'],
+                            color: Theme.colors[hasGuessed ? 'grayDark' : 'grayMedium'],
                             textDecorationLine: hasGuessed ? 'none' : 'line-through',
                           },
                         ]}
@@ -75,7 +85,7 @@ const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, isSubmitting, ge
         </ScrollView>
       </Page.Main>
       <Page.CTAs hasOffset>
-        <Button onPress={onFinish} isLoading={isSubmitting}>
+        <Button size="lg" place="float" onPress={onFinish} isLoading={isSubmitting}>
           End turn
         </Button>
       </Page.CTAs>
