@@ -26,14 +26,15 @@ const CardScore = ({ index, isTie, teamName, scoreTotal, scoreRound, bestPlayer 
       </Text>
       <Text style={Theme.typography.h3}>{teamName}</Text>
 
-      <Text style={[Theme.typography.small, { color: Theme.colors.grayDark, marginTop: 2 }]}>
-        {bestPlayer.name} was the best player! ({bestPlayer.score})
+      <Text style={[Theme.typography.small, { marginTop: 4 }]}>
+        {bestPlayer.name} was the best! ({bestPlayer.score})
       </Text>
     </View>
     <View style={Styles.fscore_score}>
-      <Text style={Theme.typography.small}>Papers</Text>
-      <Text style={Theme.typography.h1}>{scoreTotal}</Text>
-      <Text style={Theme.typography.small}>+{scoreRound} this round</Text>
+      <Text style={[Theme.typography.h2, { marginTop: 14 }]}>
+        {scoreTotal} <Text style={{ fontSize: 16 }}>pts</Text>
+      </Text>
+      <Text style={[Theme.typography.small, { marginTop: 6 }]}>+{scoreRound} this round</Text>
     </View>
   </View>
 )
@@ -52,10 +53,11 @@ CardScore.propTypes = {
 
 const Styles = StyleSheet.create({
   fscore_item: {
-    backgroundColor: Theme.colors.grayLight,
+    borderColor: Theme.colors.grayDark,
+    borderWidth: 2,
     borderRadius: 4,
     overflow: 'hidden',
-    paddingVertical: 16,
+    paddingVertical: 24,
     paddingHorizontal: 16,
     marginVertical: 8,
     display: 'flex',

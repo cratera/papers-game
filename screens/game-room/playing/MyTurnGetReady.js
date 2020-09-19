@@ -48,7 +48,7 @@ const MyTurnGetReady = ({ description, amIWaiting }) => {
       {isAllReady && <Bubbling fromBehind bgStart={Theme.colors.bg} bgEnd={Theme.colors.green} />}
       <Page.Main headerDivider>
         <View style={[Styles.header, { paddingTop: 32 }]}>
-          <Text style={Theme.typography.h1}>{`It's your turn!`}</Text>
+          <Text style={Theme.typography.h2}>{`It's your turn!`}</Text>
           <View style={StylesIn.illustration}>
             <IllustrationStars style={StylesIn.svg} width="229" height="273" />
             <Image
@@ -57,6 +57,7 @@ const MyTurnGetReady = ({ description, amIWaiting }) => {
               accessibilityLabel=""
             />
           </View>
+          {/* TODO responsive iphone 5 */}
           <Text style={Theme.typography.secondary}>Round {roundNr}</Text>
           <Text style={[Theme.typography.body, Theme.u.center, { marginTop: 12, maxWidth: 300 }]}>
             {description}
@@ -65,7 +66,7 @@ const MyTurnGetReady = ({ description, amIWaiting }) => {
       </Page.Main>
       <Page.CTAs>
         {isAllReady ? (
-          <Button onPress={onStartClick}>Start turn</Button>
+          <Button onPress={onStartClick}>Start</Button>
         ) : (
           <>
             <LoadingBadge size="sm" style={{ marginBottom: 16 }}>

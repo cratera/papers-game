@@ -18,9 +18,6 @@ const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, isSubmitting, ge
     <Page>
       <Page.Main>
         <View style={Styles.header}>
-          {/* <Text style={Theme.typography.secondary}>
-            {type === 'timesup' ? "Time's Up!" : 'All papers guessed!'}
-          </Text> */}
           <Text style={[Theme.typography.h2, Theme.u.center, { maxWidth: 300 }]}>
             Your team got <Text>{papersTurn.guessed.length}</Text> papers right!
           </Text>
@@ -45,34 +42,37 @@ const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, isSubmitting, ge
                       style={[Styles.tscore_item]}
                       onPress={() => onTogglePaper(paper, !hasGuessed)}
                     >
-                      <View
-                        style={[
-                          Styles.tscore_iconArea,
-                          Theme.u.middle,
-                          {
-                            backgroundColor: hasGuessed ? Theme.colors.grayDark : Theme.colors.bg,
-                          },
-                        ]}
-                      >
-                        <Icon
-                          size={28}
-                          color={hasGuessed ? Theme.colors.bg : Theme.colors.grayDark}
+                      {/* Need extra wrapper for web */}
+                      <View style={Styles.tscore_start}>
+                        <View
+                          style={[
+                            Styles.tscore_iconArea,
+                            Theme.u.middle,
+                            {
+                              backgroundColor: hasGuessed ? Theme.colors.grayDark : Theme.colors.bg,
+                            },
+                          ]}
+                        >
+                          <Icon
+                            size={28}
+                            color={hasGuessed ? Theme.colors.bg : Theme.colors.grayDark}
+                          />
+                        </View>
+                        <View
+                          style={{ width: 16, height: 1 }} // lazyness level 99
                         />
+                        <Text
+                          style={[
+                            Theme.typography.bold,
+                            {
+                              color: Theme.colors[hasGuessed ? 'grayDark' : 'grayMedium'],
+                              textDecorationLine: hasGuessed ? 'none' : 'line-through',
+                            },
+                          ]}
+                        >
+                          {getPaperByKey(paper)}
+                        </Text>
                       </View>
-                      <View
-                        style={{ width: 16, height: 1 }} // lazyness level 99
-                      />
-                      <Text
-                        style={[
-                          Theme.typography.bold,
-                          {
-                            color: Theme.colors[hasGuessed ? 'grayDark' : 'grayMedium'],
-                            textDecorationLine: hasGuessed ? 'none' : 'line-through',
-                          },
-                        ]}
-                      >
-                        {getPaperByKey(paper)}
-                      </Text>
                     </ItemToggle>
                   )
                 })}

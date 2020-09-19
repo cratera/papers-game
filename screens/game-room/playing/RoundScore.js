@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react'
-import { View, Text } from 'react-native'
+import { ScrollView, View, Text } from 'react-native'
 import PropTypes from 'prop-types'
 
 import PapersContext from '@store/PapersContext.js'
@@ -60,7 +60,7 @@ const RoundScore = ({ navigation }) => {
 
   if (isOnRoundIntro) {
     return (
-      <Page bgFill={Theme.colors.grayDark}>
+      <Page bgFill={Theme.colors.purple}>
         <Page.Main>
           <View
             style={[
@@ -88,8 +88,8 @@ const RoundScore = ({ navigation }) => {
             </Text>
           </View>
         </Page.Main>
-        <Page.CTAs style={{ backgroundColor: Theme.colors.grayDark }}>
-          <Button isLoading={isSubmitting} onPress={handleReadyClick}>
+        <Page.CTAs>
+          <Button place="float" isLoading={isSubmitting} onPress={handleReadyClick}>
             {`I'm ready!`}
           </Button>
         </Page.CTAs>
@@ -98,22 +98,22 @@ const RoundScore = ({ navigation }) => {
   }
 
   return (
-    <Page bgFill={false}>
+    <Page>
       {!isTie && isFinalRound && <EmojiRain type={isMyTeamWinner ? 'winner' : 'loser'} />}
       <Page.Main>
-        <View style={[Styles.header, { marginTop: 40, marginBottom: 16 }]}>
+        <View style={[{ marginHorizontal: 0, marginTop: 24, marginBottom: 16 }]}>
           {isFinalRound ? (
             <Fragment>
-              <Text style={Theme.typography.h1}>
+              <Text style={[Theme.typography.h3, Theme.u.center]}>
                 {isTie ? 'Stalemate' : isMyTeamWinner ? 'Your team won!' : 'Your team lost!'}
               </Text>
-              <Text style={Theme.typography.body}>
+              <Text style={[Theme.typography.body, Theme.u.center]}>
                 {isTie ? "It's a tie" : isMyTeamWinner ? 'They never stood a chance' : 'Yikes.'}
               </Text>
             </Fragment>
           ) : (
             <Fragment>
-              <Text style={Theme.typography.h3}>
+              <Text style={[Theme.typography.h3, Theme.u.center]}>
                 {isTie
                   ? "It's a tie!"
                   : isMyTeamWinner
@@ -123,12 +123,17 @@ const RoundScore = ({ navigation }) => {
             </Fragment>
           )}
         </View>
-
-        <GameScore BOAT={isFinalRound} />
+        <ScrollView
+          style={[Theme.u.scrollSideOffset]}
+          contentContainerStyle={{ paddingBottom: 120 }}
+        >
+          <GameScore BOAT={isFinalRound} />
+        </ScrollView>
       </Page.Main>
       <Page.CTAs>
         {isFinalRound ? (
           <Button
+            place="float"
             onPress={() => {
               navigation.navigate('gate', { goal: 'leave' })
               Papers.leaveGame()
@@ -137,7 +142,12 @@ const RoundScore = ({ navigation }) => {
             Go to homepage
           </Button>
         ) : (
-          <Button isLoading={isSubmitting} onPress={handleStartRoundClick}>
+          <Button
+            place="float"
+            bgColor={Theme.colors.purple}
+            isLoading={isSubmitting}
+            onPress={handleStartRoundClick}
+          >
             {`Start round ${round.current + 1 + 1}!`}
           </Button>
         )}

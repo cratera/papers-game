@@ -8,15 +8,13 @@ import * as Theme from '@theme'
 import Styles from './PlayingStyles.js'
 
 const TurnStatus = ({ title, player, teamName, style }) => (
-  <View style={[Styles.tst, style]}>
-    <Text style={Theme.typography.h3}>{title}</Text>
-    <View style={Styles.tst_flex}>
-      <Avatar hasMargin size="lg" src={player.avatar} alt="" />
-      <View>
-        <Text style={Theme.typography.h3}>{player.name}</Text>
-        <Text style={[Theme.typography.small, Styles.tst_team]}>{teamName}</Text>
-      </View>
-    </View>
+  <View style={[Styles.tst_flex, style]}>
+    <Text style={[Theme.typography.secondary, Styles.tst_flex_title]}>{title}</Text>
+    <Avatar size="xl" src={player.avatar} alt="" />
+    <Text style={[Theme.typography.h3, Theme.u.center, { marginTop: 24, marginBottom: 8 }]}>
+      {title || player.name}
+    </Text>
+    <Text style={[Theme.typography.secondary, Theme.u.center]}>{teamName}</Text>
   </View>
 )
 

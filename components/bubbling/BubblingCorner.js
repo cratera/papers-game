@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Animated, Easing, Platform, StyleSheet } from 'react-native'
+import { Animated, Easing, Platform, StyleSheet, View } from 'react-native'
 import Constants from 'expo-constants'
 
 import { window, isWeb } from '@constants/layout'
@@ -42,7 +42,16 @@ const BubblingCorner = ({ duration, corner, bgEnd, bgStart }) => {
   }, [])
 
   if (!MOTION_ENABLED) {
-    return null
+    return (
+      <View
+        style={[
+          StylesBubble.bg,
+          {
+            backgroundColor: bgEnd,
+          },
+        ]}
+      />
+    )
   }
 
   return (

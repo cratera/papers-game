@@ -44,11 +44,13 @@ export const typography = StyleSheet.create({
   body: {
     fontFamily: 'karla-regular',
     fontSize: 16,
+    lineHeight: 22,
     color: colors.grayDark,
   },
   secondary: {
     fontFamily: 'karla-regular',
     fontSize: 16,
+    lineHeight: 22,
     color: colors.grayMedium,
   },
   small: {
@@ -60,6 +62,7 @@ export const typography = StyleSheet.create({
   bold: {
     fontFamily: 'karla-regular',
     fontSize: 16,
+    lineHeight: 22,
     fontWeight: 'bold',
     color: colors.grayDark,
   },

@@ -7,7 +7,7 @@ import { msToSecPretty } from '@constants/utils'
 import PapersContext from '@store/PapersContext.js'
 
 import Page from '@components/page'
-import TurnStatus from './TurnStatus'
+import Avatar from '@components/avatar'
 
 import * as Theme from '@theme'
 import Styles from './PlayingStyles.js'
@@ -32,18 +32,13 @@ const OthersTurn = ({
   const roundNr = round.current + (amIWaiting ? 2 : 1)
   const isTurnOn = !hasCountdownStarted || !!countdownSec // aka: it isn't times up
   const turnStatus = React.useMemo(() => {
-    if (isAllWordsGuessed) {
-      // No need to calculate this because the component is not rendered.
-      return {}
-    }
-
     const turnState = isTurnOn && !amIWaiting ? turnWho : Papers.getNextTurn()
     const teamId = turnState.team
     const tPlayerIx = turnState[turnState.team]
     const tPlayerId = game.teams[teamId].players[tPlayerIx]
 
     return {
-      title: isTurnOn && game.hasStarted && !amIWaiting ? 'Playing now' : 'Next up',
+      title: isTurnOn && game.hasStarted && !amIWaiting ? 'Playing now:' : 'Next up:',
       player: {
         name: tPlayerId === profile.id ? 'You!' : profiles[tPlayerId]?.name || `? ${tPlayerId} ?`,
         avatar: profiles[tPlayerId]?.avatar,
@@ -55,76 +50,97 @@ const OthersTurn = ({
           ? `Waiting for ${thisTurnPlayerName} to finish their turn.`
           : game.teams[teamId].name,
     }
-  }, [isAllWordsGuessed, amIWaiting, isTurnOn, game.hasStarted])
+  }, [amIWaiting, isTurnOn, game.hasStarted])
 
   return (
     <Page>
       <Page.Main>
-        <View>
-          <View style={[Styles.header, { marginTop: 24 }]}>
-            <Text style={Theme.typography.h3}>Round {roundNr}</Text>
-            <Text style={[Theme.typography.secondary, Theme.u.center]}>
-              {'\n'} {description}
-            </Text>
-          </View>
-          <View style={Styles.main}>
-            {!hasCountdownStarted ? (
-              <Text style={Theme.typography.small}>Not started yet</Text>
-            ) : countdownSec && !isAllWordsGuessed ? null : (
-              <Fragment>
-                <Text style={[Theme.typography.small, { marginBottom: 16 }]}>
-                  {isAllWordsGuessed ? 'All papers guessed!' : "Time's up!"}
-                </Text>
-                <Text style={[Theme.typography.h1, Theme.u.center]}>
-                  {thisTurnTeamName} got {papersGuessed} papers right!
-                </Text>
-              </Fragment>
-            )}
-            <Text
-              style={[
-                Theme.typography.h1,
-                {
-                  marginVertical: 8,
-                  color: hasCountdownStarted
-                    ? countdown <= 10500
-                      ? Theme.colors.danger
-                      : Theme.colors.primary
-                    : Theme.colors.grayDark,
-                },
-              ]}
-            >
+        <View style={Styles.main}>
+          <Text
+            style={[
+              Theme.typography.body,
+              Styles.go_count321,
               {
-                hasCountdownStarted
-                  ? countdownSec > initialTimerSec // isCount321go
-                    ? countdownSec - initialTimerSec // 3, 2, 1...
-                    : countdownSec && !isAllWordsGuessed
-                    ? msToSecPretty(countdown) // 59, 58, counting...
-                    : '' // timeout or all words guessed
-                  : msToSecPretty(initialTimer) // waiting to start
-              }
+                marginVertical: 8,
+                color: hasCountdownStarted
+                  ? countdown <= 10500
+                    ? Theme.colors.danger
+                    : Theme.colors.grayDark
+                  : Theme.colors.bg,
+              },
+            ]}
+          >
+            {
+              hasCountdownStarted
+                ? countdownSec > initialTimerSec // isCount321go
+                  ? countdownSec - initialTimerSec // 3, 2, 1...
+                  : countdownSec && !isAllWordsGuessed
+                  ? msToSecPretty(countdown) // 59, 58, counting...
+                  : '' // timeout or all words guessed
+                : msToSecPretty(initialTimer) // waiting to start
+            }
+          </Text>
+
+          {/* 
+            HOLY MOTHER - OPTIMIZE/TODO!!!! This file is officially
+            the most 🍝 code ever. Result of a lot of UI iterations
+            and experimenting and lack of concentration.
+            Just make it work, pure caos evil.
+          */}
+          <View style={[Styles.tst_flex]}>
+            <Text style={[Theme.typography.secondary, Styles.tst_flex_title]}>
+              {hasCountdownStarted && countdownSec && !isAllWordsGuessed
+                ? `${papersGuessed} papers guessed`
+                : !hasCountdownStarted
+                ? turnStatus.title
+                : countdownSec && !isAllWordsGuessed
+                ? turnStatus.title
+                : isAllWordsGuessed
+                ? 'All papers guessed!'
+                : "Time's up!"}
             </Text>
-            {hasCountdownStarted && countdownSec && !isAllWordsGuessed ? (
-              <Text style={Theme.typography.small}>{papersGuessed} papers guessed</Text>
-            ) : null}
+            <Avatar size="xl" src={turnStatus.player.avatar} alt="" />
+
+            {!hasCountdownStarted ? (
+              <>
+                <Text
+                  style={[Theme.typography.h3, Theme.u.center, { marginTop: 24, marginBottom: 8 }]}
+                >
+                  {turnStatus.player.name}
+                </Text>
+                <Text style={[Theme.typography.secondary, Theme.u.center]}>
+                  {turnStatus.teamName}
+                </Text>
+              </>
+            ) : countdownSec && !isAllWordsGuessed ? (
+              <>
+                <Text
+                  style={[Theme.typography.h3, Theme.u.center, { marginTop: 24, marginBottom: 8 }]}
+                >
+                  {turnStatus.player.name}
+                </Text>
+                <Text style={[Theme.typography.secondary, Theme.u.center]}>
+                  {turnStatus.teamName}
+                </Text>
+              </>
+            ) : (
+              <Text style={[Theme.typography.h3, Theme.u.center, { marginTop: 32, maxWidth: 320 }]}>
+                {thisTurnTeamName} got {papersGuessed} papers right!
+              </Text>
+            )}
           </View>
-          {/* TODO - view when all papers were guessed */}
         </View>
       </Page.Main>
+
       <Page.CTAs>
-        {isAllWordsGuessed ? (
-          <View>
-            <Text style={Theme.typography.h3}>End of Round {roundNr}</Text>
-            <Text style={[Theme.typography.body, { marginTop: 16 }]}>
-              Waiting for {thisTurnPlayerName} to finish their turn.
-            </Text>
-          </View>
-        ) : (
-          <TurnStatus
-            title={turnStatus.title}
-            player={turnStatus.player}
-            teamName={turnStatus.teamName}
-          />
-        )}
+        <View style={[Styles.header, { marginBottom: 32 }]}>
+          <Text style={Theme.typography.secondary}>
+            {isAllWordsGuessed ? `End of round ${roundNr}` : `Round ${roundNr}`}
+          </Text>
+          <Text style={[Theme.typography.body, Theme.u.center, { marginTop: 16, maxWidth: 300 }]}>
+            {isAllWordsGuessed ? `Waiting for ${turnStatus.player.name}` : description}
+          </Text>
+        </View>
       </Page.CTAs>
     </Page>
   )

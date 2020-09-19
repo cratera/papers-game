@@ -54,4 +54,8 @@ const Styles = StyleSheet.create({
     width: 56,
     height: 56,
   },
+  size_xl: {
+    width: 104,
+    height: 104,
+  },
 })

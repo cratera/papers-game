@@ -47,6 +47,7 @@ export default StyleSheet.create({
     justifyContent: 'center',
     borderColor: Theme.colors.grayDark,
     borderWidth: 2,
+    borderRadius: 4,
     backgroundColor: Theme.colors.bg,
     marginTop: -100,
   },
@@ -114,13 +115,13 @@ export default StyleSheet.create({
 
   // Turn StaTus:
   tst_flex: {
-    marginTop: 16,
     display: 'flex',
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
+    marginTop: 50,
   },
-  tst_team: {
-    marginTop: 8,
+  tst_flex_title: {
+    marginBottom: 60,
   },
 
   // Turn score:
@@ -137,6 +138,12 @@ export default StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 20,
   },
+  tscore_start: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexShrink: 0,
+  },
   tscore_iconArea: {
     width: 32,
     height: 32,
@@ -144,6 +151,6 @@ export default StyleSheet.create({
     borderWidth: 2,
     borderRadius: 4,
     flexShrink: 0,
-    transform: [{ translateY: 8 }], // for some reason
+    // transform: [{ translateY: 8 }], // for some reason
   },
 })
