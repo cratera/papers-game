@@ -34,7 +34,6 @@ export default function ListTeams({ isStatusVisible, enableKickout, ...otherProp
         const { id, name, players } = game.teams[teamId]
         const playersList = isStatusVisible && Object.values(players)
         const total = isStatusVisible && playersList.length
-        console.log('hum', playersList)
         const done = isStatusVisible && playersList.filter(didSubmitAllWords).length
         return (
           <View key={id} style={Styles.team}>

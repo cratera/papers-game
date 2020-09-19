@@ -36,8 +36,9 @@ export class PapersContextProvider extends Component {
 
     this.state = {
       socket: null, // rename to serverAPI?
-      toggle_features: {
+      features: {
         soundSkins: null, // TODO connect & disable this
+        ANIMATIONS: false, // TODO same
       },
       profile: {
         id: props.initialProfile.id,
