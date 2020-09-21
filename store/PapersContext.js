@@ -871,7 +871,7 @@ export class PapersContextProvider extends Component {
         this.config.roundDuration = undefined
 
         if (totalScore !== Object.keys(game.players).length * 10) {
-          console.warn('Wrong score!!', totalScore, game)
+          console.warn('Wrong score!!', totalScore, this.state.profile.id, game)
           Sentry.withScope(scope => {
             scope.setExtra('response', JSON.stringify(game))
             Sentry.captureException(Error('Wrong score!'))

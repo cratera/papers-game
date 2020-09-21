@@ -12,6 +12,7 @@ function Button({
   place,
   textColor,
   bgColor,
+  loadingColor,
   numberOfLines,
   isLoading,
   children,
@@ -40,7 +41,7 @@ function Button({
             </Text>
           )
         ) : (
-          <IconSpin size={20} />
+          <IconSpin size={20} color={loadingColor} />
         )}
       </View>
     </TouchableHighlight>
@@ -66,6 +67,7 @@ Button.propTypes = {
   styleTouch: PropTypes.oneOfType([PropTypes.array, PropTypes.object, PropTypes.number]),
   bgColor: PropTypes.string,
   textColor: PropTypes.string,
+  loadingColor: PropTypes.string,
 }
 
 export default memo(Button)

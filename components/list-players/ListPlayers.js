@@ -45,7 +45,7 @@ export default function ListPlayers({ players, enableKickout, isStatusVisible, .
   }
 
   return (
-    <View style={Styles.list} {...otherProps}>
+    <View style={[Styles.list, Theme.u.cardEdge]} {...otherProps}>
       {playersSorted.map((playerId, i) => {
         const isLastChild = i === players.length
 

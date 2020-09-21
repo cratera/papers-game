@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 import { View, Text } from 'react-native'
 import PropTypes from 'prop-types'
 
@@ -20,7 +20,7 @@ const OthersTurn = ({
   initialTimerSec,
   initialTimer,
   thisTurnTeamName,
-  thisTurnPlayerName,
+  thisTurnPlayer,
   amIWaiting,
 }) => {
   const Papers = React.useContext(PapersContext)
@@ -47,7 +47,7 @@ const OthersTurn = ({
         !game.hasStarted || amIWaiting
           ? 'Waiting for everyone to be ready.'
           : tPlayerId === profile.id // if we are the next one
-          ? `Waiting for ${thisTurnPlayerName} to finish their turn.`
+          ? `Waiting for ${thisTurnPlayer.name || '???'} to finish their turn.`
           : game.teams[teamId].name,
     }
   }, [amIWaiting, isTurnOn, game.hasStarted])
@@ -66,7 +66,7 @@ const OthersTurn = ({
                   ? countdown <= 10500
                     ? Theme.colors.danger
                     : Theme.colors.grayDark
-                  : Theme.colors.bg,
+                  : Theme.colors.grayMedium,
               },
             ]}
           >
@@ -99,14 +99,14 @@ const OthersTurn = ({
                 ? 'All papers guessed!'
                 : "Time's up!"}
             </Text>
-            <Avatar size="xl" src={turnStatus.player.avatar} alt="" />
+            <Avatar size="xl" src={thisTurnPlayer.avatar} alt="" />
 
             {!hasCountdownStarted ? (
               <>
                 <Text
                   style={[Theme.typography.h3, Theme.u.center, { marginTop: 24, marginBottom: 8 }]}
                 >
-                  {turnStatus.player.name}
+                  {thisTurnPlayer.name}
                 </Text>
                 <Text style={[Theme.typography.secondary, Theme.u.center]}>
                   {turnStatus.teamName}
@@ -137,8 +137,11 @@ const OthersTurn = ({
           <Text style={Theme.typography.secondary}>
             {isAllWordsGuessed ? `End of round ${roundNr}` : `Round ${roundNr}`}
           </Text>
-          <Text style={[Theme.typography.body, Theme.u.center, { marginTop: 16, maxWidth: 300 }]}>
-            {isAllWordsGuessed ? `Waiting for ${turnStatus.player.name}` : description}
+          <Text style={[Theme.typography.body, Theme.u.center, { marginTop: 8, maxWidth: 300 }]}>
+            {isTurnOn ? description : `Waiting for ${thisTurnPlayer.name}`}
+          </Text>
+          <Text style={[Theme.typography.small, Theme.u.center, { marginTop: 8, maxWidth: 300 }]}>
+            {isTurnOn ? '' : `Next up: ${turnStatus.player.name}`}
           </Text>
         </View>
       </Page.CTAs>
@@ -154,7 +157,7 @@ OthersTurn.propTypes = {
   initialTimerSec: PropTypes.number.isRequired,
   initialTimer: PropTypes.number.isRequired,
   thisTurnTeamName: PropTypes.string,
-  thisTurnPlayerName: PropTypes.string.isRequired,
+  thisTurnPlayer: PropTypes.object.isRequired,
   amIWaiting: PropTypes.bool,
 }
 

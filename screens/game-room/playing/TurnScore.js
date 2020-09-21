@@ -1,5 +1,5 @@
 import React from 'react'
-import { Platform, View, Text } from 'react-native'
+import { Platform, View, Text, TouchableHighlight } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import PropTypes from 'prop-types'
 
@@ -14,18 +14,27 @@ import Styles from './PlayingStyles.js'
 const isWeb = Platform.OS === 'web'
 
 const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, isSubmitting, getPaperByKey }) => {
+  const guessedCount = papersTurn.guessed.length
   return (
-    <Page>
+    <Page bgFill={Theme.colors.yellow} styleInner={Styles.tscore_page}>
       <Page.Main>
-        <View style={Styles.header}>
-          <Text style={[Theme.typography.h2, Theme.u.center, { maxWidth: 300 }]}>
-            Your team got <Text>{papersTurn.guessed.length}</Text> papers right!
-          </Text>
-        </View>
+        <ScrollView style={[Theme.u.scrollSideOffset]}>
+          <View
+            style={[Styles.header, Styles.tscore_header, Theme.u.cardEdge, Theme.u.borderBottom]}
+          >
+            <Text style={[Theme.typography.h2, Theme.u.center, { maxWidth: 300 }]}>
+              {guessedCount > 0 ? (
+                <>
+                  Your team got <Text>{guessedCount}</Text> papers right!
+                </>
+              ) : (
+                'Oooopsss...'
+              )}
+            </Text>
+          </View>
 
-        <ScrollView style={[Theme.u.scrollSideOffset, { marginLeft: -16 }]}>
           {papersTurn.sorted.length ? (
-            <View style={Styles.tscore_list}>
+            <View style={[Styles.tscore_list, Theme.u.cardEdge]}>
               {papersTurn.sorted
                 .filter(
                   (paper, index) =>
@@ -39,6 +48,7 @@ const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, isSubmitting, ge
                   return (
                     <ItemToggle
                       key={`${i}_${paper}`}
+                      underlayColor={Theme.colors.grayLight}
                       style={[Styles.tscore_item]}
                       onPress={() => onTogglePaper(paper, !hasGuessed)}
                     >
@@ -49,21 +59,16 @@ const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, isSubmitting, ge
                             Styles.tscore_iconArea,
                             Theme.u.middle,
                             {
-                              backgroundColor: hasGuessed ? Theme.colors.grayDark : Theme.colors.bg,
+                              backgroundColor: Theme.colors[hasGuessed ? 'grayDark' : 'bg'],
                             },
                           ]}
                         >
-                          <Icon
-                            size={28}
-                            color={hasGuessed ? Theme.colors.bg : Theme.colors.grayDark}
-                          />
+                          <Icon size={28} color={Theme.colors[hasGuessed ? 'bg' : 'grayDark']} />
                         </View>
-                        <View
-                          style={{ width: 16, height: 1 }} // lazyness level 99
-                        />
                         <Text
                           style={[
                             Theme.typography.bold,
+                            Styles.tscore_itemText,
                             {
                               color: Theme.colors[hasGuessed ? 'grayDark' : 'grayMedium'],
                               textDecorationLine: hasGuessed ? 'none' : 'line-through',
@@ -103,22 +108,22 @@ TurnScore.propTypes = {
 }
 
 function ItemToggle(props) {
-  if (!isWeb) {
-    return <Button {...props} />
+  if (isWeb) {
+    return (
+      <View style={props.style}>
+        {props.children}
+        <Button variant="light" size="sm" onPress={props.onPress}>
+          Change
+        </Button>
+      </View>
+    )
   }
 
-  return (
-    <View style={props.style}>
-      {props.children}
-      <Button variant="light" size="sm" onPress={props.onPress}>
-        Change
-      </Button>
-    </View>
-  )
+  return <TouchableHighlight {...props} />
 }
 
 ItemToggle.propTypes = {
-  children: PropTypes.array.isRequired,
+  children: PropTypes.object.isRequired,
   onPress: PropTypes.func.isRequired,
   style: PropTypes.any,
 }

@@ -1,8 +1,8 @@
 import { Dimensions, StyleSheet } from 'react-native'
 import * as Theme from '@theme'
+import { window, headerHeight } from '@constants/layout'
 
-const vw = Dimensions.get('window').width / 100
-const vh = Dimensions.get('window').height / 100
+const { vw, vh } = window
 
 export default StyleSheet.create({
   header: {
@@ -10,7 +10,7 @@ export default StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     paddingTop: 30,
-    marginBottom: 40,
+    paddingBottom: 32,
   },
   main: {
     display: 'flex',
@@ -28,7 +28,7 @@ export default StyleSheet.create({
   go_count321: {
     fontSize: 24,
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: 3 * vh,
   },
   go_done_msg: {
     textAlign: 'center',
@@ -56,6 +56,7 @@ export default StyleSheet.create({
     flexWrap: 'wrap',
     flexDirection: 'row',
     justifyContent: 'center',
+    paddingHorizontal: 8,
   },
   go_paper_word: {
     paddingHorizontal: 4,
@@ -118,15 +119,20 @@ export default StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    marginTop: 50,
+    marginTop: 10 * vh,
   },
   tst_flex_title: {
-    marginBottom: 60,
+    marginBottom: 5 * vh,
   },
 
   // Turn score:
+  tscore_page: {
+    paddingTop: 0, // so it scroll up to the very top.
+  },
+  tscore_header: {
+    paddingTop: headerHeight,
+  },
   tscore_list: {
-    marginRight: -16,
     marginBottom: 120,
   },
   tscore_item: {
@@ -135,8 +141,8 @@ export default StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderWidth: 0,
-    paddingHorizontal: 16,
     paddingVertical: 20,
+    paddingHorizontal: 16,
   },
   tscore_start: {
     display: 'flex',
@@ -151,6 +157,9 @@ export default StyleSheet.create({
     borderWidth: 2,
     borderRadius: 4,
     flexShrink: 0,
-    // transform: [{ translateY: 8 }], // for some reason
+    marginRight: 16,
+  },
+  tscore_itemText: {
+    flexShrink: 1,
   },
 })

@@ -7,11 +7,12 @@ import * as Analytics from '@constants/analytics.js'
 import { useCountdown, usePrevious } from '@constants/utils'
 import PapersContext from '@store/PapersContext.js'
 
-import { MyTurnGetReady, MyTurnGo, OthersTurn, RoundScore } from './index'
+import { headerTheme } from '@navigation/headerStuff.js'
 
 import Page from '@components/page'
 import i18n from '@constants/i18n'
 
+import { MyTurnGetReady, MyTurnGo, OthersTurn, RoundScore } from './index'
 // import * as Theme from '@theme'
 // import Styles from './PlayingStyles.js'
 
@@ -25,7 +26,7 @@ export default function PlayingEntry({ navigation }) {
   const isRoundFinished = round.status === 'finished'
   const hasCountdownStarted = !['getReady', 'finished'].includes(round.status)
   const prevHasCountdownStarted = usePrevious(hasCountdownStarted)
-  const initialTimer = game.settings.time_ms
+  const initialTimer = 60000 // game.settings.time_ms
   const timerReady = 3400 // 400 - threshold for io connection.
   const [countdown, startCountdown] = useCountdown(hasCountdownStarted ? round.status : null, {
     timer: initialTimer + timerReady,
@@ -65,6 +66,7 @@ export default function PlayingEntry({ navigation }) {
     // OPTIMIZE - Handle nav options across diff screens in a smarter way.
     navigation.setOptions({
       headerTitle: 'Playing',
+      ...headerTheme({ hiddenTitle: true }),
       headerRight: function HLB() {
         return <Page.HeaderBtnSettings />
       },
@@ -89,7 +91,7 @@ export default function PlayingEntry({ navigation }) {
         roundIx={nextRoundIx}
         description={DESCRIPTIONS[nextRoundIx]}
         thisTurnTeamName={turnTeamName}
-        thisTurnPlayerName={turnPlayer?.name || `? ${turnPlayer} ?`}
+        thisTurnPlayer={turnPlayer}
         hasCountdownStarted={false}
         countdownSec={initialTimerSec}
         countdown={initialTimer}
@@ -120,7 +122,7 @@ export default function PlayingEntry({ navigation }) {
     <OthersTurn
       description={DESCRIPTIONS[roundIndex]}
       thisTurnTeamName={turnTeamName}
-      thisTurnPlayerName={thisTurnPlayer?.name || `? ${turnPlayerId} ?`}
+      thisTurnPlayer={thisTurnPlayer}
       hasCountdownStarted={hasCountdownStarted}
       countdownSec={countdownSec}
       countdown={countdown}

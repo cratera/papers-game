@@ -89,12 +89,16 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
   React.useLayoutEffect(() => {
     // Use prevCountdownSec to avoid a false positive
     // when the component mounts (3, 2, 1...)
-    if (!!prevCountdownSec && countdownSec === 0) {
+    // Verify stillHasWords to prevent showing timesup when not needed
+    // eg all words r done and when there's still X seconds left,
+    // this will prevent show "timesup" after X seconds.
+    if (!!prevCountdownSec && countdownSec === 0 && stillHasWords) {
       Papers.playSound('timesup')
+
       setIsDone(true)
       setTimeout(resetIsDone, 1500)
     }
-  }, [countdownSec, prevCountdownSec])
+  }, [countdownSec, prevCountdownSec, stillHasWords])
 
   React.useLayoutEffect(() => {
     // REVIEW - Is this safe? In very slow phones may not work. (eg. 5 -> 3 )
@@ -104,11 +108,15 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
   }, [countdownSec, prevCountdownSec])
 
   React.useLayoutEffect(() => {
-    if (!stillHasWords) {
+    // BUG: When papers are finished + timesup, and the user removes
+    // one paper and mark it as done again, this is executed.
+    // showing the screen "All papers guessed!" again without need.
+    // I didn't find a quick way to solve it :/
+    if (!stillHasWords && countdownSec > 0) {
       setIsDone(true)
       setTimeout(resetIsDone, 1500)
     }
-  }, [stillHasWords])
+  }, [stillHasWords, countdownSec])
 
   function resetIsDone() {
     setIsDone(false)
@@ -446,10 +454,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
         {papersTurn.current !== null &&
         !papersTurn.wordsLeft.length &&
         !papersTurn.passed.length ? (
-          <Text
-            numberOfLines={1}
-            style={[{ flexGrow: 1 }, Theme.typography.secondary, Theme.u.center]}
-          >
+          <Text numberOfLines={1} style={[Theme.typography.secondary, Theme.u.center]}>
             Last paper!
           </Text>
         ) : (
@@ -457,6 +462,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
             <Button
               variant="icon"
               size="lg"
+              loadingColor={Theme.colors.bg}
               style={Styles.go_ctas_no}
               accessibilityLabel="Pass"
               isLoading={isPaperChanging && paperAnim === 'nope'}
@@ -468,13 +474,14 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
         )}
 
         {isPaperChanging && paperAnim && (
-          <Text style={Theme.typography.body}>
+          <Text style={[Theme.typography.body, Theme.u.center, { flexGrow: 1 }]}>
             {paperAnim === 'gotcha' ? 'Good job!' : 'Damn it...'}
           </Text>
         )}
         <Button
           variant="icon"
           size="lg"
+          loadingColor={Theme.colors.success}
           style={Styles.go_ctas_yes}
           accessibilityLabel="Got it"
           isLoading={isPaperChanging && paperAnim === 'gotcha'}

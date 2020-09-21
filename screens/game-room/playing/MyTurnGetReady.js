@@ -3,6 +3,7 @@ import { Image, View, Text, StyleSheet } from 'react-native'
 import PropTypes from 'prop-types'
 
 import PapersContext from '@store/PapersContext.js'
+import { isTamagoshi } from '@constants/layout'
 
 import Bubbling from '@components/bubbling'
 import Button from '@components/button'
@@ -50,7 +51,7 @@ const MyTurnGetReady = ({ description, amIWaiting }) => {
         <View style={[Styles.header, { paddingTop: 32 }]}>
           <Text style={Theme.typography.h2}>{`It's your turn!`}</Text>
           <View style={StylesIn.illustration}>
-            <IllustrationStars style={StylesIn.svg} width="229" height="273" />
+            <IllustrationStars style={StylesIn.svg} />
             <Image
               style={[StylesIn.avatar]}
               source={{ uri: profile.avatar }}
@@ -85,10 +86,15 @@ MyTurnGetReady.propTypes = {
   amIWaiting: PropTypes.bool,
 }
 
+const areaHeight = {
+  sm: 200,
+  md: 273,
+}
+
 const StylesIn = StyleSheet.create({
   illustration: {
     width: 229,
-    height: 273, // illustration svg size
+    height: isTamagoshi ? areaHeight.sm : areaHeight.md,
     marginVertical: 24,
     display: 'flex',
     justifyContent: 'center',
@@ -98,6 +104,8 @@ const StylesIn = StyleSheet.create({
     position: 'absolute',
     top: 0,
     left: 0,
+    width: 229,
+    height: isTamagoshi ? areaHeight.sm : areaHeight.md,
   },
   avatar: {
     width: 100,

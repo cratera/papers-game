@@ -14,7 +14,7 @@ export default StyleSheet.create({
     flexWrap: 'nowrap',
     alignItems: 'center',
     paddingVertical: 12,
-    // paddingHorizontal: 16,
+    paddingHorizontal: 16,
     justifyContent: 'space-between',
   },
   item_isLast: {

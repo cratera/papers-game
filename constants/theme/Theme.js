@@ -102,11 +102,13 @@ export const u = StyleSheet.create({
   },
   scrollSideOffset: {
     // move scrollbar to the edge.
-    // marginLeft: -16,
-    // paddingLeft: 16, // REVIEW this later
-    marginRight: -16,
+    paddingVertical: 16,
+    marginHorizontal: -16,
     paddingHorizontal: 16,
-    marginLeft: -16,
+  },
+  borderBottom: {
+    borderBottomColor: colors.grayDark,
+    borderBottomWidth: 1,
   },
   CTASafeArea: {
     height: 80,

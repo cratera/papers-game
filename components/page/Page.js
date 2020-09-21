@@ -11,7 +11,7 @@ import NetInfo from '@react-native-community/netinfo'
 
 const i18nWifi = 'No internet connection'
 
-const Page = ({ children, bgFill, bannerMsg, ...otherProps }) => {
+const Page = ({ children, bgFill, bannerMsg, styleInner, ...otherProps }) => {
   const [bannerText, setBannerText] = React.useState(null)
 
   React.useEffect(() => {
@@ -46,7 +46,7 @@ const Page = ({ children, bgFill, bannerMsg, ...otherProps }) => {
         ]}
         {...otherProps}
       >
-        <View style={Styles.pageInner}>{children}</View>
+        <View style={[Styles.pageInner, styleInner]}>{children}</View>
       </SafeAreaView>
     </>
   )
@@ -61,6 +61,7 @@ Page.propTypes = {
   /** By default is `colors.grayBg`. When `false` is `colors.bg` (blank bg). DO NOT pass `true` */
   bgFill: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
   children: PropTypes.node,
+  styleInner: PropTypes.any,
 }
 
 // const isIOS = Platform.OS === 'ios'

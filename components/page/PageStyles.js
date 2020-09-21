@@ -1,7 +1,6 @@
 import { StyleSheet } from 'react-native'
-import Constants from 'expo-constants'
 
-import { isWeb } from '@constants/layout'
+import { isWeb, headerHeight } from '@constants/layout'
 
 import * as Theme from '@theme'
 
@@ -15,9 +14,7 @@ export default StyleSheet.create({
   },
   pageInner: {
     width: '100%',
-    // Safe area for transparent header, // take into account devices
-    // with top notch - Tested in iPhones SE, X and 11
-    paddingTop: isWeb ? 55 : Math.max(45, Constants.statusBarHeight),
+    paddingTop: headerHeight,
     maxWidth: 500,
     marginHorizontal: 'auto',
     flexGrow: 1,
