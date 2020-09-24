@@ -1,4 +1,4 @@
-import { Dimensions, StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native'
 import * as Theme from '@theme'
 import { window, headerHeight } from '@constants/layout'
 

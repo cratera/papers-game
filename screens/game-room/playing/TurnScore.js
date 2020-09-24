@@ -14,25 +14,21 @@ import Styles from './PlayingStyles.js'
 const isWeb = Platform.OS === 'web'
 
 const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, isSubmitting, getPaperByKey }) => {
-  const guessedCount = papersTurn.guessed.length
   return (
-    <Page bgFill={Theme.colors.yellow} styleInner={Styles.tscore_page}>
+    <Page styleInner={Styles.tscore_page}>
       <Page.Main>
+        <View style={[Styles.header, Styles.tscore_header, Theme.u.cardEdge, Theme.u.borderBottom]}>
+          <Text style={[Theme.typography.h2, Theme.u.center, { maxWidth: 300 }]}>
+            {papersTurn.sorted.length > 0 ? (
+              <>
+                Your team got <Text>{papersTurn.guessed.length}</Text> papers right!
+              </>
+            ) : (
+              'Oooopsss...'
+            )}
+          </Text>
+        </View>
         <ScrollView style={[Theme.u.scrollSideOffset]}>
-          <View
-            style={[Styles.header, Styles.tscore_header, Theme.u.cardEdge, Theme.u.borderBottom]}
-          >
-            <Text style={[Theme.typography.h2, Theme.u.center, { maxWidth: 300 }]}>
-              {guessedCount > 0 ? (
-                <>
-                  Your team got <Text>{guessedCount}</Text> papers right!
-                </>
-              ) : (
-                'Oooopsss...'
-              )}
-            </Text>
-          </View>
-
           {papersTurn.sorted.length ? (
             <View style={[Styles.tscore_list, Theme.u.cardEdge]}>
               {papersTurn.sorted

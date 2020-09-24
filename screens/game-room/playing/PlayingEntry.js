@@ -60,16 +60,19 @@ export default function PlayingEntry({ navigation }) {
 
   React.useEffect(() => {
     setNavigation()
-  }, [isMyTurn, amIReady, isRoundFinished])
+  }, [isMyTurn, hasCountdownStarted, amIReady, isRoundFinished])
 
   function setNavigation() {
     // OPTIMIZE - Handle nav options across diff screens in a smarter way.
     navigation.setOptions({
       headerTitle: 'Playing',
       ...headerTheme({ hiddenTitle: true }),
-      headerRight: function HLB() {
-        return <Page.HeaderBtnSettings />
-      },
+      headerRight:
+        isMyTurn && hasCountdownStarted
+          ? null
+          : function HLB() {
+              return <Page.HeaderBtnSettings />
+            },
     })
   }
 

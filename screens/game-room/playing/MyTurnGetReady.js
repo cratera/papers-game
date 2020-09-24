@@ -49,7 +49,7 @@ const MyTurnGetReady = ({ description, amIWaiting }) => {
       {isAllReady && <Bubbling fromBehind bgStart={Theme.colors.bg} bgEnd={Theme.colors.green} />}
       <Page.Main headerDivider>
         <View style={[Styles.header, { paddingTop: 32 }]}>
-          <Text style={Theme.typography.h2}>{`It's your turn!`}</Text>
+          <Text style={Theme.typography.h1}>{`It's your turn!`}</Text>
           <View style={StylesIn.illustration}>
             <IllustrationStars style={StylesIn.svg} />
             <Image
@@ -95,7 +95,8 @@ const StylesIn = StyleSheet.create({
   illustration: {
     width: 229,
     height: isTamagoshi ? areaHeight.sm : areaHeight.md,
-    marginVertical: 24,
+    marginTop: 36,
+    marginBottom: 24,
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',

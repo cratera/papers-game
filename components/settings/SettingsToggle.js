@@ -1,25 +1,27 @@
 import React from 'react'
+import { Text, TouchableHighlight, View } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import PropTypes from 'prop-types'
 
-import * as Theme from '@theme'
-
-import Button from '@components/button'
 import { IconGear } from '@components/icons'
+
+import * as Theme from '@theme'
 
 export default function SettingsToggle({ style, ...props }) {
   const navigation = useNavigation()
 
   return (
-    <Button
-      variant="icon"
-      accessibilityLabel="Settings page"
+    <TouchableHighlight
+      underlayColor={Theme.colors.grayLight}
       onPress={() => navigation.navigate('settings')}
-      style={[{ borderWidth: 0 }, style]}
+      style={[{ paddingVertical: 8, paddingHorizontal: 8, borderRadius: 4 }, style]}
       {...props}
     >
-      <IconGear size={20} color={Theme.colors.grayDark} />
-    </Button>
+      <View style={Theme.u.middle}>
+        <Text style={Theme.typography.body}>Menu</Text>
+        <IconGear size={16} style={{ marginLeft: 16 }} color={Theme.colors.grayDark} />
+      </View>
+    </TouchableHighlight>
   )
 }
 

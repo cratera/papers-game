@@ -1,29 +1,19 @@
 import React from 'react'
-import {
-  Image,
-  TouchableHighlight,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  TextInput,
-  Alert,
-  Platform,
-} from 'react-native'
+import { ScrollView, View, Text } from 'react-native'
 import * as MailComposer from 'expo-mail-composer'
 import { createStackNavigator } from '@react-navigation/stack'
 import PropTypes from 'prop-types'
 
 import * as Updates from 'expo-updates'
-import * as Linking from 'expo-linking'
 import {
   AdMobBanner,
   AdMobInterstitial,
-  PublisherBanner,
+  // PublisherBanner,
   AdMobRewarded,
   setTestDeviceIDAsync,
 } from 'expo-ads-admob'
+import * as StoreReview from 'expo-store-review'
+import Sentry from '@constants/Sentry'
 
 import * as Analytics from '@constants/analytics.js'
 
@@ -34,22 +24,20 @@ import { mailToFeedback, mailToBug } from '@constants/utils'
 import { headerTheme } from '@navigation/headerStuff.js'
 import Page from '@components/page'
 import ListTeams from '@components/list-teams'
-import GameScore from '@components/game-score'
 import Button from '@components/button'
-import { PickAvatar } from '@components/profile'
-import { useLeaveGame } from '@components/settings'
-import { IconArrow, IconCamera } from '@components/icons'
-import AudioPreview from './AudioPreview.js'
-import * as StoreReview from 'expo-store-review'
-import Sentry from '@constants/Sentry'
+
+import Item from './Item.js'
+
+import SettingsProfile from './SettingsProfile.js'
+import SettingsGame from './SettingsGame.js'
+import Account from './Account.js'
+import AccountDelete from './AccountDelete.js'
+import Privacy from './Privacy.js'
+import SoundAnimations from './SoundAnimations.js'
+
+import { propTypesCommon, setSubHeader } from './utils'
 
 const Stack = createStackNavigator()
-
-const propTypesCommon = {
-  navigation: PropTypes.object.isRequired, // react-navigation
-}
-
-// TODO later Hummm... it's about time to split these into diff files, no?
 
 export default function Settings(props) {
   const Papers = React.useContext(PapersContext)
@@ -58,7 +46,7 @@ export default function Settings(props) {
   React.useEffect(() => {
     props.navigation.setOptions({
       ...headerTheme(),
-      headerTitle: 'Settings',
+      headerTitle: 'Menu',
       headerLeft: function HLB() {
         return (
           <Page.HeaderBtn
@@ -88,8 +76,12 @@ export default function Settings(props) {
       ) : (
         <Stack.Screen name="settings-profile" component={SettingsProfile} />
       )}
+      <Stack.Screen name="settings-account" component={Account} />
+      <Stack.Screen name="settings-privacy" component={Privacy} />
+      <Stack.Screen name="settings-account-delete" component={AccountDelete} />
+
       <Stack.Screen name="settings-feedback" component={SettingsFeedback} />
-      <Stack.Screen name="settings-sound" component={SettingsSound} />
+      <Stack.Screen name="settings-sound" component={SoundAnimations} />
       <Stack.Screen name="settings-experimental" component={SettingsExperimental} />
       <Stack.Screen name="settings-credits" component={SettingsCredits} />
     </Stack.Navigator>
@@ -98,241 +90,6 @@ export default function Settings(props) {
 
 Settings.propTypes = {
   navigation: PropTypes.object.isRequired, // react-navigation
-}
-
-// ======
-
-function SettingsProfile({ navigation }) {
-  const Papers = React.useContext(PapersContext)
-  const [name, setName] = React.useState('')
-  const { profile } = Papers.state
-
-  async function handleDeleteAccount() {
-    if (Platform.OS === 'web') {
-      if (window.confirm(`This will delete your profile locally and from Papers' servers?`)) {
-        await Papers.resetProfile()
-        navigation.dangerouslyGetParent().reset({
-          index: 0,
-          routes: [{ name: 'home' }],
-        })
-      }
-    } else {
-      Alert.alert(
-        'Delete profile',
-        "This will delete your profile locally and from Papers' servers",
-        [
-          {
-            text: 'Delete profile',
-            onPress: async () => {
-              await Papers.resetProfile()
-              navigation.dangerouslyGetParent().reset({
-                index: 0,
-                routes: [{ name: 'home' }],
-              })
-            },
-            style: 'destructive',
-          },
-          {
-            text: 'Cancel',
-            onPress: () => true,
-            style: 'cancel',
-          },
-        ],
-        { cancelable: false }
-      )
-    }
-  }
-
-  return (
-    <Page>
-      <Page.Main>
-        <ScrollView style={Theme.u.scrollSideOffset}>
-          <AvatarSquare
-            style={Styles.avatar}
-            avatar={profile.avatar}
-            onChange={avatar => Papers.updateProfile({ avatar })}
-          />
-          <Text nativeID="inputNameLabel" style={[Styles.alignLeft, Theme.typography.small]}>
-            Name
-          </Text>
-          <TextInput
-            style={Styles.input}
-            inputAccessoryViewID="name"
-            nativeID="inputNameLabel"
-            defaultValue={profile.name}
-            returnKeyType="done"
-            onChangeText={text => setName(text)}
-            onBlur={() => name && Papers.updateProfile({ name })}
-          />
-          <MoreOptions
-            navigation={navigation}
-            list={[
-              {
-                id: 'del',
-                title: 'Delete profile',
-                variant: 'danger',
-                onPress: handleDeleteAccount,
-              },
-            ]}
-          />
-        </ScrollView>
-      </Page.Main>
-    </Page>
-  )
-}
-
-SettingsProfile.propTypes = {
-  navigation: PropTypes.object.isRequired, // react-navigation
-}
-
-// ======
-
-function SettingsGame({ navigation }) {
-  const Papers = React.useContext(PapersContext)
-  const { askToLeaveGame } = useLeaveGame({ navigation: navigation.dangerouslyGetParent() })
-  const { game } = Papers.state
-
-  if (!game) {
-    return null
-  }
-
-  return (
-    <Page>
-      <Page.Main>
-        <ScrollView style={Theme.u.scrollSideOffset}>
-          <Text
-            style={[Theme.typography.h2, Theme.u.center, { marginTop: 24 }]}
-            accessibilityRole="header"
-          >
-            {game.name}
-          </Text>
-          <Text
-            style={[Theme.typography.small, Theme.u.center, { marginTop: 4, marginBottom: 16 }]}
-            accessibilityLabel={game.code.toString()}
-          >
-            {game.code.toString().split('').join('・')}
-          </Text>
-          {game.round && (
-            <GameScore
-              id="gs"
-              style={{
-                paddingBottom: 16,
-                marginBottom: 12,
-                borderBottomWidth: 1,
-                borderBottomColor: Theme.colors.grayLight,
-              }}
-            />
-          )}
-          {[
-            {
-              id: 'pl',
-              title: 'Players',
-              icon: 'next',
-              onPress: () => {
-                navigation.navigate('settings-players')
-              },
-            },
-          ].map(item => (
-            <Item key={item.id} {...item} />
-          ))}
-
-          <MoreOptions
-            navigation={navigation}
-            list={[
-              {
-                id: 'lg',
-                title: 'Leave Game',
-                variant: 'danger',
-                onPress: askToLeaveGame,
-              },
-            ]}
-          />
-        </ScrollView>
-      </Page.Main>
-    </Page>
-  )
-}
-
-SettingsGame.propTypes = {
-  onMount: PropTypes.object, // react-navigation
-  navigation: PropTypes.object.isRequired, // react-navigation
-}
-
-function MoreOptions({ navigation, list }) {
-  const Papers = React.useContext(PapersContext)
-  const { about } = Papers.state
-
-  return (
-    <>
-      <View
-        style={{
-          paddingTop: 32,
-          paddingBottom: 16,
-          borderBottomWidth: 1,
-          borderBottomColor: Theme.colors.grayLight,
-        }}
-      >
-        <Text style={[Styles.alignLeft, Theme.typography.small, {}]}>More options</Text>
-      </View>
-
-      {[
-        {
-          id: 'sd',
-          title: 'Sound',
-          icon: 'next',
-          onPress: () => navigation.navigate('settings-sound'),
-        },
-        {
-          id: 'fb',
-          title: 'Feedback',
-          icon: 'next',
-          onPress: () => navigation.navigate('settings-feedback'),
-        },
-        {
-          id: 'pg',
-          title: 'Experimental',
-          icon: 'next',
-          onPress: () => navigation.navigate('settings-experimental'),
-        },
-        {
-          id: 'don',
-          title: 'Buy us a coffee', // TODO!! Before release
-          onPress: () => {
-            Analytics.logEvent('settings', { action: 'buycoffee' })
-            Linking.openURL('https://www.buymeacoffee.com/sandrinap')
-          },
-        },
-        ...list,
-      ].map(item => (
-        <Item key={item.id} {...item} />
-      ))}
-      <View style={[{ marginTop: 32, marginBottom: 32 }]}>
-        <TouchableOpacity onPress={() => navigation.navigate('settings-credits')}>
-          <Text style={[Theme.typography.small, Theme.u.center]}>
-            You are using version {about.version}@{about.ota}
-          </Text>
-          <Text
-            style={[
-              Theme.typography.small,
-              Theme.u.center,
-              { color: Theme.colors.grayDark, marginTop: 4 },
-            ]}
-          >
-            Acknowledgments
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </>
-  )
-}
-
-MoreOptions.defaultProps = {
-  list: [],
-}
-
-MoreOptions.propTypes = {
-  navigation: PropTypes.object,
-  list: PropTypes.array,
 }
 
 // ======
@@ -490,23 +247,6 @@ SettingsExperimental.propTypes = propTypesCommon
 
 // ======
 
-function SettingsSound({ navigation }) {
-  React.useEffect(() => {
-    setSubHeader(navigation, 'Sound Skins')
-  }, [])
-
-  return (
-    <Page>
-      <Page.Main style={{ paddingTop: 16 }}>
-        <AudioPreview />
-      </Page.Main>
-    </Page>
-  )
-}
-SettingsSound.propTypes = propTypesCommon
-
-// ======
-
 function SettingsCredits({ navigation }) {
   React.useEffect(() => {
     setSubHeader(navigation, 'Acknowledgements')
@@ -544,168 +284,12 @@ function SettingsPlayers({ navigation }) {
 
 SettingsPlayers.propTypes = propTypesCommon
 
-const Styles = StyleSheet.create({
-  avatar: {
-    marginTop: 24,
-    marginBottom: 32,
-  },
-  input: {
-    borderColor: 'transparent',
-    borderWidth: 0,
-    padding: 12,
-    marginTop: 4,
-    fontSize: 16,
-    color: Theme.colors.grayDark,
-    backgroundColor: Theme.colors.bg,
-  },
-  list: {
-    marginTop: 10,
-  },
-  alignLeft: {
-    paddingLeft: 8,
-  },
-  item: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 20,
-    paddingBottom: 20, // looks better visually
-    paddingHorizontal: 8,
-  },
-})
-
-// ==========================
-
-const AvatarSquare = ({ avatar, style, onChange }) => {
-  const [isPickerVisible, setIsPickerVisible] = React.useState(false)
-
-  return (
-    <View style={[StylesAv.avatar, style]}>
-      <TouchableHighlight
-        underlayColor={Theme.colors.bg}
-        style={StylesAv.square}
-        onPress={() => setIsPickerVisible(true)}
-      >
-        {avatar ? (
-          <>
-            <View>
-              <Image
-                style={[
-                  StylesAv.place,
-                  StylesAv.img,
-                  {
-                    // tintColor: Theme.colors.yellow,
-                  },
-                ]}
-                source={{ uri: avatar }}
-                accessibilityLabel=""
-              />
-              {/* <Image
-                style={[StylesAv.place, StylesAv.img, { position: 'absolute', opacity: 0.3 }]}
-                source={{ uri: avatar }}
-                accessibilityLabel="Profile photo"
-              /> */}
-            </View>
-          </>
-        ) : (
-          <View style={[StylesAv.place]} />
-        )}
-      </TouchableHighlight>
-      <View style={[StylesAv.icon]}>
-        <IconCamera size={13} color={Theme.colors.bg} />
-      </View>
-      <PickAvatar
-        visible={isPickerVisible}
-        onChange={() => null}
-        onSubmit={onChange}
-        onClose={() => setIsPickerVisible(false)}
-      />
-    </View>
-  )
-}
-
-AvatarSquare.propTypes = {
-  avatar: PropTypes.string,
-  style: PropTypes.oneOfType([PropTypes.array, PropTypes.object, PropTypes.number]),
-  onChange: PropTypes.func.isRequired, // (value: String)
-}
-
-const StylesAv = StyleSheet.create({
-  avatar: {
-    position: 'relative',
-    display: 'flex',
-    alignItems: 'center',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignSelf: 'center',
-  },
-  place: {
-    width: 112,
-    height: 112,
-    borderRadius: 3,
-    backgroundColor: Theme.colors.primaryLight,
-  },
-  icon: {
-    position: 'absolute',
-    bottom: -8,
-    right: -8,
-    backgroundColor: Theme.colors.primary,
-    width: 20,
-    height: 20,
-    borderRadius: 4,
-    paddingTop: 3,
-    paddingLeft: 3,
-    overflow: 'hidden',
-  },
-  img: {
-    resizeMode: 'cover',
-  },
-})
-
-// ==========================
-
-function Item({ title, icon, variant, isLast, onPress }) {
-  return (
-    <TouchableHighlight underlayColor={Theme.colors.grayLight} onPress={onPress}>
-      <View
-        style={[
-          Styles.item,
-          {
-            borderBottomColor: Theme.colors.grayLight,
-            borderBottomWidth: isLast ? 0 : 1,
-          },
-        ]}
-      >
-        <Text
-          style={[
-            Theme.typography.body,
-            {
-              ...(variant === 'danger' ? { color: Theme.colors.danger } : {}),
-            },
-          ]}
-        >
-          {title}
-        </Text>
-        {icon ? <IconArrow size={20} /> : null}
-      </View>
-    </TouchableHighlight>
-  )
-}
-
-Item.propTypes = {
-  title: PropTypes.string.isRequired,
-  isLast: PropTypes.bool,
-  variant: PropTypes.oneOf(['danger']),
-  icon: PropTypes.node,
-  onPress: PropTypes.func,
-}
-
 // ==========================
 
 function OtaChecker() {
   const [status, setstatus] = React.useState('')
   const [errorMsg, setErrorMsg] = React.useState(null)
+  // eslint-disable-next-line no-unused-vars
   const [manifest, setManifest] = React.useState(null)
 
   async function handleCheckClick() {
@@ -759,6 +343,7 @@ function TestCrashing() {
 
   async function sendExc() {
     try {
+      // eslint-disable-next-line no-unused-vars
       const foo = status.foo.bar
     } catch (e) {
       Sentry.captureException(e)
@@ -785,41 +370,4 @@ function TestCrashing() {
       </Button>
     </View>
   )
-}
-
-/// =======================
-/// =======================
-
-function setSubHeader(navigation, title) {
-  // If you find a better way of doing this. Please let me know.
-  // I spent too many hours googling it and didn't find a pretty way.
-  // In these corner cases, react navigation docs weren't very helpful...
-  function updateHeaderBackBtn({ title, btnText, onPress }) {
-    navigation.dangerouslyGetParent().setOptions({
-      headerTitle: title,
-      headerLeft: function HB() {
-        return (
-          <Page.HeaderBtn side="left" icon="back" onPress={onPress}>
-            {btnText}
-          </Page.HeaderBtn>
-        )
-      },
-    })
-  }
-
-  updateHeaderBackBtn({
-    title: title,
-    btnText: 'Back',
-    onPress: () => {
-      navigation.goBack()
-      updateHeaderBackBtn({
-        title: 'Settings',
-        btnText: 'Back',
-        onPress: () =>
-          // navigation.dangerouslyGetState()?.index === 0
-          //   ? navigation.dangerouslyGetParent().navigate('home')
-          navigation.dangerouslyGetParent().goBack(),
-      })
-    },
-  })
 }

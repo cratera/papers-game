@@ -126,8 +126,8 @@ export const IconGear = ({ size, color, style, ...props }) /* eslint-disable-lin
   const { styleWithSize, baseColor } = useProps(size, color, style)
   // prettier-ignore
   return (
-    <Svg style={ styleWithSize } fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 19" {...props}>
-      <Path d="M16 7V6l1-3-2-1-2 1h-1l-2-3H8L7 3H6L4 2 2 3l1 3v1L0 9v2l3 1v1l-1 3 2 1 2-1h1l2 3h2l1-3h1l2 1 2-2-1-2v-1l3-2V8l-3-1zm-6 6a3 3 0 11-1-7 3 3 0 011 7z" fill={baseColor} />
+    <Svg style={ styleWithSize }  fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 14" {...props}>
+      <Path fill={baseColor} d="M0 6h16v2H0zM0 12h16v2H0zM0 0h16v2H0z"/>
     </Svg>
   )
 }

@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native'
 import * as Theme from '@theme'
+import { isTamagoshi } from '@constants/layout'
 
 const variants = {
   primary: {
@@ -33,7 +34,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   base: {
-    minHeight: 52,
+    minHeight: isTamagoshi ? 54 : 66,
     // maxWidth: 800,
     borderRadius: 4,
     paddingHorizontal: 16,

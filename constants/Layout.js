@@ -18,4 +18,8 @@ export const isTamagoshi = height < 570 // aka iphone 5/SE
 
 // Safe area for transparent header, // take into account devices
 // with top notch - Tested in iPhones SE, X and 11
-export const headerHeight = isWeb ? 55 : Math.max(45, Constants.statusBarHeight)
+export const headerHeight = isWeb
+  ? 55
+  : isTamagoshi
+  ? Math.max(45, Constants.statusBarHeight)
+  : Math.max(55, Constants.statusBarHeight)

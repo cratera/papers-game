@@ -57,7 +57,7 @@ export const typography = StyleSheet.create({
     fontFamily: 'karla-regular',
     fontSize: 13, // TODO - 14 is too big compared to figma. @mmbotelho
     color: colors.grayMedium,
-    letterSpacing: -0.3,
+    letterSpacing: 0.1,
   },
   bold: {
     fontFamily: 'karla-regular',
@@ -91,11 +91,18 @@ export const u = StyleSheet.create({
   center: {
     textAlign: 'center',
   },
+  // I'm gonna regret these helpers
   middle: {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  flexBetween: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   cardEdge: {
     marginHorizontal: -16,

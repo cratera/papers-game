@@ -89,34 +89,31 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
   React.useLayoutEffect(() => {
     // Use prevCountdownSec to avoid a false positive
     // when the component mounts (3, 2, 1...)
-    // Verify stillHasWords to prevent showing timesup when not needed
-    // eg all words r done and when there's still X seconds left,
-    // this will prevent show "timesup" after X seconds.
-    if (!!prevCountdownSec && countdownSec === 0 && stillHasWords) {
+    // BUG: When papers are finished + timesup, and the user removes
+    // one paper and mark it as done again, this is executed.
+    // showing the screen "All papers guessed!" again without need.
+    // I didn't find a quick way to solve it :/
+    if (!!prevCountdownSec && countdownSec === 0) {
       Papers.playSound('timesup')
 
       setIsDone(true)
       setTimeout(resetIsDone, 1500)
     }
-  }, [countdownSec, prevCountdownSec, stillHasWords])
-
-  React.useLayoutEffect(() => {
-    // REVIEW - Is this safe? In very slow phones may not work. (eg. 5 -> 3 )
-    if (prevCountdownSec === 5 && countdownSec === 4) {
-      Papers.playSound('bomb')
-    }
   }, [countdownSec, prevCountdownSec])
 
   React.useLayoutEffect(() => {
-    // BUG: When papers are finished + timesup, and the user removes
-    // one paper and mark it as done again, this is executed.
-    // showing the screen "All papers guessed!" again without need.
-    // I didn't find a quick way to solve it :/
-    if (!stillHasWords && countdownSec > 0) {
+    // REVIEW - Is this safe? In very slow phones may not work. (eg. 5 -> 3 )
+    if (prevCountdownSec === 5 && countdownSec === 4 && stillHasWords) {
+      Papers.playSound('bomb')
+    }
+  }, [countdownSec, prevCountdownSec, stillHasWords])
+
+  React.useLayoutEffect(() => {
+    if (!stillHasWords) {
       setIsDone(true)
       setTimeout(resetIsDone, 1500)
     }
-  }, [stillHasWords, countdownSec])
+  }, [stillHasWords])
 
   function resetIsDone() {
     setIsDone(false)
@@ -303,7 +300,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
         ...state,
         ...wordsModified,
       }
-
+      Papers.playSound(hasGuessed ? 'right' : 'wrong')
       Papers.setTurnLocalState(newState)
       return newState
     })
@@ -357,7 +354,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
   if (isCount321go) {
     return (
       <Page>
-        <Page.Main style={Styles.go_countMain}>
+        <Page.Main style={[Styles.go_countMain, { alignItems: 'top', marginTop: 40 }]}>
           <Text style={[Theme.typography.body, Styles.go_count321]}>
             {countdownSec - initialTimerSec}
           </Text>
@@ -481,7 +478,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
         <Button
           variant="icon"
           size="lg"
-          loadingColor={Theme.colors.success}
+          loadingColor={Theme.colors.bg}
           style={Styles.go_ctas_yes}
           accessibilityLabel="Got it"
           isLoading={isPaperChanging && paperAnim === 'gotcha'}
