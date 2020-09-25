@@ -15,6 +15,7 @@ export const headerTheme = (opts = {}) => ({
   headerTitleStyle: {
     fontFamily: 'karla-regular',
     opacity: opts.hiddenTitle ? 0 : 1,
+    marginBottom: 7,
   },
   headerRight: null,
   headerLeft: null,

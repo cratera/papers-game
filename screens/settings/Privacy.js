@@ -10,24 +10,19 @@ import Item from './Item.js'
 import { setSubHeader, propTypesCommon } from './utils'
 
 export default function Privacy({ navigation }) {
-  // Workaround: If it's a real bool, then it passed "undefined" to <Item> ._.
-  const [ads, setAds] = React.useState('false')
-  const [sentry, setSentry] = React.useState('true')
+  const [ads, setAds] = React.useState(false)
+  const [sentry, setSentry] = React.useState(true)
 
   React.useEffect(() => {
     setSubHeader(navigation, 'Privacy')
   }, [])
 
   function handleCustomAdsToggle() {
-    setAds(fakeBool => {
-      return fakeBool === 'true' ? 'false' : 'true'
-    })
+    setAds(fakeBool => !fakeBool)
   }
 
   function handleSentryToggle() {
-    setSentry(fakeBool => {
-      return fakeBool === 'true' ? 'false' : 'true'
-    })
+    setSentry(fakeBool => !fakeBool)
   }
 
   return (

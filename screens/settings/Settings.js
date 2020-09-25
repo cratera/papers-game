@@ -1,6 +1,5 @@
 import React from 'react'
 import { ScrollView, View, Text } from 'react-native'
-import * as MailComposer from 'expo-mail-composer'
 import { createStackNavigator } from '@react-navigation/stack'
 import PropTypes from 'prop-types'
 
@@ -12,7 +11,6 @@ import {
   AdMobRewarded,
   setTestDeviceIDAsync,
 } from 'expo-ads-admob'
-import * as StoreReview from 'expo-store-review'
 import Sentry from '@constants/Sentry'
 
 import * as Analytics from '@constants/analytics.js'
@@ -20,13 +18,10 @@ import * as Analytics from '@constants/analytics.js'
 import PapersContext from '@store/PapersContext.js'
 import * as Theme from '@theme'
 
-import { mailToFeedback, mailToBug } from '@constants/utils'
 import { headerTheme } from '@navigation/headerStuff.js'
 import Page from '@components/page'
 import ListTeams from '@components/list-teams'
 import Button from '@components/button'
-
-import Item from './Item.js'
 
 import SettingsProfile from './SettingsProfile.js'
 import SettingsGame from './SettingsGame.js'
@@ -34,6 +29,7 @@ import Account from './Account.js'
 import AccountDeletion from './AccountDeletion.js'
 import Privacy from './Privacy.js'
 import SoundAnimations from './SoundAnimations.js'
+import Feedback from './Feedback.js'
 
 import { propTypesCommon, setSubHeader } from './utils'
 
@@ -80,7 +76,7 @@ export default function Settings(props) {
       <Stack.Screen name="settings-accountDeletion" component={AccountDeletion} />
       <Stack.Screen name="settings-privacy" component={Privacy} />
 
-      <Stack.Screen name="settings-feedback" component={SettingsFeedback} />
+      <Stack.Screen name="settings-feedback" component={Feedback} />
       <Stack.Screen name="settings-sound" component={SoundAnimations} />
       <Stack.Screen name="settings-experimental" component={SettingsExperimental} />
       <Stack.Screen name="settings-credits" component={SettingsCredits} />
@@ -89,77 +85,6 @@ export default function Settings(props) {
 }
 
 Settings.propTypes = {
-  navigation: PropTypes.object.isRequired, // react-navigation
-}
-
-// ======
-
-function SettingsFeedback({ navigation }) {
-  function updateHeaderBackBtn({ title, btnText, onPress }) {
-    navigation.dangerouslyGetParent().setOptions({
-      headerTitle: title,
-      headerLeft: function HB() {
-        return (
-          <Page.HeaderBtn side="left" icon="back" onPress={onPress}>
-            {btnText}
-          </Page.HeaderBtn>
-        )
-      },
-    })
-  }
-
-  React.useEffect(() => {
-    updateHeaderBackBtn({
-      title: 'Feedback',
-      btnText: 'Back',
-      onPress: () => {
-        navigation.goBack()
-        updateHeaderBackBtn({
-          title: 'Settings',
-          btnText: 'Back',
-          onPress: () => navigation.dangerouslyGetParent().goBack(),
-        })
-      },
-    })
-  }, [])
-
-  return (
-    <Page>
-      <Page.Main style={{ paddingTop: 16 }}>
-        <ScrollView>
-          {[
-            {
-              id: 'rate',
-              title: 'Rate Papers',
-              icon: '',
-              onPress: () => StoreReview.requestReview(), // TODO!! before release
-            },
-            {
-              id: 'fb',
-              title: 'Send Feedback',
-              icon: '',
-              onPress: async () => {
-                await MailComposer.composeAsync(mailToFeedback())
-              },
-            },
-            {
-              id: 'fbug',
-              title: 'Report a bug',
-              icon: '',
-              onPress: async () => {
-                await MailComposer.composeAsync(mailToBug())
-              },
-            },
-          ].map(item => (
-            <Item key={item.id} {...item} />
-          ))}
-        </ScrollView>
-      </Page.Main>
-    </Page>
-  )
-}
-
-SettingsFeedback.propTypes = {
   navigation: PropTypes.object.isRequired, // react-navigation
 }
 
@@ -254,9 +179,9 @@ function SettingsCredits({ navigation }) {
 
   return (
     <Page>
-      <Page.Main style={{ paddingTop: 16 }}>
+      <Page.Main headerDivider style={{ paddingTop: 24 }}>
         <ScrollView>
-          <Text>TODO: Acknowledgments</Text>
+          <Text style={Theme.typography.body}>TODO!!: Acknowledgments on the way...</Text>
         </ScrollView>
       </Page.Main>
     </Page>

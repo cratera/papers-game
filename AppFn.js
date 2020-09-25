@@ -8,7 +8,11 @@ import * as Font from 'expo-font'
 // import { Ionicons } from '@expo/vector-icons'; // Q: How to remove this from bundle?
 
 import { NavigationContainer } from '@react-navigation/native'
-import { createStackNavigator } from '@react-navigation/stack'
+import {
+  createStackNavigator,
+  CardStyleInterpolators,
+  HeaderStyleInterpolators,
+} from '@react-navigation/stack'
 
 import Sentry from '@constants/Sentry'
 import { headerTheme } from './navigation/headerStuff.js'
@@ -98,6 +102,8 @@ export default function AppFn({ skipLoadingScreen }) /* eslint-disable-line */ {
               component={Settings}
               options={{
                 title: '',
+                cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
+                headerStyleInterpolator: HeaderStyleInterpolators.forFade,
               }}
             />
           </Stack.Navigator>

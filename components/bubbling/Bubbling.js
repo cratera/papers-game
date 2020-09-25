@@ -14,8 +14,9 @@ const Bubbling = ({ bgStart, bgEnd, fromBehind }) => {
 
     Animated.timing(animScaleGrow, {
       toValue: 1,
-      duration: 1500,
-      easing: Easing.bezier(0, 0.5, 0.6, 1),
+      duration: 1000,
+      easing: Easing.linear,
+      // easing: Easing.bezier(0, 0.5, 0.6, 1),
       useNativeDriver: Platform.OS !== 'web',
     }).start()
   }, [])

@@ -80,7 +80,7 @@ const Styles = StyleSheet.create({
   input: {
     borderColor: 'transparent',
     borderWidth: 0,
-    padding: 24,
+    padding: 20,
     paddingRight: 8,
     marginTop: 4,
     fontSize: 16,

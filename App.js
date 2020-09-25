@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { YellowBox, Platform } from 'react-native'
+import { YellowBox } from 'react-native'
 import AppFn from './AppFn.js'
 import ErrorCrashed from './screens/misc/ErrorCrashed.js'
 

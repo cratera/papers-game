@@ -115,7 +115,7 @@ export const u = StyleSheet.create({
   },
   scrollSideOffset: {
     // move scrollbar to the edge.
-    paddingVertical: 16,
+    paddingVertical: 8,
     marginHorizontal: -16,
     paddingHorizontal: 16,
   },

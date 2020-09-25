@@ -1,4 +1,5 @@
 import React from 'react'
+import * as Device from 'expo-device'
 
 // !!!! ATTENTION !!!! //
 // When changing this file, in dev mode, make sure to refresh the app.
@@ -110,32 +111,35 @@ export function confirmLeaveGame(fnToLeave) {
   console.log('hmmmm FORCE Refresh Bug on Lobby.js')
 }
 
-export function mailToFeedback() {
+export function mailToFeedback(version) {
   // TODO!! before release.
   return {
     recipients: ['a.sandrina.p@gmail.com'],
-    subject: 'Papers Game - Feedback',
+    subject: 'Papers - Feedback',
     body:
       '\n' +
       '\n' +
       '\n' +
       '- - - - - - - - - - - - -' +
       '\n' +
-      'Using [version] [device] [deviceOS]',
+      `V. ${version} - ${Device.osName} ${Device.modelName}` +
+      '\n' +
+      '- - - - - - - - - - - - -',
   }
 }
 
-export function mailToBug() {
-  // TODO!! before release.
+export function mailToBug(version) {
   return {
     recipients: ['a.sandrina.p@gmail.com'],
-    subject: 'Papers Game - Bug',
+    subject: 'Papers - Bug',
     body:
       '\n' +
       '\n' +
       '\n' +
       '- - - - - - - - - - - - -' +
       '\n' +
-      'Using [version] [device] [deviceOS]',
+      `V. ${version} - ${Device.osName} ${Device.modelName}` +
+      '\n' +
+      '- - - - - - - - - - - - -',
   }
 }

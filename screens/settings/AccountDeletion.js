@@ -1,6 +1,7 @@
 import React from 'react'
 import { View, Text, Alert, Platform } from 'react-native'
 
+import PapersContext from '@store/PapersContext.js'
 import * as Theme from '@theme'
 
 import Button from '@components/button'
@@ -9,6 +10,8 @@ import Page from '@components/page'
 import { setSubHeader, propTypesCommon } from './utils'
 
 export default function AccountDeletion({ navigation }) {
+  const Papers = React.useContext(PapersContext)
+
   React.useEffect(() => {
     setSubHeader(navigation, 'Delete account')
   }, [])

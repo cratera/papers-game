@@ -57,7 +57,10 @@ const Sheet = React.memo(function Sheet({ visible, list, onClose }) {
         ))}
       </View>
 
-      <Button variant="light" style={{ borderWidth: 0 }} onPress={onClose}>
+      <Button
+        style={{ borderWidth: 0, borderTopRightRadius: 0, borderTopLeftRadius: 0 }}
+        onPress={onClose}
+      >
         Cancel
       </Button>
     </Modal>
@@ -80,10 +83,13 @@ Sheet.propTypes = {
 const Styles = StyleSheet.create({
   options: {
     backgroundColor: Theme.colors.bg,
-    marginBottom: 16,
     paddingVertical: 8,
     paddingBottom: 12,
-    borderRadius: 16,
+    borderRadius: 4,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+    borderBottomWidth: 2,
+    borderBottomColor: Theme.colors.grayDark,
   },
   options_outside: {
     flexGrow: 1,

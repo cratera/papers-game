@@ -21,7 +21,7 @@ const SOUNDS = {
 const playset = {}
 
 let isSoundActive = !__DEV__ // off by default during dev
-let isSoundInSilent = !__DEV__
+let isSoundInSilent = true
 
 export async function init() {
   Audio.setAudioModeAsync({
