@@ -94,7 +94,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
     // showing the screen "All papers guessed!" again without need.
     // I didn't find a quick way to solve it :/
     if (!!prevCountdownSec && countdownSec === 0) {
-      Papers.playSound('timesup')
+      Papers.soundPlay('timesup')
 
       setIsDone(true)
       setTimeout(resetIsDone, 1500)
@@ -104,7 +104,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
   React.useLayoutEffect(() => {
     // REVIEW - Is this safe? In very slow phones may not work. (eg. 5 -> 3 )
     if (prevCountdownSec === 5 && countdownSec === 4 && stillHasWords) {
-      Papers.playSound('bomb')
+      Papers.soundPlay('bomb')
     }
   }, [countdownSec, prevCountdownSec, stillHasWords])
 
@@ -255,7 +255,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
       return
     }
 
-    Papers.playSound(hasGuessed ? 'right' : 'wrong')
+    Papers.soundPlay(hasGuessed ? 'right' : 'wrong')
 
     setIsPaperChanging(true)
     setPaperAnimation(hasGuessed ? 'gotcha' : 'nope')
@@ -300,7 +300,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
         ...state,
         ...wordsModified,
       }
-      Papers.playSound(hasGuessed ? 'right' : 'wrong')
+      Papers.soundPlay(hasGuessed ? 'right' : 'wrong')
       Papers.setTurnLocalState(newState)
       return newState
     })

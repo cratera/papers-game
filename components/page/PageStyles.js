@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native'
 
-import { isWeb, headerHeight } from '@constants/layout'
+import { headerHeight } from '@constants/layout'
 
 import * as Theme from '@theme'
 

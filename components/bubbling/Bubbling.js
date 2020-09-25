@@ -3,25 +3,27 @@ import PropTypes from 'prop-types'
 import { Animated, Easing, Platform, StyleSheet, View } from 'react-native'
 import Constants from 'expo-constants'
 
-import { window, isWeb } from '@constants/layout'
+import { window } from '@constants/layout'
+
+import PapersContext from '@store/PapersContext.js'
 
 const Bubbling = ({ bgStart, bgEnd, fromBehind }) => {
+  const Papers = React.useContext(PapersContext)
+  const motionEnabled = Papers.state.profile.settings.motion
   const animScaleGrow = React.useRef(new Animated.Value(0)).current
-  const MOTION_ENABLED = React.useRef(!isWeb).current
 
   React.useEffect(() => {
-    if (!MOTION_ENABLED) return
+    if (!motionEnabled) return
 
     Animated.timing(animScaleGrow, {
       toValue: 1,
       duration: 1000,
       easing: Easing.linear,
-      // easing: Easing.bezier(0, 0.5, 0.6, 1),
       useNativeDriver: Platform.OS !== 'web',
     }).start()
   }, [])
 
-  if (!MOTION_ENABLED) {
+  if (!motionEnabled) {
     if (fromBehind) {
       return (
         <View

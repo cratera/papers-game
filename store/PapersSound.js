@@ -20,17 +20,18 @@ const SOUNDS = {
 }
 const playset = {}
 
-let isSoundActive = !__DEV__ // off by default during dev
-let isSoundInSilent = true
+let isSoundActive
 
-export async function init() {
+export async function init(initialSoundActive) {
+  setSoundStatus(initialSoundActive)
+
   Audio.setAudioModeAsync({
     allowsRecordingIOS: false,
     staysActiveInBackground: false,
-    interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
+    interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_MIX_WITH_OTHERS,
     playsInSilentModeIOS: true,
     playThroughEarpieceAndroid: false,
-    // shouldDuckAndroid: true,
+    shouldDuckAndroid: true,
     // interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
   })
 
@@ -59,17 +60,6 @@ export function setSoundStatus(bool) {
 
 export function getSoundStatus() {
   return isSoundActive
-}
-
-export function setSoundInSilent(bool) {
-  Audio.setAudioModeAsync({
-    playsInSilentModeIOS: bool,
-  })
-  isSoundInSilent = bool
-}
-
-export function getSoundInSilent() {
-  return isSoundInSilent
 }
 
 export function play(soundId) {

@@ -3,11 +3,20 @@ import PropTypes from 'prop-types'
 import { Animated, Easing, Platform, StyleSheet, View } from 'react-native'
 import Constants from 'expo-constants'
 
-import { window, isWeb } from '@constants/layout'
+import { window } from '@constants/layout'
+
+import PapersContext from '@store/PapersContext.js'
 
 const getStyles = (corner, backgroundColor, animScaleGrow, inputRange) => ({
-  top: window.height - 76,
-  left: corner === 'bottom-right' ? window.width - 62 : 62,
+  ...(corner === 'settings'
+    ? {
+        top: 220,
+        left: window.width - 62,
+      }
+    : {
+        top: window.height - 76,
+        left: corner === 'bottom-right' ? window.width - 62 : 62,
+      }),
   backgroundColor,
   transform: [
     {
@@ -26,12 +35,13 @@ const getStyles = (corner, backgroundColor, animScaleGrow, inputRange) => ({
   ],
 })
 
-const BubblingCorner = ({ duration, corner, bgEnd, bgStart }) => {
+const BubblingCorner = ({ duration, forced, corner, bgEnd, bgStart }) => {
+  const Papers = React.useContext(PapersContext)
+  const motionEnabled = Papers.state.profile.settings.motion || forced
   const animScaleGrow = React.useRef(new Animated.Value(0)).current
-  const MOTION_ENABLED = React.useRef(!isWeb).current
 
   React.useEffect(() => {
-    if (!MOTION_ENABLED) return
+    if (!motionEnabled) return
 
     Animated.timing(animScaleGrow, {
       toValue: 1,
@@ -41,7 +51,7 @@ const BubblingCorner = ({ duration, corner, bgEnd, bgStart }) => {
     }).start()
   }, [])
 
-  if (!MOTION_ENABLED) {
+  if (!motionEnabled) {
     return (
       <View
         style={[
@@ -86,6 +96,7 @@ BubblingCorner.propTypes = {
   bgEnd: PropTypes.string.isRequired,
   corner: PropTypes.oneOf(['bottom-right', 'bottom-left']),
   duration: PropTypes.number.isRequired,
+  forced: PropTypes.bool, // force animation even when motion is disabled
 }
 
 export default BubblingCorner

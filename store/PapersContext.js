@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { AsyncStorage } from 'react-native'
 import PropTypes from 'prop-types'
 
+import { isWeb } from '@constants/layout'
 import Sentry from '@constants/Sentry'
 
 import wordsForEveryone from './wordsForEveryone.js'
@@ -20,15 +21,22 @@ export const loadProfile = async () => {
   const name = (await AsyncStorage.getItem('profile_name')) || null
   const avatar = (await AsyncStorage.getItem('profile_avatar')) || null
   const gameId = (await AsyncStorage.getItem('profile_gameId')) || null
+  const settingsStored = (await AsyncStorage.getItem('profile_settings')) || null
 
-  return { id, name, avatar, gameId }
+  return {
+    id,
+    name,
+    avatar,
+    gameId,
+    settings: settingsStored ? JSON.parse(settingsStored) : { sound: !__DEV__, motion: !isWeb },
+  }
 }
 
 export class PapersContextProvider extends Component {
   constructor(props) {
     super(props)
 
-    // TODO save this on localStorage
+    // TODO save this on localStorage. Update: Why? lol
     this.config = {
       // myTeamId: Number,
       // roundDuration: Number
@@ -36,16 +44,12 @@ export class PapersContextProvider extends Component {
 
     this.state = {
       socket: null, // rename to serverAPI?
-      features: {
-        soundSkins: null, // TODO connect & disable this
-        ANIMATIONS: false, // TODO same
-      },
       profile: {
         id: props.initialProfile.id,
         name: props.initialProfile.name,
         avatar: props.initialProfile.avatar,
-        // the last game this player tried to access
-        gameId: props.initialProfile.gameId,
+        gameId: props.initialProfile.gameId, // the last game accessed
+        settings: props.initialProfile.settings,
       },
       game: null, // see Firebase.js for structure.
       profiles: {}, // List of game players' profiles.
@@ -60,12 +64,12 @@ export class PapersContextProvider extends Component {
 
     this.PapersAPI = {
       open: this.open.bind(this),
-
       // pausePlayer: this.pausePlayer.bind(this),
       // recoverPlayer: this.recoverPlayer.bind(this),
 
       updateProfile: this.updateProfile.bind(this),
       resetProfile: this.resetProfile.bind(this),
+      updateProfileSettings: this.updateProfileSettings.bind(this),
 
       accessGame: this.accessGame.bind(this),
       leaveGame: this.leaveGame.bind(this),
@@ -89,28 +93,24 @@ export class PapersContextProvider extends Component {
 
       deleteGame: this.deleteGame.bind(this),
 
-      playSound: this.playSound.bind(this),
+      soundToggleStatus: this.soundToggleStatus.bind(this),
+      soundPlay: this.soundPlay.bind(this),
+
+      motionToggle: this.motionToggle.bind(this),
 
       sendTracker: this.sendTracker.bind(this),
     }
   }
 
-  // Maybe it should be a Route to ask for this,
-  // because it might want to retrieve different stuff...
-  // ex: on room/:id, I don't care about profile.gameId.
-  // Instead I want the room/:id
   async componentDidMount() {
-    const { id, name, gameId, avatar } = this.state.profile
+    const { avatar, ...profile } = this.state.profile
     console.log('PapersContext Mounted:', {
-      name,
-      gameId,
-      id,
+      ...profile,
       hasAvatar: !!avatar,
     })
     await this.tryToReconnect()
 
-    // REVIEW - Is this the right moment to load the skins?
-    await PapersSound.init()
+    await PapersSound.init(profile.settings.sound)
   }
 
   componentWillUnmount() {
@@ -479,6 +479,28 @@ export class PapersContextProvider extends Component {
     }))
   }
 
+  async updateProfileSettings(setting, value) {
+    if (__DEV__) console.log('📌 updateProfileSettings()', setting, value)
+    const newSettings = {
+      ...this.state.profile.settings,
+      [setting]: value,
+    }
+
+    try {
+      await AsyncStorage.setItem('profile_settings', JSON.stringify(newSettings))
+    } catch (e) {
+      console.warn('error: updateProfileSettings', e)
+      Sentry.captureException(e, { tags: { pp_action: 'UP_1' } })
+    }
+
+    this.setState(state => ({
+      profile: {
+        ...state.profile,
+        settings: newSettings,
+      },
+    }))
+  }
+
   async resetProfile(profile) {
     if (__DEV__) console.log('📌 resetProfile()')
     try {
@@ -554,7 +576,7 @@ export class PapersContextProvider extends Component {
     }
 
     try {
-      this.PapersAPI.playSound('ready')
+      this.PapersAPI.soundPlay('ready')
       await this.state.socket.markMeAsReady(roundStatus, () => {
         this.state.socket.startGame()
       })
@@ -573,7 +595,7 @@ export class PapersContextProvider extends Component {
     if (__DEV__) console.log('📌 markMeAsReadyForNextRound()')
 
     try {
-      this.PapersAPI.playSound('ready')
+      this.PapersAPI.soundPlay('ready')
       await this.state.socket.markMeAsReadyForNextRound(() => {
         this._startNextRound()
       })
@@ -613,7 +635,7 @@ export class PapersContextProvider extends Component {
   startTurn() {
     if (__DEV__) console.log('📌 startTurn()')
     try {
-      this.PapersAPI.playSound('turnstart')
+      this.PapersAPI.soundPlay('turnstart')
       this.state.socket.startTurn()
     } catch (e) {
       console.warn('error: startTurn', e)
@@ -852,8 +874,19 @@ export class PapersContextProvider extends Component {
     await this.leaveGame({ gameDeleted: true })
   }
 
-  playSound(soundId) {
+  soundToggleStatus() {
+    const newStatus = !this.state.profile.settings.sound
+    PapersSound.setSoundStatus(newStatus)
+    this.updateProfileSettings('sound', newStatus)
+  }
+
+  soundPlay(soundId) {
     PapersSound.play(soundId)
+  }
+
+  motionToggle() {
+    const newStatus = !this.state.profile.settings.motion
+    this.updateProfileSettings('motion', newStatus)
   }
 
   sendTracker(trackName, opts) {
@@ -891,6 +924,10 @@ PapersContextProvider.propTypes = {
     name: PropTypes.string,
     avatar: PropTypes.string,
     gameId: PropTypes.string,
+    settings: PropTypes.shape({
+      sound: PropTypes.bool,
+      motions: PropTypes.bool,
+    }),
   }),
   children: PropTypes.node,
 }

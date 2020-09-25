@@ -1,17 +1,23 @@
 import React from 'react'
 import { ScrollView, View } from 'react-native'
 
+import { isWeb } from '@constants/layout'
+
+import PapersContext from '@store/PapersContext.js'
+
 import Page from '@components/page'
 import { IconExternal } from '@components/icons'
-
-import * as Theme from '@theme'
 
 import Item from './Item.js'
 import { setSubHeader, propTypesCommon } from './utils'
 
+import * as Theme from '@theme'
+
 export default function Privacy({ navigation }) {
+  // const Papers = React.useContext(PapersContext)
+  // const { profile } = Papers.state
+  // const settingsCrashReportEnabled = profile.settings.crashReport
   const [ads, setAds] = React.useState(false)
-  const [sentry, setSentry] = React.useState(true)
 
   React.useEffect(() => {
     setSubHeader(navigation, 'Privacy')
@@ -21,24 +27,31 @@ export default function Privacy({ navigation }) {
     setAds(fakeBool => !fakeBool)
   }
 
-  function handleSentryToggle() {
-    setSentry(fakeBool => !fakeBool)
-  }
+  // function handleSentryToggle() {
+  //   Papers.updateProfileSettings('crashReport', !settingsCrashReportEnabled)
+  // }
 
   return (
     <Page>
       <Page.Main headerDivider>
         <ScrollView style={[Theme.u.scrollSideOffset]}>
           <View style={Theme.u.cardEdge}>
-            <Item title="Show personalized ads" switchValue={ads} onPress={handleCustomAdsToggle} />
-            <Item
-              title="Share with developers"
-              description="Share anonymous crash reports and help us improve Papers"
-              switchValue={sentry}
-              onPress={handleSentryToggle}
-            />
-
-            <View style={Theme.u.listDivider} />
+            {isWeb ? null : (
+              <>
+                <Item
+                  title="Show personalized ads"
+                  switchValue={ads}
+                  onPress={handleCustomAdsToggle}
+                />
+                {/* <Item
+                  title="Share with developers"
+                  description="Share anonymous crash reports and help us improve Papers"
+                  switchValue={settingsCrashReportEnabled}
+                  onPress={handleSentryToggle}
+                /> */}
+                <View style={Theme.u.listDivider} />
+              </>
+            )}
 
             <Item
               title="Privacy Policy"
