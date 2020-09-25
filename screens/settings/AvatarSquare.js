@@ -8,7 +8,7 @@ import * as Theme from '@theme'
 
 // import { IconCamera } from '@components/icons'
 
-export default function AvatarSquare({ avatar, size, style, onChange }) {
+export default function AvatarSquare({ avatar, size, stroke, style, onChange }) {
   const [isPickerVisible, setIsPickerVisible] = React.useState(false)
   const stylesSize = { width: size, height: size }
   const Wrapper = onChange ? TouchableHighlight : View
@@ -21,7 +21,7 @@ export default function AvatarSquare({ avatar, size, style, onChange }) {
       >
         {avatar ? (
           <Image
-            style={[StylesAv.place, StylesAv.img, stylesSize]}
+            style={[StylesAv.place, StylesAv.img, stylesSize, { borderWidth: stroke }]}
             source={{ uri: avatar }}
             accessibilityLabel=""
           />
@@ -43,6 +43,7 @@ export default function AvatarSquare({ avatar, size, style, onChange }) {
 
 AvatarSquare.defaultProps = {
   size: 88,
+  stroke: 1,
 }
 
 AvatarSquare.propTypes = {
@@ -50,6 +51,7 @@ AvatarSquare.propTypes = {
   style: PropTypes.oneOfType([PropTypes.array, PropTypes.object, PropTypes.number]),
   onChange: PropTypes.func,
   size: PropTypes.number,
+  stroke: PropTypes.number,
 }
 
 const StylesAv = StyleSheet.create({
@@ -62,7 +64,6 @@ const StylesAv = StyleSheet.create({
     alignSelf: 'center',
   },
   place: {
-    borderWidth: 1,
     borderColor: Theme.colors.grayDark,
     backgroundColor: Theme.colors.primaryLight,
   },

@@ -1,6 +1,5 @@
 import React from 'react'
-import { StyleSheet, ScrollView, View, Text, TextInput, Alert, Platform } from 'react-native'
-import PropTypes from 'prop-types'
+import { StyleSheet, ScrollView, View, Text, TextInput } from 'react-native'
 
 import PapersContext from '@store/PapersContext.js'
 import * as Theme from '@theme'
@@ -9,47 +8,16 @@ import Page from '@components/page'
 
 import AvatarSquare from './AvatarSquare.js'
 import Item from './Item.js'
+import { setSubHeader, propTypesCommon } from './utils'
 
 export default function SettingsAccount({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const [name, setName] = React.useState('')
   const { profile } = Papers.state
 
-  async function handleDeleteAccount() {
-    if (Platform.OS === 'web') {
-      if (window.confirm(`This will delete your profile locally and from Papers' servers?`)) {
-        await Papers.resetProfile()
-        navigation.dangerouslyGetParent().reset({
-          index: 0,
-          routes: [{ name: 'home' }],
-        })
-      }
-    } else {
-      Alert.alert(
-        'Delete profile',
-        "This will delete your profile locally and from Papers' servers",
-        [
-          {
-            text: 'Delete profile',
-            onPress: async () => {
-              await Papers.resetProfile()
-              navigation.dangerouslyGetParent().reset({
-                index: 0,
-                routes: [{ name: 'home' }],
-              })
-            },
-            style: 'destructive',
-          },
-          {
-            text: 'Cancel',
-            onPress: () => true,
-            style: 'cancel',
-          },
-        ],
-        { cancelable: false }
-      )
-    }
-  }
+  React.useEffect(() => {
+    setSubHeader(navigation, 'Account')
+  }, [])
 
   return (
     <Page>
@@ -61,10 +29,11 @@ export default function SettingsAccount({ navigation }) {
                 avatar={profile.avatar}
                 style={Styles.avatar}
                 size={120}
+                stroke={2}
                 onChange={avatar => Papers.updateProfile({ avatar })}
               />
             </View>
-            <View style={Styles.listSpacer} />
+            <View style={Theme.u.listDivider} />
 
             <View style={[Theme.u.flexBetween, Styles.field]}>
               <Text nativeID="inputNameLabel" style={[Styles.alignLeft, Theme.typography.body]}>
@@ -87,15 +56,14 @@ export default function SettingsAccount({ navigation }) {
               icon="next"
               onPress={() => navigation.navigate('settings-privacy')}
             />
-            <View style={Styles.listSpacer} />
+            <View style={Theme.u.listDivider} />
             <Item
               id="del"
-              title="Delete profile"
+              title="Delete account"
               icon="next"
-              // onPress={() => navigation.navigate('settings-account_delete')}
-              onPress={handleDeleteAccount}
+              onPress={() => navigation.navigate('settings-accountDeletion')}
             />
-            <View style={Styles.listSpacer} />
+            <View style={Theme.u.listDivider} />
           </View>
         </ScrollView>
       </Page.Main>
@@ -103,19 +71,11 @@ export default function SettingsAccount({ navigation }) {
   )
 }
 
-SettingsAccount.propTypes = {
-  navigation: PropTypes.object.isRequired, // react-navigation
-}
+SettingsAccount.propTypes = propTypesCommon
 
 const Styles = StyleSheet.create({
   avatarBox: {
     paddingBottom: 8,
-  },
-  listSpacer: {
-    height: 8,
-    borderBottomColor: Theme.colors.grayDark,
-    borderBottomWidth: 1,
-    marginBottom: 8,
   },
   input: {
     borderColor: 'transparent',

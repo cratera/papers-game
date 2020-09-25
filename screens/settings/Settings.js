@@ -31,7 +31,7 @@ import Item from './Item.js'
 import SettingsProfile from './SettingsProfile.js'
 import SettingsGame from './SettingsGame.js'
 import Account from './Account.js'
-import AccountDelete from './AccountDelete.js'
+import AccountDeletion from './AccountDeletion.js'
 import Privacy from './Privacy.js'
 import SoundAnimations from './SoundAnimations.js'
 
@@ -46,7 +46,7 @@ export default function Settings(props) {
   React.useEffect(() => {
     props.navigation.setOptions({
       ...headerTheme(),
-      headerTitle: 'Menu',
+      headerTitle: 'Settings',
       headerLeft: function HLB() {
         return (
           <Page.HeaderBtn
@@ -77,8 +77,8 @@ export default function Settings(props) {
         <Stack.Screen name="settings-profile" component={SettingsProfile} />
       )}
       <Stack.Screen name="settings-account" component={Account} />
+      <Stack.Screen name="settings-accountDeletion" component={AccountDeletion} />
       <Stack.Screen name="settings-privacy" component={Privacy} />
-      <Stack.Screen name="settings-account-delete" component={AccountDelete} />
 
       <Stack.Screen name="settings-feedback" component={SettingsFeedback} />
       <Stack.Screen name="settings-sound" component={SoundAnimations} />

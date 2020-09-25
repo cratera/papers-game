@@ -3,10 +3,6 @@ import { TouchableOpacity, StyleSheet, View, Text } from 'react-native'
 
 import PropTypes from 'prop-types'
 
-import * as Linking from 'expo-linking'
-
-import * as Analytics from '@constants/analytics.js'
-
 import PapersContext from '@store/PapersContext.js'
 import * as Theme from '@theme'
 import Item from './Item.js'

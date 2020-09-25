@@ -107,6 +107,12 @@ export const u = StyleSheet.create({
   cardEdge: {
     marginHorizontal: -16,
   },
+  listDivider: {
+    height: 8,
+    borderBottomColor: colors.grayDark,
+    borderBottomWidth: 1,
+    marginBottom: 8,
+  },
   scrollSideOffset: {
     // move scrollbar to the edge.
     paddingVertical: 16,

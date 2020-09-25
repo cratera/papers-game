@@ -1,18 +1,69 @@
 import React from 'react'
-import { Text } from 'react-native'
-import Page from '@components/page'
+import { ScrollView, View } from 'react-native'
 
+import Page from '@components/page'
+import { IconExternal } from '@components/icons'
+
+import * as Theme from '@theme'
+
+import Item from './Item.js'
 import { setSubHeader, propTypesCommon } from './utils'
 
 export default function Privacy({ navigation }) {
+  // Workaround: If it's a real bool, then it passed "undefined" to <Item> ._.
+  const [ads, setAds] = React.useState('false')
+  const [sentry, setSentry] = React.useState('true')
+
   React.useEffect(() => {
     setSubHeader(navigation, 'Privacy')
   }, [])
 
+  function handleCustomAdsToggle() {
+    setAds(fakeBool => {
+      return fakeBool === 'true' ? 'false' : 'true'
+    })
+  }
+
+  function handleSentryToggle() {
+    setSentry(fakeBool => {
+      return fakeBool === 'true' ? 'false' : 'true'
+    })
+  }
+
   return (
     <Page>
       <Page.Main headerDivider>
-        <Text>Privacy on the way...</Text>
+        <ScrollView style={[Theme.u.scrollSideOffset]}>
+          <View style={Theme.u.cardEdge}>
+            <Item title="Show personalized ads" switchValue={ads} onPress={handleCustomAdsToggle} />
+            <Item
+              title="Share with developers"
+              description="Share anonymous crash reports and help us improve Papers"
+              switchValue={sentry}
+              onPress={handleSentryToggle}
+            />
+
+            <View style={Theme.u.listDivider} />
+
+            <Item
+              title="Privacy Policy"
+              Icon={IconExternal}
+              onPress={() => console.warn('TODO!! page!!')}
+            />
+            <Item
+              title="Terms of Service"
+              Icon={IconExternal}
+              onPress={() => console.warn('TODO!! page!!')}
+            />
+            <Item
+              title="User Agreement"
+              Icon={IconExternal}
+              onPress={() => console.warn('TODO!! page!!')}
+            />
+
+            <View style={Theme.u.listDivider} />
+          </View>
+        </ScrollView>
       </Page.Main>
     </Page>
   )
