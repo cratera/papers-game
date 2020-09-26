@@ -22,11 +22,12 @@ export default function PlayingEntry({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const { profile, profiles, game } = Papers.state
   const round = game.round
+  const roundIndex = round.current
 
   const isRoundFinished = round.status === 'finished'
   const hasCountdownStarted = !['getReady', 'finished'].includes(round.status)
   const prevHasCountdownStarted = usePrevious(hasCountdownStarted)
-  const initialTimer = 60000 // game.settings.time_ms
+  const initialTimer = game.settings.time_ms[roundIndex]
   const timerReady = 3400 // 400 - threshold for io connection.
   const [countdown, startCountdown] = useCountdown(hasCountdownStarted ? round.status : null, {
     timer: initialTimer + timerReady,
@@ -34,7 +35,6 @@ export default function PlayingEntry({ navigation }) {
   const initialTimerSec = Math.round(initialTimer / 1000)
   const countdownSec = Math.round(countdown / 1000)
 
-  const roundIndex = round.current
   const turnWho = round?.turnWho || {}
   const turnTeam = turnWho.team
   const turnPlayerId = game.teams[turnTeam].players[turnWho[turnTeam]]
