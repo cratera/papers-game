@@ -94,7 +94,7 @@ const BubblingCorner = ({ duration, forced, corner, bgEnd, bgStart }) => {
 BubblingCorner.propTypes = {
   bgStart: PropTypes.string.isRequired,
   bgEnd: PropTypes.string.isRequired,
-  corner: PropTypes.oneOf(['bottom-right', 'bottom-left']),
+  corner: PropTypes.oneOf(['bottom-right', 'bottom-left', 'settings']),
   duration: PropTypes.number.isRequired,
   forced: PropTypes.bool, // force animation even when motion is disabled
 }

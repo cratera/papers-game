@@ -354,7 +354,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
   if (isCount321go) {
     return (
       <Page>
-        <Page.Main style={[Styles.go_countMain, { alignItems: 'top', marginTop: 40 }]}>
+        <Page.Main style={[Styles.go_countMain, { marginTop: 40 }]}>
           <Text style={[Theme.typography.body, Styles.go_count321]}>
             {countdownSec - initialTimerSec}
           </Text>

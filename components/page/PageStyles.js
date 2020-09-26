@@ -30,6 +30,8 @@ export default StyleSheet.create({
   banner: {
     backgroundColor: Theme.colors.grayDark,
     paddingVertical: 8,
+    top: headerHeight,
+    zIndex: 1,
   },
   banner_text: {
     color: Theme.colors.bg,
