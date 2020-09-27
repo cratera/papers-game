@@ -19,15 +19,9 @@ export default StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  // logo: {
-  //   // TODO / REVIEW This is how we do @media. Abstract this.
-  //   marginTop: vh > 6 ? vh * 20 : vh * 5,
-  //   fontSize: 100,
-  // },
   paragraph: {
     marginVertical: 16,
     textAlign: 'center',
-    // margin: 80 auto;
   },
   input: {
     borderBottomColor: Theme.colors.grayDark,
@@ -35,11 +29,6 @@ export default StyleSheet.create({
     textAlign: 'center',
     marginTop: 4,
     height: 76,
-
-    // ${Theme.bp.xs} {
-    //   margin-top: 1.6rem;
-    //   margin-bottom: 1.6rem;
-    // }
   },
   cta: {
     marginBottom: 16,
@@ -55,18 +44,8 @@ export default StyleSheet.create({
     borderWidth: 2,
     alignSelf: 'center',
   },
-  avatarSvg: {
-    /* camera */
-    marginTop: -16,
-    marginBottom: 16,
-  },
   avatarImg: {
-    // ${avatarPlace}
     resizeMode: 'cover',
-  },
-  avatarTxt: {
-    fontSize: 16,
-    color: Theme.colors.grayDark,
   },
 
   feedback: {
@@ -76,27 +55,11 @@ export default StyleSheet.create({
 
   // -----
 
-  memeContainer: {
-    position: 'relative',
-    marginBottom: 32,
-
-    // ${Theme.bp.xs} {
-    //   margin-bottom: 1.4rem;
-    // }
+  CTAtutorial: {
+    marginTop: 16,
+    height: 56,
   },
-  memeHead: {
-    zIndex: 1,
-    height: 70,
-  },
-  memeFace: {
-    backgroundColor: Theme.colors.grayDark,
-    width: 70,
-    height: 70,
-  },
-  memeBody: {
-    width: 200,
-    height: 200,
-    opacity: 0.8,
-    marginTop: -60,
+  CTAtutorial_text: {
+    color: Theme.colors.bg,
   },
 })

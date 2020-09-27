@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Text } from 'react-native'
+import { Text, TouchableOpacity } from 'react-native'
 
 import * as Theme from '@theme'
 import Styles from './HomeStyles.js'
@@ -25,6 +25,12 @@ export default function HomeSigned({ navigation }) {
         >
           Join
         </Button>
+        <TouchableOpacity
+          style={[Styles.CTAtutorial, Theme.u.middle]}
+          onPress={() => navigation.navigate('tutorial')}
+        >
+          <Text style={[Theme.typography.body, Styles.CTAtutorial_text]}>How to play</Text>
+        </TouchableOpacity>
       </Page.CTAs>
     </Page>
   )

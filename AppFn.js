@@ -23,6 +23,7 @@ import Home from './screens/home'
 import GameRoom from './screens/game-room'
 import Settings from './screens/settings'
 import AccessGame from './screens/access-game'
+import Tutorial from './screens/tutorial'
 
 const Stack = createStackNavigator()
 
@@ -100,6 +101,15 @@ export default function AppFn({ skipLoadingScreen }) /* eslint-disable-line */ {
             <Stack.Screen
               name="settings"
               component={Settings}
+              options={{
+                title: '',
+                cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
+                headerStyleInterpolator: HeaderStyleInterpolators.forFade,
+              }}
+            />
+            <Stack.Screen
+              name="tutorial"
+              component={Tutorial}
               options={{
                 title: '',
                 cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,

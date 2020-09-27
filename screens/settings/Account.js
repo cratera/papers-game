@@ -6,7 +6,7 @@ import * as Theme from '@theme'
 
 import Page from '@components/page'
 
-import { AvatarField } from '@components/avatar'
+import AvatarField from '@components/avatar/AvatarField'
 import Item from './Item.js'
 import { useSubHeader, propTypesCommon } from './utils'
 
