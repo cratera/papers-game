@@ -8,16 +8,13 @@ import Page from '@components/page'
 
 import { AvatarField } from '@components/avatar'
 import Item from './Item.js'
-import { setSubHeader, propTypesCommon } from './utils'
+import { useSubHeader, propTypesCommon } from './utils'
 
 export default function SettingsAccount({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const [name, setName] = React.useState('')
   const { profile } = Papers.state
-
-  React.useEffect(() => {
-    setSubHeader(navigation, 'Account')
-  }, [])
+  useSubHeader(navigation, 'Account')
 
   return (
     <Page>

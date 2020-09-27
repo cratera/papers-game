@@ -31,7 +31,7 @@ import Privacy from './Privacy.js'
 import SoundAnimations from './SoundAnimations.js'
 import Feedback from './Feedback.js'
 
-import { propTypesCommon, setSubHeader } from './utils'
+import { propTypesCommon, useSubHeader } from './utils'
 
 const Stack = createStackNavigator()
 
@@ -91,8 +91,8 @@ Settings.propTypes = {
 // ======
 
 function SettingsExperimental({ navigation }) {
+  useSubHeader(navigation, 'Experimental')
   React.useEffect(() => {
-    setSubHeader(navigation, 'Experimental')
     async function setAd() {
       await setTestDeviceIDAsync('EMULATOR')
     }
@@ -173,9 +173,7 @@ SettingsExperimental.propTypes = propTypesCommon
 // ======
 
 function SettingsCredits({ navigation }) {
-  React.useEffect(() => {
-    setSubHeader(navigation, 'Acknowledgements')
-  }, [])
+  useSubHeader(navigation, 'Acknowledgements')
 
   return (
     <Page>
@@ -192,9 +190,7 @@ SettingsCredits.propTypes = propTypesCommon
 // ======
 
 function SettingsPlayers({ navigation }) {
-  React.useEffect(() => {
-    setSubHeader(navigation, 'Players')
-  }, [])
+  useSubHeader(navigation, 'Players')
 
   return (
     <Page>

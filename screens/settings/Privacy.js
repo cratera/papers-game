@@ -3,13 +3,11 @@ import { ScrollView, View } from 'react-native'
 
 import { isWeb } from '@constants/layout'
 
-import PapersContext from '@store/PapersContext.js'
-
 import Page from '@components/page'
 import { IconExternal } from '@components/icons'
 
 import Item from './Item.js'
-import { setSubHeader, propTypesCommon } from './utils'
+import { useSubHeader, propTypesCommon } from './utils'
 
 import * as Theme from '@theme'
 
@@ -19,9 +17,7 @@ export default function Privacy({ navigation }) {
   // const settingsCrashReportEnabled = profile.settings.crashReport
   const [ads, setAds] = React.useState(false)
 
-  React.useEffect(() => {
-    setSubHeader(navigation, 'Privacy')
-  }, [])
+  useSubHeader(navigation, 'Privacy')
 
   function handleCustomAdsToggle() {
     setAds(fakeBool => !fakeBool)

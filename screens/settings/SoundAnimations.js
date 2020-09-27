@@ -10,7 +10,7 @@ import Button from '@components/button'
 import Page from '@components/page'
 
 import Item from './Item'
-import { setSubHeader, propTypesCommon } from './utils'
+import { useSubHeader, propTypesCommon } from './utils'
 
 // OPTMIZE make this dynamic
 const sounds = ['ready', 'turnstart', 'wrong', 'right', 'bomb', 'fivesl', 'timesup']
@@ -21,10 +21,7 @@ export default function SettingsSound({ navigation }) {
   const settingsSoundActive = profile.settings.sound
   const settingsMotion = profile.settings.motion
   const [motionFeedback, setMotionFeedback] = React.useState(false)
-
-  React.useEffect(() => {
-    setSubHeader(navigation, 'Sound & Animations')
-  }, [])
+  useSubHeader(navigation, 'Sound & Animations')
 
   function toggleSoundOn() {
     Papers.soundToggleStatus()

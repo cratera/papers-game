@@ -10,10 +10,13 @@ import { IconArrow } from '@components/icons'
 
 import Avatar from '@components/avatar'
 import MoreOptions from './MoreOptions.js'
+import { useSubHeader } from './utils'
 
 export default function SettingsProfile({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const { profile } = Papers.state
+
+  useSubHeader(navigation, 'Settings')
 
   return (
     <Page>
