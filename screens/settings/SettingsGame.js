@@ -1,20 +1,24 @@
 import React from 'react'
-import { ScrollView, Text } from 'react-native'
+import { ScrollView, Text, View } from 'react-native'
 import PropTypes from 'prop-types'
 
 import PapersContext from '@store/PapersContext.js'
 import * as Theme from '@theme'
+
+import { IconTimes } from '@components/icons'
 import Page from '@components/page'
 import GameScore from '@components/game-score'
 import { useLeaveGame } from '@components/settings'
 
 import Item from './Item.js'
-import MoreOptions from './MoreOptions.js'
+import { useSubHeader } from './utils'
 
 export default function SettingsGame({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const { askToLeaveGame } = useLeaveGame({ navigation: navigation.dangerouslyGetParent() })
   const { game } = Papers.state
+
+  useSubHeader(navigation, '')
 
   if (!game) {
     return null
@@ -22,12 +26,9 @@ export default function SettingsGame({ navigation }) {
 
   return (
     <Page>
-      <Page.Main>
+      <Page.Main headerDivider>
         <ScrollView style={Theme.u.scrollSideOffset}>
-          <Text
-            style={[Theme.typography.h2, Theme.u.center, { marginTop: 24 }]}
-            accessibilityRole="header"
-          >
+          <Text style={[Theme.typography.h2, Theme.u.center]} accessibilityRole="header">
             {game.name}
           </Text>
           <Text
@@ -36,41 +37,17 @@ export default function SettingsGame({ navigation }) {
           >
             {game.code.toString().split('').join('・')}
           </Text>
-          {game.round && (
-            <GameScore
-              id="gs"
-              style={{
-                paddingBottom: 16,
-                marginBottom: 12,
-                borderBottomWidth: 1,
-                borderBottomColor: Theme.colors.grayLight,
-              }}
+          {game.round && <GameScore />}
+          <View style={Theme.u.cardEdge}>
+            <View style={Theme.u.listDivider} />
+            <Item
+              title="Settings"
+              icon="next"
+              onPress={() => navigation.navigate('settings-profile')}
             />
-          )}
-          {[
-            {
-              id: 'pl',
-              title: 'Players',
-              icon: 'next',
-              onPress: () => {
-                navigation.navigate('settings-players')
-              },
-            },
-          ].map(item => (
-            <Item key={item.id} {...item} />
-          ))}
-
-          <MoreOptions
-            navigation={navigation}
-            list={[
-              {
-                id: 'lg',
-                title: 'Leave Game',
-                variant: 'danger',
-                onPress: askToLeaveGame,
-              },
-            ]}
-          />
+            <View style={Theme.u.listDivider} />
+            <Item title="Leave Game" variant="danger" Icon={IconTimes} onPress={askToLeaveGame} />
+          </View>
         </ScrollView>
       </Page.Main>
     </Page>

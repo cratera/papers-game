@@ -33,12 +33,7 @@ export default function Item({ title, description, icon, Icon, variant, switchVa
       >
         <View style={Styles.text}>
           <Text
-            style={[
-              Theme.typography.body,
-              {
-                ...(variant === 'danger' ? { color: Theme.colors.danger } : {}),
-              },
-            ]}
+            style={[Theme.typography.body, variant === 'danger' && { color: Theme.colors.danger }]}
           >
             {title}
           </Text>
@@ -54,7 +49,7 @@ export default function Item({ title, description, icon, Icon, variant, switchVa
           />
         )}
         {Icon ? (
-          <Icon size={16} />
+          <Icon size={16} color={variant === 'danger' && Theme.colors.danger} />
         ) : icon === 'next' ? (
           <IconArrow size={20} />
         ) : icon ? (

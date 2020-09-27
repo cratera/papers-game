@@ -1,8 +1,6 @@
 import React, { Fragment } from 'react'
-import PropTypes from 'prop-types'
-
 import { Image, TouchableHighlight, Text, View } from 'react-native'
-import { Svg, Path } from 'react-native-svg'
+import PropTypes from 'prop-types'
 
 import { PickAvatar } from '@components/avatar'
 

@@ -38,7 +38,7 @@ Avatar.propTypes = {
   alt: PropTypes.string.isRequired,
   hasMargin: PropTypes.bool,
   style: PropTypes.any,
-  size: PropTypes.oneOf(['md', 'lg', 'xl', 'xxl']),
+  size: PropTypes.oneOf(['md', 'lg', 'll', 'xl', 'xxl']),
   stroke: PropTypes.number,
 }
 

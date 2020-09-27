@@ -8,9 +8,13 @@ import Styles from './HomeStyles.js'
 
 import { headerTheme, headerBorder } from '@navigation/headerStuff.js'
 import Page from '@components/page'
-import Button from '@components/button'
+// import Button from '@components/button'
 
 import InputAvatar from './InputAvatar.js'
+
+import { window } from '@constants/layout'
+
+const { vh } = window
 
 // 🐛BUG / QUESTION: Had to transform this Component to a Class so TextInput works properly.
 // When it was a function component, on onChangeText trigger, the TextInput would unmount/mount,
@@ -38,9 +42,13 @@ export default class HomeSignup extends React.Component {
 
   componentDidMount() {
     this.props.navigation.setOptions({
-      ...headerTheme({ hiddenTitle: true, hiddenBorder: true, bgColor: Theme.colors.purple }),
+      ...headerTheme({ hiddenTitle: true }),
       headerLeft: null,
-      headerRight: null,
+      headerRight: () => (
+        <Page.HeaderBtn side="right" icon="next" textPrimary onPress={this.goNextStep}>
+          Next
+        </Page.HeaderBtn>
+      ),
     })
   }
 
@@ -52,28 +60,33 @@ export default class HomeSignup extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (!prevState.name && this.state.name) {
-      this.props.navigation.setOptions({
-        // ...headerBorder(true),
-        headerRight: () => (
+    this.props.navigation.setOptions({
+      headerLeft:
+        this.state.step === 0
+          ? null
+          : () => (
+              <Page.HeaderBtn side="left" icon="back" onPress={this.goBackStep}>
+                Back
+              </Page.HeaderBtn>
+            ),
+      headerRight: () => {
+        if (this.state.step === 1 && !this.state.name) {
+          return null
+        } else if (this.state.step === 2) {
+          return (
+            <Page.HeaderBtn side="right" primary onPress={this.setProfile}>
+              {this.state.avatar ? 'Done' : 'Skip & Finish'}
+            </Page.HeaderBtn>
+          )
+        }
+
+        return (
           <Page.HeaderBtn side="right" icon="next" textPrimary onPress={this.goNextStep}>
             Next
           </Page.HeaderBtn>
-        ),
-      })
-    } else if (!this.state.name && prevState.name) {
-      this.props.navigation.setOptions({
-        headerRight: null,
-      })
-    } else if (!prevState.avatar && this.state.avatar) {
-      this.props.navigation.setOptions({
-        headerRight: () => (
-          <Page.HeaderBtn side="right" textPrimary onPress={this.setProfile}>
-            Finish
-          </Page.HeaderBtn>
-        ),
-      })
-    }
+        )
+      },
+    })
   }
 
   render() {
@@ -85,8 +98,8 @@ export default class HomeSignup extends React.Component {
     }[state.step]
 
     return (
-      <Page bgFill={state.step === 0 ? Theme.colors.purple : Theme.colors.bg}>
-        <Page.Main style={Styles.main}>
+      <Page bgFill={Theme.colors.bg}>
+        <Page.Main headerDivider style={Styles.main}>
           <CurrentStep />
         </Page.Main>
       </Page>
@@ -96,10 +109,12 @@ export default class HomeSignup extends React.Component {
   stepWelcome() {
     return (
       <View style={Styles.content}>
-        <Text style={[Theme.typography.h1, Theme.u.center]}>Papers</Text>
-        <View style={{ width: 280, marginTop: 48 }}>
-          <Button onPress={this.goNextStep}>Play game</Button>
-        </View>
+        <Text style={[Theme.typography.h2, Theme.u.center, { marginTop: -25 * vh }]}>Welcome!</Text>
+        <Text
+          style={[Theme.typography.secondary, Theme.u.center, { marginTop: 16, maxWidth: 300 }]}
+        >
+          Papers is the perfect game for your dinner party with friends or family
+        </Text>
       </View>
     )
   }
@@ -116,6 +131,7 @@ export default class HomeSignup extends React.Component {
           autoFocus
           nativeID="inputNameLabel"
           defaultValue={this.state.name}
+          placeholder="Your name"
           onChangeText={name => this.setState(state => ({ ...state, name }))}
         />
       </View>
@@ -141,79 +157,18 @@ export default class HomeSignup extends React.Component {
     }
   }
 
-  // OPTIMIZE - Find a cleaner way header state based on step.
-  // State machines, right?
-
   goNextStep() {
-    const currentStep = this.state.step
     this.setState(state => ({
       ...state,
       step: state.step + 1,
     }))
-
-    if (currentStep === 0) {
-      this.props.navigation.setOptions({
-        headerStyle: headerBorder(true),
-        // ...headerTheme({ hiddenTitle: true, hiddenBorder: true, bgColor: Theme.colors.bg }),
-        headerLeft: () => (
-          <Page.HeaderBtn side="left" icon="back" onPress={this.goBackStep}>
-            Back
-          </Page.HeaderBtn>
-        ),
-        headerRight: this.state.name
-          ? () => (
-              <Page.HeaderBtn
-                side="right"
-                icon="next"
-                textPrimary
-                onPress={() => this.goNextStep('name')}
-              >
-                Next
-              </Page.HeaderBtn>
-            )
-          : null,
-      })
-    }
-
-    if (currentStep === 1) {
-      this.props.navigation.setOptions({
-        headerRight: () => (
-          <Page.HeaderBtn side="right" primary onPress={this.setProfile}>
-            Skip
-          </Page.HeaderBtn>
-        ),
-      })
-    }
   }
 
   goBackStep() {
-    const step = this.state.step
     this.setState(state => ({
       ...state,
-      step: step - 1,
+      step: state.step - 1,
     }))
-
-    if (step - 1 === 0) {
-      this.props.navigation.setOptions({
-        headerLeft: null,
-        headerRight: null,
-        // ...headerBorder(false),
-      })
-    } else if (step - 1 === 1) {
-      this.props.navigation.setOptions({
-        // ...headerBorder(true),
-        headerRight: () => (
-          <Page.HeaderBtn
-            side="right"
-            icon="next"
-            textPrimary
-            onPress={() => this.goNextStep('avatar')}
-          >
-            Next
-          </Page.HeaderBtn>
-        ),
-      })
-    }
   }
 
   setProfile() {
