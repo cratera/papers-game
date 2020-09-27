@@ -8,7 +8,7 @@ import * as Theme from '@theme'
 import Page from '@components/page'
 import { IconArrow } from '@components/icons'
 
-import AvatarSquare from './AvatarSquare.js'
+import Avatar from '@components/avatar'
 import MoreOptions from './MoreOptions.js'
 
 export default function SettingsProfile({ navigation }) {
@@ -25,7 +25,7 @@ export default function SettingsProfile({ navigation }) {
             onPress={() => navigation.navigate('settings-account')}
           >
             <View style={Styles.accountTap}>
-              <AvatarSquare style={Styles.accountTap_avatar} avatar={profile.avatar} />
+              <Avatar style={Styles.accountTap_avatar} src={profile.avatar} size="ll" stroke={1} />
               <View style={{ flexGrow: 1 }}>
                 <Text style={[Theme.typography.small]}>Account</Text>
                 <Text style={[Theme.typography.body]}>{profile.name}</Text>

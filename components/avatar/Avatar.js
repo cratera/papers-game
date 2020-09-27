@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 
 import * as Theme from '@theme'
 
-export default function Avatar({ src, alt, hasMargin, size, ...otherProps }) {
+export default function Avatar({ src, alt, hasMargin, size, stroke, style, ...otherProps }) {
   const Tag = src ? Image : View
 
   return (
@@ -17,9 +17,11 @@ export default function Avatar({ src, alt, hasMargin, size, ...otherProps }) {
         : {})}
       style={[
         Styles.avatar,
+        { borderWidth: stroke },
         src && { resizeMode: 'cover' },
         hasMargin && Styles.margin,
         Styles[`size_${size}`],
+        style,
       ]}
       {...otherProps}
     />
@@ -28,20 +30,22 @@ export default function Avatar({ src, alt, hasMargin, size, ...otherProps }) {
 
 Avatar.defaultProps = {
   size: 'md',
+  stroke: 2,
 }
 
 Avatar.propTypes = {
   src: PropTypes.string,
   alt: PropTypes.string.isRequired,
   hasMargin: PropTypes.bool,
-  size: PropTypes.string,
+  style: PropTypes.any,
+  size: PropTypes.oneOf(['md', 'lg', 'xl', 'xxl']),
+  stroke: PropTypes.number,
 }
 
 const Styles = StyleSheet.create({
   avatar: {
     backgroundColor: Theme.colors.primaryLight,
     borderColor: Theme.colors.grayDark,
-    borderWidth: 2,
   },
   margin: {
     marginRight: 16,
@@ -54,8 +58,16 @@ const Styles = StyleSheet.create({
     width: 56,
     height: 56,
   },
+  size_ll: {
+    width: 88,
+    height: 88,
+  },
   size_xl: {
     width: 104,
     height: 104,
+  },
+  size_xxl: {
+    width: 120,
+    height: 120,
   },
 })

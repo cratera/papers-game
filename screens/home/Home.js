@@ -1,4 +1,5 @@
 import React from 'react'
+import { Text, TouchableOpacity } from 'react-native'
 import PropTypes from 'prop-types'
 
 import * as Analytics from '@constants/analytics.js'
@@ -6,11 +7,28 @@ import * as Analytics from '@constants/analytics.js'
 import PapersContext from '@store/PapersContext.js'
 
 import { headerTheme } from '@navigation/headerStuff.js'
-import Page from '@components/page'
+
+import Avatar from '@components/avatar'
 import HomeSigned from './HomeSigned.js'
 import HomeSignup from './HomeSignup.js'
 
 import * as Theme from '@theme'
+
+function HeaderName({ name, onPress }) /* eslint-disable-line */ {
+  return (
+    <TouchableOpacity style={{ paddingLeft: 24, paddingBottom: 15 }} onPress={onPress}>
+      <Text style={Theme.typography.body}>{name}</Text>
+    </TouchableOpacity>
+  )
+}
+
+function HeaderAvatar({ avatar, onPress }) /* eslint-disable-line */ {
+  return (
+    <TouchableOpacity style={{ paddingRight: 24, paddingBottom: 15 }} onPress={onPress}>
+      <Avatar src={avatar} alt="Settings" />
+    </TouchableOpacity>
+  )
+}
 
 export default function HomeScreen({ navigation }) {
   const Papers = React.useContext(PapersContext)
@@ -32,9 +50,12 @@ export default function HomeScreen({ navigation }) {
         hiddenTitle: true,
         bgColor: Theme.colors.purple,
       }),
+      headerLeft: function HBS() {
+        return profile.name ? <HeaderName name={profile.name} onPress={goSettings} /> : null
+      },
       headerTitle: profile.name ? 'Home' : 'Create Profile',
       headerRight: function HBS() {
-        return profile.name ? <Page.HeaderBtnSettings /> : null
+        return profile.name ? <HeaderAvatar avatar={profile.avatar} onPress={goSettings} /> : null
       },
     })
     // Bug, on mount this is called twice
@@ -46,6 +67,10 @@ export default function HomeScreen({ navigation }) {
       navigation.navigate('room')
     }
   }, [gameId])
+
+  function goSettings() {
+    navigation.navigate('settings')
+  }
 
   async function handleUpdateProfile(profile) {
     // Do this here to take advatange of hooks!

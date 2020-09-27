@@ -6,7 +6,7 @@ import * as Theme from '@theme'
 
 import Page from '@components/page'
 
-import AvatarSquare from './AvatarSquare.js'
+import { AvatarField } from '@components/avatar'
 import Item from './Item.js'
 import { setSubHeader, propTypesCommon } from './utils'
 
@@ -25,11 +25,8 @@ export default function SettingsAccount({ navigation }) {
         <ScrollView style={[Theme.u.scrollSideOffset]}>
           <View style={Theme.u.cardEdge}>
             <View style={[Styles.avatarBox]}>
-              <AvatarSquare
+              <AvatarField
                 avatar={profile.avatar}
-                style={Styles.avatar}
-                size={120}
-                stroke={2}
                 onChange={avatar => Papers.updateProfile({ avatar })}
               />
             </View>
@@ -75,7 +72,7 @@ SettingsAccount.propTypes = propTypesCommon
 
 const Styles = StyleSheet.create({
   avatarBox: {
-    paddingBottom: 8,
+    paddingVertical: 8,
   },
   input: {
     borderColor: 'transparent',

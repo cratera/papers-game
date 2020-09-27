@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, TouchableHighlight } from 'react-native'
+import { View, Text, TouchableOpacity } from 'react-native'
 import PropTypes from 'prop-types'
 
 import { usePrevious, msToSecPretty, getRandomInt } from '@constants/utils'
@@ -391,8 +391,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
           {msToSecPretty(countdown)}
         </Text>
         <View style={Styles.go_zone}>
-          <TouchableHighlight
-            underlayColor={Theme.colors.bg}
+          <TouchableOpacity
             onPressIn={() => {
               setPapersTurn(state => ({
                 ...state,
@@ -434,7 +433,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
                 )}
               </View>
             </View>
-          </TouchableHighlight>
+          </TouchableOpacity>
         </View>
 
         {/* {true && (
