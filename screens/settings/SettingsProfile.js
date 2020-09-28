@@ -28,7 +28,13 @@ export default function SettingsProfile({ navigation }) {
             onPress={() => navigation.navigate('settings-account')}
           >
             <View style={Styles.accountTap}>
-              <Avatar style={Styles.accountTap_avatar} src={profile.avatar} size="ll" stroke={1} />
+              <Avatar
+                style={Styles.accountTap_avatar}
+                src={profile.avatar}
+                size="ll"
+                stroke={1}
+                alt=""
+              />
               <View style={{ flexGrow: 1 }}>
                 <Text style={[Theme.typography.small]}>Account</Text>
                 <Text style={[Theme.typography.body]}>{profile.name}</Text>

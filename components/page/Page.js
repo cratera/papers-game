@@ -79,7 +79,10 @@ const HeaderBtn = ({ side, icon, style, textPrimary, children, isLoading, ...oth
       variant="flat"
       textColor={color}
       isLoading={isLoading}
-      style={[side === 'left' ? { marginLeft: 16 } : { marginRight: 16 }]}
+      style={[
+        side === 'left' ? { marginLeft: 16 } : { marginRight: 16 },
+        IconMapped && { marginTop: 8 },
+      ]}
       {...otherProps}
     >
       <>

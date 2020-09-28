@@ -1,9 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Animated, Easing, Platform, StyleSheet, View } from 'react-native'
-import Constants from 'expo-constants'
 
-import { window } from '@constants/layout'
+import { window, statusBarHeight } from '@constants/layout'
 
 import PapersContext from '@store/PapersContext.js'
 
@@ -97,7 +96,7 @@ export default Bubbling
 const StylesBubble = StyleSheet.create({
   bg: {
     position: 'absolute',
-    top: Constants.statusBarHeight * -1,
+    top: statusBarHeight * -1,
     left: 0,
     width: window.width,
     height: window.height,

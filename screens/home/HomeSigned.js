@@ -11,8 +11,8 @@ import Page from '@components/page'
 
 export default function HomeSigned({ navigation }) {
   return (
-    <Page>
-      <Bubbling fromBehind bgStart={Theme.colors.bg} bgEnd={Theme.colors.purple} />
+    <Page bgFill={Theme.colors.purple}>
+      <Bubbling bgStart={Theme.colors.bg} bgEnd={Theme.colors.purple} />
       <Page.Main headerDivider style={[Styles.main, { justifyContent: 'center' }]}>
         <Text style={[Theme.typography.h1, { marginBottom: 120 }]}>Papers</Text>
       </Page.Main>

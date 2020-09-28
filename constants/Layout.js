@@ -4,6 +4,7 @@ import Constants from 'expo-constants'
 const width = Dimensions.get('window').width
 const height = Dimensions.get('window').height
 
+export const statusBarHeight = Math.max(21, Constants.statusBarHeight)
 export const window = {
   width,
   height,
@@ -18,8 +19,4 @@ export const isTamagoshi = height < 570 // aka iphone 5/SE
 
 // Safe area for transparent header, // take into account devices
 // with top notch - Tested in iPhones SE, X and 11
-export const headerHeight = isWeb
-  ? 55
-  : isTamagoshi
-  ? Math.max(45, Constants.statusBarHeight)
-  : Math.max(55, Constants.statusBarHeight)
+export const headerHeight = isWeb ? 55 : 55 + statusBarHeight

@@ -6,7 +6,7 @@ import { TextInput, Text, View } from 'react-native'
 import * as Theme from '@theme'
 import Styles from './HomeStyles.js'
 
-import { headerTheme, headerBorder } from '@navigation/headerStuff.js'
+import { headerTheme } from '@navigation/headerStuff.js'
 import Page from '@components/page'
 // import Button from '@components/button'
 
