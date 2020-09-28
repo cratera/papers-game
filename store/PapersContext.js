@@ -68,7 +68,7 @@ export class PapersContextProvider extends Component {
       profiles: {}, // List of game players' profiles.
       about: {
         version: '0.2.5',
-        ota: '12',
+        ota: '13',
       },
     }
 
