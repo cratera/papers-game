@@ -43,12 +43,10 @@ export default function SettingsAccount({ navigation }) {
                 onBlur={() => name && Papers.updateProfile({ name })}
               />
             </View>
-
             <Item
-              id="privacy"
-              title="Privacy"
+              title="Statistics"
               icon="next"
-              onPress={() => navigation.navigate('settings-privacy')}
+              onPress={() => navigation.navigate('settings-statistics')}
             />
             <View style={Theme.u.listDivider} />
             <Item

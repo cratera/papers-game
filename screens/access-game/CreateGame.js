@@ -44,8 +44,6 @@ export default function CreateGame({ navigation }) {
   }, [])
 
   React.useEffect(() => {
-    // REVIEW - How to use closures in RN
-    // https://stackoverflow.com/questions/62038483/react-navigation-access-state-inside-setoptions-headerright-callback
     navigation.setOptions({
       headerRight: hasValidName
         ? function HB() {
@@ -64,52 +62,6 @@ export default function CreateGame({ navigation }) {
         : null,
     })
   }, [hasValidName, state.gameName, isCreating])
-
-  return (
-    <Page bannerMsg={state.isUnexError && state.errorMsg}>
-      <Page.Main headerDivider>
-        {/* <KeyboardAvoidingView
-          behavior={'padding'}
-          keyboardShouldPersistTaps="always"
-          style={{ flex: 1, alignSelf: 'stretch' }}
-        > */}
-        <View>
-          {isCreating ? (
-            <LoadingBadge variant="page">Creating game</LoadingBadge>
-          ) : (
-            <>
-              <Text style={[Styles.title, Theme.typography.body]}>{i18n.title}</Text>
-
-              <TextInput
-                style={[Theme.typography.h2, Styles.input]}
-                inputAccessoryViewID="name"
-                autoFocus
-                autoCorrect={false}
-                nativeID="inputNameLabel"
-                defaultValue={state.gameName}
-                placeholder="Choose a name..."
-                onChangeText={handleInputChange}
-              />
-              {state.isInvalid && (
-                <Text style={[Theme.typography.small, Styles.hintMsg, Styles.errorMsg]}>
-                  You can only use letters and numbers.
-                </Text>
-              )}
-              {state.errorMsg && !state.isUnexError && (
-                <Text style={[Theme.typography.small, Styles.hintMsg, Styles.errorMsg]}>
-                  {state.errorMsg}
-                </Text>
-              )}
-              <Text nativeID="inputNameLabel" style={[Styles.tip, Theme.typography.secondary]}>
-                {i18n.description}
-              </Text>
-            </>
-          )}
-        </View>
-        {/* </KeyboardAvoidingView> */}
-      </Page.Main>
-    </Page>
-  )
 
   function handleInputChange(gameName) {
     const isInvalid = slugString(gameName) !== gameName.toLowerCase()
@@ -146,6 +98,46 @@ export default function CreateGame({ navigation }) {
   function goHome() {
     navigation.navigate('home')
   }
+
+  return (
+    <Page bannerMsg={state.isUnexError && state.errorMsg}>
+      <Page.Main headerDivider>
+        <View>
+          {isCreating ? (
+            <LoadingBadge variant="page">Creating game</LoadingBadge>
+          ) : (
+            <>
+              <Text style={[Styles.title, Theme.typography.body]}>{i18n.title}</Text>
+
+              <TextInput
+                style={[Theme.typography.h2, Styles.input]}
+                inputAccessoryViewID="name"
+                autoFocus
+                autoCorrect={false}
+                nativeID="inputNameLabel"
+                defaultValue={state.gameName}
+                placeholder="Choose a name..."
+                onChangeText={handleInputChange}
+              />
+              {state.isInvalid && (
+                <Text style={[Theme.typography.small, Styles.hintMsg, Styles.errorMsg]}>
+                  You can only use letters and numbers.
+                </Text>
+              )}
+              {state.errorMsg && !state.isUnexError && (
+                <Text style={[Theme.typography.small, Styles.hintMsg, Styles.errorMsg]}>
+                  {state.errorMsg}
+                </Text>
+              )}
+              <Text nativeID="inputNameLabel" style={[Styles.tip, Theme.typography.secondary]}>
+                {i18n.description}
+              </Text>
+            </>
+          )}
+        </View>
+      </Page.Main>
+    </Page>
+  )
 }
 
 CreateGame.propTypes = {

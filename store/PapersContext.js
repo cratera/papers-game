@@ -16,19 +16,31 @@ const i18nUnexpectedError = 'Unexpected error. Please try again later.'
 
 const PapersContext = React.createContext({})
 
+const settingsDefaults = { sound: !__DEV__, motion: !isWeb }
+const statsDefaults = {
+  // NOTE: If you change this, don't forget Statistics.js
+  gamesCreated: 0,
+  gamesJoined: 0,
+  gamesWon: 0,
+  gamesLost: 0,
+  papersGuessed: 0,
+}
+
 export const loadProfile = async () => {
   const id = (await AsyncStorage.getItem('profile_id')) || null
   const name = (await AsyncStorage.getItem('profile_name')) || null
   const avatar = (await AsyncStorage.getItem('profile_avatar')) || null
   const gameId = (await AsyncStorage.getItem('profile_gameId')) || null
   const settingsStored = (await AsyncStorage.getItem('profile_settings')) || null
+  const statsStored = (await AsyncStorage.getItem('profile_stats')) || null
 
   return {
     id,
     name,
     avatar,
     gameId,
-    settings: settingsStored ? JSON.parse(settingsStored) : { sound: !__DEV__, motion: !isWeb },
+    settings: settingsStored ? JSON.parse(settingsStored) : settingsDefaults,
+    stats: statsStored ? JSON.parse(statsStored) : statsDefaults,
   }
 }
 
@@ -50,6 +62,7 @@ export class PapersContextProvider extends Component {
         avatar: props.initialProfile.avatar,
         gameId: props.initialProfile.gameId, // the last game accessed
         settings: props.initialProfile.settings,
+        stats: props.initialProfile.stats,
       },
       game: null, // see Firebase.js for structure.
       profiles: {}, // List of game players' profiles.
@@ -70,6 +83,7 @@ export class PapersContextProvider extends Component {
       updateProfile: this.updateProfile.bind(this),
       resetProfile: this.resetProfile.bind(this),
       updateProfileSettings: this.updateProfileSettings.bind(this),
+      resetProfileStats: this.resetProfileStats.bind(this),
 
       accessGame: this.accessGame.bind(this),
       leaveGame: this.leaveGame.bind(this),
@@ -188,9 +202,14 @@ export class PapersContextProvider extends Component {
         return
       }
 
-      await this.accessGame('join', gameId, () => {
-        if (__DEV__) console.log(`Joined to ${gameId} completed!`)
-      })
+      await this.accessGame(
+        'join',
+        gameId,
+        () => {
+          if (__DEV__) console.log(`Joined ${gameId} completed!`)
+        },
+        { automatic: true }
+      )
     }
   }
 
@@ -225,7 +244,13 @@ export class PapersContextProvider extends Component {
     })
   }
 
-  async accessGame(variant, gameName, cb) {
+  async accessGame(variant, gameName, cb, customOpts = {}) {
+    const opts = {
+      // Pass true when the access is internally made, rather than user interaction (eg on App refresh/restart)
+      automatic: false,
+      ...customOpts,
+    }
+
     if (!this.state.socket || !this.state.profile.id) {
       if (__DEV__) console.log('📌 accessGame() - init needed first')
 
@@ -234,13 +259,11 @@ export class PapersContextProvider extends Component {
           this._removeGameFromState()
           return cb(null, errorMsg)
         }
-        this.accessGame(variant, gameName, cb)
+        this.accessGame(variant, gameName, cb, opts)
       })
-
       return
     }
 
-    // OPTMIZE - Verify the profile is updated.
     if (__DEV__) console.log('📌 accessGame()', variant, gameName)
 
     if (!gameName) {
@@ -256,8 +279,14 @@ export class PapersContextProvider extends Component {
       const gameId = await this.state.socket[`${variant}Game`](gameName)
       this._subscribeGame(gameId)
       this.PapersAPI.updateProfile({ gameId })
-      // REVIEW - This is called on page refresh. It shouldn't
-      Analytics.logEvent(`${variant}_game`, { count: 1 }) // TODO count
+
+      if (!opts.automatic) {
+        const statKey = variant === 'create' ? 'gamesCreated' : 'gamesJoined'
+        Analytics.logEvent(`${variant}_game`, {
+          count: this.state.profile.stats[statKey] + 1,
+        })
+        this.updateProfileStats(statKey, 1)
+      }
       cb(gameId)
     } catch (e) {
       const errorMsgMap = {
@@ -481,24 +510,53 @@ export class PapersContextProvider extends Component {
 
   async updateProfileSettings(setting, value) {
     if (__DEV__) console.log('📌 updateProfileSettings()', setting, value)
-    const newSettings = {
-      ...this.state.profile.settings,
-      [setting]: value,
-    }
 
-    try {
-      await AsyncStorage.setItem('profile_settings', JSON.stringify(newSettings))
-    } catch (e) {
-      console.warn('error: updateProfileSettings', e)
-      Sentry.captureException(e, { tags: { pp_action: 'UP_1' } })
-    }
+    this.setState(
+      state => ({
+        profile: {
+          ...state.profile,
+          settings: {
+            ...state.profile.settings,
+            [setting]: value,
+          },
+        },
+      }),
+      async () => {
+        const newSettings = this.state.profile.settings
+        try {
+          await AsyncStorage.setItem('profile_settings', JSON.stringify(newSettings))
+        } catch (e) {
+          console.warn('error: updateProfileSettings', e)
+          Sentry.captureException(e, { tags: { pp_action: 'UP_1' } })
+        }
+      }
+    )
+  }
 
-    this.setState(state => ({
-      profile: {
-        ...state.profile,
-        settings: newSettings,
-      },
-    }))
+  async updateProfileStats(statKey, valueToAdd) {
+    // Similar to updateProfileSettings. Could be DRY but it's ok...
+    if (__DEV__) console.log('📌 updateProfileStats()', statKey, valueToAdd)
+
+    this.setState(
+      state => ({
+        profile: {
+          ...state.profile,
+          stats: {
+            ...state.profile.stats,
+            [statKey]: state.profile.stats[statKey] + valueToAdd,
+          },
+        },
+      }),
+      async () => {
+        const newStats = this.state.profile.stats
+        try {
+          await AsyncStorage.setItem('profile_settings', JSON.stringify(newStats))
+        } catch (e) {
+          console.warn('error: updateProfileStats', e)
+          Sentry.captureException(e, { tags: { pp_action: 'UPS_1' } })
+        }
+      }
+    )
   }
 
   async resetProfile(profile) {
@@ -508,6 +566,8 @@ export class PapersContextProvider extends Component {
       await AsyncStorage.removeItem('profile_name')
       await AsyncStorage.removeItem('profile_avatar')
       await AsyncStorage.removeItem('profile_groupId')
+      await AsyncStorage.removeItem('profile_settings')
+      await AsyncStorage.removeItem('profile_stats')
 
       if (this.state.socket) {
         await this.state.socket.resetProfile()
@@ -525,6 +585,23 @@ export class PapersContextProvider extends Component {
 
     this.setState(state => ({
       profile: {},
+    }))
+  }
+
+  async resetProfileStats(profile) {
+    if (__DEV__) console.log('📌 resetProfileStats()')
+    try {
+      await AsyncStorage.removeItem('profile_stats')
+    } catch (e) {
+      console.warn('error: resetProfileStats', e)
+      Sentry.captureException(e, { tags: { pp_action: 'RPS_0' } })
+    }
+
+    this.setState(state => ({
+      profile: {
+        ...state.profile,
+        stats: statsDefaults,
+      },
     }))
   }
 
@@ -910,6 +987,14 @@ export class PapersContextProvider extends Component {
             Sentry.captureException(Error('Wrong score!'))
           })
         }
+
+        // Last round
+        if (game.round.current === 2) {
+          const statUpdate = opts.isMyTeamWinner ? 'gamesWon' : 'gamesLost'
+          this.updateProfileSettings(statUpdate, 1)
+          this.updateProfileSettings('papersGuessed', opts.myTotalScore) // TODO this
+        }
+
         break
       }
       default:
@@ -927,6 +1012,13 @@ PapersContextProvider.propTypes = {
     settings: PropTypes.shape({
       sound: PropTypes.bool,
       motions: PropTypes.bool,
+    }),
+    stats: PropTypes.shape({
+      gamesCreated: 0,
+      gamesJoined: 0,
+      gamesWon: 0,
+      gamesLost: 0,
+      papersGuessed: 0,
     }),
   }),
   children: PropTypes.node,

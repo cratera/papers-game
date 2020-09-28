@@ -35,6 +35,8 @@ const RoundScore = ({ navigation }) => {
   React.useEffect(() => {
     Papers.sendTracker('game_finishRound', {
       arrayOfScores: scoreByRound[roundIx].arrayOfScores,
+      isMyTeamWinner,
+      myTotalScore: null, // TODO!!! THIS
     })
   }, [])
 

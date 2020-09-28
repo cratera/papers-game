@@ -16,7 +16,7 @@ import * as Theme from '@theme'
 
 function HeaderName({ name, onPress }) /* eslint-disable-line */ {
   return (
-    <TouchableOpacity style={{ paddingLeft: 24, paddingBottom: 15 }} onPress={onPress}>
+    <TouchableOpacity style={{ paddingLeft: 24, paddingBottom: 10 }} onPress={onPress}>
       <Text style={Theme.typography.body}>{name}</Text>
     </TouchableOpacity>
   )

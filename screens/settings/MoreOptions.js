@@ -29,6 +29,12 @@ export default function MoreOptions({ navigation, list }) {
           },
           {
             id: 'pg',
+            title: 'Privacy',
+            icon: 'next',
+            onPress: () => navigation.navigate('settings-privacy'),
+          },
+          {
+            id: 'xp',
             title: 'Experimental',
             icon: 'next',
             onPress: () => navigation.navigate('settings-experimental'),
