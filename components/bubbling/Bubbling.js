@@ -20,7 +20,7 @@ const Bubbling = ({ bgStart, bgEnd, fromBehind }) => {
       easing: Easing.linear,
       useNativeDriver: Platform.OS !== 'web',
     }).start()
-  }, [])
+  }, [motionEnabled])
 
   if (!motionEnabled) {
     if (fromBehind) {
@@ -46,7 +46,6 @@ const Bubbling = ({ bgStart, bgEnd, fromBehind }) => {
         {
           backgroundColor: bgStart,
           zIndex: fromBehind ? 0 : 1,
-          // opacity: 1,
           opacity: fromBehind
             ? 1
             : animScaleGrow.interpolate({
@@ -96,10 +95,11 @@ export default Bubbling
 const StylesBubble = StyleSheet.create({
   bg: {
     position: 'absolute',
-    top: 0, // headerHeight * -1,
+    top: headerHeight * -1,
     left: 0,
     width: window.width,
-    height: window.height,
+    // avoid somehow rare bug, where bg height does not cover fullscreen
+    height: window.height + headerHeight,
     overflow: 'hidden',
   },
   bubble: {
