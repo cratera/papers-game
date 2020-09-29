@@ -21,7 +21,7 @@ function setSubHeader(navigation, title) {
 
 export function useSubHeader(navigation, title) {
   React.useEffect(() => {
-    // if (__DEV__) console.log(':::: useSubHeader()', title)
+    // if (__DEV__) console.log(':: useSubHeader()', title)
     const unsubscribe = navigation.addListener('focus', () => setSubHeader(navigation, title))
 
     return unsubscribe

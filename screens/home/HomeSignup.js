@@ -8,7 +8,7 @@ import Styles from './HomeStyles.js'
 
 import { headerTheme } from '@navigation/headerStuff.js'
 import Page from '@components/page'
-// import Button from '@components/button'
+import Button from '@components/button'
 
 import InputAvatar from './InputAvatar.js'
 
@@ -70,7 +70,7 @@ export default class HomeSignup extends React.Component {
               </Page.HeaderBtn>
             ),
       headerRight: () => {
-        if (this.state.step === 1 && !this.state.name) {
+        if (this.state.step === 0 || (this.state.step === 1 && !this.state.name)) {
           return null
         } else if (this.state.step === 2) {
           return (
@@ -108,13 +108,21 @@ export default class HomeSignup extends React.Component {
 
   stepWelcome() {
     return (
-      <View style={Styles.content}>
+      <View style={[Styles.content]}>
         <Text style={[Theme.typography.h2, Theme.u.center, { marginTop: -25 * vh }]}>Welcome!</Text>
         <Text
-          style={[Theme.typography.secondary, Theme.u.center, { marginTop: 16, maxWidth: 300 }]}
+          style={[
+            Theme.typography.secondary,
+            Theme.u.center,
+            { marginTop: 16, marginBottom: 72, maxWidth: 300 },
+          ]}
         >
           Papers is the perfect game for your dinner party with friends or family
         </Text>
+
+        <Button styleTouch={{ width: 300 }} onPress={this.goNextStep}>
+          Start
+        </Button>
       </View>
     )
   }
