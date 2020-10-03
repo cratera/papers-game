@@ -31,5 +31,5 @@ export const isTamagoshi = height < 570 // aka iphone 5/SE
 
 // Safe area for transparent header.In phones with notch (iphoneX)
 // ignore the extra notch height (statusBarHeight)
-const safeArea = isIPhoneX ? 50 - statusBarHeight : 50
+const safeArea = isIPhoneX ? 50 - statusBarHeight : 40
 export const headerHeight = isWeb ? 55 : safeArea + statusBarHeight
