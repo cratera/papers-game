@@ -55,9 +55,9 @@ export default function SettingsSound({ navigation }) {
           <View style={Theme.u.cardEdge}>
             <Item title="Play sounds" switchValue={settingsSoundActive} onPress={toggleSoundOn} />
             <Item
-              title="Animations"
-              description="When disabled, the number of animations are reduced"
-              switchValue={settingsMotion}
+              title="Reduce animations"
+              description="Good for older phones or if the battery is low."
+              switchValue={!settingsMotion}
               onPress={toggleMotion}
             />
             <View style={Theme.u.listDivider} />
