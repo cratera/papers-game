@@ -101,15 +101,15 @@ const OthersTurn = ({
             </Text>
             <Avatar size="xl" src={thisTurnPlayer.avatar} alt="" />
 
-            {!hasCountdownStarted ? (
+            {!hasCountdownStarted || (countdownSec && !isAllWordsGuessed) ? (
               <>
                 <Text
                   style={[Theme.typography.h3, Theme.u.center, { marginTop: 24, marginBottom: 8 }]}
                 >
-                  {thisTurnPlayer.name}
+                  {!hasCountdownStarted ? thisTurnPlayer.name : turnStatus.player.name}
                 </Text>
                 <Text style={[Theme.typography.secondary, Theme.u.center]}>
-                  {turnStatus.teamName}
+                  {!hasCountdownStarted ? thisTurnTeamName : turnStatus.teamName}
                 </Text>
               </>
             ) : countdownSec && !isAllWordsGuessed ? (
@@ -133,7 +133,7 @@ const OthersTurn = ({
       </Page.Main>
 
       <Page.CTAs>
-        <View style={[Styles.header, { marginBottom: 32 }]}>
+        <View style={[Styles.header]}>
           <Text style={Theme.typography.secondary}>
             {isAllWordsGuessed ? `End of round ${roundNr}` : `Round ${roundNr}`}
           </Text>

@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native'
 import * as Theme from '@theme'
-import { window, headerHeight } from '@constants/layout'
+
+import { isTamagoshi, headerHeight, window } from '@constants/layout'
 
 const { vw, vh } = window
 
@@ -122,7 +123,7 @@ export default StyleSheet.create({
     marginTop: 10 * vh,
   },
   tst_flex_title: {
-    marginBottom: 5 * vh,
+    marginBottom: isTamagoshi ? 16 : 40,
   },
 
   // Turn score:

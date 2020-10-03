@@ -79,10 +79,7 @@ export default function GameRoomEntry({ navigation, route }) {
     <Stack.Navigator
       screenOptions={{
         gestureEnabled: false,
-
-        // headerStyleInterpolator: headerFor,
         cardStyleInterpolator: cardForFade,
-        // animationEnabled: false,
         ...headerTheme(),
       }}
       initialRouteName={initialRouter}

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Text } from 'react-native'
+import { Text, View } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import PropTypes from 'prop-types'
 
@@ -83,7 +83,8 @@ export default function LobbyWriting({ navigation }) {
       )}
       <Page.Main headerDivider>
         <ScrollView style={Theme.u.scrollSideOffset}>
-          <ListTeams isStatusVisible style={{ paddingTop: 40 }} />
+          <ListTeams isStatusVisible style={{ paddingTop: 24 }} />
+          <View style={Theme.u.CTASafeArea} />
         </ScrollView>
       </Page.Main>
       {didEveryoneSubmittedTheirWords && (

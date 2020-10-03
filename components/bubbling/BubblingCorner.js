@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Animated, Easing, Platform, StyleSheet, View } from 'react-native'
 
-import { window, statusBarHeight } from '@constants/layout'
+import { window, headerHeight } from '@constants/layout'
 
 import PapersContext from '@store/PapersContext.js'
 
@@ -103,10 +103,11 @@ export default BubblingCorner
 const StylesBubble = StyleSheet.create({
   bg: {
     position: 'absolute',
-    top: statusBarHeight * -1,
+    top: headerHeight * -1,
     left: 0,
     width: window.width,
-    height: window.height,
+    // avoid somehow rare bug, where bg height does not cover fullscreen
+    height: window.height + headerHeight,
     overflow: 'hidden',
   },
   bubble: {

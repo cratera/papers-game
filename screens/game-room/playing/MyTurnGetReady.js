@@ -1,10 +1,11 @@
 import React from 'react'
-import { Image, View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet } from 'react-native'
 import PropTypes from 'prop-types'
 
 import PapersContext from '@store/PapersContext.js'
 import { isTamagoshi } from '@constants/layout'
 
+import Avatar from '@components/avatar'
 import Bubbling from '@components/bubbling'
 import Button from '@components/button'
 import Page from '@components/page'
@@ -54,13 +55,8 @@ const MyTurnGetReady = ({ description, amIWaiting }) => {
           >{`It's your turn!`}</Text>
           <View style={StylesIn.illustration}>
             <IllustrationStars style={StylesIn.svg} />
-            <Image
-              style={[StylesIn.avatar]}
-              source={{ uri: profile.avatar }}
-              accessibilityLabel=""
-            />
+            <Avatar src={profile.avatar} alt="" size="xxl" />
           </View>
-          {/* TODO responsive iphone 5 */}
           <Text style={Theme.typography.secondary}>Round {roundNr}</Text>
           <Text style={[Theme.typography.body, Theme.u.center, { marginTop: 12, maxWidth: 300 }]}>
             {description}
@@ -109,16 +105,6 @@ const StylesIn = StyleSheet.create({
     left: 0,
     width: 229,
     height: isTamagoshi ? areaHeight.sm : areaHeight.md,
-  },
-  avatar: {
-    width: 100,
-    height: 100,
-    backgroundColor: Theme.colors.grayMedium,
-    borderColor: Theme.colors.grayDark,
-    borderWidth: 2,
-  },
-  mirror: {
-    transform: [{ scaleX: -1 }, { rotate: '18deg' }],
   },
 })
 

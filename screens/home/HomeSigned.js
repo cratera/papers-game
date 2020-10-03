@@ -34,8 +34,6 @@ export default function HomeSigned({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const { profile } = Papers.state
 
-  console.log('::.::', profile.settings.motion)
-
   React.useEffect(() => {
     navigation.setOptions({
       ...headerTheme({
