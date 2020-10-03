@@ -10,7 +10,7 @@ import * as Theme from '@theme'
 export default function ListTeams({ isStatusVisible, enableKickout, ...otherProps }) {
   const Papers = React.useContext(PapersContext)
   const { game } = Papers.state
-  const didSubmitAllWords = plId => game.words[plId]
+  const didSubmitAllWords = plId => game?.words[plId]
 
   if (!game) {
     // TODO add global warning.

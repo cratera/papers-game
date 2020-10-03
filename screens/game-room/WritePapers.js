@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import debounce from 'lodash/debounce'
-import { Keyboard, KeyboardAvoidingView, View, TextInput, Text, ScrollView } from 'react-native'
+import { Keyboard, View, TextInput, Text, ScrollView } from 'react-native'
 import Sentry from '@constants/Sentry'
 
 import * as Analytics from '@constants/analytics.js'
@@ -14,7 +14,7 @@ import { IconArrow } from '@components/icons'
 import * as Theme from '@theme'
 import Styles from './WritePapersStyles.js'
 
-import { window, isWeb, isAndroid } from '@constants/layout'
+import { window, isAndroid } from '@constants/layout'
 
 const { vw, vh } = window
 
@@ -22,8 +22,10 @@ export default function WritePapers({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const { game, profile } = Papers.state
   const [words, setLocalWords] = React.useState([])
-  const [keyboardHeight, setKeyboardHeight] = React.useState(null)
+  const [kbHeight, setkbHeight] = React.useState(null) // kb = keyboard
+  const [distanceFromKb, setDistanceFromKb] = React.useState(null)
   const refSlides = React.useRef()
+  const refCTAs = React.useRef()
   const scrollDebounced = React.useRef(debounce(handleScrollPapers, 450)).current // <300 fucks up scroll on iOS
 
   const [errorMsg, setErrorMsg] = React.useState(null)
@@ -89,11 +91,20 @@ export default function WritePapers({ navigation }) {
 
   React.useEffect(() => {
     const onKeyboardDidShow = e => {
-      setKeyboardHeight(e.endCoordinates.height)
+      const kbHeight = e.endCoordinates.height
+      setkbHeight(kbHeight)
+      setTimeout(() => {})
+      refCTAs.current.measure((x, y, ctaW, ctaH, pX, pY) => {
+        const vh100 = vh * 100
+        const pYEnd = pY + ctaH
+        const space = 8
+        const distance = vh100 - (pYEnd + kbHeight) - space
+        setDistanceFromKb(Math.round(distance))
+      })
     }
 
     const KBfallback = setTimeout(() => {
-      if (!keyboardHeight) setKeyboardHeight(0)
+      if (!kbHeight) setkbHeight(0)
     }, 1500)
 
     Keyboard.addListener('keyboardDidShow', onKeyboardDidShow)
@@ -101,7 +112,7 @@ export default function WritePapers({ navigation }) {
       clearTimeout(KBfallback)
       Keyboard.removeListener('keyboardDidShow', onKeyboardDidShow)
     }
-  }, [keyboardHeight]) // TODO later useKeyboardHeight?
+  }, [kbHeight]) // TODO later usekbHeight?
 
   React.useEffect(() => {
     if (wordsAreStored) {
@@ -109,8 +120,8 @@ export default function WritePapers({ navigation }) {
     }
 
     return function closeKb() {
-      // In old/slow phones (iPhone5) the keyboard persited (rarely) after changing
-      // pages. This will make sure it gets closed.
+      // In old/slow phones (iPhone5) the keyboard persited (rarely)
+      // after changing pages. This will make sure it gets closed.
       Keyboard.dismiss()
     }
   }, [wordsAreStored])
@@ -128,12 +139,12 @@ export default function WritePapers({ navigation }) {
             Fill out the words or sentences you want your friends to guess.
           </Text>
         </View>
-        <KeyboardAvoidingView
+        <View
           behavior="padding"
           style={[
             Styles.scrollKAV,
             {
-              opacity: keyboardHeight !== null ? 1 : 0, // TODO fadein?
+              opacity: kbHeight !== null ? 1 : 0, // TODO fadein?
             },
           ]}
         >
@@ -145,22 +156,16 @@ export default function WritePapers({ navigation }) {
             onScroll={e => {
               scrollDebounced(e.nativeEvent.contentOffset.x, paperIndex)
             }}
-            style={[
-              Theme.u.scrollSideOffset,
-              Styles.slides,
-              {
-                height: 100 * vh - 195 - keyboardHeight, // REVIEW/TODO pixel perfect this height
-              },
-            ]}
+            style={[Theme.u.scrollSideOffset, Styles.slides]}
           >
             {renderPapers()}
           </ScrollView>
 
-          <View style={Styles.ctas}>
+          <View style={[Styles.ctas, { marginTop: distanceFromKb }]} ref={refCTAs}>
             <Button
               variant="icon"
               size="lg"
-              style={[Styles.ctas_btn]}
+              style={Styles.ctas_btn}
               styleTouch={[paperIndex === 0 && Styles.ctas_btn_isHidden]}
               onPress={() => paperIndex !== 0 && handleClickPrev()}
             >
@@ -183,7 +188,7 @@ export default function WritePapers({ navigation }) {
               <IconArrow size={20} color={Theme.colors.grayDark} />
             </Button>
           </View>
-        </KeyboardAvoidingView>
+        </View>
       </Page.Main>
     </Page>
   )
@@ -287,13 +292,7 @@ const SlidePaper = ({ onChange, isActive, onFocus, onSubmit, i }) => {
 
   return (
     <View
-      style={[
-        Styles.slide,
-        (isActive || isFocused) && Styles.slide_isActive,
-        isWeb && {
-          height: vw * 70 - 16, // ugly workaround
-        },
-      ]}
+      style={[Styles.slide, (isActive || isFocused) && Styles.slide_isActive]}
       data-slide={i + 1}
     >
       <TextInput
@@ -302,11 +301,7 @@ const SlidePaper = ({ onChange, isActive, onFocus, onSubmit, i }) => {
           Styles.input,
           Theme.typography.h2,
           (isActive || isFocused) && Styles.input_isActive,
-          isWeb && {
-            height: '100px', // ~2 lines
-          },
         ]}
-        // caretHidden
         multiline
         autoCorrect={false}
         keyboardType={isAndroid ? 'visible-password' : 'default'} // Remove Android auto-suggestions

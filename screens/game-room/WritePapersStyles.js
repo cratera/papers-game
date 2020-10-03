@@ -1,22 +1,26 @@
 import { Platform, StyleSheet } from 'react-native'
 import * as Theme from '@theme'
 
-import { window } from '@constants/layout'
+import { isTamagoshi, isWeb, window } from '@constants/layout'
 
 const { vw } = window
 
 const paperHeight = vw * 65
 
+const slideHeight = isTamagoshi ? 50 * vw : 70 * vw
+
 export default StyleSheet.create({
   header: {
-    paddingVertical: 16,
+    paddingVertical: isTamagoshi ? 8 : 16,
   },
   scrollKAV: {},
   slides: {
+    height: slideHeight,
     maxHeight: paperHeight + 12,
     paddingHorizontal: 0,
   },
   slide: {
+    ...(isWeb ? { height: slideHeight - 16 } : {}),
     width: vw * 100 - 32,
     marginHorizontal: 16,
     display: 'flex',
@@ -36,6 +40,7 @@ export default StyleSheet.create({
     borderColor: 'transparent',
     color: Theme.colors.grayDark,
     textAlign: 'center',
+    ...(isWeb ? { height: '100' /* 2 lines */ } : {}),
   },
   input_isActive: {
     // outline: none // not supported. TODO later, maybe an external stylesheet?...
