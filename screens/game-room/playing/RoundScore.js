@@ -6,10 +6,10 @@ import PapersContext from '@store/PapersContext.js'
 
 import Button from '@components/button'
 import Page from '@components/page'
-import { useScores } from '@store/papersMethods'
+import { getTeamId, useScores } from '@store/papersMethods'
 
 import { headerTheme } from '@navigation/headerStuff.js'
-import EmojiRain from './EmojiRain'
+// import EmojiRain from './EmojiRain'
 import GameScore from '@components/game-score'
 
 import * as Theme from '@theme'
@@ -27,16 +27,26 @@ const RoundScore = ({ navigation }) => {
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [isOnRoundIntro, setIsOnRoundIntro] = React.useState(false)
 
-  const { isMyTeamWinner, isTie, scoreByRound } = React.useMemo(
+  const { isMyTeamWinner, isTie, scoreByRound, getPlayersSorted } = React.useMemo(
     () => useScores(game.score, game.teams, profile.id),
     []
   )
+
+  function getMyTotalScore() {
+    if (!isFinalRound) return null
+
+    const myTeamId = getTeamId(profile.id, game.teams)
+    const playersSorted = getPlayersSorted(myTeamId, roundIx, true)
+    return playersSorted.find(p => p.id === profile.id)?.score || 0
+  }
+
+  const myTotalScore = getMyTotalScore()
 
   React.useEffect(() => {
     Papers.sendTracker('game_finishRound', {
       arrayOfScores: scoreByRound[roundIx].arrayOfScores,
       isMyTeamWinner,
-      myTotalScore: null, // TODO!!! THIS
+      myTotalScore,
     })
   }, [])
 
@@ -101,16 +111,20 @@ const RoundScore = ({ navigation }) => {
 
   return (
     <Page>
-      {!isTie && isFinalRound && <EmojiRain type={isMyTeamWinner ? 'winner' : 'loser'} />}
+      {/* {!isTie && isFinalRound && <EmojiRain type={isMyTeamWinner ? 'winner' : 'loser'} />} */}
       <Page.Main>
         <View style={[{ marginHorizontal: 0, marginTop: 24, marginBottom: 16 }]}>
           {isFinalRound ? (
             <Fragment>
               <Text style={[Theme.typography.h3, Theme.u.center]}>
-                {isTie ? 'Stalemate' : isMyTeamWinner ? 'Your team won!' : 'Your team lost!'}
+                {isTie ? 'Stalemate' : isMyTeamWinner ? 'Your team won!' : 'Your team lost'}
               </Text>
               <Text style={[Theme.typography.body, Theme.u.center]}>
-                {isTie ? "It's a tie" : isMyTeamWinner ? 'They never stood a chance' : 'Yikes.'}
+                {isTie
+                  ? "It's a tie"
+                  : isMyTeamWinner
+                  ? '😎 They never stood a chance 😎'
+                  : '💩 Yikes 💩'}
               </Text>
             </Fragment>
           ) : (
@@ -136,6 +150,7 @@ const RoundScore = ({ navigation }) => {
         {isFinalRound ? (
           <Button
             place="float"
+            bgColor={Theme.colors.purple}
             onPress={() => {
               navigation.navigate('gate', { goal: 'leave' })
               Papers.leaveGame()
@@ -150,7 +165,7 @@ const RoundScore = ({ navigation }) => {
             isLoading={isSubmitting}
             onPress={handleStartRoundClick}
           >
-            {`Start round ${round.current + 1 + 1}!`}
+            {`Start round ${roundIx + 1 + 1}!`}
           </Button>
         )}
       </Page.CTAs>

@@ -13,9 +13,9 @@ export default StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'nowrap',
     alignItems: 'center',
+    justifyContent: 'space-between',
     paddingVertical: 12,
     paddingHorizontal: 16,
-    justifyContent: 'space-between',
   },
   item_isLast: {
     marginBottom: 0,
@@ -24,11 +24,9 @@ export default StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    flexGrow: 1,
   },
   who_text: {
     display: 'flex',
-    flexGrow: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
   },

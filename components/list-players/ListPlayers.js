@@ -20,7 +20,13 @@ const LoadingAvatar = () => (
   </View>
 )
 
-export default function ListPlayers({ players, enableKickout, isStatusVisible, ...otherProps }) {
+export default function ListPlayers({
+  players,
+  enableKickout,
+  isStatusVisible,
+  RenderSuffix,
+  ...otherProps
+}) {
   const Papers = React.useContext(PapersContext)
   const [isClicked, setIsClicked] = React.useState(null) // playerId
   const [isKicking, setIsKicking] = React.useState(null) // playerId
@@ -127,6 +133,7 @@ export default function ListPlayers({ players, enableKickout, isStatusVisible, .
                     Kick
                   </Button>
                 )}
+                {RenderSuffix && <RenderSuffix ix={i} />}
               </View>
             </View>
           </TouchableHighlight>
@@ -200,4 +207,5 @@ ListPlayers.propTypes = {
   players: PropTypes.arrayOf(PropTypes.string), // [playerId],
   enableKickout: PropTypes.bool,
   isStatusVisible: PropTypes.bool,
+  RenderSuffix: PropTypes.func,
 }

@@ -70,9 +70,8 @@ export default function Settings(props) {
           <Stack.Screen name="settings-game" component={SettingsGame} />
           <Stack.Screen name="settings-players" component={SettingsPlayers} />
         </>
-      ) : (
-        <Stack.Screen name="settings-profile" component={SettingsProfile} />
-      )}
+      ) : null}
+      <Stack.Screen name="settings-profile" component={SettingsProfile} />
       <Stack.Screen name="settings-account" component={Account} />
       <Stack.Screen name="settings-accountDeletion" component={AccountDeletion} />
       <Stack.Screen name="settings-privacy" component={Privacy} />

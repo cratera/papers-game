@@ -16,6 +16,7 @@ export const colors = {
   pink: '#DE7C9B',
   purple: '#C299C4',
   yellow: '#EED486',
+  salmon: '#F2C9AD',
   // ....
 }
 
@@ -81,7 +82,8 @@ export const typography = StyleSheet.create({
     fontSize: 14,
     backgroundColor: 'rgba(0, 0, 0, 0.1)',
     lineHeight: 14,
-    paddingVertical: 6,
+    paddingTop: 7,
+    paddingBottom: 6,
     paddingHorizontal: 4,
   },
 })

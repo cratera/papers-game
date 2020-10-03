@@ -4,37 +4,68 @@ import PropTypes from 'prop-types'
 
 import * as Theme from '@theme'
 
+import ListPlayers from '@components/list-players'
+
 const podiumMap = {
   0: '1st place',
   1: '2nd place',
   3: '3rd place',
 }
 
-const CardScore = ({ index, isTie, teamName, scoreTotal, scoreRound, bestPlayer }) => (
-  <View style={Styles.fscore_item} key={index}>
-    <View style={Styles.fscore_info}>
+// eslint-disable-next-line react/prop-types
+const PlayerItemScore = ({ ix, score }) => (
+  <>
+    {ix === 0 && (
       <Text
-        style={[
-          Styles.fscore_tag,
-          {
-            backgroundColor: isTie || index === 0 ? Theme.colors.primary : Theme.colors.grayDark,
-            marginBottom: 8,
-          },
-        ]}
+        style={[Theme.typography.badge, { marginRight: 16, backgroundColor: Theme.colors.salmon }]}
       >
-        {isTie ? 'Tie' : podiumMap[index]}
+        Best player
       </Text>
-      <Text style={Theme.typography.h3}>{teamName}</Text>
+    )}
 
-      <Text style={[Theme.typography.small, { marginTop: 4 }]}>
-        {bestPlayer.name} was the best! ({bestPlayer.score})
-      </Text>
+    <Text
+      numberOfLines={1}
+      style={[
+        Theme.typography.body,
+        {
+          backgroundColor: Theme.colors.grayDark,
+          color: Theme.colors.bg,
+          paddingHorizontal: 4,
+        },
+      ]}
+    >
+      {score}
+    </Text>
+  </>
+)
+
+const CardScore = ({ index, isTie, teamName, scoreTotal, scoreRound, playersSorted }) => (
+  <View style={Styles.fscore_item}>
+    <View style={Styles.fscore_summary}>
+      <View style={Styles.fscore_info}>
+        <Text style={Theme.typography.h3}>{teamName}</Text>
+        <Text
+          style={[
+            Styles.fscore_tag,
+            {
+              backgroundColor: isTie || index === 0 ? Theme.colors.primary : Theme.colors.grayDark,
+              marginBottom: 8,
+            },
+          ]}
+        >
+          {isTie ? 'Tie' : podiumMap[index]}
+        </Text>
+      </View>
+      <View style={Styles.fscore_score}>
+        <Text style={[Theme.typography.h2]}>{scoreTotal} pts</Text>
+        <Text style={[Theme.typography.small, { marginTop: 4 }]}>+{scoreRound} this round</Text>
+      </View>
     </View>
-    <View style={Styles.fscore_score}>
-      <Text style={[Theme.typography.h2, { marginTop: 14 }]}>
-        {scoreTotal} <Text style={{ fontSize: 16 }}>pts</Text>
-      </Text>
-      <Text style={[Theme.typography.small, { marginTop: 6 }]}>+{scoreRound} this round</Text>
+    <View style={{ marginTop: 16 }}>
+      <ListPlayers
+        players={playersSorted.map(({ id }) => id)}
+        RenderSuffix={({ ix }) => <PlayerItemScore ix={ix} score={playersSorted[ix].score} />}
+      />
     </View>
   </View>
 )
@@ -45,10 +76,12 @@ CardScore.propTypes = {
   teamName: PropTypes.string.isRequired,
   scoreTotal: PropTypes.number.isRequired,
   scoreRound: PropTypes.number.isRequired,
-  bestPlayer: PropTypes.shape({
-    name: PropTypes.string,
-    score: PropTypes.number,
-  }).isRequired,
+  playersSorted: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string,
+      score: PropTypes.number,
+    })
+  ).isRequired,
 }
 
 const Styles = StyleSheet.create({
@@ -60,9 +93,10 @@ const Styles = StyleSheet.create({
     paddingVertical: 24,
     paddingHorizontal: 16,
     marginVertical: 8,
+  },
+  fscore_summary: {
     display: 'flex',
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
   },
   fscore_info: {
@@ -82,8 +116,9 @@ const Styles = StyleSheet.create({
     color: Theme.colors.bg,
     paddingHorizontal: 8,
     paddingVertical: 1,
-    borderRadius: 9,
+    borderRadius: 2,
     overflow: 'hidden',
+    marginTop: 8,
   },
 })
 

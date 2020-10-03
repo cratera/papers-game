@@ -55,7 +55,7 @@ const MyTurnGetReady = ({ description, amIWaiting }) => {
           >{`It's your turn!`}</Text>
           <View style={StylesIn.illustration}>
             <IllustrationStars style={StylesIn.svg} />
-            <Avatar src={profile.avatar} alt="" size="xxl" />
+            <Avatar src={profile.avatar} alt="" size={isTamagoshi ? 'xl' : 'xxl'} />
           </View>
           <Text style={Theme.typography.secondary}>Round {roundNr}</Text>
           <Text style={[Theme.typography.body, Theme.u.center, { marginTop: 12, maxWidth: 300 }]}>

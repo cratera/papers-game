@@ -67,7 +67,9 @@ Page.propTypes = {
 // const isIOS = Platform.OS === 'ios'
 
 const iconsMap = {
+  // eslint-disable-next-line react/display-name
   back: () => <Text>☜ </Text>, // IconArrow
+  // eslint-disable-next-line react/display-name
   next: () => <Text> ☞</Text>, // IconArrow
 }
 
@@ -81,7 +83,7 @@ const HeaderBtn = ({ side, icon, style, textPrimary, children, isLoading, ...oth
       isLoading={isLoading}
       style={[
         side === 'left' ? { marginLeft: 16 } : { marginRight: 16 },
-        IconMapped && { marginTop: 8 },
+        IconMapped && { marginTop: 6 },
       ]}
       {...otherProps}
     >

@@ -49,17 +49,17 @@ export function useScores(gameScore, gameTeams, profileId) {
 
   const scoreByRound = [1, 2, 3].map((x, roundIx) => {
     const teamsPlayersScore = {}
-    const scorePlayers = gameScore ? gameScore[roundIx] : null
+    const playersScore = gameScore ? gameScore[roundIx] : null
     const teamsScore = {}
     let bestPlayer = {}
 
-    if (scorePlayers) {
+    if (playersScore) {
       Object.keys(gameTeams).forEach(teamId => {
         gameTeams[teamId].players.forEach(playerId => {
           if (!myTeamId) {
             myTeamId = playerId === profileId ? teamId : null
           }
-          const playerScore = scorePlayers[playerId] ? scorePlayers[playerId].length : 0
+          const playerScore = playersScore[playerId] ? playersScore[playerId].length : 0
           if (playerScore > (bestPlayer.score || 0)) {
             bestPlayer = {
               id: playerId,
@@ -96,9 +96,12 @@ export function useScores(gameScore, gameTeams, profileId) {
     }
   })
 
-  function getBestPlayer(teamId, roundIx, BOAT) {
+  const sortByScore = (p1, p2) => p2.score - p1.score
+
+  function getPlayersSorted(teamId, roundIx, BOAT) {
+    let playersScore
+
     if (BOAT) {
-      // best player of all rounds
       const playersTotalScore = {}
       scoreByRound.forEach(round => {
         round.teamsPlayersScore[teamId].forEach(player => {
@@ -108,15 +111,14 @@ export function useScores(gameScore, gameTeams, profileId) {
           playersTotalScore[player.id] += player.score
         })
       })
-      const pTotalScoreArray = Object.keys(playersTotalScore)
-      const highestScore = Math.max(...pTotalScoreArray.map(id => playersTotalScore[id]))
-      const bestPlayerId = pTotalScoreArray.find(id => playersTotalScore[id] === highestScore)
-      return { id: bestPlayerId, score: highestScore }
+
+      playersScore = Object.entries(playersTotalScore).map(([id, score]) => ({ id, score }))
+    } else {
+      playersScore = scoreByRound[roundIx].teamsPlayersScore[teamId] || []
     }
-    // best player of this round only
-    const playersScore = scoreByRound[roundIx].teamsPlayersScore[teamId]
-    const highestScore = Math.max(...playersScore.map(p => p.score))
-    return playersScore.find(p => p.score === highestScore)
+
+    const playersSorted = playersScore.sort(sortByScore)
+    return playersSorted
   }
 
   const arrayOfScores = Object.values(scoreTotal)
@@ -134,7 +136,7 @@ export function useScores(gameScore, gameTeams, profileId) {
     isMyTeamWinner,
     isTie,
     sortTeamsByScore,
-    getBestPlayer,
+    getPlayersSorted,
   }
 }
 

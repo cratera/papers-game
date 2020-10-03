@@ -9,31 +9,25 @@ import CardScore from './CardScore.js'
 
 const GameScore = ({ BOAT, style }) => {
   const Papers = React.useContext(PapersContext)
-  const { profile, profiles, game } = Papers.state
+  const { profile, game } = Papers.state
   const round = game.round
   const roundIx = round.current
-  const { scoreByRound, scoreTotal, isTie, getBestPlayer, sortTeamsByScore } = React.useMemo(
+  const { scoreByRound, scoreTotal, isTie, getPlayersSorted, sortTeamsByScore } = React.useMemo(
     () => useScores(game.score, game.teams, profile.id),
     []
   )
 
-  // TODO bug "arrayOfTeamsId" sometimes is empty
-  // TODO bug, sometimes the numbers don't match an it can happen a number being submitted by mistake.
-  // dunno how that happened, but it did.
   return (
     <View style={style}>
       {scoreByRound[roundIx].arrayOfTeamsId.sort(sortTeamsByScore).map((teamId, index) => {
-        const bestPlayer = getBestPlayer(teamId, roundIx, BOAT)
+        const playersSorted = getPlayersSorted(teamId, roundIx, BOAT)
         return (
           <CardScore
             key={teamId}
             index={index}
             isTie={isTie}
             teamName={game.teams[teamId].name}
-            bestPlayer={{
-              name: profiles[bestPlayer.id]?.name || '???',
-              score: bestPlayer.score,
-            }}
+            playersSorted={playersSorted}
             scoreTotal={scoreTotal[teamId]}
             scoreRound={scoreByRound[roundIx].teamsScore[teamId]}
           />

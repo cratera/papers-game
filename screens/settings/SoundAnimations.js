@@ -60,10 +60,10 @@ export default function SettingsSound({ navigation }) {
               switchValue={!settingsMotion}
               onPress={toggleMotion}
             />
-            <View style={Theme.u.listDivider} />
-
             {settingsSoundActive && __DEV__ && (
               <View>
+                <View style={Theme.u.listDivider} />
+
                 <Text style={[Theme.typography.h3, Theme.u.center, { marginVertical: 8 }]}>
                   Preview: (dev only)
                 </Text>
@@ -81,6 +81,9 @@ export default function SettingsSound({ navigation }) {
               </View>
             )}
           </View>
+          <View style={{ height: 40 }} />
+          <Button onPress={Papers.resetProfileSettings}>Restore default settings</Button>
+          <View style={Theme.u.CTASafeArea} />
         </ScrollView>
       </Page.Main>
     </Page>

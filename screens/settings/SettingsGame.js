@@ -32,7 +32,7 @@ export default function SettingsGame({ navigation }) {
             {game.name}
           </Text>
           <Text
-            style={[Theme.typography.small, Theme.u.center, { marginTop: 4, marginBottom: 16 }]}
+            style={[Theme.typography.small, Theme.u.center, { marginTop: 4, marginBottom: 8 }]}
             accessibilityLabel={game.code.toString()}
           >
             {game.code.toString().split('').join('・')}

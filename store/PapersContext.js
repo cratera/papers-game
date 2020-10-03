@@ -83,6 +83,7 @@ export class PapersContextProvider extends Component {
       updateProfile: this.updateProfile.bind(this),
       resetProfile: this.resetProfile.bind(this),
       updateProfileSettings: this.updateProfileSettings.bind(this),
+      resetProfileSettings: this.resetProfileSettings.bind(this),
       resetProfileStats: this.resetProfileStats.bind(this),
 
       accessGame: this.accessGame.bind(this),
@@ -588,13 +589,30 @@ export class PapersContextProvider extends Component {
     }))
   }
 
+  async resetProfileSettings(profile) {
+    if (__DEV__) console.log('📌 resetProfileSettings()')
+    try {
+      await AsyncStorage.removeItem('profile_settings')
+    } catch (e) {
+      console.warn('error: profile_settings', e)
+      Sentry.captureException(e, { tags: { pp_action: 'RPSET_0' } })
+    }
+
+    this.setState(state => ({
+      profile: {
+        ...state.profile,
+        settings: settingsDefaults,
+      },
+    }))
+  }
+
   async resetProfileStats(profile) {
     if (__DEV__) console.log('📌 resetProfileStats()')
     try {
       await AsyncStorage.removeItem('profile_stats')
     } catch (e) {
       console.warn('error: resetProfileStats', e)
-      Sentry.captureException(e, { tags: { pp_action: 'RPS_0' } })
+      Sentry.captureException(e, { tags: { pp_action: 'RPSTA_0' } })
     }
 
     this.setState(state => ({
@@ -971,6 +989,7 @@ export class PapersContextProvider extends Component {
       case 'game_finishRound': {
         const game = this.state.game
         const totalScore = opts.arrayOfScores.reduce((acc, cur) => acc + cur, 0)
+        const isFinalRound = game.round.current === game.settings.roundsCount - 1
 
         Analytics.logEvent(`game_finishRound_${game.round.current + 1}`, {
           players: Object.keys(game.players).length,
@@ -988,11 +1007,10 @@ export class PapersContextProvider extends Component {
           })
         }
 
-        // Last round
-        if (game.round.current === 2) {
+        if (isFinalRound) {
           const statUpdate = opts.isMyTeamWinner ? 'gamesWon' : 'gamesLost'
-          this.updateProfileSettings(statUpdate, 1)
-          this.updateProfileSettings('papersGuessed', opts.myTotalScore) // TODO this
+          this.updateProfileStats(statUpdate, 1)
+          this.updateProfileStats('papersGuessed', opts.myTotalScore)
         }
 
         break
