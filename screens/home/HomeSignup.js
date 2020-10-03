@@ -140,6 +140,7 @@ export default class HomeSignup extends React.Component {
           nativeID="inputNameLabel"
           defaultValue={this.state.name}
           placeholder="Your name"
+          maxLength={10}
           onChangeText={name => this.setState(state => ({ ...state, name }))}
         />
       </View>

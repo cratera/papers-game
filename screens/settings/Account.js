@@ -38,6 +38,7 @@ export default function SettingsAccount({ navigation }) {
                 inputAccessoryViewID="name"
                 nativeID="inputNameLabel"
                 defaultValue={profile.name}
+                maxLength={10}
                 returnKeyType="done"
                 onChangeText={text => setName(text)}
                 onBlur={() => name && Papers.updateProfile({ name })}
