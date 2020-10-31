@@ -27,7 +27,7 @@ export default function LobbyJoining({ navigation }) {
   const creatorId = hasGame && game.creatorId
   const profileIsAdmin = creatorId === profileId
   const playersKeys = hasGame ? Object.keys(game.players) : []
-  const neededPlayers = 4 - playersKeys.length
+  const neededPlayers = playersKeys.length < 4
   const wordsAreStored = !!game?.words?.[profileId]
 
   React.useEffect(() => {
@@ -127,7 +127,7 @@ export default function LobbyJoining({ navigation }) {
 
               {neededPlayers ? (
                 <Text style={[Theme.typography.secondary, Theme.u.center, { marginTop: 16 }]}>
-                  Need {neededPlayers} more
+                  Need {4 - playersKeys.length} more
                 </Text>
               ) : null}
             </ScrollView>
