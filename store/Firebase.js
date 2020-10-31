@@ -324,7 +324,7 @@ const gameInitialState = ({ id, name, code, creatorId }) => ({
   settings: {
     roundsCount: 3,
     words: 10,
-    time_ms: [30000, 30000, 45000],
+    time_ms: [45000, 45000, 60000],
   },
 })
 

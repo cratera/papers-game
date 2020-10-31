@@ -27,7 +27,7 @@ export default function LobbyJoining({ navigation }) {
   const creatorId = hasGame && game.creatorId
   const profileIsAdmin = creatorId === profileId
   const playersKeys = hasGame ? Object.keys(game.players) : []
-  const neededPlayers = playersKeys.length < 4
+  const neededPlayers = playersKeys.length < 4 // FIX THIS SUPPORT >4
   const wordsAreStored = !!game?.words?.[profileId]
 
   React.useEffect(() => {
