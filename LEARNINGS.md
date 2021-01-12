@@ -70,7 +70,9 @@ yarn release:ota -- -m "x.x.x@xx ![release summary]"
   ## 1º time in a new mac, fetch the certificates made by expo.
   ## expo fetch:ios:certs
 
-  # build everything
+  ## UPDATE APP.JSON WITH NEW VERSION
+
+  # build everything (~1-2min)
   EXPO_IOS_DIST_P12_PASSWORD=<PASS> turtle build:ios --public-url https://papers-native.firebaseapp.com/ios-index.json --team-id <TEAMID> --dist-p12-path secrets/papers-game_dist.p12 --provisioning-profile-path secrets/papers-game.mobileprovision
 
   # a build path is shown in the last lines of log... something like:
@@ -79,11 +81,12 @@ yarn release:ota -- -m "x.x.x@xx ![release summary]"
   # upload to test flight
   expo upload:ios --path path/to/archive.ipa
 
-  # after a few seconds it asks for app-specific password
+  # after a few seconds it asks for apple id credentials.
+  # after a 1-2 min it asks for app-specific password
   # Go to secrets or https://appleid.apple.com/account/manage
 
-  # wait 2min... and then wait more ~20 minutes... be patient...
-  # After, go to AppStoreConnect. The the new build is there. It will take a few hours to process the build
+  # wait 2min... and then wait ~20 minutes more... be patient...
+  # After, go to AppStoreConnect. The the new build is there. It will take a few hours to process it
 ```
 
 ---
