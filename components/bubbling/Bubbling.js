@@ -8,7 +8,7 @@ import PapersContext from '@store/PapersContext.js'
 
 const Bubbling = ({ bgStart, bgEnd, fromBehind }) => {
   const Papers = React.useContext(PapersContext)
-  const motionEnabled = Papers.state.profile.settings.motion
+  const motionEnabled = Papers.state.profile.settings?.motion
   const animScaleGrow = React.useRef(new Animated.Value(0)).current
 
   React.useEffect(() => {

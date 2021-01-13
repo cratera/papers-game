@@ -8,7 +8,7 @@ export const headerTheme = (opts = {}) => ({
   headerTransparent: true, // Do globally to avoid jumps in screens
   headerTitleAlign: 'center',
   headerTitleStyle: {
-    fontFamily: 'karla-regular',
+    // fontFamily: 'karla-regular',
     opacity: opts.hiddenTitle ? 0 : 1,
   },
   headerRight: null,

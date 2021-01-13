@@ -36,7 +36,7 @@ const getStyles = (corner, backgroundColor, animScaleGrow, inputRange) => ({
 
 const BubblingCorner = ({ duration, forced, corner, bgEnd, bgStart }) => {
   const Papers = React.useContext(PapersContext)
-  const motionEnabled = Papers.state.profile.settings.motion || forced
+  const motionEnabled = Papers.state.profile.settings?.motion || forced
   const animScaleGrow = React.useRef(new Animated.Value(0)).current
 
   React.useEffect(() => {

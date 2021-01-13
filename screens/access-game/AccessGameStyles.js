@@ -37,7 +37,7 @@ export default StyleSheet.create({
   code_maskDigit: {
     textAlign: 'center',
     width: 30,
-    fontFamily: 'youngSerif-regular',
+    // fontFamily: 'youngSerif-regular',
     // fontVariantNumeric: 'tabular-nums',
   },
   code_maskPlaceholder: {
