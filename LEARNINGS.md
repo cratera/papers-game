@@ -98,3 +98,11 @@ yarn release:ota -- -m "x.x.x@xx ![release summary]"
   - No unit tests? Making it work is the first test you need.
   - Not sure what's the best place for something? Just do it and leave a `REVIEW`.
   - Remember to have fun and don't be afraid to experiment.
+
+---
+
+## Expo eject to bare
+
+- `npm run expo` was okay. Had to add password for Cocoa (no explicit prompt)
+- Used `npx @react-native-community/cli doctor`. Nothing critical.
+- Ran `yarn web` and `yarn ios`. All fine (test new account + new game 3 players. Web + Simular + iPhone12)
