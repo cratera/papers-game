@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Platform, StatusBar, StyleSheet, View } from 'react-native'
-import { SplashScreen } from 'expo'
+import * as SplashScreen from 'expo-splash-screen'
 
 // import * as Analytics from '@constants/analytics.js'
 
@@ -42,7 +42,7 @@ export default function AppFn({ skipLoadingScreen }) /* eslint-disable-line */ {
 
     async function loadResourcesAndDataAsync() {
       try {
-        SplashScreen.preventAutoHide()
+        await SplashScreen.preventAutoHideAsync()
 
         setInitialNavigationState(await getInitialState())
 
@@ -59,7 +59,7 @@ export default function AppFn({ skipLoadingScreen }) /* eslint-disable-line */ {
         Sentry.captureException(e, { tags: { pp_page: 'AppFn' } })
       } finally {
         setLoadingComplete(true)
-        SplashScreen.hide()
+        await SplashScreen.hideAsync()
       }
     }
 

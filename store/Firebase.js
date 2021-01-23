@@ -209,6 +209,10 @@ async function updateProfile(profile) {
   const { avatar, ...theProfile } = profile
 
   try {
+    // TODO/REFACTOR: Disabled this after updating to Expo SDK40.
+    // It says Yellowbox is decreated, so I can't see the actual error.
+    // Maybe the API changed?
+    /*
     const isHTTPLink = avatar && avatar.indexOf('https://') === 0
     if (avatar && isHTTPLink) {
       if (__DEV__) console.log(':: avatar ignored because it is a link')
@@ -238,6 +242,7 @@ async function updateProfile(profile) {
       })
       // TODO - delete avatar from storage.
     }
+    */
     DB.ref('users/' + LOCAL_PROFILE.id).update(theProfile)
   } catch (error) {
     console.warn(':: updateProfile failed!', error)

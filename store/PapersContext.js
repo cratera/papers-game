@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { AsyncStorage } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import PropTypes from 'prop-types'
 
 import { isWeb } from '@constants/layout'

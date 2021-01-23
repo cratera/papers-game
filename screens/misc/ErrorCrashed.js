@@ -1,7 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { AsyncStorage, Platform, View, Text } from 'react-native'
+import { Platform, View, Text } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
 import * as Updates from 'expo-updates'
 
 import Page from '@components/page'
