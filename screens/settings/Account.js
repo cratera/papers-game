@@ -6,7 +6,6 @@ import * as Theme from '@theme'
 
 import Page from '@components/page'
 
-import AvatarField from '@components/avatar/AvatarField'
 import Item from './Item.js'
 import { useSubHeader, propTypesCommon } from './utils'
 
@@ -21,12 +20,7 @@ export default function SettingsAccount({ navigation }) {
       <Page.Main headerDivider>
         <ScrollView style={[Theme.u.scrollSideOffset]}>
           <View style={Theme.u.cardEdge}>
-            <View style={[Styles.avatarBox]}>
-              <AvatarField
-                avatar={profile.avatar}
-                onChange={avatar => Papers.updateProfile({ avatar })}
-              />
-            </View>
+            <View style={[Styles.avatarBox]}></View>
             <View style={Theme.u.listDivider} />
 
             <View style={[Theme.u.flexBetween, Styles.field]}>

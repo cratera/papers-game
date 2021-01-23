@@ -10,8 +10,6 @@ import { headerTheme } from '@navigation/headerStuff.js'
 import Page from '@components/page'
 import Button from '@components/button'
 
-import InputAvatar from './InputAvatar.js'
-
 import { window } from '@constants/layout'
 
 const { vh } = window
@@ -151,7 +149,7 @@ export default class HomeSignup extends React.Component {
     return (
       <View style={{ flex: 1, alignSelf: 'stretch' }}>
         <View style={{ flex: 1, alignSelf: 'stretch' }}>
-          <InputAvatar avatar={this.state.avatar} onChange={this.handleChangeAvatar} />
+          <Text>Avatar not available yet</Text>
         </View>
       </View>
     )

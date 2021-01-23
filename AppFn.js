@@ -5,7 +5,6 @@ import * as SplashScreen from 'expo-splash-screen'
 // import * as Analytics from '@constants/analytics.js'
 
 import * as Font from 'expo-font'
-// import { Ionicons } from '@expo/vector-icons'; // Q: How to remove this from bundle?
 
 import { NavigationContainer } from '@react-navigation/native'
 import {

@@ -1,9 +1,9 @@
 {
-  "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "start": "SENTRY_AUTH_TOKEN=%SENTRY_AUTH_TOKEN% expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "start": "react-native start",
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "ios:device": "react-native run-ios --device",
     "web": "expo start --web",
     "release:landing": "firebase deploy --only hosting:landing",
     "release:web": "SENTRY_AUTH_TOKEN=%SENTRY_AUTH_TOKEN% expo build:web && firebase deploy --only hosting:web",
@@ -15,7 +15,6 @@
     "preset": "jest-expo"
   },
   "dependencies": {
-    "@expo/vector-icons": "^12.0.0",
     "@react-native-async-storage/async-storage": "^1.13.3",
     "@react-native-community/masked-view": "0.1.10",
     "@react-native-community/netinfo": "5.9.7",
@@ -31,29 +30,31 @@
     "expo-constants": "~9.3.3",
     "expo-firebase-analytics": "~2.6.0",
     "expo-font": "~8.4.0",
-    "expo-image-picker": "~9.2.0",
     "expo-linking": "~2.0.1",
     "expo-mail-composer": "~9.0.0",
     "expo-splash-screen": "~0.8.1",
+    "expo-status-bar": "~1.0.3",
     "expo-store-review": "~2.3.0",
-    "expo-updates": "~0.4.1",
+    "expo-updates": "~0.4.0",
     "expo-web-browser": "~8.6.0",
     "firebase": "7.9.0",
     "pubsub-js": "^1.8.0",
     "react": "16.13.1",
     "react-dom": "16.13.1",
-    "react-native": "https://github.com/expo/react-native/archive/sdk-40.0.1.tar.gz",
+    "react-native": "~0.63.4",
     "react-native-gesture-handler": "~1.8.0",
     "react-native-reanimated": "~1.13.0",
     "react-native-safe-area-context": "3.1.9",
     "react-native-screens": "~2.15.2",
     "react-native-svg": "12.1.0",
+    "react-native-unimodules": "~0.12.0",
     "react-native-web": "~0.13.12",
     "sentry-expo": "^2.1.2"
   },
   "devDependencies": {
     "@babel/core": "~7.9.0",
     "babel-eslint": "^10.1.0",
+    "babel-jest": "~25.2.6",
     "babel-plugin-module-resolver": "^4.0.0",
     "babel-preset-expo": "8.3.0",
     "dotenv": "^8.2.0",
@@ -63,9 +64,13 @@
     "eslint-plugin-react": "^7.19.0",
     "eslint-plugin-react-native": "^3.8.1",
     "eslint-standard": "^1.0.2",
+    "jest": "~25.2.6",
     "jest-expo": "^40.0.0",
     "prettier": "^2.0.5",
+    "react-test-renderer": "~16.13.1",
     "standard": "^14.3.3"
   },
-  "private": true
+  "private": true,
+  "name": "papers-game-bare-sdk40",
+  "version": "1.0.0"
 }

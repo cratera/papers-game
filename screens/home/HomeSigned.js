@@ -62,7 +62,7 @@ export default function HomeSigned({ navigation }) {
         <Text style={[Theme.typography.h1, { marginBottom: 120 }]}>Papers</Text>
       </Page.Main>
       <Page.CTAs>
-        <Button onPress={() => openAccessGameModal('create')}>Create Game</Button>
+        <Button onPress={() => openAccessGameModal('create')}>Create Game!</Button>
         <Button
           variant="light"
           style={{ marginTop: 16 }}
