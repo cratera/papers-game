@@ -28,25 +28,6 @@ Here's a list of my learnings while building this mobile game with reac-native.
 
 # Releases
 
-<!-- oh gosh... -->
-
-- [Upload apps](https://docs.expo.io/distribution/uploading-apps/#2-start-the-upload)
-- [Troubleshooting turtle-cli](https://github.com/expo/turtle/issues/179). Install node 12.0.0 using `NVM` and try again.
-- [Change owner access node modules - to install turtle](https://stackoverflow.com/questions/48910876/error-eacces-permission-denied-access-usr-local-lib-node-modules-react)
-- [Change between node versions using nvm](https://stackoverflow.com/questions/47763783/cant-uninstall-global-npm-packages-after-installing-nvm)
-- [Release Channels](https://docs.expo.io/distribution/release-channels/) - Useful to test diff versions (a.k.a staging) for users before going to production.
-- [HTTP Headers for firebase](https://github.com/expo/expo/issues/4069)
-- [How to use dotenv (.env vars) in package.json](https://medium.com/@arrayknight/how-to-use-env-variables-in-package-json-509b9b663867)
-
-## Web
-
-```bash
-# RELEASE WEB
-yarn release:web -- -m "x.x.x@xx ![release summary]"
-```
-
----
-
 ## Apple / IOS
 
 ### Requirements
@@ -59,9 +40,9 @@ yarn release:web -- -m "x.x.x@xx ![release summary]"
 - If 1st time create manually a `/dist` in the root project.
 - If 1st time, connect firebase target (similar to git setupstream): `firebase target:apply hosting native papers-native`
 
-# OTA update:
+### OTA update
 
-## A single command does it all. Under the wood it:
+A single command does it all. Under the wood it:
 
 - Sets the Sentry auth token
 - Run turtle ios to ensure all's fine
@@ -72,14 +53,29 @@ yarn release:web -- -m "x.x.x@xx ![release summary]"
 yarn release:ota -- -m "x.x.x@xx ![release summary]"
 ```
 
-# App Store build
+### Publishing to App Store
 
-## With Expo managed workflow.
+#### With Bare React Native
+
+1. Follow [React Guide](https://reactnative.dev/docs/next/publishing-to-app-store)
+
+- 1.1 Edit NSAllowsArbitraryLoads entries
+- 1.2 Product -> Scheme -> Edit Release
+- 1.3 _(Skipped)_ LaunchScreen didn't work (check comments in fiel code)
+
+2. Update "build version" at General tab
+
+3. Go Product > Archive. Follow the wizard instructions and voilà.
+
+#### With Expo Managed
+
+_Note: This was used during SDK37. Now, with +SDK40, I use Bare workflow only._
 
 Build a local standalone app IPA ready for Apple App Store
 
 1. Run the OTA update command first.
-   1.1. If 1st time in a new Mac, fetch the certificates made by expo.
+
+- 1.1. If 1st time in a new Mac, fetch the certificates made by expo.
 
 ```bash
 expo fetch:ios:certs
@@ -101,34 +97,33 @@ A build path with `.ipa` file is shown in the last lines of log... something lik
 expo upload:ios --path path/to/archive.ipa
 ```
 
-4.1. After a few seconds it asks for apple id credentials.
-4.2. After a 1-2 min it asks for app-specific password. Go to secrets or https://appleid.apple.com/account/manage
-4.3. Wait 2min... and then wait ~20 minutes more... be patient...
-4.4. After, go to AppStoreConnect. The the new build is there. It will take a few hours to process it
+- 4.1. After a few seconds it asks for apple id credentials.
+- 4.2. After a 1-2 min it asks for app-specific password. Go to secrets or https://appleid.apple.com/account/manage
+- 4.3. Wait 2min... and then wait ~20 minutes more... be patient...
+- 4.4. After, go to AppStoreConnect. The the new build is there. It will take a few hours to process it
 
 Apple store "Missing Compliance" - [Stackoverflow guide](https://stackoverflow.com/questions/63613197/app-store-help-answering-missing-compliance-using-expo-firebase/63613422#63613422)
 
-## With Bare React Native
+## Web
 
-1. Follow [React Guide](https://reactnative.dev/docs/next/publishing-to-app-store)
-   1.1 Edit NSAllowsArbitraryLoads entries
-   1.2 Product -> Scheme -> Edit Release
-   1.3 _(Skipped)_ LaunchScreen didn't work (check comments in fiel code)
-2. Update "build version" at General tab
-
-### Option A: Build IPA to AppStore
-
-3. Go Product > Archive. Follow the wizard instructions and voilà.
-
-### Option B: OTA
-
-3. Runing the same `release:ota` as Expo Managed works!
+```bash
+yarn release:web -- -m "x.x.x@xx ![release summary]"
+```
 
 ---
 
-#### Troubleshooting:
+## Release Troubleshooting
 
-- Custom Fonts weren't working in the release version. [This article](https://dev.to/kennymark/using-custom-fonts-in-react-native-21j7) and [this helped.](https://github.com/oblador/react-native-vector-icons/issues/1074#issuecomment-534053163)
+Links that helped me during the journey to figure out the release process:
+
+- [(Expo Bare): Upload apps](https://docs.expo.io/distribution/uploading-apps/#2-start-the-upload)
+- [Troubleshooting turtle-cli](https://github.com/expo/turtle/issues/179). Install node 12.0.0 using `NVM` and try again.
+- [Change owner access node modules - to install turtle](https://stackoverflow.com/questions/48910876/error-eacces-permission-denied-access-usr-local-lib-node-modules-react)
+- [Change between node versions using nvm](https://stackoverflow.com/questions/47763783/cant-uninstall-global-npm-packages-after-installing-nvm)
+- [(Expo Managed): Release Channels](https://docs.expo.io/distribution/release-channels/) - Useful to test diff versions (a.k.a staging) for users before going to production.
+- [HTTP Headers for firebase](https://github.com/expo/expo/issues/4069)
+- [How to use dotenv (.env vars) in package.json](https://medium.com/@arrayknight/how-to-use-env-variables-in-package-json-509b9b663867)
+- [(Expo Bare): Custom Fonts weren't working in the release version](https://dev.to/kennymark/using-custom-fonts-in-react-native-21j7) and [this solution](https://github.com/oblador/react-native-vector-icons/issues/1074#issuecomment-534053163)
 
 ---
 

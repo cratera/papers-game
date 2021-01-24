@@ -6,22 +6,22 @@ Papers is the perfect game for your dinner party. Made with love by [Sandrina](s
 
 ## Status
 
-In development... We hope to release it the v1.0 this summer. See our [Public roadmap](https://github.com/sandrina-p/papers-game/projects/1)
+In development... 90% done. We hope to release in a month or two. [Public roadmap](https://github.com/sandrina-p/papers-game/projects/1)
 
 ## How to play
 
-The current released version is in very early stage (beta).
+The current released version is in a very early stage (beta).
 
-- **iPhone:** get it touch and we'll send you a beta tester link.
+- **iPhone:** get it touch, and we'll send you a beta tester link.
 - **Browser (mobile)**: Go to [the website](http://papersgame.com/).
 
-To report bugs or send dfeedback, get it touch [by e-mail](mailto:a.sandrina.p@gmail.com) or [open an issue](https://github.com/sandrina-p/papers-game/issues/new).
+Send feedback [by e-mail](mailto:a.sandrina.p@gmail.com) or [open an issue](https://github.com/sandrina-p/papers-game/issues/new).
 
 ## Development
 
-[![runs with expo](https://img.shields.io/badge/Runs%20with%20Expo-000.svg?style=flat-square&logo=EXPO&labelColor=f3f3f3&logoColor=000)](https://expo.io/)
+[![runs with Bara Expo](https://img.shields.io/badge/Runs%20with%20Expo-000.svg?style=flat-square&logo=EXPO&labelColor=f3f3f3&logoColor=000)](https://expo.io/)
 
-Requirements: [Node.js](https://nodejs.org/en/), [Expo CLI](https://expo.io/tools#cli) and [Yarn](https://yarnpkg.com/).
+Requirements: MacOS with [Node.js](https://nodejs.org/en/), [Expo CLI SDK40](https://expo.io/tools#cli), [Yarn](https://yarnpkg.com/).
 
 - Install dependencies:
 
@@ -31,11 +31,10 @@ yarn # or npm install
 
 - Start the project in dev:
 
-```bash
-yarn start # or npm run start
-```
+* Simulator: `yarn ios`
+* Device: [use XCode to run on your iPhone](https://reactnative.dev/docs/running-on-device)
+* Web: `yarn web`
 
-A new webpage on the browser will be opened with a QR Code.
+## Release
 
-- **Play on the browser**: Click "Run in Web Browser"
-- **Play on the Phone**: Install [Expo Client](https://expo.io/tools#client) and take a photo of the QR code.
+Read [LEARNINGS.md](/LEARNINGS.md) for further details.
