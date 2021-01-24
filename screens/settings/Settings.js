@@ -1,9 +1,11 @@
 import React from 'react'
-import { ScrollView, View, Text } from 'react-native'
+import { Platform, ScrollView, View, Text } from 'react-native'
 import { createStackNavigator } from '@react-navigation/stack'
 import PropTypes from 'prop-types'
 
 import * as Updates from 'expo-updates'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
 import {
   AdMobBanner,
   AdMobInterstitial,
@@ -94,6 +96,8 @@ Settings.propTypes = {
 function SettingsExperimental({ navigation }) {
   useSubHeader(navigation, 'Experimental')
   React.useEffect(() => {
+    if (Platform.OS === 'web') return
+
     async function setAd() {
       await setTestDeviceIDAsync('EMULATOR')
     }
@@ -123,6 +127,17 @@ function SettingsExperimental({ navigation }) {
           </View>
 
           <View style={styleBlock}>
+            <Button
+              onPress={async () => {
+                await AsyncStorage.removeItem('profile_settings')
+                await AsyncStorage.removeItem('profile_stats')
+              }}
+            >
+              AsyncStorage: Delete Settings and Stats
+            </Button>
+          </View>
+
+          <View style={styleBlock}>
             <Text style={[Theme.typography.h3, Theme.u.center, { marginBottom: 16 }]}>
               AdMob tests
             </Text>
@@ -136,33 +151,37 @@ function SettingsExperimental({ navigation }) {
               }}
             />
             <Text>{'\n'}</Text>
-            <Button
-              onPress={async () => {
-                await AdMobInterstitial.setAdUnitID('ca-app-pub-3940256099942544/1033173712') // Test ID, Replace with your-admob-unit-id
-                await AdMobInterstitial.requestAdAsync({ servePersonalizedAds: false })
-                await AdMobInterstitial.showAdAsync()
-              }}
-            >
-              Trigger AdMobInterstitial
-            </Button>
-            <Text>{'\n'}</Text>
+            {Platform.OS !== 'web' && (
+              <>
+                <Button
+                  onPress={async () => {
+                    await AdMobInterstitial.setAdUnitID('ca-app-pub-3940256099942544/1033173712') // Test ID, Replace with your-admob-unit-id
+                    await AdMobInterstitial.requestAdAsync({ servePersonalizedAds: false })
+                    await AdMobInterstitial.showAdAsync()
+                  }}
+                >
+                  Trigger AdMobInterstitial
+                </Button>
+                <Text>{'\n'}</Text>
 
-            <Button
-              onPress={async () => {
-                await AdMobRewarded.setAdUnitID('ca-app-pub-3940256099942544/5224354917') // Test ID, Replace with your-admob-unit-id
-                await AdMobRewarded.requestAdAsync()
-                await AdMobRewarded.showAdAsync()
-                AdMobRewarded.addEventListener('rewardedVideoDidRewardUser', reward => {
-                  console.log(':: rewarded DidReward', reward)
-                })
-                AdMobRewarded.addEventListener('rewardedVideoDidClose', reward => {
-                  console.log(':: rewarded Closeed', reward)
-                })
-              }}
-            >
-              Trigger AdMobReward
-            </Button>
-            <Text>{'\n\n'}</Text>
+                <Button
+                  onPress={async () => {
+                    await AdMobRewarded.setAdUnitID('ca-app-pub-3940256099942544/5224354917') // Test ID, Replace with your-admob-unit-id
+                    await AdMobRewarded.requestAdAsync()
+                    await AdMobRewarded.showAdAsync()
+                    AdMobRewarded.addEventListener('rewardedVideoDidRewardUser', reward => {
+                      console.log(':: rewarded DidReward', reward)
+                    })
+                    AdMobRewarded.addEventListener('rewardedVideoDidClose', reward => {
+                      console.log(':: rewarded Closeed', reward)
+                    })
+                  }}
+                >
+                  Trigger AdMobReward
+                </Button>
+                <Text>{'\n\n'}</Text>
+              </>
+            )}
           </View>
         </ScrollView>
       </Page.Main>
