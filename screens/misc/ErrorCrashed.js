@@ -19,6 +19,8 @@ export default function ErrorCrashed({ error }) {
   const [recoverFailed, setRecoverFailed] = React.useState(false)
 
   React.useEffect(() => {
+    Sentry.captureException(error, { tags: { pp_page: 'crash_0' } })
+
     if (AUTO_RELOAD) {
       setTimeout(async () => {
         tryRecover()

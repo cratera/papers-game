@@ -118,6 +118,7 @@ function SettingsExperimental({ navigation }) {
         <ScrollView style={{ paddingTop: 32, marginHorizontal: -16 }}>
           <Text style={[Theme.typography.h3, Theme.u.center]}>🚧 For Devs only. Stay away! 🚧</Text>
 
+          <Text>IsDev: {__DEV__.toString()}</Text>
           <View style={styleBlock}>
             <OtaChecker />
           </View>
