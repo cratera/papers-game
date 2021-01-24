@@ -117,6 +117,7 @@ export default function CreateGame({ navigation }) {
                 nativeID="inputNameLabel"
                 defaultValue={state.gameName}
                 placeholder="Choose a name..."
+                placeholderTextColor={Theme.colors.grayLight}
                 onChangeText={handleInputChange}
               />
               {state.isInvalid && (

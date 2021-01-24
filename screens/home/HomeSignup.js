@@ -42,11 +42,7 @@ export default class HomeSignup extends React.Component {
     this.props.navigation.setOptions({
       ...headerTheme({ hiddenTitle: true }),
       headerLeft: null,
-      headerRight: () => (
-        <Page.HeaderBtn side="right" icon="next" textPrimary onPress={this.goNextStep}>
-          Next
-        </Page.HeaderBtn>
-      ),
+      headerRight: null,
     })
   }
 
@@ -115,7 +111,7 @@ export default class HomeSignup extends React.Component {
             { marginTop: 16, marginBottom: 72, maxWidth: 300 },
           ]}
         >
-          Papers is the perfect game for your dinner party with friends or family
+          Papers is the perfect game for your dinner party with friends or family.
         </Text>
 
         <Button styleTouch={{ width: 300 }} onPress={this.goNextStep}>
@@ -138,6 +134,7 @@ export default class HomeSignup extends React.Component {
           nativeID="inputNameLabel"
           defaultValue={this.state.name}
           placeholder="Your name"
+          placeholderTextColor={Theme.colors.grayLight}
           maxLength={10}
           onChangeText={name => this.setState(state => ({ ...state, name }))}
         />

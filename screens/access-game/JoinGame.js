@@ -147,6 +147,7 @@ export default function JoinGame({ navigation }) {
                       key="code"
                       style={[Theme.typography.h1, Styles.code_input]}
                       placeholder="4 digits"
+                      placeholderTextColor={Theme.colors.grayLight}
                       keyboardType="number-pad"
                       inputAccessoryViewID="code"
                       nativeID="inputCodeName"
