@@ -6,6 +6,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 
 import * as Updates from 'expo-updates'
 
+import Sentry from '@constants/Sentry'
+
 import Page from '@components/page'
 import Button from '@components/button'
 import { IconSpin } from '@components/icons'
@@ -62,7 +64,11 @@ export default function ErrorCrashed({ error }) {
     if (Platform.OS === 'web') {
       global.location.reload()
     } else {
-      Updates.reloadAsync()
+      try {
+        Updates.reloadAsync()
+      } catch (e) {
+        Sentry.captureException(error, { tags: { pp_page: 'crash_R' } })
+      }
     }
   }
 

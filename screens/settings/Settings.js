@@ -254,6 +254,7 @@ function OtaChecker() {
   async function handleReloadClick() {
     await Updates.reloadAsync()
   }
+
   return (
     <View>
       <Button variant="light" isLoading={status === 'checking'} onPress={handleCheckClick}>

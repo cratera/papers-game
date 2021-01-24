@@ -26,36 +26,37 @@ import Tutorial from './screens/tutorial'
 
 const Stack = createStackNavigator()
 
-export default function AppFn({ skipLoadingScreen }) /* eslint-disable-line */ {
+export default function AppFn() {
   const [initialProfile, setInitialProfile] = React.useState({})
   const [isLoadingComplete, setLoadingComplete] = React.useState(false)
-  // const [errorRecent, setErrorRecent] = React.useState(false)
   const [initialNavigationState, setInitialNavigationState] = React.useState()
   const navigationRef = React.useRef()
-  // const routeNameRef = React.useRef()
   const { getInitialState } = useLinking(navigationRef)
 
-  // Load any resources or data that we need prior to rendering the app
   React.useEffect(() => {
     StatusBar.setHidden(true, 'none')
 
     async function loadResourcesAndDataAsync() {
       try {
+        // https://github.com/expo/expo/issues/10816
         await SplashScreen.preventAutoHideAsync()
+      } catch (e) {
+        Sentry.captureException(e, { tags: { pp_page: 'AppFn_0' } })
+      }
 
+      try {
         setInitialNavigationState(await getInitialState())
 
-        setInitialProfile(await loadProfile())
+        const profile = await loadProfile()
+        setInitialProfile(profile)
 
-        // Load fonts REVIEW @mmbotelho
         await Font.loadAsync({
-          // ...Ionicons.font,
           'Karla-Regular': require('./assets/fonts/Karla-Regular.ttf'),
           'Karla-Bold': require('./assets/fonts/Karla-Bold.ttf'),
           'YoungSerif-Regular': require('./assets/fonts/YoungSerif-Regular.ttf'),
         })
       } catch (e) {
-        Sentry.captureException(e, { tags: { pp_page: 'AppFn' } })
+        Sentry.captureException(e, { tags: { pp_page: 'AppFn_1' } })
       } finally {
         setLoadingComplete(true)
         await SplashScreen.hideAsync()
@@ -65,7 +66,7 @@ export default function AppFn({ skipLoadingScreen }) /* eslint-disable-line */ {
     loadResourcesAndDataAsync()
   }, [])
 
-  if (!isLoadingComplete && !skipLoadingScreen) {
+  if (!isLoadingComplete) {
     return null
   }
 

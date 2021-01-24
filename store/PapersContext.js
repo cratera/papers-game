@@ -39,8 +39,8 @@ export const loadProfile = async () => {
     name,
     avatar,
     gameId,
-    settings: settingsStored ? JSON.parse(settingsStored) : settingsDefaults,
-    stats: statsStored ? JSON.parse(statsStored) : statsDefaults,
+    settings: JSON.parse(settingsStored) || settingsDefaults,
+    stats: JSON.parse(statsStored) || statsDefaults,
   }
 }
 
@@ -68,7 +68,7 @@ export class PapersContextProvider extends Component {
       profiles: {}, // List of game players' profiles.
       about: {
         version: '0.3.1',
-        ota: '03',
+        ota: '04',
       },
     }
 
@@ -119,13 +119,10 @@ export class PapersContextProvider extends Component {
 
   async componentDidMount() {
     const { avatar, ...profile } = this.state.profile
-    console.log('PapersContext Mounted:', {
-      ...profile,
-      hasAvatar: !!avatar,
-    })
+    console.log('Papers mounted:', profile)
     await this.tryToReconnect()
 
-    await PapersSound.init(profile.settings?.sound)
+    await PapersSound.init(profile.settings.sound)
   }
 
   componentWillUnmount() {
