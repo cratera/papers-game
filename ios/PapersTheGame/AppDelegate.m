@@ -71,6 +71,11 @@ static void InitializeFlipper(UIApplication *application) {
   rootViewController.view = rootView;
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
+  // // https://reactnative.dev/docs/next/publishing-to-app-store
+  // It failed: Terminating app due to uncaught exception 'NSInvalidArgumentException', reason: 'Could not find a storyboard named 'LaunchScreen' in bundle NSBundle
+  // UIStoryboard *sb = [UIStoryboard storyboardWithName:@"LaunchScreen" bundle:nil];
+  // UIViewController *vc = [sb instantiateInitialViewController];
+  // rootView.loadingView = vc.view;
 
   return bridge;
  }

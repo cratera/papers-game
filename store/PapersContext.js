@@ -61,14 +61,14 @@ export class PapersContextProvider extends Component {
         name: props.initialProfile.name,
         avatar: props.initialProfile.avatar,
         gameId: props.initialProfile.gameId, // the last game accessed
-        settings: props.initialProfile.settings,
+        settings: props.initialProfile.settings || {},
         stats: props.initialProfile.stats,
       },
       game: null, // see Firebase.js for structure.
       profiles: {}, // List of game players' profiles.
       about: {
-        version: '0.2.6',
-        ota: '00',
+        version: '0.3.1',
+        ota: '03',
       },
     }
 
@@ -125,7 +125,7 @@ export class PapersContextProvider extends Component {
     })
     await this.tryToReconnect()
 
-    await PapersSound.init(profile.settings.sound)
+    await PapersSound.init(profile.settings?.sound)
   }
 
   componentWillUnmount() {

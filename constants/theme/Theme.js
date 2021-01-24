@@ -22,63 +22,63 @@ export const colors = {
 
 export const typography = StyleSheet.create({
   h1: {
-    fontFamily: 'youngSerif-regular',
+    fontFamily: 'YoungSerif-Regular',
     fontSize: 44,
     lineHeight: 44,
     color: colors.grayDark,
   },
   h2: {
-    fontFamily: 'youngSerif-regular',
+    fontFamily: 'YoungSerif-Regular',
     fontSize: 28,
     color: colors.grayDark,
   },
   h3: {
-    fontFamily: 'youngSerif-regular',
+    fontFamily: 'YoungSerif-Regular',
     fontSize: 24,
     color: colors.grayDark,
   },
   display: {
-    fontFamily: 'karla-regular',
+    fontFamily: 'Karla-Regular',
     fontSize: 24,
     color: colors.grayDark,
   },
   body: {
-    fontFamily: 'karla-regular',
+    fontFamily: 'Karla-Regular',
     fontSize: 16,
     lineHeight: 22,
     color: colors.grayDark,
   },
   secondary: {
-    fontFamily: 'karla-regular',
+    fontFamily: 'Karla-Regular',
     fontSize: 16,
     lineHeight: 22,
     color: colors.grayMedium,
   },
   small: {
-    fontFamily: 'karla-regular',
+    fontFamily: 'Karla-Regular',
     fontSize: 13, // TODO - 14 is too big compared to figma. @mmbotelho
     color: colors.grayMedium,
     letterSpacing: 0.1,
   },
   bold: {
-    fontFamily: 'karla-regular',
+    fontFamily: 'Karla-Regular',
     fontSize: 16,
     lineHeight: 22,
     fontWeight: 'bold',
     color: colors.grayDark,
   },
   // italic: {
-  //   fontFamily: 'karla-regular',
+  //   fontFamily: 'Karla-Regular',
   //   color: colors.grayMedium,
   //   fontStyle: 'italic',
   // },
   error: {
-    fontFamily: 'karla-regular',
+    fontFamily: 'Karla-Regular',
     fontSize: 14,
     color: colors.danger,
   },
   badge: {
-    fontFamily: 'karla-regular',
+    fontFamily: 'Karla-Regular',
     fontSize: 14,
     backgroundColor: 'rgba(0, 0, 0, 0.1)',
     lineHeight: 14,

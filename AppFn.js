@@ -50,9 +50,9 @@ export default function AppFn({ skipLoadingScreen }) /* eslint-disable-line */ {
         // Load fonts REVIEW @mmbotelho
         await Font.loadAsync({
           // ...Ionicons.font,
-          'karla-regular': require('./assets/fonts/karla/Karla-Regular.ttf'),
-          // 'karla-bold': require('./assets/fonts/karla/Karla-Regular.ttf'),
-          'youngSerif-regular': require('./assets/fonts/youngSerif/YoungSerif-Regular.ttf'),
+          'Karla-Regular': require('./assets/fonts/Karla-Regular.ttf'),
+          'Karla-Bold': require('./assets/fonts/Karla-Bold.ttf'),
+          'YoungSerif-Regular': require('./assets/fonts/YoungSerif-Regular.ttf'),
         })
       } catch (e) {
         Sentry.captureException(e, { tags: { pp_page: 'AppFn' } })

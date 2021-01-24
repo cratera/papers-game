@@ -22,7 +22,7 @@ const playset = {}
 
 let isSoundActive
 
-export async function init(initialSoundActive) {
+export async function init(initialSoundActive = true) {
   setSoundStatus(initialSoundActive)
 
   Audio.setAudioModeAsync({
