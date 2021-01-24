@@ -14,6 +14,7 @@
 		1B302E5C25BCEF900062C10F /* YoungSerif-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3084347192E147308D5C2BCF /* YoungSerif-Regular.ttf */; };
 		1B302EB525BCF0740062C10F /* Karla-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 73AEFA043B5A4996BB20B926 /* Karla-Regular.ttf */; };
 		1B302EB725BCF07A0062C10F /* Karla-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 744A129C52D54A09BDB09A89 /* Karla-Bold.ttf */; };
+		1B847AB625BDAE0000EB51F5 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B847AB525BDAE0000EB51F5 /* StoreKit.framework */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
 		66E6DC77B377416AA86AE2EF /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5F7D33EFEB60409B9A73F95C /* GoogleService-Info.plist */; };
 		96905EF65AED1B983A6B3ABC /* libPods-PapersTheGame.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 58EEBF8E8E6FB1BC6CAF49B5 /* libPods-PapersTheGame.a */; };
@@ -30,6 +31,7 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = PapersTheGame/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = PapersTheGame/main.m; sourceTree = "<group>"; };
 		14B5B79A8FF141D3A546D4ED /* Karla-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Karla-Bold.ttf"; path = "../assets/fonts/karla/Karla-Bold.ttf"; sourceTree = "<group>"; };
+		1B847AB525BDAE0000EB51F5 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		3084347192E147308D5C2BCF /* YoungSerif-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "YoungSerif-Regular.ttf"; path = "../assets/fonts/YoungSerif-Regular.ttf"; sourceTree = "<group>"; };
 		58EEBF8E8E6FB1BC6CAF49B5 /* libPods-PapersTheGame.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PapersTheGame.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		597282F854E4438E8999C0FD /* Karla-BoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Karla-BoldItalic.ttf"; path = "../assets/fonts/karla/Karla-BoldItalic.ttf"; sourceTree = "<group>"; };
@@ -53,6 +55,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				96905EF65AED1B983A6B3ABC /* libPods-PapersTheGame.a in Frameworks */,
+				1B847AB625BDAE0000EB51F5 /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -94,6 +97,7 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1B847AB525BDAE0000EB51F5 /* StoreKit.framework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
 				58EEBF8E8E6FB1BC6CAF49B5 /* libPods-PapersTheGame.a */,
@@ -156,6 +160,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "PapersTheGame" */;
 			buildPhases = (
+				1B847AB925BDCA8300EB51F5 /* Update info.plist */,
 				08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
 				13B07F871A680F5B00A75B9A /* Sources */,
@@ -259,6 +264,24 @@
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
+		};
+		1B847AB925BDCA8300EB51F5 /* Update info.plist */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Update info.plist";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# https://stackoverflow.com/a/45861923/4737729\ntouch $INFOPLIST_FILE\n";
 		};
 		800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;

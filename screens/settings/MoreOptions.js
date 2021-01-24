@@ -28,6 +28,12 @@ export default function MoreOptions({ navigation, list }) {
             onPress: () => navigation.navigate('settings-feedback'),
           },
           {
+            id: 'pay',
+            title: 'Papers Extras',
+            icon: 'next',
+            onPress: () => navigation.navigate('settings-purchases'),
+          },
+          {
             id: 'pg',
             title: 'Privacy',
             icon: 'next',

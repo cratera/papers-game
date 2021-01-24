@@ -11,3 +11,5 @@ export const SCREEN_FADE = ({ current, closing }) => ({
     opacity: current.progress,
   },
 })
+
+export const REVENUECAT_PUBLIC_SDK_KEY = 'CRJcWftXiqbcTvnbAfgzcIGPEWKzISSK'

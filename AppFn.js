@@ -13,10 +13,13 @@ import {
   HeaderStyleInterpolators,
 } from '@react-navigation/stack'
 
-import Sentry from '@constants/Sentry'
+import Purchases from 'react-native-purchases'
+
+import Sentry from './constants/Sentry'
+import { cardForFade } from './constants/animations'
+import { REVENUECAT_PUBLIC_SDK_KEY } from './constants/constants'
 import { headerTheme } from './navigation/headerStuff.js'
 import useLinking from './navigation/useLinking'
-import { cardForFade } from './constants/animations'
 import { PapersContextProvider, loadProfile } from './store/PapersContext.js'
 import Home from './screens/home'
 import GameRoom from './screens/game-room'
@@ -29,6 +32,7 @@ const Stack = createStackNavigator()
 export default function AppFn() {
   const [initialProfile, setInitialProfile] = React.useState({})
   const [isLoadingComplete, setLoadingComplete] = React.useState(false)
+
   const [initialNavigationState, setInitialNavigationState] = React.useState()
   const navigationRef = React.useRef()
   const { getInitialState } = useLinking(navigationRef)
@@ -64,6 +68,11 @@ export default function AppFn() {
     }
 
     loadResourcesAndDataAsync()
+  }, [])
+
+  React.useEffect(() => {
+    Purchases.setDebugLogsEnabled(__DEV__)
+    Purchases.setup(REVENUECAT_PUBLIC_SDK_KEY)
   }, [])
 
   if (!isLoadingComplete) {

@@ -14,6 +14,9 @@ Here's a list of my learnings while building this mobile game with reac-native.
 - Android: `<Views/>` inside `<Text/>` must have explicit width and height.
 - Android: Use `keyboardType="visible-password"` in `TextInput` to remove auto suggestions (gif, photo, etc...)
 - Custom header height - [avoid screen jumps](https://github.com/react-navigation/react-navigation/issues/5936)
+- In-App Purchases:
+  - Expo Managed doesn't support it. That was the main reason to eject to Bare React Native (SDK40).
+  - Use [RevenueCat](revenuecat.com). Their docs are awesome. This [YT tutorial](https://www.youtube.com/watch?v=l_Cm906w640&ab_channel=CodeWithChris) helped a lot too.
 
 ## Expo
 
@@ -59,7 +62,7 @@ yarn release:ota -- -m "x.x.x@xx ![release summary]"
 
 1. Follow [React Guide](https://reactnative.dev/docs/next/publishing-to-app-store)
 
-- 1.1 Edit NSAllowsArbitraryLoads entries
+- 1.1 Edit NSAllowsArbitraryLoads entries (Info Pane)
 - 1.2 Product -> Scheme -> Edit Release
 - 1.3 _(Skipped)_ LaunchScreen didn't work (check comments in fiel code)
 
