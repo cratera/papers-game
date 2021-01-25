@@ -50,7 +50,7 @@ export default StyleSheet.create({
     textAlign: 'center',
   },
   errorMsg: {
-    fontSize: 14,
+    fontSize: Theme.typography.fontSizeSmall,
     paddingVertical: 6,
     paddingHorizontal: 12,
     backgroundColor: Theme.colors.yellow,

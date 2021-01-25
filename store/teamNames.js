@@ -14,4 +14,12 @@ export default [
   'Boomers',
   'Millennials',
   'Dreamers',
+  'Hot Shots',
+  'Outliers',
+  'Ninjas',
+  'Squad',
+  'Trouble Makers',
+  'Tea Spillers',
+  'Cupcakes',
+  'Young Bucks',
 ]

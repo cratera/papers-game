@@ -22,8 +22,13 @@ export default function LobbyWriting({ navigation }) {
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [errorMsg, setErrorMsg] = React.useState('')
   const { askToLeaveGame } = useLeaveGame({ navigation })
-  const { game } = Papers.state || {}
-  const gameWords = game?.words || {}
+  const { game, profile } = Papers.state || {}
+  const hasGame = !!game
+  const gameWords = (hasGame && game.words) || {}
+  const profileId = profile && profile.id
+  const creatorId = hasGame && game.creatorId
+  const profileIsAdmin = creatorId === profileId
+
   const didSubmitAllWords = React.useCallback(
     plId => gameWords[plId]?.length === game.settings.words,
     [gameWords]
@@ -53,7 +58,7 @@ export default function LobbyWriting({ navigation }) {
   React.useEffect(() => {
     if (didEveryoneSubmittedTheirWords) {
       navigation.setOptions({
-        headerTitle: 'Done!',
+        headerTitle: 'All done!',
       })
     }
   }, [didEveryoneSubmittedTheirWords])
@@ -87,6 +92,17 @@ export default function LobbyWriting({ navigation }) {
           <View style={Theme.u.CTASafeArea} />
         </ScrollView>
       </Page.Main>
+      {__DEV__ && profileIsAdmin && (
+        <Page.CTAs hasOffset>
+          <Button
+            variant="danger"
+            onPress={Papers.setWordsForEveyone}
+            styleTouch={{ marginTop: 16 }}
+          >
+            {"💥 Write everyone's papers 💥"}
+          </Button>
+        </Page.CTAs>
+      )}
       {didEveryoneSubmittedTheirWords && (
         <Page.CTAs hasOffset>
           <Text style={[Theme.typography.error, Theme.u.center, { marginBottom: 8 }]}>

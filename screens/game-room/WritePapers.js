@@ -298,8 +298,8 @@ const SlidePaper = ({ onChange, isActive, onFocus, onSubmit, i }) => {
       <TextInput
         ref={elInput}
         style={[
-          Styles.input,
           Theme.typography.h2,
+          Styles.input,
           (isActive || isFocused) && Styles.input_isActive,
         ]}
         multiline

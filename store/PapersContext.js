@@ -65,7 +65,7 @@ export class PapersContextProvider extends Component {
         stats: props.initialProfile.stats,
       },
       game: null, // see Firebase.js for structure.
-      profiles: {}, // List of game players' profiles.
+      profiles: {},
       about: {
         version: '0.3.2',
         ota: '01',
@@ -76,10 +76,6 @@ export class PapersContextProvider extends Component {
     this._subscribeGame = this._subscribeGame.bind(this)
 
     this.PapersAPI = {
-      open: this.open.bind(this),
-      // pausePlayer: this.pausePlayer.bind(this),
-      // recoverPlayer: this.recoverPlayer.bind(this),
-
       updateProfile: this.updateProfile.bind(this),
       resetProfile: this.resetProfile.bind(this),
       updateProfileSettings: this.updateProfileSettings.bind(this),
@@ -155,10 +151,6 @@ export class PapersContextProvider extends Component {
   }
 
   // =========== Papers API
-
-  open() {
-    // Legacy...
-  }
 
   init() {
     if (__DEV__) console.log('📌 init()')
@@ -461,7 +453,6 @@ export class PapersContextProvider extends Component {
     })
   }
 
-  // { id, name, avatar, gameId }
   async updateProfile(profile, opts = {}) {
     if (__DEV__) console.log('📌 updateProfile()', profile, opts)
     const mapKeys = {
@@ -578,7 +569,6 @@ export class PapersContextProvider extends Component {
     } catch (e) {
       console.warn('error: resetProfile', e)
       Sentry.captureException(e, { tags: { pp_action: 'RP_0' } })
-      // return Error('Unexpected error. Please try again later')
     }
 
     this.setState(state => ({

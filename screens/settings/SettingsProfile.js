@@ -74,7 +74,7 @@ const Styles = StyleSheet.create({
     borderWidth: 0,
     padding: 12,
     marginTop: 4,
-    fontSize: 16,
+    fontSize: Theme.typography.fontSizeBase,
     color: Theme.colors.grayDark,
     backgroundColor: Theme.colors.bg,
   },

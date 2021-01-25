@@ -1,5 +1,7 @@
 import { StyleSheet } from 'react-native'
 
+import { isTamagoshi } from '@constants/layout'
+
 export const colors = {
   grayDark: '#000000',
   grayMedium: 'rgba(0, 0, 0, 0.5)',
@@ -19,6 +21,9 @@ export const colors = {
   salmon: '#F2C9AD',
   // ....
 }
+
+const fontSizeBase = isTamagoshi ? 16 : 18
+const fontSizeSmall = isTamagoshi ? 13 : 14
 
 export const typography = StyleSheet.create({
   h1: {
@@ -44,48 +49,45 @@ export const typography = StyleSheet.create({
   },
   body: {
     fontFamily: 'Karla-Regular',
-    fontSize: 16,
+    fontSize: fontSizeBase,
     lineHeight: 22,
     color: colors.grayDark,
   },
   secondary: {
     fontFamily: 'Karla-Regular',
-    fontSize: 16,
+    fontSize: fontSizeBase,
     lineHeight: 22,
     color: colors.grayMedium,
   },
   small: {
     fontFamily: 'Karla-Regular',
-    fontSize: 13, // TODO - 14 is too big compared to figma. @mmbotelho
+    fontSize: fontSizeSmall,
     color: colors.grayMedium,
     letterSpacing: 0.1,
   },
   bold: {
     fontFamily: 'Karla-Regular',
-    fontSize: 16,
+    fontSize: fontSizeBase,
     lineHeight: 22,
     fontWeight: 'bold',
     color: colors.grayDark,
   },
-  // italic: {
-  //   fontFamily: 'Karla-Regular',
-  //   color: colors.grayMedium,
-  //   fontStyle: 'italic',
-  // },
   error: {
     fontFamily: 'Karla-Regular',
-    fontSize: 14,
+    fontSize: fontSizeSmall,
     color: colors.danger,
   },
   badge: {
     fontFamily: 'Karla-Regular',
-    fontSize: 14,
+    fontSize: fontSizeSmall,
     backgroundColor: 'rgba(0, 0, 0, 0.1)',
     lineHeight: 14,
     paddingTop: 7,
     paddingBottom: 6,
     paddingHorizontal: 4,
   },
+  fontSizeBase: fontSizeBase,
+  fontSizeSmall: fontSizeSmall,
 })
 
 // Utils

@@ -70,7 +70,7 @@ const Styles = StyleSheet.create({
     padding: 20,
     paddingRight: 8,
     marginTop: 4,
-    fontSize: 16,
+    fontSize: Theme.typography.fontSizeBase,
     flexGrow: 1,
     textAlign: 'right',
     color: Theme.colors.grayMedium,

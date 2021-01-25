@@ -118,6 +118,7 @@ export default function CreateGame({ navigation }) {
                 defaultValue={state.gameName}
                 placeholder="Choose a name..."
                 placeholderTextColor={Theme.colors.grayLight}
+                maxLength={16}
                 onChangeText={handleInputChange}
               />
               {state.isInvalid && (

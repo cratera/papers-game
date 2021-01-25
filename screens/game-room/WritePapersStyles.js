@@ -40,7 +40,8 @@ export default StyleSheet.create({
     borderColor: 'transparent',
     color: Theme.colors.grayDark,
     textAlign: 'center',
-    ...(isWeb ? { height: '100' /* 2 lines */ } : {}),
+    ...(isWeb ? { height: '100' /* 2 lines */, fontSize: 28 } : {}),
+    ...(isTamagoshi ? { fontSize: 28 } : { fontSize: 36 }),
   },
   input_isActive: {
     // outline: none // not supported. TODO later, maybe an external stylesheet?...
