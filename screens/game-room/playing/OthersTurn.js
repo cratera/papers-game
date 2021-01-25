@@ -8,10 +8,12 @@ import PapersContext from '@store/PapersContext.js'
 
 import Page from '@components/page'
 import Avatar from '@components/avatar'
+import Button from '@components/button'
 
 import * as Theme from '@theme'
 import Styles from './PlayingStyles.js'
 
+// TODO/REFACTOR later. This really needs some refactor.
 const OthersTurn = ({
   description,
   hasCountdownStarted,
@@ -31,15 +33,22 @@ const OthersTurn = ({
   const turnWho = round?.turnWho || {}
   const roundNr = round.current + (amIWaiting ? 2 : 1)
   const isTurnOn = !hasCountdownStarted || !!countdownSec // aka: it isn't times up
+
+  const playersOffline = Object.keys(game.players).filter(pId => game.players[pId].isAfk).length
+  const turnWhoStringified = JSON.stringify(turnWho) // This changing, means a turn was skipped.
+
   const turnStatus = React.useMemo(() => {
     const turnState = isTurnOn && !amIWaiting ? turnWho : Papers.getNextTurn()
     const teamId = turnState.team
     const tPlayerIx = turnState[turnState.team]
     const tPlayerId = game.teams[teamId].players[tPlayerIx]
+    const tPlayer = game.players[tPlayerId] || {}
 
     return {
       title: isTurnOn && game.hasStarted && !amIWaiting ? 'Playing now:' : 'Next up:',
       player: {
+        id: tPlayerId,
+        isAfk: tPlayer.isAfk,
         name: tPlayerId === profile.id ? 'You!' : profiles[tPlayerId]?.name || `? ${tPlayerId} ?`,
         avatar: profiles[tPlayerId]?.avatar,
       },
@@ -50,7 +59,9 @@ const OthersTurn = ({
           ? `Waiting for ${thisTurnPlayer.name || '???'} to finish their turn.`
           : game.teams[teamId].name,
     }
-  }, [amIWaiting, isTurnOn, game.hasStarted])
+  }, [amIWaiting, isTurnOn, game.hasStarted, playersOffline, turnWhoStringified])
+
+  console.log('...', game.players, playersOffline)
 
   return (
     <Page>
@@ -111,6 +122,23 @@ const OthersTurn = ({
                 <Text style={[Theme.typography.secondary, Theme.u.center]}>
                   {!hasCountdownStarted ? thisTurnTeamName : turnStatus.teamName}
                 </Text>
+                {turnStatus.player.isAfk && (
+                  // REVIEW @mmbotelho
+                  <>
+                    <Text
+                      style={[
+                        Theme.typography.error,
+                        Theme.u.center,
+                        { marginTop: 12, marginBottom: 4 },
+                      ]}
+                    >
+                      They seem offline.
+                    </Text>
+                    <Button size="sm" onPress={() => Papers.skipTurn(turnStatus.player.id)}>
+                      Skip to another team member
+                    </Button>
+                  </>
+                )}
               </>
             ) : countdownSec && !isAllWordsGuessed ? (
               <>

@@ -59,6 +59,7 @@ const PUBLIC_API = {
   startTurn,
   setPapersGuessed,
   finishTurn,
+  skipTurn,
   setRound,
 }
 
@@ -477,11 +478,14 @@ function _pubGame(gameId) {
       })
 
       DB.ref(`users/${id}/isAfk`).on('value', data => {
-        if (__DEV__) console.log('⚙️ player is afk!', id, data.val())
+        const isAfk = data.val()
+        if (!isAfk) return
+
+        if (__DEV__) console.log('⚙️ player is afk!', id)
         PubSub.publish('game.players.changed', {
           id,
           info: {
-            isAfk: data.val(),
+            isAfk,
           },
         })
       })
@@ -568,7 +572,7 @@ async function leaveGame({ wasKicked = false } = {}) {
       DB.ref(`games/${gameId}`).remove()
     } else {
       if (__DEV__) console.log(':: removing')
-      await DB.ref(`games/${gameId}/players/${LOCAL_PROFILE.id}`).remove()
+      await DB.ref(`games/${gameId}/players/${LOCAL_PROFILE.id}`).update({ isAfk: true })
     }
   }
 
@@ -807,6 +811,17 @@ async function finishTurn({ playerScore, roundStatus }, cb) {
   }
 
   await DB.ref(`games/${gameId}/score/${roundStatus.current}`).update(playerScore)
+  await DB.ref(`games/${gameId}/round`).update(roundStatus)
+  await DB.ref(`games/${gameId}/papersGuessed`).set(0)
+}
+
+/**
+ *
+ */
+async function skipTurn({ roundStatus }) {
+  if (__DEV__) console.log('⚙️ skipTurn()')
+  const gameId = LOCAL_PROFILE.gameId
+
   await DB.ref(`games/${gameId}/round`).update(roundStatus)
   await DB.ref(`games/${gameId}/papersGuessed`).set(0)
 }

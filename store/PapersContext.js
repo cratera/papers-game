@@ -6,7 +6,7 @@ import { isWeb } from '@constants/layout'
 import Sentry from '@constants/Sentry'
 
 import wordsForEveryone from './wordsForEveryone.js'
-import { getNextTurn } from './papersMethods.js'
+import { getNextTurn, getNextSkippedTurn } from './papersMethods.js'
 import * as PapersSound from './PapersSound.js'
 
 import serverInit from './Firebase.js'
@@ -96,6 +96,7 @@ export class PapersContextProvider extends Component {
       pingReadyStatus: this.pingReadyStatus.bind(this),
 
       startTurn: this.startTurn.bind(this),
+      skipTurn: this.skipTurn.bind(this),
       getNextTurn: this.getNextTurn.bind(this),
       finishTurn: this.finishTurn.bind(this),
 
@@ -729,6 +730,34 @@ export class PapersContextProvider extends Component {
   getNextTurn() {
     const { teams, round } = this.state.game
     return getNextTurn(round.turnWho, teams)
+  }
+
+  async skipTurn(playerId) {
+    const { players, teams, round } = this.state.game
+
+    if (players[playerId].isAfk === false) {
+      Sentry.withScope(scope => {
+        scope.setExtra('response', JSON.stringify(this.state.game))
+        Sentry.captureException(Error('Skip unneded!'))
+      })
+      return
+    }
+
+    const turnWho = getNextSkippedTurn(round.turnWho, teams)
+
+    try {
+      await this.state.socket.skipTurn({
+        roundStatus: {
+          ...round,
+          turnWho,
+        },
+      })
+    } catch (e) {
+      Sentry.withScope(scope => {
+        scope.setExtra('response', JSON.stringify(this.state.game))
+        Sentry.captureException(e)
+      })
+    }
   }
 
   async finishTurn(papersTurn, cb) {

@@ -33,6 +33,37 @@ export function getNextTurn(turnWho, teams) {
   }
 }
 
+/**
+ * A util to know who is the next one to play within the same team.
+ * @param {Object} turnWho
+ * @param {String} turnWho.team The current teamId playing
+ * @param {String} turnWho[teamId] The current/most recent player of that team playing 
+
+ * @param {Object} teams An object with teams (their ids).
+ * @param {String[]} teams[teamId].players List of team's players (String)
+ * 
+ * @example
+ * // returns { team:1, 0:0, 1:1 }
+ * getNextTurn({ team:0, 0:0, 1:0 }, teams)
+* @example
+ * // returns { team:0, 0:1, 1:1 }
+ * getNextTurn({ team:1, 0:0, 1:1 }, teams)
+ * @returns {Object} the turnWho state.
+ */
+export function getNextSkippedTurn(turnWho, teams) {
+  const { team, ...teamWho } = turnWho
+
+  const playersCount = teams[team].players.length
+  const player = teamWho[team]
+  const nextPlayer = player + 1 >= playersCount ? 0 : player + 1
+
+  return {
+    ...turnWho,
+    team: team,
+    [team]: nextPlayer,
+  }
+}
+
 // -------------------------------------------------------------
 
 /**
