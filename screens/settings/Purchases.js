@@ -3,54 +3,57 @@ import { ScrollView, Text, View } from 'react-native'
 
 import Purchases from 'react-native-purchases'
 
+import * as Theme from '@theme'
+
 import Sentry from '@constants/Sentry'
 import Page from '@components/page'
 
 import Button from '@components/button'
+import { getPurchaserType } from '@components/purchases/purchases.service.js'
+
 import { useSubHeader, propTypesCommon } from './utils'
 
-import * as Theme from '@theme'
+const syncTypes = {
+  PAYING: 'paying',
+  RESTORING: 'restoring',
+  FORGETTING: 'forgetting',
+}
+
+const packageAds = 'papers_109_remove_ads01'
 
 export default function PurchasesView({ navigation }) {
   const [userType, setUserType] = React.useState(null)
   const [offerings, setOfferings] = React.useState('loading')
-  const [isPaying, setIsPaying] = React.useState(false)
-  const [isRestoring, setIsRestoring] = React.useState(false)
+  const [syncingType, setSyncingType] = React.useState(false)
 
   useSubHeader(navigation, 'Papers Extras')
-
-  async function loadPurchases() {
-    try {
-      // Available packs
-      const offerings = await Purchases.getOfferings()
-      if (offerings.current !== null) {
-        setOfferings(offerings.current)
-      }
-
-      // User purchases
-      const purchaserInfo = await Purchases.getPurchaserInfo()
-      if (purchaserInfo?.entitlements?.active?.member?.productIdentifier) {
-        setUserType('MEMBER')
-      } else {
-        console.log(':: purchase-info', 'User Free')
-        setUserType('FREE')
-      }
-    } catch (e) {
-      Sentry.captureException(e, { tags: { pp_action: 'PAY_0' } })
-    }
-  }
 
   React.useEffect(() => {
     loadPurchases()
   }, [])
 
+  async function loadPurchases() {
+    try {
+      const offerings = await Purchases.getOfferings()
+      if (offerings.current !== null) {
+        setOfferings(offerings.current)
+      }
+    } catch (e) {
+      Sentry.captureException(e, { tags: { pp_action: 'PAY_0' } })
+    }
+
+    const purchaserType = await getPurchaserType()
+    setUserType(purchaserType)
+  }
+
   async function handlePayClick() {
     const packageRemoveAds = offerings.availablePackages[0]
     console.log('to pay:', packageRemoveAds)
-    setIsPaying(true)
+    setSyncingType(syncTypes.PAYING)
+
     try {
       const { purchaserInfo, productIdentifier } = await Purchases.purchasePackage(packageRemoveAds)
-      if (typeof purchaserInfo.entitlements.member?.['papers_109_remove_ads01'] !== 'undefined') {
+      if (purchaserInfo.entitlements.active.member.productIdentifier === packageAds) {
         console.log('PAYED!!!', productIdentifier)
         loadPurchases()
       }
@@ -61,12 +64,12 @@ export default function PurchasesView({ navigation }) {
         Sentry.captureException(e, { tags: { pp_action: 'PAY_P' } })
       }
     } finally {
-      setIsPaying(false)
+      setSyncingType(null)
     }
   }
 
   async function handleRestoreClick() {
-    setIsRestoring(true)
+    setSyncingType(syncTypes.RESTORING)
 
     try {
       await Purchases.restoreTransactions()
@@ -74,7 +77,20 @@ export default function PurchasesView({ navigation }) {
     } catch (e) {
       Sentry.captureException(e, { tags: { pp_action: 'PAY_R' } })
     } finally {
-      setIsRestoring(false)
+      setSyncingType(null)
+    }
+  }
+
+  async function handleForgetClick() {
+    setSyncingType(syncTypes.FORGETTING)
+
+    try {
+      await Purchases.identify(Date.now().toString())
+      loadPurchases()
+    } catch (e) {
+      Sentry.captureException(e, { tags: { pp_action: 'PAY_F' } })
+    } finally {
+      setSyncingType(null)
     }
   }
 
@@ -89,18 +105,44 @@ export default function PurchasesView({ navigation }) {
 
             {userType === 'FREE' && (
               <>
-                <Button variant="light" onPress={handlePayClick} isLoading={isPaying}>
+                <Button
+                  variant="light"
+                  onPress={handlePayClick}
+                  isLoading={syncingType === syncTypes.PAYING}
+                >
                   Remove ads
                 </Button>
                 <Text>{'\n'}</Text>
 
-                <Button variant="light" onPress={handleRestoreClick} isLoading={isRestoring}>
+                <Button
+                  variant="light"
+                  onPress={handleRestoreClick}
+                  isLoading={syncingType === syncTypes.RESTORING}
+                >
                   Restore purchases
                 </Button>
               </>
             )}
 
-            {userType === 'MEMBER' && <Text style={Theme.typography.h3}>You have Papers Pro!</Text>}
+            {userType === 'MEMBER' && (
+              <>
+                <Text style={Theme.typography.h3}>You have Papers Pro!</Text>
+                <Text style={Theme.typography.body}>
+                  Go to Experimental page. The ads disappeared.
+                </Text>
+                <Text>{'\n'}</Text>
+
+                <Text>{'\n'}</Text>
+
+                <Button
+                  variant="light"
+                  onPress={handleForgetClick}
+                  isLoading={syncingType === syncTypes.FORGETTING}
+                >
+                  (debug) Forget purchases
+                </Button>
+              </>
+            )}
           </View>
         </ScrollView>
       </Page.Main>
