@@ -20,13 +20,14 @@ export default StyleSheet.create({
     marginBottom: 100,
   },
   slide_isActive: {},
-  input: {
-    borderColor: 'transparent',
-    color: Theme.colors.grayDark,
-    textAlign: 'center',
+  media: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    flexGrow: 1,
   },
-  input_isActive: {
-    // outline: none // not supported. TODO later, maybe an external stylesheet?...
+  illustration: {
+    width: 60 * vw,
   },
   status: {
     flexGrow: 1,

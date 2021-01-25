@@ -404,9 +404,9 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
             <View
               style={[
                 Styles.go_paper,
-                !isPaperBlur && {
-                  borderColor: Theme.colors.purple,
-                },
+                // !isPaperBlur && {
+                //   borderColor: Theme.colors.purple,
+                // },
               ]}
             >
               <View style={Styles.go_paper_sentence}>

@@ -19,6 +19,7 @@ export const colors = {
   purple: '#C299C4',
   yellow: '#EED486',
   salmon: '#F2C9AD',
+  orange: '#EFA16F',
   // ....
 }
 

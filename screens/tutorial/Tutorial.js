@@ -1,17 +1,21 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import debounce from 'lodash/debounce'
 import { View, Text, ScrollView } from 'react-native'
 
+import * as Theme from '@theme'
+
 import * as Analytics from '@constants/analytics.js'
+import { window } from '@constants/layout'
 
 import Button from '@components/button'
 import Page from '@components/page'
 import { IconArrow } from '@components/icons'
-import * as Theme from '@theme'
-import Styles from './TutorialStyles.js'
+import IllustrationPersonCalling from '@components/illustrations/PersonCalling.js'
+import IllustrationPersonThink from '@components/illustrations/PersonThink.js'
+import IllustrationPersonGuess from '@components/illustrations/PersonGuess.js'
+import IllustrationPersonGroup from '@components/illustrations/PersonGroup.js'
 
-import { window } from '@constants/layout'
+import Styles from './TutorialStyles.js'
 
 const { vw } = window
 
@@ -19,34 +23,28 @@ const tutorialConfig = [
   {
     title: 'Call your friends',
     detail: 'You need at least 3 more friends',
-    bgFill: Theme.colors.yellow,
+    bgFill: Theme.colors.purple,
+    Illustration: IllustrationPersonCalling,
   },
   {
     title: 'Get creative',
     detail:
       'Write down 10 unique words, sentences, expressions... Keep them secret! Your friends will have to guess these later.',
-    bgFill: Theme.colors.red,
+    bgFill: Theme.colors.orange,
+    Illustration: IllustrationPersonThink,
   },
   {
-    title: 'Start guessing',
-    detail: 'Every team gets 1 minute to guess as many papers as they can.',
-    bgFill: Theme.colors.purple,
-  },
-  {
-    title: 'Step it up!',
+    title: 'Start guessing!',
     detail:
-      'Round 2 starts when all papers were guessed. Now you can only use 3 words to describe your paper to your team.',
+      'Every team gets 1 minute to guess as many papers as they can. but pay attention. Each round has different rules.',
     bgFill: Theme.colors.yellow,
-  },
-  {
-    title: 'Mimi time',
-    detail: 'No words, no sounds, just gestures.  ',
-    bgFill: Theme.colors.pink,
+    Illustration: IllustrationPersonGuess,
   },
   {
     title: 'Have fun!',
     detail: 'The main goal is for you and your friends to enjoy yourselves. ',
-    bgFill: Theme.colors.yellow,
+    bgFill: Theme.colors.green,
+    Illustration: IllustrationPersonGroup,
   },
 ]
 
@@ -54,7 +52,6 @@ const stepTotal = tutorialConfig.length
 
 export default function Tutorial({ navigation }) {
   const refSlider = React.useRef()
-  const scrollDebounced = React.useRef(debounce(handleScrollPapers, 350)).current // < 300 fucks up scroll on iOS
   const [stepIndex, setStepIndex] = React.useState(0)
 
   React.useEffect(() => {
@@ -76,18 +73,14 @@ export default function Tutorial({ navigation }) {
   }, [stepIndex])
 
   return (
-    <Page
-    // bgFill={tutorialConfig[stepIndex].bgFill}
-    >
+    <Page bgFill={tutorialConfig[stepIndex].bgFill}>
       <Page.Main>
         <ScrollView
           ref={refSlider}
           pagingEnabled
-          scrollEventThrottle={500}
           horizontal
-          onScroll={e => {
-            scrollDebounced(e.nativeEvent.contentOffset.x, stepIndex)
-          }}
+          // scrollEventThrottle={100}
+          onMomentumScrollEnd={handleScrollEnd}
           style={[Theme.u.scrollSideOffset, Styles.slides]}
         >
           {renderTutorial()}
@@ -108,7 +101,6 @@ export default function Tutorial({ navigation }) {
               style={{ transform: [{ rotate: '180deg' }] }}
             />
           </Button>
-
           <View style={Styles.status} />
 
           <Button
@@ -137,11 +129,11 @@ export default function Tutorial({ navigation }) {
     return papers
   }
 
-  function handleScrollPapers(scrollX, curPaper) {
-    const newPaper = Math.round(scrollX / (vw * 100))
-    if (curPaper !== newPaper) {
-      setStepIndex(newPaper)
-    }
+  function handleScrollEnd(e) {
+    const { contentOffset, layoutMeasurement } = e.nativeEvent
+    const pageIndex = Math.floor(contentOffset.x / layoutMeasurement.width)
+
+    setStepIndex(Math.max(Math.min(stepTotal, pageIndex)), 0)
   }
 
   function handleClickPrev() {
@@ -160,12 +152,11 @@ Tutorial.propTypes = {
 // ===============
 
 const TutorialStep = ({ isActive, ix, stepTotal }) => {
+  const Illustration = tutorialConfig[ix].Illustration
   return (
     <View style={[Styles.step, isActive && Styles.step_isActive]}>
-      <View style={{ flexGrow: 1 }}>
-        <Text style={[Theme.typography.small, Theme.u.center]}>
-          {'\n'}Awesome illustration coming!
-        </Text>
+      <View style={Styles.media}>
+        <Illustration style={Styles.illustration} />
       </View>
 
       <Text style={[Theme.typography.small, Theme.u.center]}>
