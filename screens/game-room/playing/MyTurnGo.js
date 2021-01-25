@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, TouchableOpacity } from 'react-native'
+import { View, Text, Pressable } from 'react-native'
 import PropTypes from 'prop-types'
 
 import { usePrevious, msToSecPretty, getRandomInt } from '@constants/utils'
@@ -391,7 +391,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
           {msToSecPretty(countdown)}
         </Text>
         <View style={Styles.go_zone}>
-          <TouchableOpacity
+          <Pressable
             onPressIn={() => {
               setPapersTurn(state => ({
                 ...state,
@@ -404,7 +404,9 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
             <View
               style={[
                 Styles.go_paper,
-                // Styles[`go_paper_${paperAnim}`]
+                !isPaperBlur && {
+                  borderColor: Theme.colors.purple,
+                },
               ]}
             >
               <View style={Styles.go_paper_sentence}>
@@ -433,17 +435,8 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
                 )}
               </View>
             </View>
-          </TouchableOpacity>
+          </Pressable>
         </View>
-
-        {/* {true && (
-          <View style={{ display: 'block' }}>
-            <Text style={{ fontSize: 10, lineHeight: 10 }}>
-              {'\n'} - passed: {papersTurn.passed.join(', ')} {'\n'} - guessed:{' '}
-              {papersTurn.guessed.join(', ')} {'\n'} - wordsLeft: {papersTurn.wordsLeft.join(', ')}{' '}
-            </Text>
-          </View>
-        )} */}
       </Page.Main>
 
       <Page.CTAs style={Styles.go_ctas}>

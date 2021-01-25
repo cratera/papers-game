@@ -1,5 +1,5 @@
 import React, { memo } from 'react'
-import { View, Text, TouchableHighlight } from 'react-native'
+import { View, Text, TouchableOpacity } from 'react-native'
 import PropTypes from 'prop-types'
 import { IconSpin } from '@components/icons'
 
@@ -22,10 +22,10 @@ function Button({
 }) {
   const isIcon = variant === 'icon'
   return (
-    <TouchableHighlight
+    <TouchableOpacity
       {...otherProps}
       style={[Styles.touch, styleTouch, place === 'float' && Styles.place_float]}
-      underlayColor={'transparent'}
+      activeOpacity={0.5}
       {...(isLoading ? { disabled: true } : {})}
     >
       <View style={[Styles.btnWrapper({ variant, size, place, bgColor }), style]}>
@@ -44,7 +44,7 @@ function Button({
           <IconSpin size={20} color={loadingColor} />
         )}
       </View>
-    </TouchableHighlight>
+    </TouchableOpacity>
   )
 }
 
