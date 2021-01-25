@@ -250,7 +250,7 @@ const Styles = StyleSheet.create({
     color: Theme.colors.primary,
   },
   cta_txt: {
-    fontSize: Theme.typography.fontSizeBase,
+    fontSize: Theme.fontSize.base,
     color: Theme.colors.primary,
   },
   teamHeader: {

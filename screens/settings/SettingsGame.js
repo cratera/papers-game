@@ -47,6 +47,7 @@ export default function SettingsGame({ navigation }) {
             />
             <View style={Theme.u.listDivider} />
             <Item title="Leave Game" variant="danger" Icon={IconTimes} onPress={askToLeaveGame} />
+            <Text>{'\n'}</Text>
           </View>
         </ScrollView>
       </Page.Main>

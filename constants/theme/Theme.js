@@ -86,9 +86,12 @@ export const typography = StyleSheet.create({
     paddingBottom: 6,
     paddingHorizontal: 4,
   },
-  fontSizeBase: fontSizeBase,
-  fontSizeSmall: fontSizeSmall,
 })
+
+export const fontSize = {
+  base: fontSizeBase,
+  small: 15,
+}
 
 // Utils
 export const u = StyleSheet.create({

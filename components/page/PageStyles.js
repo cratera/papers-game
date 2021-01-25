@@ -37,7 +37,7 @@ export default StyleSheet.create({
   banner_text: {
     color: Theme.colors.bg,
     textAlign: 'center',
-    fontSize: Theme.typography.fontSizeSmall,
+    fontSize: Theme.fontSize.small,
   },
   ctas: {
     position: 'absolute',

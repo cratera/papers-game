@@ -112,7 +112,7 @@ const Styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   fscore_tag: {
-    fontSize: Theme.typography.fontSizeSmall,
+    fontSize: Theme.fontSize.small,
     color: Theme.colors.bg,
     paddingHorizontal: 8,
     paddingVertical: 1,
