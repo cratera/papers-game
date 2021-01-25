@@ -1,10 +1,12 @@
 import React from 'react'
-import { TouchableOpacity, StyleSheet, View, Text } from 'react-native'
+import { Platform, TouchableOpacity, StyleSheet, View, Text } from 'react-native'
+import * as Linking from 'expo-linking'
 
 import PropTypes from 'prop-types'
 
 import PapersContext from '@store/PapersContext.js'
 import * as Theme from '@theme'
+import { IconExternal } from '@components/icons'
 import Item from './Item.js'
 
 export default function MoreOptions({ navigation, list }) {
@@ -21,17 +23,27 @@ export default function MoreOptions({ navigation, list }) {
             icon: 'next',
             onPress: () => navigation.navigate('settings-sound'),
           },
+          Platform.OS === 'web'
+            ? {
+                id: 'dn',
+                title: 'Buy us a coffee!',
+                Icon: IconExternal,
+                onPress: () => {
+                  // TODO this
+                  Linking.openURL('https://google.com')
+                },
+              }
+            : {
+                id: 'pay',
+                title: 'Papers Extras',
+                icon: 'next',
+                onPress: () => navigation.navigate('settings-purchases'),
+              },
           {
             id: 'fb',
             title: 'Feedback',
             icon: 'next',
             onPress: () => navigation.navigate('settings-feedback'),
-          },
-          {
-            id: 'pay',
-            title: 'Papers Extras',
-            icon: 'next',
-            onPress: () => navigation.navigate('settings-purchases'),
           },
           {
             id: 'pg',

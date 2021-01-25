@@ -71,8 +71,10 @@ export default function AppFn() {
   }, [])
 
   React.useEffect(() => {
-    Purchases.setDebugLogsEnabled(__DEV__)
-    Purchases.setup(REVENUECAT_PUBLIC_SDK_KEY)
+    if (Platform.OS !== 'web') {
+      Purchases.setDebugLogsEnabled(__DEV__)
+      Purchases.setup(REVENUECAT_PUBLIC_SDK_KEY)
+    }
   }, [])
 
   if (!isLoadingComplete) {

@@ -1,5 +1,6 @@
 import React from 'react'
 import { ScrollView, View } from 'react-native'
+import * as Linking from 'expo-linking'
 
 import { isWeb } from '@constants/layout'
 
@@ -52,17 +53,7 @@ export default function Privacy({ navigation }) {
             <Item
               title="Privacy Policy"
               Icon={IconExternal}
-              onPress={() => console.warn('TODO!! page!!')}
-            />
-            <Item
-              title="Terms of Service"
-              Icon={IconExternal}
-              onPress={() => console.warn('TODO!! page!!')}
-            />
-            <Item
-              title="User Agreement"
-              Icon={IconExternal}
-              onPress={() => console.warn('TODO!! page!!')}
+              onPress={() => Linking.openURL('https://papersgame.com/privacy-policy')}
             />
 
             <View style={Theme.u.listDivider} />
