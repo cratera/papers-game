@@ -1,30 +1,26 @@
 import React from 'react'
-import { StyleSheet, View, Image } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import PropTypes from 'prop-types'
 
 import * as Theme from '@theme'
 
-export default function Avatar({ src, alt, hasMargin, size, stroke, style, ...otherProps }) {
-  const Tag = src ? Image : View
+import * as Avatars from './Illustrations'
 
+export default function Avatar({ src, alt, hasMargin, size, stroke, style, ...otherProps }) {
+  const Avatar = Avatars[src]
   return (
-    <Tag
-      {...(src
-        ? {
-            source: { uri: src },
-            accessibilityLabel: '',
-          }
-        : {})}
+    <View
       style={[
         Styles.avatar,
         { borderWidth: stroke },
-        src && { resizeMode: 'cover' },
         hasMargin && Styles.margin,
         Styles[`size_${size}`],
         style,
       ]}
       {...otherProps}
-    />
+    >
+      {Avatar && <Avatar />}
+    </View>
   )
 }
 

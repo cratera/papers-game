@@ -1,7 +1,9 @@
 import { StyleSheet } from 'react-native'
 import * as Theme from '@theme'
 
-// const vh = Dimensions.get('window').height / 100
+import { window } from '@constants/layout'
+
+const { vw } = window
 
 export default StyleSheet.create({
   main: {
@@ -30,6 +32,23 @@ export default StyleSheet.create({
     marginTop: 4,
     height: 76,
   },
+  avatarList: {
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    flex: 1,
+  },
+  avatarItem: {
+    width: vw * 29,
+    height: vw * 29,
+    marginVertical: vw * 2,
+    borderWidth: 4,
+    borderColor: 'transparent',
+  },
+  avatarItem_active: {
+    borderColor: Theme.colors.grayDark,
+  },
   cta: {
     marginBottom: 16,
   },
@@ -37,17 +56,6 @@ export default StyleSheet.create({
     marginBottom: 56,
     textAlign: 'center',
   },
-  avatarPlace: {
-    width: 160,
-    height: 160,
-    borderColor: Theme.colors.grayDark,
-    borderWidth: 2,
-    alignSelf: 'center',
-  },
-  avatarImg: {
-    resizeMode: 'cover',
-  },
-
   feedback: {
     textAlign: 'center',
     color: Theme.colors.grayMedium,

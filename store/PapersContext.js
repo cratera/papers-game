@@ -556,8 +556,20 @@ export class PapersContextProvider extends Component {
       await AsyncStorage.removeItem('profile_name')
       await AsyncStorage.removeItem('profile_avatar')
       await AsyncStorage.removeItem('profile_groupId')
-      await AsyncStorage.removeItem('profile_settings')
-      await AsyncStorage.removeItem('profile_stats')
+
+      this.setState(state => ({
+        ...state,
+        profile: {
+          ...state.profile,
+          id: undefined,
+          name: undefined,
+          avatar: undefined,
+          groupId: undefined,
+        },
+      }))
+
+      await this.resetProfileSettings()
+      await this.resetProfileStats()
 
       if (this.state.socket) {
         await this.state.socket.resetProfile()
@@ -571,16 +583,12 @@ export class PapersContextProvider extends Component {
       console.warn('error: resetProfile', e)
       Sentry.captureException(e, { tags: { pp_action: 'RP_0' } })
     }
-
-    this.setState(state => ({
-      profile: {},
-    }))
   }
 
   async resetProfileSettings(profile) {
     if (__DEV__) console.log('📌 resetProfileSettings()')
     try {
-      await AsyncStorage.removeItem('profile_settings')
+      await AsyncStorage.setItem('profile_settings', JSON.stringify(settingsDefaults))
     } catch (e) {
       console.warn('error: profile_settings', e)
       Sentry.captureException(e, { tags: { pp_action: 'RPSET_0' } })
@@ -597,7 +605,7 @@ export class PapersContextProvider extends Component {
   async resetProfileStats(profile) {
     if (__DEV__) console.log('📌 resetProfileStats()')
     try {
-      await AsyncStorage.removeItem('profile_stats')
+      await AsyncStorage.setItem('profile_stats', JSON.stringify(statsDefaults))
     } catch (e) {
       console.warn('error: resetProfileStats', e)
       Sentry.captureException(e, { tags: { pp_action: 'RPSTA_0' } })

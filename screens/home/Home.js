@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import * as Analytics from '@constants/analytics.js'
+import Sentry from '@constants/Sentry'
 
 import PapersContext from '@store/PapersContext.js'
 
@@ -32,11 +33,10 @@ export default function HomeScreen({ navigation }) {
   }, [profile.name])
 
   async function handleUpdateProfile(profile) {
-    // Do this here to take advatange of hooks!
     try {
       await Papers.updateProfile(profile)
-    } catch {
-      // hum... later
+    } catch (e) {
+      Sentry.captureException(e, { tags: { pp_action: 'UP_0' } })
     }
   }
 

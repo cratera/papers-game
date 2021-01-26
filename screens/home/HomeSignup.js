@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { TextInput, Text, View } from 'react-native'
+import { TouchableOpacity, TextInput, Text, View } from 'react-native'
 
 import * as Theme from '@theme'
 import Styles from './HomeStyles.js'
@@ -9,6 +9,7 @@ import Styles from './HomeStyles.js'
 import { headerTheme } from '@navigation/headerStuff.js'
 import Page from '@components/page'
 import Button from '@components/button'
+import * as Avatars from '@components/avatar/Illustrations'
 
 import { window } from '@constants/layout'
 
@@ -67,9 +68,11 @@ export default class HomeSignup extends React.Component {
         if (this.state.step === 0 || (this.state.step === 1 && !this.state.name)) {
           return null
         } else if (this.state.step === 2) {
+          if (!this.state.avatar) return null
+
           return (
             <Page.HeaderBtn side="right" primary onPress={this.setProfile}>
-              {this.state.avatar ? 'Done' : 'Skip & Finish'}
+              Done
             </Page.HeaderBtn>
           )
         }
@@ -92,10 +95,13 @@ export default class HomeSignup extends React.Component {
     }[state.step]
 
     return (
-      <Page bgFill={Theme.colors.bg}>
-        <Page.Main headerDivider style={Styles.main}>
+      <Page bgFill={state.step === 0 ? Theme.colors.yellow : Theme.colors.bg}>
+        <Page.Main headerDivider={state.step !== 0} style={Styles.main}>
           <CurrentStep />
         </Page.Main>
+        <Page.CTAs>
+          {state.step === 0 && <Button onPress={this.goNextStep}>Start</Button>}
+        </Page.CTAs>
       </Page>
     )
   }
@@ -108,15 +114,11 @@ export default class HomeSignup extends React.Component {
           style={[
             Theme.typography.secondary,
             Theme.u.center,
-            { marginTop: 16, marginBottom: 72, maxWidth: 300 },
+            { marginTop: 24, marginBottom: 72, maxWidth: 300 },
           ]}
         >
           Papers is the perfect game for your dinner party with friends or family.
         </Text>
-
-        <Button styleTouch={{ width: 300 }} onPress={this.goNextStep}>
-          Start
-        </Button>
       </View>
     )
   }
@@ -145,20 +147,30 @@ export default class HomeSignup extends React.Component {
   stepAvatar() {
     return (
       <View style={{ flex: 1, alignSelf: 'stretch' }}>
-        <View style={{ flex: 1, alignSelf: 'stretch' }}>
-          <Text>Avatar not available yet</Text>
+        <Text style={[Theme.typography.secondary, Theme.u.center, { marginBottom: 16 }]}>
+          Chose your avatar
+        </Text>
+        <View style={Styles.avatarList}>
+          {Object.keys(Avatars).map(key => {
+            const AvatarKey = Avatars[key]
+            return (
+              <TouchableOpacity key={key} onPress={() => this.handleChangeAvatar(key)}>
+                <AvatarKey
+                  style={[Styles.avatarItem, key === this.state.avatar && Styles.avatarItem_active]}
+                />
+              </TouchableOpacity>
+            )
+          })}
         </View>
       </View>
     )
   }
 
   handleChangeAvatar(avatar) {
-    if (avatar) {
-      this.setState(state => ({
-        ...state,
-        avatar,
-      }))
-    }
+    this.setState(state => ({
+      ...state,
+      avatar,
+    }))
   }
 
   goNextStep() {

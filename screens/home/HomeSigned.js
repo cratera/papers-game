@@ -49,7 +49,7 @@ export default function HomeSigned({ navigation }) {
         return profile.name ? <HeaderAvatar avatar={profile.avatar} onPress={goSettings} /> : null
       },
     })
-  }, [profile.name])
+  }, [profile.name, profile.avatar])
 
   function goSettings() {
     navigation.navigate('settings')
