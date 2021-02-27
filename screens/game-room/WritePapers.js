@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import debounce from 'lodash/debounce'
 import { Keyboard, View, TextInput, Text, ScrollView } from 'react-native'
 import Sentry from '@constants/Sentry'
 
@@ -26,7 +25,6 @@ export default function WritePapers({ navigation }) {
   const [distanceFromKb, setDistanceFromKb] = React.useState(null)
   const refSlides = React.useRef()
   const refCTAs = React.useRef()
-  const scrollDebounced = React.useRef(debounce(handleScrollPapers, 450)).current // <300 fucks up scroll on iOS
 
   const [errorMsg, setErrorMsg] = React.useState(null)
   const [isSubmiting, setIsSubmiting] = React.useState(false)
@@ -151,11 +149,8 @@ export default function WritePapers({ navigation }) {
           <ScrollView
             ref={refSlides}
             pagingEnabled
-            scrollEventThrottle={500}
             horizontal
-            onScroll={e => {
-              scrollDebounced(e.nativeEvent.contentOffset.x, paperIndex)
-            }}
+            onMomentumScrollEnd={handleScrollEnd}
             style={[Theme.u.scrollSideOffset, Styles.slides]}
           >
             {renderPapers()}
@@ -215,11 +210,11 @@ export default function WritePapers({ navigation }) {
     return papers
   }
 
-  function handleScrollPapers(scrollX, curPaper) {
-    const newPaper = Math.round(scrollX / (vw * 100))
-    if (curPaper !== newPaper) {
-      setPaperIndex(newPaper)
-    }
+  function handleScrollEnd(e) {
+    const { contentOffset, layoutMeasurement } = e.nativeEvent
+    const paperIndex = Math.floor(contentOffset.x / layoutMeasurement.width)
+
+    setPaperIndex(paperIndex)
   }
 
   function handleWordChange(word, index) {

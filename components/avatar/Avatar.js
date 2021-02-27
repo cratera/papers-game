@@ -4,10 +4,10 @@ import PropTypes from 'prop-types'
 
 import * as Theme from '@theme'
 
-import * as Avatars from './Illustrations'
+import * as avatars from './Illustrations'
 
 export default function Avatar({ src, alt, hasMargin, size, stroke, style, ...otherProps }) {
-  const Avatar = Avatars[src]
+  const Avatar = avatars[src]?.Component
   return (
     <View
       style={[

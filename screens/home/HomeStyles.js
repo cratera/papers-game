@@ -29,8 +29,9 @@ export default StyleSheet.create({
     borderBottomColor: Theme.colors.grayDark,
     borderBottomWidth: 2,
     textAlign: 'center',
-    marginTop: 4,
+    marginTop: 60,
     height: 76,
+    color: Theme.colors.purple,
   },
   avatarList: {
     display: 'flex',

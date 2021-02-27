@@ -4,8 +4,8 @@ import { isTamagoshi } from '@constants/layout'
 
 const variants = {
   primary: {
-    bg: Theme.colors.bg,
-    text: Theme.colors.grayDark,
+    bg: Theme.colors.grayDark,
+    text: Theme.colors.bg,
   },
   success: {
     bg: Theme.colors.success,

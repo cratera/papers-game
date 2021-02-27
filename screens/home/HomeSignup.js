@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { TouchableOpacity, TextInput, Text, View } from 'react-native'
+import { TextInput, Text, View } from 'react-native'
 
 import * as Theme from '@theme'
 import Styles from './HomeStyles.js'
@@ -9,7 +9,7 @@ import Styles from './HomeStyles.js'
 import { headerTheme } from '@navigation/headerStuff.js'
 import Page from '@components/page'
 import Button from '@components/button'
-import * as Avatars from '@components/avatar/Illustrations'
+import AvatarSelector from '@components/avatar/AvatarSelector'
 
 import { window } from '@constants/layout'
 
@@ -126,7 +126,7 @@ export default class HomeSignup extends React.Component {
   stepName() {
     return (
       <View style={{ flex: 1, alignSelf: 'stretch' }}>
-        <Text nativeID="inputNameLabel" style={[Theme.typography.secondary, Theme.u.center]}>
+        <Text nativeID="inputNameLabel" style={[Theme.typography.h3, Theme.u.center]}>
           How should we call you?
         </Text>
         <TextInput
@@ -147,20 +147,13 @@ export default class HomeSignup extends React.Component {
   stepAvatar() {
     return (
       <View style={{ flex: 1, alignSelf: 'stretch' }}>
-        <Text style={[Theme.typography.secondary, Theme.u.center, { marginBottom: 16 }]}>
-          Chose your avatar
+        <Text style={[Theme.typography.h3, Theme.u.center, { marginBottom: 16 }]}>
+          Chose your character
         </Text>
-        <View style={Styles.avatarList}>
-          {Object.keys(Avatars).map(key => {
-            const AvatarKey = Avatars[key]
-            return (
-              <TouchableOpacity key={key} onPress={() => this.handleChangeAvatar(key)}>
-                <AvatarKey
-                  style={[Styles.avatarItem, key === this.state.avatar && Styles.avatarItem_active]}
-                />
-              </TouchableOpacity>
-            )
-          })}
+        <View style={Theme.u.cardEdge}>
+          {/* <View style={Styles.avatarList}> */}
+          <AvatarSelector value={this.state.avatar} onChange={this.handleChangeAvatar} />
+          {/* </View> */}
         </View>
       </View>
     )

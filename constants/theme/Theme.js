@@ -14,13 +14,18 @@ export const colors = {
   danger: '#FF005c',
   bg: '#ffffff',
 
-  green: '#A3C764',
-  pink: '#DE7C9B',
-  purple: '#C299C4',
-  yellow: '#EED486',
-  salmon: '#F2C9AD',
   orange: '#EFA16F',
-  // ....
+  orange_desatured: '#EFBD9E',
+  purple: '#C299C4',
+  purple_desatured: '#C3A3C4',
+  yellow: '#EED486',
+  yellow_desatured: '#EEDA9D',
+  pink: '#DE7C9B',
+  pink_desatured: '#C56E8A',
+  salmon: '#F2C9AD',
+  salmon_desatured: '#F2D7C4',
+  green: '#A3C764',
+  green_desatured: '#B4CF84',
 }
 
 const fontSizeBase = isTamagoshi ? 16 : 18
