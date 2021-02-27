@@ -11,6 +11,10 @@
     "eject": "expo eject",
     "test": "jest --watchAll"
   },
+  "engines": {
+    "npm": "6.x.x",
+    "node": "12.18.2"
+  },
   "jest": {
     "preset": "jest-expo"
   },
