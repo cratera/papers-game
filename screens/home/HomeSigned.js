@@ -8,31 +8,33 @@ import * as Theme from '@theme'
 import Styles from './HomeStyles.js'
 
 import { headerTheme } from '@navigation/headerStuff.js'
+import * as avatars from '@components/avatar/Illustrations'
 
 import Avatar from '@components/avatar'
 import Button from '@components/button'
 import Bubbling from '@components/bubbling'
 import Page from '@components/page'
 
-function HeaderName({ name, onPress }) /* eslint-disable-line */ {
+function HeaderMenu({ name, onPress }) /* eslint-disable-line */ {
   return (
-    <TouchableOpacity style={{ paddingLeft: 24, paddingBottom: 10 }} onPress={onPress}>
-      <Text style={Theme.typography.body}>{name}</Text>
+    <TouchableOpacity style={{ paddingRight: 24, paddingBottom: 10 }} onPress={onPress}>
+      <Text style={Theme.typography.body}>Menu</Text>
     </TouchableOpacity>
   )
 }
 
-function HeaderAvatar({ avatar, onPress }) /* eslint-disable-line */ {
-  return (
-    <TouchableOpacity style={{ paddingRight: 24, paddingBottom: 15 }} onPress={onPress}>
-      <Avatar src={avatar} alt="Settings" />
-    </TouchableOpacity>
-  )
-}
+// function HeaderAvatar({ avatar, onPress }) /* eslint-disable-line */ {
+//   return (
+//     <TouchableOpacity style={{ paddingRight: 24, paddingBottom: 15 }} onPress={onPress}>
+//       <Avatar src={avatar} alt="Settings" />
+//     </TouchableOpacity>
+//   )
+// }
 
 export default function HomeSigned({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const { profile } = Papers.state
+  const avatarBg = avatars[profile.avatar]?.bgColor
 
   React.useEffect(() => {
     navigation.setOptions({
@@ -41,12 +43,12 @@ export default function HomeSigned({ navigation }) {
         hiddenTitle: true,
         bgColor: Theme.colors.purple,
       }),
-      headerLeft: function HBS() {
-        return profile.name ? <HeaderName name={profile.name} onPress={goSettings} /> : null
-      },
+      // headerLeft: function HBS() {
+      //   return profile.name ? <HeaderName name={profile.name} onPress={goSettings} /> : null
+      // },
       headerTitle: profile.name ? 'Home' : 'Create Profile',
       headerRight: function HBS() {
-        return profile.name ? <HeaderAvatar avatar={profile.avatar} onPress={goSettings} /> : null
+        return profile.name ? <HeaderMenu name={profile.name} onPress={goSettings} /> : null
       },
     })
   }, [profile.name, profile.avatar])
@@ -56,15 +58,18 @@ export default function HomeSigned({ navigation }) {
   }
 
   return (
-    <Page bgFill={Theme.colors.purple}>
-      <Bubbling bgStart={Theme.colors.bg} bgEnd={Theme.colors.purple} />
-      <Page.Main headerDivider style={[Styles.main, { justifyContent: 'center' }]}>
-        <Text style={[Theme.typography.h1, { marginBottom: 120 }]}>Papers</Text>
+    <Page bgFill={avatarBg}>
+      <Bubbling bgStart={Theme.colors.bg} bgEnd={avatarBg} />
+      <Page.Main headerDivider style={[Styles.main_signed]}>
+        <Avatar src={profile.avatar} stroke={0} size="xxxl" />
+        <Text style={[Theme.typography.h3]}>{profile.name}</Text>
       </Page.Main>
       <Page.CTAs>
-        <Button onPress={() => openAccessGameModal('create')}>Create Game</Button>
+        <Button variant="blank" onPress={() => openAccessGameModal('create')}>
+          Create Game
+        </Button>
         <Button
-          variant="light"
+          // variant="light"
           style={{ marginTop: 16 }}
           onPress={() => openAccessGameModal('join')}
         >

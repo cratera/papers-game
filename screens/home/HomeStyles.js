@@ -14,6 +14,15 @@ export default StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 40,
   },
+  main_signed: {
+    display: 'flex',
+    flexGrow: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    // backgroundColor: 'red',
+    marginBottom: 250,
+  },
   content: {
     display: 'flex',
     flexGrow: 1,
@@ -69,6 +78,6 @@ export default StyleSheet.create({
     height: 56,
   },
   CTAtutorial_text: {
-    color: Theme.colors.bg,
+    color: Theme.colors.grayDark,
   },
 })

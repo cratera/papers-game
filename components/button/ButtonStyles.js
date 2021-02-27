@@ -15,6 +15,10 @@ const variants = {
     bg: Theme.colors.danger,
     text: Theme.colors.bg,
   },
+  blank: {
+    bg: Theme.colors.bg,
+    text: Theme.colors.grayDark,
+  },
   light: {
     bg: 'transparent',
     text: Theme.colors.grayDark,
@@ -36,7 +40,7 @@ const styles = StyleSheet.create({
   base: {
     minHeight: isTamagoshi ? 54 : 66,
     // maxWidth: 800,
-    borderRadius: 4,
+    borderRadius: 12,
     paddingHorizontal: 16,
     overflow: 'hidden', // so borderRadius works.
     display: 'flex',
@@ -105,9 +109,9 @@ const styles = StyleSheet.create({
 })
 
 const stylesSize = {
-  default: 16,
+  default: 18,
   sm: 14,
-  lg: 16,
+  lg: 18,
 }
 
 // TODO Later - This code is 💩...

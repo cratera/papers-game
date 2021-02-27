@@ -70,11 +70,12 @@ export default class HomeSignup extends React.Component {
         } else if (this.state.step === 2) {
           if (!this.state.avatar) return null
 
-          return (
-            <Page.HeaderBtn side="right" primary onPress={this.setProfile}>
-              Done
-            </Page.HeaderBtn>
-          )
+          return null
+          //  (
+          //   <Page.HeaderBtn side="right" primary onPress={this.setProfile}>
+          //     Done
+          //   </Page.HeaderBtn>
+          // )
         }
 
         return (
@@ -94,13 +95,17 @@ export default class HomeSignup extends React.Component {
       2: this.stepAvatar,
     }[state.step]
 
+    console.log('xx', this.state.avatar)
     return (
-      <Page bgFill={state.step === 0 ? Theme.colors.yellow : Theme.colors.bg}>
+      <Page bgFill={/*state.step === 0 ? Theme.colors.yellow : */ Theme.colors.bg}>
         <Page.Main headerDivider={state.step !== 0} style={Styles.main}>
           <CurrentStep />
         </Page.Main>
         <Page.CTAs>
           {state.step === 0 && <Button onPress={this.goNextStep}>Start</Button>}
+          {state.step === 2 && state.avatar && <Button onPress={this.setProfile}>Choose</Button>}
+
+          {/* {state.step === 1 && <Button onPress={this.goNextStep}>Choose</Button>} */}
         </Page.CTAs>
       </Page>
     )
@@ -110,7 +115,7 @@ export default class HomeSignup extends React.Component {
     return (
       <View style={[Styles.content]}>
         <Text style={[Theme.typography.h2, Theme.u.center, { marginTop: -25 * vh }]}>Welcome!</Text>
-        <Text
+        {/* <Text
           style={[
             Theme.typography.secondary,
             Theme.u.center,
@@ -118,7 +123,7 @@ export default class HomeSignup extends React.Component {
           ]}
         >
           Papers is the perfect game for your dinner party with friends or family.
-        </Text>
+        </Text> */}
       </View>
     )
   }
@@ -152,7 +157,11 @@ export default class HomeSignup extends React.Component {
         </Text>
         <View style={Theme.u.cardEdge}>
           {/* <View style={Styles.avatarList}> */}
-          <AvatarSelector value={this.state.avatar} onChange={this.handleChangeAvatar} />
+          <AvatarSelector
+            value={this.state.avatar}
+            onChange={this.handleChangeAvatar}
+            isChangeOnMount
+          />
           {/* </View> */}
         </View>
       </View>
@@ -160,6 +169,7 @@ export default class HomeSignup extends React.Component {
   }
 
   handleChangeAvatar(avatar) {
+    console.log('change', avatar)
     this.setState(state => ({
       ...state,
       avatar,

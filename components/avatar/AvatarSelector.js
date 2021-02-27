@@ -60,12 +60,24 @@ function shuffleAvatarsGroups() {
   })
 }
 
-export default function AvatarSelector({ defaultValue, value, onChange }) {
+export default function AvatarSelector({ defaultValue, value, onChange, isChangeOnMount }) {
   const avatarsListGrouped = React.useMemo(() => shuffleAvatarsGroups(), []) || []
   const avatarsList = avatarsListGrouped.flat()
   const refSlides = React.useRef()
 
   // TODO - optimistic behavior
+
+  React.useEffect(() => {
+    // Ensure slides is scrolled at the right position
+    const slideIndex = avatarsList.findIndex(config => config.key === defaultValue)
+    if (slideIndex) {
+      refSlides.current.scrollTo({ x: vw * 90 * slideIndex - 22 })
+    }
+
+    if (isChangeOnMount) {
+      onChange(avatarsList[0].key)
+    }
+  }, [])
 
   function handleScrollEnd(e) {
     const { contentOffset, layoutMeasurement } = e.nativeEvent
@@ -76,14 +88,6 @@ export default function AvatarSelector({ defaultValue, value, onChange }) {
     console.log('avatarName', avatarName, pageIxSafe)
     onChange(avatarName)
   }
-
-  React.useEffect(() => {
-    // Ensure slides is scrolled at the right position
-    const slideIndex = avatarsList.findIndex(config => config.key === defaultValue)
-    if (slideIndex) {
-      refSlides.current.scrollTo({ x: vw * 90 * slideIndex - 22 })
-    }
-  }, [])
 
   return (
     <>
@@ -113,6 +117,8 @@ AvatarSelector.propTypes = {
   value: PropTypes.string,
   defaultValue: PropTypes.string,
   onChange: PropTypes.func,
+  /** set the first avatar */
+  isChangeOnMount: PropTypes.bool,
 }
 
 const Styles = StyleSheet.create({

@@ -6,7 +6,7 @@ import * as Theme from '@theme'
 
 import * as avatars from './Illustrations'
 
-export default function Avatar({ src, alt, hasMargin, size, stroke, style, ...otherProps }) {
+export default function Avatar({ src, hasMargin, size, stroke, style, ...otherProps }) {
   const Avatar = avatars[src]?.Component
   return (
     <View
@@ -31,7 +31,6 @@ Avatar.defaultProps = {
 
 Avatar.propTypes = {
   src: PropTypes.string,
-  alt: PropTypes.string.isRequired,
   hasMargin: PropTypes.bool,
   style: PropTypes.any,
   size: PropTypes.oneOf(['md', 'lg', 'll', 'xl', 'xxl']),
@@ -40,7 +39,7 @@ Avatar.propTypes = {
 
 const Styles = StyleSheet.create({
   avatar: {
-    backgroundColor: Theme.colors.primaryLight,
+    // backgroundColor: Theme.colors.primaryLight,
     borderColor: Theme.colors.grayDark,
   },
   margin: {
@@ -65,5 +64,9 @@ const Styles = StyleSheet.create({
   size_xxl: {
     width: 120,
     height: 120,
+  },
+  size_xxxl: {
+    width: 295,
+    height: 295,
   },
 })
