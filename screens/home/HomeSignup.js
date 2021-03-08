@@ -97,7 +97,7 @@ export default class HomeSignup extends React.Component {
 
     console.log('xx', this.state.avatar)
     return (
-      <Page bgFill={/*state.step === 0 ? Theme.colors.yellow : */ Theme.colors.bg}>
+      <Page bgFill={/* state.step === 0 ? Theme.colors.yellow : */ Theme.colors.bg}>
         <Page.Main headerDivider={state.step !== 0} style={Styles.main}>
           <CurrentStep />
         </Page.Main>

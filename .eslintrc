@@ -14,5 +14,28 @@
   },
   "rules": {
     "prettier/prettier": "error"
+    // "import/order": [
+    //   "warn",
+    //   {
+    //     "groups": ["builtin", "external", "parent"],
+    //     "pathGroups": [
+    //       {
+    //         "pattern": "@components/**",
+    //         "group": "parent",
+    //         "position": "before"
+    //       },
+    //       {
+    //         "pattern": "@constants/**",
+    //         "group": "parent",
+    //         "position": "before"
+    //       }
+    //     ],
+    //     "newlines-between": "always",
+    //     "alphabetize": {
+    //       "order": "asc" /* sort in ascending order. Options: ['ignore', 'asc', 'desc'] */,
+    //       "caseInsensitive": true /* ignore case. Options: [true, false] */
+    //     }
+    //   }
+    // ]
   }
 }

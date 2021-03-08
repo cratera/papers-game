@@ -15,7 +15,7 @@ const cardsSize = vw * 90
 
 function AvatarBtn({
   avatarConfig,
-  //onPress,
+  // onPress,
   isActive,
   ...props
 }) {
