@@ -21,30 +21,47 @@ const { vw } = window
 
 const tutorialConfig = [
   {
+    title: 'Welcome to Papers!',
+    detail:
+      'Papers is a game where you compete with your friends. Who guesses the most words, wins!',
+    Illustration: IllustrationPersonGroup,
+  },
+  {
     title: 'Call your friends',
-    detail: 'You need at least 3 more friends',
-    bgFill: Theme.colors.purple,
+    detail: function Detail() {
+      return (
+        <Text>
+          You need at least <Text style={Styles.hightlight}>4 friends</Text> in total to play the
+          game.{' '}
+        </Text>
+      )
+    },
     Illustration: IllustrationPersonCalling,
   },
   {
-    title: 'Get creative',
-    detail:
-      'Write down 10 unique words, sentences, expressions... Keep them secret! Your friends will have to guess these later.',
-    bgFill: Theme.colors.orange,
+    title: 'Create your papers',
+    detail: function Detail() {
+      return (
+        <Text>
+          Write down <Text style={Styles.hightlight}>10 unique words</Text>, sentences,
+          expressions... Keep them secret! Your friends will have to guess these later.
+        </Text>
+      )
+    },
     Illustration: IllustrationPersonThink,
   },
   {
     title: 'Start guessing!',
-    detail:
-      'Every team gets 1 minute to guess as many papers as they can. but pay attention. Each round has different rules.',
+    detail: function Detail() {
+      return (
+        <Text>
+          Every team gets <Text style={Styles.hightlight}>45 seconds</Text> to guess as many papers
+          as they can. But pay attention. Each round has different rules.
+        </Text>
+      )
+    },
     bgFill: Theme.colors.yellow,
     Illustration: IllustrationPersonGuess,
-  },
-  {
-    title: 'Have fun!',
-    detail: 'The main goal is for you and your friends to enjoy yourselves. ',
-    bgFill: Theme.colors.green,
-    Illustration: IllustrationPersonGroup,
   },
 ]
 
@@ -73,7 +90,7 @@ export default function Tutorial({ navigation }) {
   }, [stepIndex])
 
   return (
-    <Page bgFill={tutorialConfig[stepIndex].bgFill}>
+    <Page bgFill={Theme.colors.bg}>
       <Page.Main>
         <ScrollView
           ref={refSlider}
@@ -88,30 +105,19 @@ export default function Tutorial({ navigation }) {
       </Page.Main>
       <Page.CTAs>
         <View style={Styles.ctas}>
-          <Button
-            variant="icon"
-            size="lg"
-            style={[Styles.ctas_btn]}
-            styleTouch={[stepIndex === 0 && Styles.ctas_btn_isHidden]}
-            onPress={() => stepIndex !== 0 && handleClickPrev()}
-          >
-            <IconArrow
-              size={20}
-              color={Theme.colors.grayDark}
-              style={{ transform: [{ rotate: '180deg' }] }}
-            />
-          </Button>
-          <View style={Styles.status} />
-
-          <Button
-            variant="icon"
-            size="lg"
-            style={Styles.ctas_btn}
-            styleTouch={[stepIndex === stepTotal - 1 && Styles.ctas_btn_isHidden]}
-            onPress={() => stepIndex !== stepTotal - 1 && handleClickNext()}
-          >
-            <IconArrow size={20} color={Theme.colors.grayDark} />
-          </Button>
+          {stepIndex !== stepTotal - 1 ? (
+            <Button
+              variant="light"
+              size="lg"
+              onPress={() => stepIndex !== stepTotal - 1 && handleClickNext()}
+            >
+              Next
+            </Button>
+          ) : (
+            <Button variant="primary" size="lg" onPress={navigation.goBack}>
+              Start
+            </Button>
+          )}
         </View>
       </Page.CTAs>
     </Page>
@@ -136,10 +142,6 @@ export default function Tutorial({ navigation }) {
     setStepIndex(Math.max(Math.min(stepTotal, pageIndex)), 0)
   }
 
-  function handleClickPrev() {
-    setStepIndex(Math.max(0, stepIndex - 1))
-  }
-
   function handleClickNext() {
     setStepIndex(index => index + 1)
   }
@@ -153,19 +155,33 @@ Tutorial.propTypes = {
 
 const TutorialStep = ({ isActive, ix, stepTotal }) => {
   const Illustration = tutorialConfig[ix].Illustration
+  const Detail = tutorialConfig[ix].detail
   return (
     <View style={[Styles.step, isActive && Styles.step_isActive]}>
       <View style={Styles.media}>
         <Illustration style={Styles.illustration} />
       </View>
-
-      <Text style={[Theme.typography.small, Theme.u.center]}>
-        Step {ix + 1} out of {stepTotal}
-      </Text>
-      <Text style={[Theme.typography.h3, Theme.u.center, { marginVertical: 8 }]}>
-        {tutorialConfig[ix].title}
-      </Text>
-      <Text style={[Theme.typography.body, Theme.u.center]}>{tutorialConfig[ix].detail}</Text>
+      <View style={Styles.content}>
+        {
+          <Text
+            style={[
+              Theme.typography.small,
+              Theme.u.center,
+              ix === 0 && {
+                opacity: 0,
+              },
+            ]}
+          >
+            Step {ix} out of {stepTotal}
+          </Text>
+        }
+        <Text style={[Theme.typography.h3, Theme.u.center, { marginVertical: 8 }]}>
+          {tutorialConfig[ix].title}
+        </Text>
+        <Text style={[Theme.typography.body, Theme.u.center]}>
+          {typeof Detail === 'string' ? Detail : <Detail />}
+        </Text>
+      </View>
     </View>
   )
 }

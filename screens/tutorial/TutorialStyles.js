@@ -24,27 +24,18 @@ export default StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'center',
-    flexGrow: 1,
   },
   illustration: {
     width: 60 * vw,
-  },
-  status: {
+    height: 90 * vw,
     flexGrow: 1,
   },
-  ctas: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 0,
-    paddingTop: 8,
-    paddingBottom: 8,
+  content: {
+    marginTop: 24,
+    minHeight: 150, // ~4 lines iphone 5
   },
-  ctas_btn: {
-    // backgroundColor: Theme.colors.primary,
-  },
-  ctas_btn_isHidden: {
-    opacity: 0,
-    // pointerEvents: 'none',
+  ctas: {},
+  hightlight: {
+    color: Theme.colors.pink,
   },
 })
