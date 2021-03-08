@@ -65,24 +65,13 @@ export default class HomeSignup extends React.Component {
               </Page.HeaderBtn>
             ),
       headerRight: () => {
-        if (this.state.step === 0 || (this.state.step === 1 && !this.state.name)) {
-          return null
-        } else if (this.state.step === 2) {
-          if (!this.state.avatar) return null
-
-          return null
-          //  (
-          //   <Page.HeaderBtn side="right" primary onPress={this.setProfile}>
-          //     Done
-          //   </Page.HeaderBtn>
-          // )
+        if (this.state.step === 0 && this.state.name) {
+          return (
+            <Page.HeaderBtn side="right" icon="next" textPrimary onPress={this.goNextStep}>
+              Next
+            </Page.HeaderBtn>
+          )
         }
-
-        return (
-          <Page.HeaderBtn side="right" icon="next" textPrimary onPress={this.goNextStep}>
-            Next
-          </Page.HeaderBtn>
-        )
       },
     })
   }
@@ -90,9 +79,9 @@ export default class HomeSignup extends React.Component {
   render() {
     const state = this.state
     const CurrentStep = {
-      0: this.stepWelcome,
-      1: this.stepName,
-      2: this.stepAvatar,
+      // 0: this.stepWelcome,
+      0: this.stepName,
+      1: this.stepAvatar,
     }[state.step]
 
     console.log('xx', this.state.avatar)
@@ -103,7 +92,7 @@ export default class HomeSignup extends React.Component {
         </Page.Main>
         <Page.CTAs>
           {state.step === 0 && <Button onPress={this.goNextStep}>Start</Button>}
-          {state.step === 2 && state.avatar && <Button onPress={this.setProfile}>Choose</Button>}
+          {state.step === 1 && state.avatar && <Button onPress={this.setProfile}>Choose</Button>}
 
           {/* {state.step === 1 && <Button onPress={this.goNextStep}>Choose</Button>} */}
         </Page.CTAs>

@@ -8,10 +8,12 @@ import PapersContext from '@store/PapersContext.js'
 
 import HomeSigned from './HomeSigned.js'
 import HomeSignup from './HomeSignup.js'
+import Tutorial from '../tutorial'
 
 export default function HomeScreen({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const { profile, game } = Papers.state
+  const [isTutorialDone, setIsTutorialDone] = React.useState(false)
   const gameId = game?.id
 
   React.useEffect(() => {
@@ -38,6 +40,10 @@ export default function HomeScreen({ navigation }) {
     } catch (e) {
       Sentry.captureException(e, { tags: { pp_action: 'UP_0' } })
     }
+  }
+
+  if (!isTutorialDone) {
+    return <Tutorial isMandatory navigation={navigation} onDone={() => setIsTutorialDone(true)} />
   }
 
   return !profile.name ? (

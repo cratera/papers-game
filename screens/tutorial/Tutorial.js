@@ -67,20 +67,22 @@ const tutorialConfig = [
 
 const stepTotal = tutorialConfig.length
 
-export default function Tutorial({ navigation }) {
+export default function Tutorial({ navigation, isMandatory, onDone }) {
   const refSlider = React.useRef()
   const [stepIndex, setStepIndex] = React.useState(0)
 
   React.useEffect(() => {
     Analytics.setCurrentScreen('tutorial')
     navigation.setOptions({
-      headerLeft: function HLB() {
-        return (
-          <Page.HeaderBtn side="left" onPress={navigation.goBack}>
-            Close
-          </Page.HeaderBtn>
-        )
-      },
+      headerLeft: isMandatory
+        ? null
+        : function HLB() {
+            return (
+              <Page.HeaderBtn side="left" onPress={navigation.goBack}>
+                Close
+              </Page.HeaderBtn>
+            )
+          },
     })
   }, [])
 
@@ -88,6 +90,14 @@ export default function Tutorial({ navigation }) {
     // Ensure slides is scrolled at the right position
     refSlider.current.scrollTo({ x: vw * 100 * stepIndex })
   }, [stepIndex])
+
+  function handleOnStart() {
+    if (onDone) {
+      onDone()
+    } else {
+      navigation.goBack()
+    }
+  }
 
   return (
     <Page bgFill={Theme.colors.bg}>
@@ -114,8 +124,8 @@ export default function Tutorial({ navigation }) {
               Next
             </Button>
           ) : (
-            <Button variant="primary" size="lg" onPress={navigation.goBack}>
-              Start
+            <Button variant="primary" size="lg" onPress={handleOnStart}>
+              {isMandatory ? 'Start' : 'Play!'}
             </Button>
           )}
         </View>
@@ -149,6 +159,9 @@ export default function Tutorial({ navigation }) {
 
 Tutorial.propTypes = {
   navigation: PropTypes.object.isRequired, // react-navigation
+  /** When true, does not allow exit */
+  isMandatory: PropTypes.bool,
+  onDone: PropTypes.func,
 }
 
 // ===============
