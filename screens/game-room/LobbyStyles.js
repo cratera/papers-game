@@ -3,9 +3,9 @@ import { StyleSheet } from 'react-native'
 
 export default StyleSheet.create({
   header: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
+    // display: 'flex',
+    // flexDirection: 'column',
+    // alignItems: 'center',
     paddingTop: 24,
     paddingBottom: 24,
   },

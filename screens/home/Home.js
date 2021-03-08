@@ -42,7 +42,7 @@ export default function HomeScreen({ navigation }) {
     }
   }
 
-  if (!isTutorialDone) {
+  if (!isTutorialDone && !profile.name) {
     return <Tutorial isMandatory navigation={navigation} onDone={() => setIsTutorialDone(true)} />
   }
 

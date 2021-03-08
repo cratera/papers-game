@@ -18,11 +18,13 @@ const i18n = {
   description: 'Your friends will use this to join.',
 }
 
+const nameMaxSize = 16
+
 export default function CreateGame({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const [isCreating, setCreating] = React.useState(false)
   const [state, setState] = React.useState({
-    gameName: null,
+    gameName: '',
     isInvalid: false,
     errorMsg: null,
     isUnexError: false,
@@ -107,7 +109,7 @@ export default function CreateGame({ navigation }) {
             <LoadingBadge variant="page">Creating game</LoadingBadge>
           ) : (
             <>
-              <Text style={[Styles.title, Theme.typography.body]}>{i18n.title}</Text>
+              <Text style={[Styles.title, Theme.typography.h3]}>{i18n.title}</Text>
 
               <TextInput
                 style={[Theme.typography.h2, Styles.input]}
@@ -118,7 +120,7 @@ export default function CreateGame({ navigation }) {
                 defaultValue={state.gameName}
                 placeholder="Choose a name..."
                 placeholderTextColor={Theme.colors.grayLight}
-                maxLength={16}
+                maxLength={nameMaxSize}
                 onChangeText={handleInputChange}
               />
               {state.isInvalid && (
@@ -131,9 +133,22 @@ export default function CreateGame({ navigation }) {
                   {state.errorMsg}
                 </Text>
               )}
-              <Text nativeID="inputNameLabel" style={[Styles.tip, Theme.typography.secondary]}>
-                {i18n.description}
-              </Text>
+              <View style={Styles.tip}>
+                <Text nativeID="inputNameLabel" style={[Theme.typography.small]}>
+                  {i18n.description}
+                </Text>
+                <Text
+                  nativeID="inputNameLabel"
+                  style={[
+                    Theme.typography.small,
+                    state.gameName.length === nameMaxSize && {
+                      color: Theme.colors.danger,
+                    },
+                  ]}
+                >
+                  {state.gameName.length} / {nameMaxSize}
+                </Text>
+              </View>
             </>
           )}
         </View>

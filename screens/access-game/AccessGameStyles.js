@@ -7,16 +7,19 @@ export default StyleSheet.create({
     marginTop: 40,
   },
   tip: {
-    textAlign: 'center',
-    marginTop: 24,
+    marginTop: 16,
     marginBottom: 0,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
+  // TODO component TextField
   input: {
     borderBottomColor: Theme.colors.grayDark,
     borderBottomWidth: 2,
     textAlign: 'center',
     marginTop: 4,
-    color: Theme.colors.grayDark,
+    color: Theme.colors.pink,
     height: 76,
   },
   code: {

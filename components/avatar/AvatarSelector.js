@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { StyleSheet, ScrollView, View } from 'react-native'
+import { StyleSheet, TouchableOpacity, ScrollView, View } from 'react-native'
 
 import { window } from '@constants/layout'
 
@@ -13,24 +13,19 @@ const avatarsTotal = avatarsByName.length
 const { vw } = window
 const cardsSize = vw * 90
 
-function AvatarBtn({
-  avatarConfig,
-  // onPress,
-  isActive,
-  ...props
-}) {
+function AvatarBtn({ avatarConfig, onPress, isActive, ...props }) {
   if (!avatarConfig) return null
   const AvatarSvg = avatarConfig.Component
   if (!AvatarSvg) return null
 
   return (
-    // <TouchableOpacity onPress={onPress} {...props}>
-    <View style={[Styles.avatarItem, isActive && Styles.avatarItem_active]}>
-      <View style={[Styles.avatarArea, { backgroundColor: avatarConfig.bgColor }]}>
-        <AvatarSvg />
+    <TouchableOpacity onPress={onPress} {...props}>
+      <View style={[Styles.avatarItem, isActive && Styles.avatarItem_active]}>
+        <View style={[Styles.avatarArea, { backgroundColor: avatarConfig.bgColor }]}>
+          <AvatarSvg />
+        </View>
       </View>
-    </View>
-    // </TouchableOpacity>
+    </TouchableOpacity>
   )
 }
 
@@ -41,6 +36,7 @@ AvatarBtn.propTypes = {
     Component: PropTypes.function,
   }),
   isActive: PropTypes.bool,
+  onPress: PropTypes.func,
 }
 
 function shuffleAvatarsGroups() {
@@ -89,6 +85,12 @@ export default function AvatarSelector({ defaultValue, value, onChange, isChange
     onChange(avatarName)
   }
 
+  function handleAvatarPress(key) {
+    // const avatarName = avatarsList[key].key
+    // console.log('avatarName', avatarName)
+    onChange(key)
+  }
+
   return (
     <>
       {/* <View></View> */}
@@ -106,7 +108,14 @@ export default function AvatarSelector({ defaultValue, value, onChange, isChange
 
         {avatarsList.map(avatarConfig => {
           const { key } = avatarConfig
-          return <AvatarBtn key={key} avatarConfig={avatarConfig} isActive={key === value} />
+          return (
+            <AvatarBtn
+              onPress={() => handleAvatarPress(key)}
+              key={key}
+              avatarConfig={avatarConfig}
+              isActive={key === value}
+            />
+          )
         })}
       </ScrollView>
     </>

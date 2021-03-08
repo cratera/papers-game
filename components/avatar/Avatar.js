@@ -7,19 +7,24 @@ import * as Theme from '@theme'
 import * as avatars from './Illustrations'
 
 export default function Avatar({ src, hasMargin, size, stroke, style, ...otherProps }) {
-  const Avatar = avatars[src]?.Component
+  const avatar = avatars[src]
+  const Illustration = avatar?.Component
+  console.log('src', src)
   return (
     <View
       style={[
         Styles.avatar,
-        { borderWidth: stroke },
+        {
+          backgroundColor: avatar?.bgColor,
+        },
+        // { borderWidth: stroke },
         hasMargin && Styles.margin,
         Styles[`size_${size}`],
         style,
       ]}
       {...otherProps}
     >
-      {Avatar && <Avatar />}
+      {Illustration && <Illustration />}
     </View>
   )
 }
@@ -40,7 +45,8 @@ Avatar.propTypes = {
 const Styles = StyleSheet.create({
   avatar: {
     // backgroundColor: Theme.colors.primaryLight,
-    borderColor: Theme.colors.grayDark,
+    // borderColor: Theme.colors.grayDark,
+    borderRadius: 12,
   },
   margin: {
     marginRight: 16,
@@ -50,8 +56,8 @@ const Styles = StyleSheet.create({
     height: 40,
   },
   size_lg: {
-    width: 56,
-    height: 56,
+    width: 64,
+    height: 64,
   },
   size_ll: {
     width: 88,

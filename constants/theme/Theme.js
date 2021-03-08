@@ -48,6 +48,11 @@ export const typography = StyleSheet.create({
     fontSize: 24,
     color: colors.grayDark,
   },
+  h4: {
+    fontFamily: 'YoungSerif-Regular',
+    fontSize: 16,
+    color: colors.grayDark,
+  },
   display: {
     fontFamily: 'Karla-Regular',
     fontSize: 24,

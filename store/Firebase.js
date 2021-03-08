@@ -207,7 +207,8 @@ async function _avatarDelete({ path, fileName }) {
  */
 async function updateProfile(profile) {
   if (__DEV__) console.log('⚙️ updateProfile()', profile)
-  const { avatar, ...theProfile } = profile
+
+  const { /* avatar, */ ...theProfile } = profile
 
   try {
     // TODO/REFACTOR: Disabled this after updating to Expo SDK40.

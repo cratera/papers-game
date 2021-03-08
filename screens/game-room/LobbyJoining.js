@@ -29,6 +29,7 @@ export default function LobbyJoining({ navigation }) {
   const playersKeys = hasGame ? Object.keys(game.players) : []
   const neededPlayers = playersKeys.length < 4 // FIX THIS SUPPORT >4
   const wordsAreStored = !!game?.words?.[profileId]
+  const canCreateTeam = profileIsAdmin && !neededPlayers && !hasTeams
 
   React.useEffect(() => {
     navigation.setOptions({
@@ -44,20 +45,20 @@ export default function LobbyJoining({ navigation }) {
   }, [])
 
   React.useEffect(() => {
-    if (profileIsAdmin && !neededPlayers && !hasTeams) {
+    if (canCreateTeam) {
       navigation.setOptions({
-        headerRight: function HLB() {
-          return (
-            <Page.HeaderBtn
-              side="right"
-              icon="next"
-              textPrimary
-              onPress={() => navigation.navigate('teams')}
-            >
-              Teams
-            </Page.HeaderBtn>
-          )
-        },
+        // headerRight: function HLB() {
+        //   return (
+        //     <Page.HeaderBtn
+        //       side="right"
+        //       icon="next"
+        //       textPrimary
+        //       onPress={() => navigation.navigate('teams')}
+        //     >
+        //       Teams
+        //     </Page.HeaderBtn>
+        //   )
+        // },
       })
     } else if (hasTeams) {
       navigation.setOptions({
@@ -70,7 +71,7 @@ export default function LobbyJoining({ navigation }) {
         headerRight: null,
       })
     }
-  }, [profileIsAdmin, neededPlayers, hasTeams])
+  }, [hasTeams, canCreateTeam])
 
   React.useEffect(() => {
     if (hasTeams) {
@@ -106,15 +107,14 @@ export default function LobbyJoining({ navigation }) {
   }
 
   return (
-    <Page bgFill={Theme.colors.yellow}>
+    <Page>
       <Bubbling bgStart={Theme.colors.bg} bgEnd={Theme.colors.yellow} />
       <Page.Main headerDivider>
         {!game.teams ? (
           <>
-            <View style={[Styles.header, Theme.u.cardEdge]}>
-              <Text style={[Theme.typography.secondary]}>Ask your friends to join</Text>
+            <View style={[Styles.header]}>
               <Text style={[Styles.header_title, Theme.typography.h1]}>{game.name}</Text>
-              <Text style={[Theme.typography.body]} accessibilityLabel={game.code.toString()}>
+              <Text style={[Theme.typography.secondary]} accessibilityLabel={game.code.toString()}>
                 {game.code.toString().split('').join('・')}
               </Text>
             </View>
@@ -125,6 +125,7 @@ export default function LobbyJoining({ navigation }) {
             >
               <ListPlayers players={playersKeys} enableKickout />
 
+              {/*  TODO CONTINUE HERE */}
               {neededPlayers ? (
                 <Text style={[Theme.typography.secondary, Theme.u.center, { marginTop: 16 }]}>
                   Need {4 - playersKeys.length} more
@@ -139,6 +140,16 @@ export default function LobbyJoining({ navigation }) {
         )}
       </Page.Main>
       <Page.CTAs hasOffset={profileIsAdmin && !neededPlayers}>
+        {canCreateTeam ? (
+          <Button onPress={goToWritePapers}>Create teams</Button>
+        ) : (
+          <Button onPress={goToWritePapers}>Need x players</Button>
+        )}
+        {/* {neededPlayers ? (
+          <Text style={[Theme.typography.secondary, Theme.u.center]}>
+            Need {4 - playersKeys.length} more
+          </Text>
+        ) : null} */}
         {game.teams ? <Button onPress={goToWritePapers}>Write papers</Button> : null}
         {__DEV__ && game.teams && profileIsAdmin && (
           <Button

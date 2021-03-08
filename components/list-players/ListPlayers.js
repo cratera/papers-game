@@ -102,12 +102,12 @@ export default function ListPlayers({
             <View key={playerId} style={[Styles.item, isLastChild && Styles.item_isLast]}>
               <View style={Styles.who}>
                 {!isStatusVisible || (isStatusVisible && wordsSubmitted) ? (
-                  <Avatar src={avatar} hasMargin alt="" />
+                  <Avatar src={avatar} size="lg" hasMargin alt="" />
                 ) : (
                   <LoadingAvatar />
                 )}
                 <View style={Styles.who_text}>
-                  <Text style={Theme.typography.body}>
+                  <Text style={Theme.typography.h4}>
                     {name}
                     {playerId === profileId && <Text> (you)</Text>}
                   </Text>
