@@ -6,10 +6,9 @@ import Sentry from '@constants/Sentry'
 import * as Analytics from '@constants/analytics.js'
 
 import PapersContext from '@store/PapersContext.js'
-
 import Button from '@components/button'
 import Page from '@components/page'
-import { IconArrow } from '@components/icons'
+import { IconCheck, IconArrow, IllustrationSmile } from '@components/icons'
 import * as Theme from '@theme'
 import Styles from './WritePapersStyles.js'
 
@@ -21,6 +20,7 @@ export default function WritePapers({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const { game, profile } = Papers.state
   const [words, setLocalWords] = React.useState([])
+  const [isOnTutorial, setIsOnTutorial] = React.useState(true)
   const [kbHeight, setkbHeight] = React.useState(null) // kb = keyboard
   const [distanceFromKb, setDistanceFromKb] = React.useState(null)
   const refSlides = React.useRef()
@@ -31,7 +31,7 @@ export default function WritePapers({ navigation }) {
   const [paperIndex, setPaperIndex] = React.useState(0)
 
   const wordsGoal = game.settings.words
-  const wordsCount = words.filter(word => !!word).length
+  const wordsCount = words.filter(word => !!word && !!word.trim()).length
   const wordsAreStored = !!game.words && !!game.words[profile.id]
   const isAllWordsDone = wordsCount === 10
 
@@ -53,50 +53,17 @@ export default function WritePapers({ navigation }) {
   }, [])
 
   React.useEffect(() => {
-    const isMounted = true // TODO avoid a memory leak here caused by isSubmiting (finished)
-    if (isAllWordsDone && isMounted) {
-      navigation.setOptions({
-        headerRight: function HLB() {
-          return (
-            <Page.HeaderBtn
-              side="right"
-              textPrimary
-              isLoading={isSubmiting}
-              onPress={handleSubmitClick}
-            >
-              Finish
-            </Page.HeaderBtn>
-          )
-        },
-      })
-    } else {
-      navigation.setOptions({
-        headerRight: function HLB() {
-          return (
-            <View>
-              <Text style={{ color: Theme.colors.grayLight }}>
-                {Math.round((100 * wordsCount) / wordsGoal)}% done
-                {/* Quickest way to create a white space. marginRight/with didn't worked */}
-                <Text style={{ color: 'transparent' }}>__</Text>
-              </Text>
-            </View>
-          )
-        },
-      })
-    }
-    // Pass words as dependency so that "Finish" has the most recent words on submit.
-  }, [isAllWordsDone, words, wordsGoal, wordsCount, isSubmiting])
-
-  React.useEffect(() => {
     const onKeyboardDidShow = e => {
-      const kbHeight = e.endCoordinates.height
-      setkbHeight(kbHeight)
+      const newKbHeight = e.endCoordinates.height
+      setkbHeight(newKbHeight)
       setTimeout(() => {})
+
       refCTAs.current.measure((x, y, ctaW, ctaH, pX, pY) => {
         const vh100 = vh * 100
         const pYEnd = pY + ctaH
-        const space = 8
-        const distance = vh100 - (pYEnd + kbHeight) - space
+        const space = 16
+        const distance = vh100 - (pYEnd + newKbHeight) - space
+
         setDistanceFromKb(Math.round(distance))
       })
     }
@@ -105,7 +72,10 @@ export default function WritePapers({ navigation }) {
       if (!kbHeight) setkbHeight(0)
     }, 1500)
 
-    Keyboard.addListener('keyboardDidShow', onKeyboardDidShow)
+    // Prevent kb flickrs. BUG workaround
+    if (!kbHeight) {
+      Keyboard.addListener('keyboardDidShow', onKeyboardDidShow)
+    }
     return () => {
       clearTimeout(KBfallback)
       Keyboard.removeListener('keyboardDidShow', onKeyboardDidShow)
@@ -125,68 +95,11 @@ export default function WritePapers({ navigation }) {
   }, [wordsAreStored])
 
   React.useEffect(() => {
-    // Ensure slides is scrolled at the right position
-    refSlides.current.scrollTo({ x: vw * 100 * paperIndex })
-  }, [paperIndex])
-
-  return (
-    <Page bannerMsg={errorMsg}>
-      <Page.Main headerDivider>
-        <View style={[Styles.header]}>
-          <Text style={[Theme.typography.secondary, Theme.u.center]}>
-            Fill out the words or sentences you want your friends to guess.
-          </Text>
-        </View>
-        <View
-          behavior="padding"
-          style={[
-            Styles.scrollKAV,
-            {
-              opacity: kbHeight !== null ? 1 : 0, // TODO fadein?
-            },
-          ]}
-        >
-          <ScrollView
-            ref={refSlides}
-            pagingEnabled
-            horizontal
-            onMomentumScrollEnd={handleScrollEnd}
-            style={[Theme.u.scrollSideOffset, Styles.slides]}
-          >
-            {renderPapers()}
-          </ScrollView>
-
-          <View style={[Styles.ctas, { marginTop: distanceFromKb }]} ref={refCTAs}>
-            <Button
-              variant="icon"
-              size="lg"
-              style={Styles.ctas_btn}
-              styleTouch={[paperIndex === 0 && Styles.ctas_btn_isHidden]}
-              onPress={() => paperIndex !== 0 && handleClickPrev()}
-            >
-              <IconArrow
-                size={20}
-                color={Theme.colors.grayDark}
-                style={{ transform: [{ rotate: '180deg' }] }}
-              />
-            </Button>
-
-            <View style={Styles.status} />
-
-            <Button
-              variant="icon"
-              size="lg"
-              style={Styles.ctas_btn}
-              styleTouch={[paperIndex === wordsGoal - 1 && Styles.ctas_btn_isHidden]}
-              onPress={() => paperIndex !== wordsGoal - 1 && handleClickNext()}
-            >
-              <IconArrow size={20} color={Theme.colors.grayDark} />
-            </Button>
-          </View>
-        </View>
-      </Page.Main>
-    </Page>
-  )
+    if (!isOnTutorial) {
+      // Ensure slides is scrolled at the right position
+      refSlides.current.scrollTo({ x: vw * 100 * paperIndex })
+    }
+  }, [isOnTutorial, paperIndex])
 
   function renderPapers() {
     const papers = [
@@ -208,13 +121,6 @@ export default function WritePapers({ navigation }) {
     }
 
     return papers
-  }
-
-  function handleScrollEnd(e) {
-    const { contentOffset, layoutMeasurement } = e.nativeEvent
-    const paperIndex = Math.floor(contentOffset.x / layoutMeasurement.width)
-
-    setPaperIndex(paperIndex)
   }
 
   function handleWordChange(word, index) {
@@ -267,6 +173,104 @@ export default function WritePapers({ navigation }) {
     }
     setIsSubmiting(false)
   }
+
+  if (isOnTutorial) {
+    return (
+      <Page bannerMsg={errorMsg} bgFill={Theme.colors.purple}>
+        <Page.Main headerDivider>
+          <View style={[Styles.header]}>
+            <View style={Styles.slidePlaceholder}>
+              <IllustrationSmile />
+            </View>
+            <Text style={[Theme.typography.h2, Styles.slideTitle, Theme.u.center]}>
+              Time to create your papers!
+            </Text>
+            <Text style={[Theme.typography.secondary, Theme.u.center]}>
+              Fill out the words or sentences you want your friends to guess.
+            </Text>
+          </View>
+        </Page.Main>
+        <Page.CTAs>
+          <Button variant="blank" size="lg" onPress={() => setIsOnTutorial(false)}>
+            {"Let's do it!"}
+          </Button>
+        </Page.CTAs>
+      </Page>
+    )
+  }
+
+  const currentWord = words[paperIndex]
+  const isWordValid = currentWord && currentWord.trim()
+
+  return (
+    <Page bannerMsg={errorMsg} bgFill={Theme.colors.purple}>
+      <Page.Main headerDivider>
+        <View
+          behavior="padding"
+          style={[
+            Styles.scrollKAV,
+            {
+              opacity: kbHeight !== null ? 1 : 0, // TODO fadein?
+            },
+          ]}
+        >
+          <ScrollView
+            ref={refSlides}
+            pagingEnabled
+            horizontal
+            scrollEnabled={false}
+            style={[Theme.u.scrollSideOffset, Styles.slides]}
+          >
+            {renderPapers()}
+          </ScrollView>
+
+          <View style={[Styles.ctas, { marginTop: distanceFromKb }]} ref={refCTAs}>
+            <Button
+              variant="icon"
+              size="lg"
+              style={Styles.ctas_btn}
+              bgColor={Theme.colors.bg}
+              styleTouch={[paperIndex === 0 && Styles.ctas_btn_isHidden]}
+              onPress={() => paperIndex !== 0 && handleClickPrev()}
+            >
+              <IconArrow
+                size={20}
+                color={Theme.colors.grayDark}
+                style={{ transform: [{ rotate: '180deg' }] }}
+              />
+            </Button>
+
+            <View style={Styles.status}>
+              <Text style={[Theme.typography.body, Theme.u.center]}>{wordsCount} / 10</Text>
+            </View>
+
+            {isAllWordsDone && paperIndex === wordsGoal - 1 ? (
+              <Button
+                variant="icon"
+                size="lg"
+                style={Styles.ctas_btn}
+                bgColor={Theme.colors.grayDark}
+                onPress={handleSubmitClick}
+              >
+                <IconCheck size={20} color={Theme.colors.bg} />
+              </Button>
+            ) : (
+              <Button
+                variant="icon"
+                size="lg"
+                style={Styles.ctas_btn}
+                bgColor={isWordValid ? Theme.colors.bg : Theme.colors.grayLight}
+                // disabled={isWordValid} TODO/BUG workaround this changes the layout position.
+                onPress={() => isWordValid && handleClickNext()}
+              >
+                <IconArrow size={20} color={Theme.colors.grayDark} />
+              </Button>
+            )}
+          </View>
+        </View>
+      </Page.Main>
+    </Page>
+  )
 }
 
 WritePapers.propTypes = {

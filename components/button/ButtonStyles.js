@@ -124,7 +124,7 @@ const stylesSize = {
 
 // TODO Later - This code is 💩...
 export const btnWrapper = ({ variant, size, place, bgColor, disabled }) => {
-  const variantToApply = disabled && variant === 'primary' ? 'disabled' : variant
+  const variantToApply = disabled ? 'disabled' : variant
   return [
     styles.base,
     {

@@ -7,7 +7,7 @@ const { vw } = window
 
 const paperHeight = vw * 65
 
-const slideHeight = isTamagoshi ? 50 * vw : 70 * vw
+const slideHeight = isTamagoshi ? 50 * vw : 67 * vw
 
 export default StyleSheet.create({
   header: {
@@ -19,6 +19,16 @@ export default StyleSheet.create({
     maxHeight: paperHeight + 12,
     paddingHorizontal: 0,
   },
+  slidePlaceholder: {
+    height: slideHeight,
+    backgroundColor: Theme.colors.bg,
+    borderRadius: 12,
+    padding: 15 * vw,
+    marginBottom: 32,
+  },
+  slideTitle: {
+    marginBottom: 16,
+  },
   slide: {
     ...(isWeb ? { height: slideHeight - 16 } : {}),
     width: vw * 100 - 32,
@@ -27,10 +37,12 @@ export default StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center',
     backgroundColor: Theme.colors.bg,
-    borderWidth: 2,
-    borderColor: Theme.colors.grayMedium,
+    // borderWidth: 2,
+    // borderColor: Theme.colors.grayMedium,
+    borderRadius: 12,
     paddingVertical: Platform === 'web' ? 16 : 0,
     paddingHorizontal: 16,
+    marginTop: 16,
     marginBottom: 10,
   },
   slide_isActive: {
@@ -58,7 +70,7 @@ export default StyleSheet.create({
     paddingBottom: 8,
   },
   ctas_btn: {
-    // backgroundColor: Theme.colors.primary,
+    borderWidth: 0,
   },
   ctas_btn_isHidden: {
     opacity: 0,

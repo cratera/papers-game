@@ -146,7 +146,7 @@ export default function LobbyJoining({ navigation }) {
       <Page.CTAs hasOffset={profileIsAdmin && !neededPlayers}>
         {canCreateTeam ? (
           <Button onPress={goToTeamsCreation}>Create teams</Button>
-        ) : profileIsAdmin ? (
+        ) : neededPlayers && !profileIsAdmin ? (
           <Button disabled>{copyAddPlayers}</Button>
         ) : null}
 

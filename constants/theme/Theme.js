@@ -70,6 +70,12 @@ export const typography = StyleSheet.create({
     lineHeight: 22,
     color: colors.grayMedium,
   },
+  inverted: {
+    fontFamily: 'Karla-Regular',
+    fontSize: fontSizeBase,
+    lineHeight: 22,
+    color: colors.bg,
+  },
   small: {
     fontFamily: 'Karla-Regular',
     fontSize: fontSizeSmall,
