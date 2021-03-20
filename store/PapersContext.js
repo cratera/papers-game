@@ -68,7 +68,7 @@ export class PapersContextProvider extends Component {
       profiles: {},
       about: {
         version: '0.3.2',
-        ota: '04',
+        ota: '05',
       },
     }
 
