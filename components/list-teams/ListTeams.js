@@ -41,7 +41,7 @@ export default function ListTeams({ isStatusVisible, enableKickout, ...otherProp
               <Text style={Theme.typography.h3}>{name}</Text>
               {isStatusVisible && (
                 <Text style={Theme.typography.secondary}>
-                  {done}/{total}
+                  {done} / {total}
                 </Text>
               )}
             </View>

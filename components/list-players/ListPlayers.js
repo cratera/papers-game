@@ -101,11 +101,12 @@ export default function ListPlayers({
           >
             <View key={playerId} style={[Styles.item, isLastChild && Styles.item_isLast]}>
               <View style={Styles.who}>
-                {!isStatusVisible || (isStatusVisible && wordsSubmitted) ? (
-                  <Avatar src={avatar} size="lg" hasMargin alt="" />
-                ) : (
-                  <LoadingAvatar />
-                )}
+                <Avatar
+                  src={avatar}
+                  size="lg"
+                  hasMargin
+                  isAfk={isStatusVisible && !wordsSubmitted}
+                />
                 <View style={Styles.who_text}>
                   <Text style={Theme.typography.h4}>
                     {name}

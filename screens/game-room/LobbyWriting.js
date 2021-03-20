@@ -83,9 +83,9 @@ export default function LobbyWriting({ navigation }) {
 
   return (
     <Page>
-      {didEveryoneSubmittedTheirWords && (
+      {/* {didEveryoneSubmittedTheirWords && (
         <Bubbling fromBehind bgStart={Theme.colors.bg} bgEnd={Theme.colors.purple} />
-      )}
+      )} */}
       <Page.Main headerDivider>
         <ScrollView style={Theme.u.scrollSideOffset}>
           <ListTeams isStatusVisible style={{ paddingTop: 24 }} />

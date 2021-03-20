@@ -1,15 +1,14 @@
 import React from 'react'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import PropTypes from 'prop-types'
 
 import * as Theme from '@theme'
 
 import * as avatars from './Illustrations'
 
-export default function Avatar({ src, hasMargin, size, stroke, style, ...otherProps }) {
+export default function Avatar({ src, isAfk, hasMargin, size, stroke, style, ...otherProps }) {
   const avatar = avatars[src]
   const Illustration = avatar?.Component
-  console.log('src', src)
   return (
     <View
       style={[
@@ -24,7 +23,7 @@ export default function Avatar({ src, hasMargin, size, stroke, style, ...otherPr
       ]}
       {...otherProps}
     >
-      {Illustration && <Illustration />}
+      {isAfk ? <Text style={Styles.afk}>...</Text> : Illustration && <Illustration />}
     </View>
   )
 }
@@ -40,6 +39,8 @@ Avatar.propTypes = {
   style: PropTypes.any,
   size: PropTypes.oneOf(['md', 'lg', 'll', 'xl', 'xxl']),
   stroke: PropTypes.number,
+  /** Show loading/pending status instead of the avatar */
+  isAfk: PropTypes.bool,
 }
 
 const Styles = StyleSheet.create({
@@ -74,5 +75,12 @@ const Styles = StyleSheet.create({
   size_xxxl: {
     width: 295,
     height: 295,
+  },
+  afk: {
+    fontSize: 25,
+    lineHeight: 52, // hardcoded for size_lg :x
+    fontFamily: 'YoungSerif-Regular',
+    color: Theme.colors.bg,
+    textAlign: 'center',
   },
 })
