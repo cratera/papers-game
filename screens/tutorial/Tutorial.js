@@ -125,7 +125,7 @@ export default function Tutorial({ navigation, isMandatory, onDone }) {
             </Button>
           ) : (
             <Button variant="primary" size="lg" onPress={handleOnStart}>
-              {isMandatory ? 'Start' : 'Play!'}
+              Got it!
             </Button>
           )}
         </View>
@@ -185,7 +185,7 @@ const TutorialStep = ({ isActive, ix, stepTotal }) => {
               },
             ]}
           >
-            Step {ix} out of {stepTotal}
+            Step {ix} out of {stepTotal - 1}
           </Text>
         }
         <Text style={[Theme.typography.h3, Theme.u.center, { marginVertical: 8 }]}>

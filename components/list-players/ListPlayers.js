@@ -147,7 +147,7 @@ export default function ListPlayers({
           {
             text: isClicked ? `❌ Remove "${profiles[isClicked].name}"` : '',
             onPress: () => {
-              handleKickOut(isKicking)
+              handleKickOut(isClicked)
             },
           },
         ]}
@@ -157,6 +157,7 @@ export default function ListPlayers({
 
   async function handleKickOut(playerId) {
     const playerTeamId = game.teams ? getTeamId(playerId, game.teams) : null
+    console.log('xxx', profiles, playerId)
     const playerName = profiles[playerId].name
     const goodTeamSize = playerTeamId ? game.teams[playerTeamId].players.length > 2 : true
     const msg = goodTeamSize

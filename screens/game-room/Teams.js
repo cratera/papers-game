@@ -4,7 +4,7 @@ import { View, StyleSheet, Text } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 
 import * as Analytics from '@constants/analytics.js'
-import Bubbling from '@components/bubbling'
+// import Bubbling from '@components/bubbling'
 import { LoadingBadge } from '@components/loading'
 
 import { getRandomInt } from '@constants/utils'
@@ -33,8 +33,8 @@ function areTeamPlayersEqual(teamsOld, teamsNew) {
   return result
 }
 
-const bgStart = Theme.colors.yellow
-const bgEnd = Theme.colors.pink
+const bgStart = Theme.colors.bg // yellow
+const bgEnd = Theme.colors.bg // pink
 
 export default function Teams({ navigation }) {
   const Papers = React.useContext(PapersContext)
@@ -83,7 +83,7 @@ export default function Teams({ navigation }) {
     }
   }, [playersCount])
 
-  // TODO later This could be useRandomTeams()
+  // TODO later This could be hook useRandomTeams()
   function getRandomTeams() {
     const players = Object.keys(game.players)
     const teamsNr = 2 // LATER - Game Setting
@@ -174,7 +174,7 @@ export default function Teams({ navigation }) {
 
   return (
     <Page bannerMsg={errorMsg} bgFill={bgEnd}>
-      <Bubbling bgStart={bgStart} bgEnd={bgEnd} />
+      {/* <Bubbling bgStart={bgStart} bgEnd={bgEnd} /> */}
       <Page.Main headerDivider>
         <ScrollView
           style={[Theme.u.scrollSideOffset]}
@@ -185,18 +185,18 @@ export default function Teams({ navigation }) {
 
             return (
               <View key={id} style={Styles.team}>
-                <View style={[Styles.teamHeader, Theme.u.cardEdge]}>
-                  <Text style={Theme.typography.secondary}>Team {'0' + (+teamId + 1)}</Text>
+                <View style={[Styles.teamHeader]}>
                   <View style={Styles.teamHeader_title}>
                     <Text style={Theme.typography.h2}>{name}</Text>
                     {/* <Button
                         variant="icon"
                         accessibilityLabel="Rename team"
                         onPress={() => handleRenameOf(id)}
-                      >
+                        >
                         ✏️
                       </Button> */}
                   </View>
+                  <Text style={Theme.typography.secondary}>Team {'0' + (+teamId + 1)}</Text>
                 </View>
                 <ListPlayers players={players} />
               </View>
@@ -256,7 +256,7 @@ const Styles = StyleSheet.create({
   teamHeader: {
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center',
+    // alignItems: 'center',
     paddingVertical: 16,
     marginBottom: 16,
   },
@@ -264,14 +264,14 @@ const Styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 4,
+    marginBottom: 4,
   },
   ctas: {
     display: 'flex',
     flexDirection: 'row',
   },
   ctas_random: {
-    backgroundColor: Theme.colors.bg,
+    backgroundColor: Theme.colors.grayDark,
     borderColor: Theme.colors.grayDark,
     borderWidth: 2,
     marginRight: 8,

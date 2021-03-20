@@ -46,7 +46,7 @@ export default function HomeScreen({ navigation }) {
     return <Tutorial isMandatory navigation={navigation} onDone={() => setIsTutorialDone(true)} />
   }
 
-  return !profile.name ? (
+  return !profile.name || !profile.avatar ? (
     <HomeSignup onSubmit={handleUpdateProfile} navigation={navigation} />
   ) : (
     <HomeSigned navigation={navigation} />

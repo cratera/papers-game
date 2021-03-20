@@ -18,6 +18,7 @@ function Button({
   children,
   style,
   styleTouch,
+  disabled,
   ...otherProps
 }) {
   const isIcon = variant === 'icon'
@@ -27,9 +28,9 @@ function Button({
       style={[Styles.touch, styleTouch, place === 'float' && Styles.place_float]}
       activeOpacity={0.5}
       underlayColor="transparent"
-      {...(isLoading ? { disabled: true } : {})}
+      {...(isLoading || disabled ? { disabled: true } : {})}
     >
-      <View style={[Styles.btnWrapper({ variant, size, place, bgColor }), style]}>
+      <View style={[Styles.btnWrapper({ variant, size, place, bgColor, disabled }), style]}>
         {!isLoading ? (
           isIcon ? (
             children
@@ -69,6 +70,7 @@ Button.propTypes = {
   bgColor: PropTypes.string,
   textColor: PropTypes.string,
   loadingColor: PropTypes.string,
+  disabled: PropTypes.bool,
 }
 
 export default memo(Button)

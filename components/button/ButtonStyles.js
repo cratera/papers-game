@@ -19,6 +19,10 @@ const variants = {
     bg: Theme.colors.bg,
     text: Theme.colors.grayDark,
   },
+  disabled: {
+    bg: 'rgba(0, 0, 0, 0.3)', // Theme.colors.grayLight,
+    text: Theme.colors.bg,
+  },
   light: {
     bg: 'transparent',
     text: Theme.colors.grayDark,
@@ -55,6 +59,10 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: Theme.colors.grayDark,
   },
+  disabled: {
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
   icon: {
     width: 44,
     height: 44,
@@ -87,8 +95,8 @@ const styles = StyleSheet.create({
   },
 
   lg: {
-    minWidth: 58,
-    minHeight: 58,
+    minWidth: 65,
+    minHeight: 65,
   },
 
   // --------- place
@@ -115,13 +123,14 @@ const stylesSize = {
 }
 
 // TODO Later - This code is 💩...
-export const btnWrapper = ({ variant, size, place, bgColor }) => {
+export const btnWrapper = ({ variant, size, place, bgColor, disabled }) => {
+  const variantToApply = disabled && variant === 'primary' ? 'disabled' : variant
   return [
     styles.base,
     {
-      backgroundColor: bgColor || variants[variant].bg,
+      backgroundColor: bgColor || variants[variantToApply].bg,
     },
-    styles[variant],
+    styles[variantToApply],
     styles[size],
     styles[place],
   ]

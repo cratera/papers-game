@@ -30,6 +30,7 @@ export default function LobbyJoining({ navigation }) {
   const neededPlayers = playersKeys.length < 4 // FIX THIS SUPPORT >4
   const wordsAreStored = !!game?.words?.[profileId]
   const canCreateTeam = profileIsAdmin && !neededPlayers && !hasTeams
+  const copyAddPlayers = `Add ${4 - playersKeys.length} more friends`
 
   React.useEffect(() => {
     navigation.setOptions({
@@ -91,6 +92,10 @@ export default function LobbyJoining({ navigation }) {
     navigation.navigate('write-papers')
   }
 
+  function goToTeamsCreation() {
+    navigation.navigate('teams')
+  }
+
   if (!game) {
     // TODO/BUG: This is the weirdest BUG with React.
     // Let me try to explain this and reproduce later...
@@ -125,10 +130,9 @@ export default function LobbyJoining({ navigation }) {
             >
               <ListPlayers players={playersKeys} enableKickout />
 
-              {/*  TODO CONTINUE HERE */}
-              {neededPlayers ? (
+              {neededPlayers && !profileIsAdmin ? (
                 <Text style={[Theme.typography.secondary, Theme.u.center, { marginTop: 16 }]}>
-                  Need {4 - playersKeys.length} more
+                  {copyAddPlayers}
                 </Text>
               ) : null}
             </ScrollView>
@@ -141,15 +145,11 @@ export default function LobbyJoining({ navigation }) {
       </Page.Main>
       <Page.CTAs hasOffset={profileIsAdmin && !neededPlayers}>
         {canCreateTeam ? (
-          <Button onPress={goToWritePapers}>Create teams</Button>
-        ) : (
-          <Button onPress={goToWritePapers}>Need x players</Button>
-        )}
-        {/* {neededPlayers ? (
-          <Text style={[Theme.typography.secondary, Theme.u.center]}>
-            Need {4 - playersKeys.length} more
-          </Text>
-        ) : null} */}
+          <Button onPress={goToTeamsCreation}>Create teams</Button>
+        ) : profileIsAdmin ? (
+          <Button disabled>{copyAddPlayers}</Button>
+        ) : null}
+
         {game.teams ? <Button onPress={goToWritePapers}>Write papers</Button> : null}
         {__DEV__ && game.teams && profileIsAdmin && (
           <Button
