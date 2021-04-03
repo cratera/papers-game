@@ -6,7 +6,7 @@ import * as Theme from '@theme'
 import Styles from './PageStyles.js'
 import SettingsToggle from '@components/settings'
 import Button from '@components/button'
-// import { IconArrow } from '@components/icons'
+import { IconChevron } from '@components/icons'
 import NetInfo from '@react-native-community/netinfo'
 
 const i18nWifi = 'No internet connection'
@@ -66,15 +66,7 @@ Page.propTypes = {
 
 // const isIOS = Platform.OS === 'ios'
 
-const iconsMap = {
-  // eslint-disable-next-line react/display-name
-  back: () => <Text>☜ </Text>, // IconArrow
-  // eslint-disable-next-line react/display-name
-  next: () => <Text> ☞</Text>, // IconArrow
-}
-
 const HeaderBtn = ({ side, icon, style, textPrimary, children, isLoading, ...otherProps }) => {
-  const IconMapped = iconsMap[icon]
   const color = Theme.colors.grayDark // textPrimary ? Theme.colors.grayDark : Theme.colors.grayMedium
   return (
     <Button
@@ -83,24 +75,31 @@ const HeaderBtn = ({ side, icon, style, textPrimary, children, isLoading, ...oth
       isLoading={isLoading}
       style={[
         side === 'left' ? { marginLeft: 16 } : { marginRight: 16 },
-        IconMapped && { marginTop: 6 },
+        { transform: [{ translateY: -6 }] },
       ]}
       {...otherProps}
     >
       <>
-        {side === 'left' && IconMapped && (
-          <IconMapped
-            size={16}
-            color={Theme.colors.grayMedium}
-            style={{ transform: [{ rotate: '180deg' }, { translateY: -2 }, { translateX: 3 }] }}
+        {side === 'left' && (
+          <IconChevron
+            size={24}
+            color={Theme.colors.grayDark}
+            style={{
+              transform: [{ rotate: '180deg' }, { translateY: -6 }, { translateX: 7 }],
+              marginRight: -4,
+            }}
           />
         )}
         {children}
-        {side === 'right' && IconMapped && (
+        {side === 'right' && (
           // it feels like 1998
           <>
             <View style={{ width: 8, height: 1 }} />
-            <IconMapped size={16} color={color} style={{ transform: [{ translateY: 3 }] }} />
+            <IconChevron
+              size={24}
+              color={color}
+              style={{ transform: [{ translateY: 6 }, { translateX: -4 }], marginRight: -4 }}
+            />
           </>
         )}
       </>
@@ -127,7 +126,8 @@ const Main = ({ children, style, headerDivider, ...otherProps }) => {
       style={[
         Styles.main,
         style,
-        headerDivider && { borderTopColor: Theme.colors.grayDark, borderTopWidth: 1 },
+        // DEPRECATED
+        // headerDivider && { borderTopColor: Theme.colors.grayDark, borderTopWidth: 1 },
       ]}
       {...otherProps}
     >

@@ -102,6 +102,16 @@ export const IconArrow = ({ size, color, style, ...props }) /* eslint-disable-li
   )
 }
 
+export const IconChevron = ({ size, color, style, ...props }) /* eslint-disable-line */ => {
+  const { styleWithSize, baseColor } = useProps(size, color, style)
+  // prettier-ignore
+  return (
+    <Svg style={ styleWithSize } xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <Path fill-rule="evenodd" clip-rule="evenodd" d="M9.3 5.3a1 1 0 011.4 0l6 6a1 1 0 010 1.4l-6 6a1 1 0 01-1.4-1.4l5.29-5.3-5.3-5.3a1 1 0 010-1.4z" fill={baseColor} />
+    </Svg>
+  )
+}
+
 export const IconTimes = ({ size, color, style, ...props }) /* eslint-disable-line */ => {
   const { styleWithSize, baseColor } = useProps(size, color, style)
   // prettier-ignore

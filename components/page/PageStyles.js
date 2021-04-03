@@ -26,7 +26,6 @@ export default StyleSheet.create({
     flexShrink: 1,
     alignSelf: 'stretch',
     paddingHorizontal: edgeGutter,
-    // backgroundColor: 'red',
   },
   banner: {
     backgroundColor: Theme.colors.grayDark,

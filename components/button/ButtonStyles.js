@@ -139,7 +139,7 @@ export const btnWrapper = ({ variant, size, place, bgColor, disabled }) => {
 export const btnText = ({ variant, size, color }) => {
   return {
     fontFamily: variant === 'flat' ? 'Karla-Regular' : 'YoungSerif-Regular',
-    fontSize: stylesSize[size],
+    fontSize: variant === 'flat' ? 16 : stylesSize[size],
     color: color || variants[variant].text,
   }
 }
