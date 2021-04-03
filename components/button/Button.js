@@ -57,7 +57,16 @@ Button.defaultProps = {
 }
 
 Button.propTypes = {
-  variant: PropTypes.oneOf(['primary', 'success', 'danger', 'light', 'flat', 'icon']),
+  variant: PropTypes.oneOf([
+    'primary',
+    'success',
+    'blank',
+    'danger',
+    'light',
+    'ghost',
+    'flat',
+    'icon',
+  ]),
   size: PropTypes.oneOf(['default', 'sm', 'lg']),
   place: PropTypes.oneOf(['edgeKeyboard', 'float']),
   isLoading: PropTypes.bool,

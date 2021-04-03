@@ -15,7 +15,9 @@ export default function SettingsProfileAvatar({ navigation }) {
   const { profile } = Papers.state
   const [avatar, setAvatar] = React.useState('')
   const defaultAvatar = React.useRef(profile.avatar).current
-  useSubHeader(navigation, 'Account')
+  useSubHeader(navigation, 'Account', {
+    hiddenTitle: true,
+  })
 
   function handleOnSelectorChange(avatar) {
     setAvatar(avatar)
@@ -32,10 +34,8 @@ export default function SettingsProfileAvatar({ navigation }) {
         <View
           style={[
             Theme.u.cardEdge,
+            Theme.u.middle,
             {
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
               flexGrow: 1,
               marginBottom: 120, // CTAs height
             },
@@ -57,14 +57,16 @@ export default function SettingsProfileAvatar({ navigation }) {
             Choose your character
           </Text>
           <View
-            style={{
-              flexGrow: 1,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-            }}
+            style={[
+              {
+                flexGrow: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+              },
+            ]}
           >
-            {/* Needed to make center work */}
+            {/* Needed to make it centered */}
             <View>
               <AvatarSelector
                 value={profile.avatar}

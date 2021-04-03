@@ -27,6 +27,10 @@ const variants = {
     bg: 'transparent',
     text: Theme.colors.grayDark,
   },
+  ghost: {
+    bg: 'transparent',
+    text: Theme.colors.grayDark,
+  },
   flat: {
     bg: 'transparent',
     text: Theme.colors.grayDark, // primary just on skip. @mmbotelho
@@ -138,7 +142,7 @@ export const btnWrapper = ({ variant, size, place, bgColor, disabled }) => {
 
 export const btnText = ({ variant, size, color }) => {
   return {
-    fontFamily: variant === 'flat' ? 'Karla-Regular' : 'YoungSerif-Regular',
+    fontFamily: ['flat', 'ghost'].includes(variant) ? 'Karla-Regular' : 'YoungSerif-Regular',
     fontSize: variant === 'flat' ? 16 : stylesSize[size],
     color: color || variants[variant].text,
   }

@@ -18,7 +18,6 @@ import Sentry from '@constants/Sentry'
 import Page from '@components/page'
 import Button from '@components/button'
 import usePurchases from '@components/purchases/usePurchases.js'
-import IllustrationPersonCalling from '@components/illustrations/PersonCalling.js'
 
 import { propTypesCommon, useSubHeader } from './utils'
 
@@ -52,10 +51,6 @@ export default function SettingsExperimental({ navigation }) {
           <Text style={[Theme.typography.h3, Theme.u.center]}>🚧 For Devs only! 🚧</Text>
 
           <Text>IsDev: {__DEV__.toString()}</Text>
-
-          <View style={{ backgroundColor: Theme.colors.purple, height: 200 }}>
-            <IllustrationPersonCalling />
-          </View>
 
           <View style={styleBlock}>
             <OtaChecker />

@@ -181,6 +181,7 @@ export default function WritePapers({ navigation }) {
       <Page bannerMsg={errorMsg} bgFill={Theme.colors.purple}>
         <Page.Main headerDivider>
           <View style={[Styles.header]}>
+            {/* TODO use <Card /> */}
             <View style={Styles.slidePlaceholder}>
               <IllustrationSmile />
             </View>

@@ -64,8 +64,6 @@ Page.propTypes = {
   styleInner: PropTypes.any,
 }
 
-// const isIOS = Platform.OS === 'ios'
-
 const HeaderBtn = ({ side, icon, style, textPrimary, children, isLoading, ...otherProps }) => {
   const color = Theme.colors.grayDark // textPrimary ? Theme.colors.grayDark : Theme.colors.grayMedium
   return (
@@ -75,7 +73,7 @@ const HeaderBtn = ({ side, icon, style, textPrimary, children, isLoading, ...oth
       isLoading={isLoading}
       style={[
         side === 'left' ? { marginLeft: 16 } : { marginRight: 16 },
-        { transform: [{ translateY: -6 }] },
+        { transform: [{ translateY: -4 }] },
       ]}
       {...otherProps}
     >
@@ -90,6 +88,7 @@ const HeaderBtn = ({ side, icon, style, textPrimary, children, isLoading, ...oth
             }}
           />
         )}
+        {side === 'left-close' && <View style={{ width: 16, height: 24 }} />}
         {children}
         {side === 'right' && (
           // it feels like 1998

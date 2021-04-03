@@ -18,10 +18,10 @@ const sounds = ['ready', 'turnstart', 'wrong', 'right', 'bomb', 'fivesl', 'times
 export default function SettingsSound({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const { profile } = Papers.state
-  const settingsSoundActive = profile.settings.sound
-  const settingsMotion = profile.settings.motion
+  const settingsSoundActive = !!profile.settings.sound // need !! in case is undefined
+  const settingsMotion = !!profile.settings.motion
   const [motionFeedback, setMotionFeedback] = React.useState(false)
-  useSubHeader(navigation, 'Sound & Animations')
+  useSubHeader(navigation, 'Sound & animations')
 
   function toggleSoundOn() {
     Papers.soundToggleStatus()
@@ -53,6 +53,7 @@ export default function SettingsSound({ navigation }) {
       <Page.Main headerDivider>
         <ScrollView style={[Theme.u.scrollSideOffset]}>
           <View style={Theme.u.cardEdge}>
+            {/*  */}
             <Item title="Play sounds" switchValue={settingsSoundActive} onPress={toggleSoundOn} />
             <Item
               title="Reduce animations"
@@ -82,7 +83,9 @@ export default function SettingsSound({ navigation }) {
             )}
           </View>
           <View style={{ height: 40 }} />
-          <Button onPress={Papers.resetProfileSettings}>Restore default settings</Button>
+          {__DEV__ && (
+            <Button onPress={Papers.resetProfileSettings}>Restore default settings</Button>
+          )}
           <View style={Theme.u.CTASafeArea} />
         </ScrollView>
       </Page.Main>

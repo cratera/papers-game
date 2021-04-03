@@ -4,14 +4,15 @@ import * as Linking from 'expo-linking'
 
 import PropTypes from 'prop-types'
 
-import PapersContext from '@store/PapersContext.js'
-import * as Theme from '@theme'
 import { IconExternal } from '@components/icons'
+import PapersContext from '@store/PapersContext.js'
+import { isDebugging } from '@constants/utils.js'
+import * as Theme from '@theme'
 import Item from './Item.js'
 
 export default function MoreOptions({ navigation, list }) {
   const Papers = React.useContext(PapersContext)
-  const { about } = Papers.state
+  const { profile, about } = Papers.state
 
   return (
     <>
@@ -19,7 +20,7 @@ export default function MoreOptions({ navigation, list }) {
         {[
           {
             id: 'sd',
-            title: 'Sound & Animations',
+            title: 'Sound & animations',
             icon: 'next',
             onPress: () => navigation.navigate('settings-sound'),
           },
@@ -51,12 +52,16 @@ export default function MoreOptions({ navigation, list }) {
             icon: 'next',
             onPress: () => navigation.navigate('settings-privacy'),
           },
-          {
-            id: 'xp',
-            title: 'Experimental',
-            icon: 'next',
-            onPress: () => navigation.navigate('settings-experimental'),
-          },
+          ...(isDebugging(profile.name)
+            ? [
+                {
+                  id: 'xp',
+                  title: 'Experimental',
+                  icon: 'next',
+                  onPress: () => navigation.navigate('settings-experimental'),
+                },
+              ]
+            : []),
           ...list,
         ].map(item => (
           <Item key={item.id} {...item} />
@@ -107,7 +112,7 @@ const Styles = StyleSheet.create({
     marginHorizontal: 16,
   },
   footer: {
-    marginTop: 24,
+    marginTop: 8,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',

@@ -9,7 +9,7 @@ import { mailToFeedback, mailToBug } from '@constants/utils'
 import PapersContext from '@store/PapersContext.js'
 
 import Page from '@components/page'
-import { IconArrow } from '@components/icons'
+import { IconExternal } from '@components/icons'
 
 import * as Theme from '@theme'
 
@@ -63,15 +63,16 @@ export default function Feedback({ navigation }) {
               {
                 id: 'fb',
                 title: 'Send feedback',
-                Icon: IconArrow,
+                Icon: IconExternal,
                 onPress: async () => {
                   await MailComposer.composeAsync(mailToFeedback(`${about.version}@${about.ota}`))
                 },
               },
               {
+                hasDivider: true,
                 id: 'fbug',
                 title: 'Report a bug',
-                Icon: IconArrow,
+                Icon: IconExternal,
                 onPress: async () => {
                   await MailComposer.composeAsync(mailToBug(`${about.version}@${about.ota}`))
                 },
@@ -79,8 +80,6 @@ export default function Feedback({ navigation }) {
             ].map(item => (
               <Item key={item.id} {...item} />
             ))}
-
-            <View style={Theme.u.listDivider} />
           </View>
         </ScrollView>
       </Page.Main>

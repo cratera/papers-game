@@ -15,14 +15,14 @@ import ListTeams from '@components/list-teams'
 import SettingsProfile from './SettingsProfile.js'
 import SettingsGame from './SettingsGame.js'
 import SettingsProfileAvatar from './SettingsProfileAvatar.js'
-import Account from './Account.js'
+// import Account from './Account.js'
 import AccountDeletion from './AccountDeletion.js'
 import Experimental from './Experimental.js'
 import Feedback from './Feedback.js'
 import Privacy from './Privacy.js'
 import Purchases from './Purchases.js'
 import Statistics from './Statistics.js'
-import SoundAnimations from './SoundAnimations.js'
+import SettingSoundAnimations from './SettingsSoundAnimations.js'
 
 import { propTypesCommon, useSubHeader } from './utils'
 
@@ -33,25 +33,6 @@ export default function Settings(props) {
   const { game } = Papers.state
 
   React.useEffect(() => {
-    props.navigation.setOptions({
-      ...headerTheme(),
-      headerTitle: 'Settings',
-      headerLeft: function HLB() {
-        return (
-          <Page.HeaderBtn
-            side="left"
-            icon="back"
-            onPress={() =>
-              props.navigation.canGoBack()
-                ? props.navigation.goBack()
-                : props.navigation.navigate(game ? 'room' : 'home')
-            }
-          >
-            Back
-          </Page.HeaderBtn>
-        )
-      },
-    })
     Analytics.setCurrentScreen('settings')
   }, [])
 
@@ -65,7 +46,7 @@ export default function Settings(props) {
       ) : null}
       <Stack.Screen name="settings-profile" component={SettingsProfile} />
       <Stack.Screen name="settings-profile-avatar" component={SettingsProfileAvatar} />
-      <Stack.Screen name="settings-account" component={Account} />
+      {/* <Stack.Screen name="settings-account" component={Account} /> */}
       <Stack.Screen name="settings-accountDeletion" component={AccountDeletion} />
       <Stack.Screen name="settings-privacy" component={Privacy} />
       <Stack.Screen name="settings-purchases" component={Purchases} />
@@ -73,7 +54,7 @@ export default function Settings(props) {
 
       <Stack.Screen name="settings-statistics" component={Statistics} />
       <Stack.Screen name="settings-feedback" component={Feedback} />
-      <Stack.Screen name="settings-sound" component={SoundAnimations} />
+      <Stack.Screen name="settings-sound" component={SettingSoundAnimations} />
       <Stack.Screen name="settings-credits" component={SettingsCredits} />
     </Stack.Navigator>
   )

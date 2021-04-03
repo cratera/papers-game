@@ -14,10 +14,15 @@ import { useSubHeader } from './utils'
 
 export default function SettingsProfile({ navigation }) {
   const Papers = React.useContext(PapersContext)
+  const refInputName = React.useRef()
   const [name, setName] = React.useState('')
   const { profile } = Papers.state
 
-  useSubHeader(navigation, 'Settings')
+  useSubHeader(navigation, 'Settings', { isEntry: true })
+
+  function handleNameLabelPress() {
+    refInputName.current.focus()
+  }
 
   return (
     <Page>
@@ -42,10 +47,13 @@ export default function SettingsProfile({ navigation }) {
             </View>
           </TouchableOpacity>
           <View style={[Theme.u.flexBetween]}>
-            <Text nativeID="inputNameLabel" style={Theme.typography.body}>
-              Name
-            </Text>
+            <TouchableOpacity style={[Styles.inputLabel]} onPress={handleNameLabelPress}>
+              <Text nativeID="inputNameLabel" style={[Theme.typography.body, Styles.inputLabel]}>
+                Name
+              </Text>
+            </TouchableOpacity>
             <TextInput
+              ref={refInputName}
               style={Styles.input}
               inputAccessoryViewID="name"
               nativeID="inputNameLabel"
@@ -83,6 +91,8 @@ const Styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+    marginTop: 16,
+    marginBottom: 8 + 8,
   },
   accountTap_avatar: {},
   accountTap_avatarIcon: {
@@ -96,6 +106,10 @@ const Styles = StyleSheet.create({
     marginTop: -16 - 8,
     marginLeft: '50%',
     transform: [{ translateX: -16 - 8 }],
+  },
+  inputLabel: {
+    paddingVertical: 7,
+    flexGrow: 1,
   },
   input: {
     borderColor: 'transparent',

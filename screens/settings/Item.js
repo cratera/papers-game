@@ -26,14 +26,14 @@ export default function Item({
   const elProps = isSwitch
     ? {}
     : {
-        underlayColor: Theme.colors.grayLight,
+        underlayColor: Theme.colors.salmon_desatured,
         onPress: handleOnPress,
       }
 
   return (
-    <Element {...elProps}>
-      <>
-        {hasDivider ? <View style={Styles.divider}></View> : null}
+    <>
+      {hasDivider ? <View style={Styles.divider}></View> : null}
+      <Element {...elProps}>
         <View
           style={[
             Styles.item,
@@ -55,7 +55,7 @@ export default function Item({
           </View>
           {isSwitch && (
             <Switch
-              trackColor={{ false: Theme.colors.grayLight, true: Theme.colors.grayDark }}
+              trackColor={{ false: Theme.colors.grayLight, true: Theme.colors.green }}
               thumbColor={Theme.colors.bg}
               ios_backgroundColor={Theme.colors.grayLight}
               onValueChange={onPress}
@@ -63,15 +63,15 @@ export default function Item({
             />
           )}
           {Icon ? (
-            <Icon size={16} color={variant === 'danger' && Theme.colors.danger} />
+            <Icon size={24} color={variant === 'danger' && Theme.colors.danger} />
           ) : icon === 'next' ? (
             <IconChevron size={24} color={Theme.colors.grayDark} />
           ) : icon ? (
             <Text style={Theme.typography.secondary}>{icon}</Text>
           ) : null}
         </View>
-      </>
-    </Element>
+      </Element>
+    </>
   )
 }
 
@@ -99,7 +99,7 @@ const Styles = StyleSheet.create({
     marginRight: 16,
   },
   divider: {
-    borderTopWidth: 1,
+    borderTopWidth: 0.5,
     marginHorizontal: 16,
     marginVertical: 4,
     borderTopColor: Theme.colors.grayLight,

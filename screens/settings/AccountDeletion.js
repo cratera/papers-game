@@ -6,12 +6,14 @@ import * as Theme from '@theme'
 
 import Button from '@components/button'
 import Page from '@components/page'
-
+import Card from '@components/card'
 import { useSubHeader, propTypesCommon } from './utils'
 
 export default function AccountDeletion({ navigation }) {
   const Papers = React.useContext(PapersContext)
-  useSubHeader(navigation, 'Delete account')
+  useSubHeader(navigation, 'Delete account', {
+    hiddenTitle: true,
+  })
 
   async function handleDeleteAccount() {
     if (Platform.OS === 'web') {
@@ -50,18 +52,33 @@ export default function AccountDeletion({ navigation }) {
   }
 
   return (
-    <Page>
+    <Page bgFill={Theme.colors.pink_desatured}>
       <Page.Main headerDivider>
         <View style={{ marginTop: 48 }}>
-          <Text style={[Theme.typography.body, Theme.u.center]}>Are you sure?</Text>
-          <Text
-            style={[Theme.typography.secondary, Theme.u.center, { marginTop: 8, marginBottom: 48 }]}
-          >
-            All your data will be deleted from your phone and from Papers servers
+          <Card variant="paper-cry"></Card>
+          <Text style={[Theme.typography.h2, Theme.u.center, { marginTop: 32 }]}>
+            Are you sure?
           </Text>
-          <Button onPress={handleDeleteAccount}>Delete account</Button>
+          <Text style={[Theme.typography.body, Theme.u.center, { marginTop: 16 }]}>
+            All your data will be deleted.
+          </Text>
         </View>
       </Page.Main>
+      <Page.CTAs>
+        <Button variant="blank" onPress={handleDeleteAccount}>
+          Yes, delete account
+        </Button>
+        <Button
+          variant="ghost"
+          onPress={navigation.goBack}
+          style={{
+            marginTop: 8,
+            marginBottom: -16,
+          }}
+        >
+          No, take me back
+        </Button>
+      </Page.CTAs>
     </Page>
   )
 }

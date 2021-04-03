@@ -78,7 +78,7 @@ export default function Tutorial({ navigation, isMandatory, onDone }) {
         ? null
         : function HLB() {
             return (
-              <Page.HeaderBtn side="left" onPress={navigation.goBack}>
+              <Page.HeaderBtn side="left-close" onPress={navigation.goBack}>
                 Close
               </Page.HeaderBtn>
             )

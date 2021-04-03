@@ -13,9 +13,6 @@ import { useSubHeader, propTypesCommon } from './utils'
 import * as Theme from '@theme'
 
 export default function Privacy({ navigation }) {
-  // const Papers = React.useContext(PapersContext)
-  // const { profile } = Papers.state
-  // const settingsCrashReportEnabled = profile.settings.crashReport
   const [ads, setAds] = React.useState(false)
 
   useSubHeader(navigation, 'Privacy')
@@ -23,10 +20,6 @@ export default function Privacy({ navigation }) {
   function handleCustomAdsToggle() {
     setAds(fakeBool => !fakeBool)
   }
-
-  // function handleSentryToggle() {
-  //   Papers.updateProfileSettings('crashReport', !settingsCrashReportEnabled)
-  // }
 
   return (
     <Page>
@@ -40,23 +33,19 @@ export default function Privacy({ navigation }) {
                   switchValue={ads}
                   onPress={handleCustomAdsToggle}
                 />
-                {/* <Item
-                  title="Share with developers"
-                  description="Share anonymous crash reports and help us improve Papers"
-                  switchValue={settingsCrashReportEnabled}
-                  onPress={handleSentryToggle}
-                /> */}
-                <View style={Theme.u.listDivider} />
               </>
             )}
-
             <Item
+              hasDivider={!isWeb}
               title="Privacy Policy"
               Icon={IconExternal}
               onPress={() => Linking.openURL('https://papersgame.com/privacy-policy')}
             />
-
-            <View style={Theme.u.listDivider} />
+            <Item
+              title="Terms of Service"
+              Icon={IconExternal}
+              onPress={() => Linking.openURL('https://papersgame.com/terms')}
+            />
           </View>
         </ScrollView>
       </Page.Main>
