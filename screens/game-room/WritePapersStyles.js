@@ -7,7 +7,7 @@ const { vw } = window
 
 const paperHeight = vw * 65
 
-const slideHeight = isTamagoshi ? 50 * vw : 67 * vw
+const slideHeight = isTamagoshi ? 50 * vw : 70 * vw
 
 export default StyleSheet.create({
   header: {

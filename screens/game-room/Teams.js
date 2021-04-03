@@ -196,7 +196,7 @@ export default function Teams({ navigation }) {
                         ✏️
                       </Button> */}
                   </View>
-                  <Text style={Theme.typography.secondary}>Team {'0' + (+teamId + 1)}</Text>
+                  <Text style={Theme.typography.secondary}>Team {teamId + 1}</Text>
                 </View>
                 <ListPlayers players={players} />
               </View>

@@ -42,7 +42,9 @@ export default function WritePapers({ navigation }) {
           <Page.HeaderBtn
             side="left"
             icon="back"
-            onPress={() => navigation.navigate('lobby-joining')}
+            onPress={() =>
+              isOnTutorial ? navigation.navigate('lobby-joining') : setIsOnTutorial(true)
+            }
           >
             Back
           </Page.HeaderBtn>
@@ -50,7 +52,7 @@ export default function WritePapers({ navigation }) {
       },
     })
     Analytics.setCurrentScreen(`game_write_papers`)
-  }, [])
+  }, [isOnTutorial])
 
   React.useEffect(() => {
     const onKeyboardDidShow = e => {
@@ -241,16 +243,16 @@ export default function WritePapers({ navigation }) {
             </Button>
 
             <View style={Styles.status}>
-              <Text style={[Theme.typography.body, Theme.u.center]}>{wordsCount} / 10</Text>
+              <Text style={[Theme.typography.body, Theme.u.center]}>{paperIndex + 1} / 10</Text>
             </View>
 
-            {isAllWordsDone && paperIndex === wordsGoal - 1 ? (
+            {paperIndex === wordsGoal - 1 ? (
               <Button
                 variant="icon"
                 size="lg"
                 style={Styles.ctas_btn}
-                bgColor={Theme.colors.grayDark}
-                onPress={handleSubmitClick}
+                bgColor={isAllWordsDone ? Theme.colors.grayDark : Theme.colors.grayLight}
+                onPress={() => isAllWordsDone && handleSubmitClick()}
               >
                 <IconCheck size={20} color={Theme.colors.bg} />
               </Button>
@@ -260,7 +262,6 @@ export default function WritePapers({ navigation }) {
                 size="lg"
                 style={Styles.ctas_btn}
                 bgColor={isWordValid ? Theme.colors.bg : Theme.colors.grayLight}
-                // disabled={isWordValid} TODO/BUG workaround this changes the layout position.
                 onPress={() => isWordValid && handleClickNext()}
               >
                 <IconArrow size={20} color={Theme.colors.grayDark} />
