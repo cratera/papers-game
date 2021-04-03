@@ -35,7 +35,7 @@ export default function MoreOptions({ navigation, list }) {
               }
             : {
                 id: 'pay',
-                title: 'Papers Extras',
+                title: 'Buy Papers (no ads)',
                 icon: 'next',
                 onPress: () => navigation.navigate('settings-purchases'),
               },
@@ -61,23 +61,23 @@ export default function MoreOptions({ navigation, list }) {
         ].map(item => (
           <Item key={item.id} {...item} />
         ))}
-        <View style={Styles.listSpacer} />
+        {/* <View style={Styles.listSpacer} /> */}
       </View>
 
-      <View style={[{ marginTop: 16 }]}>
+      <View style={[Styles.footer]}>
         <Text style={[Theme.typography.small, { color: Theme.colors.grayDark }]}>
           Made with 🖤 by Maggie and Sandy.
         </Text>
         <View style={{ display: 'flex', flexDirection: 'row', marginTop: 8 }}>
           <Text style={[Theme.typography.small]}>
-            Papers version {about.version}@{about.ota} ∙
+            Version {about.version}@{about.ota} ∙
           </Text>
           <TouchableOpacity onPress={() => navigation.navigate('settings-credits')}>
             <Text
               style={[
                 Theme.typography.small,
                 Theme.u.center,
-                { color: Theme.colors.grayDark, textDecorationLine: 'underline', marginLeft: 4 },
+                { textDecorationLine: 'underline', marginLeft: 4 },
               ]}
             >
               Acknowledgments
@@ -101,8 +101,15 @@ MoreOptions.propTypes = {
 const Styles = StyleSheet.create({
   listSpacer: {
     height: 8,
-    borderBottomColor: Theme.colors.grayDark,
+    borderBottomColor: Theme.colors.grayLight,
     borderBottomWidth: 1,
     marginBottom: 8,
+    marginHorizontal: 16,
+  },
+  footer: {
+    marginTop: 24,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
   },
 })

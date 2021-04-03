@@ -2,11 +2,20 @@ import React from 'react'
 import { StyleSheet, TouchableHighlight, View, Switch, Text } from 'react-native'
 import PropTypes from 'prop-types'
 
-import { IconArrow } from '@components/icons'
+import { IconChevron } from '@components/icons'
 
 import * as Theme from '@theme'
 
-export default function Item({ title, description, icon, Icon, variant, switchValue, onPress }) {
+export default function Item({
+  title,
+  description,
+  icon,
+  Icon,
+  variant,
+  switchValue,
+  onPress,
+  hasDivider,
+}) {
   const isSwitch = switchValue !== undefined
   function handleOnPress() {
     // when is a switch, the user must click it instead of the whole area
@@ -23,39 +32,45 @@ export default function Item({ title, description, icon, Icon, variant, switchVa
 
   return (
     <Element {...elProps}>
-      <View
-        style={[
-          Styles.item,
-          {
-            paddingVertical: isSwitch ? 20 : 24,
-          },
-        ]}
-      >
-        <View style={Styles.text}>
-          <Text
-            style={[Theme.typography.body, variant === 'danger' && { color: Theme.colors.danger }]}
-          >
-            {title}
-          </Text>
-          {description && <Text style={[Theme.typography.small]}>{description}</Text>}
+      <>
+        {hasDivider ? <View style={Styles.divider}></View> : null}
+        <View
+          style={[
+            Styles.item,
+            {
+              paddingVertical: isSwitch ? 20 : 24,
+            },
+          ]}
+        >
+          <View style={Styles.text}>
+            <Text
+              style={[
+                Theme.typography.body,
+                variant === 'danger' && { color: Theme.colors.danger },
+              ]}
+            >
+              {title}
+            </Text>
+            {description && <Text style={[Theme.typography.small]}>{description}</Text>}
+          </View>
+          {isSwitch && (
+            <Switch
+              trackColor={{ false: Theme.colors.grayLight, true: Theme.colors.grayDark }}
+              thumbColor={Theme.colors.bg}
+              ios_backgroundColor={Theme.colors.grayLight}
+              onValueChange={onPress}
+              value={switchValue}
+            />
+          )}
+          {Icon ? (
+            <Icon size={16} color={variant === 'danger' && Theme.colors.danger} />
+          ) : icon === 'next' ? (
+            <IconChevron size={24} color={Theme.colors.grayDark} />
+          ) : icon ? (
+            <Text style={Theme.typography.secondary}>{icon}</Text>
+          ) : null}
         </View>
-        {isSwitch && (
-          <Switch
-            trackColor={{ false: Theme.colors.grayLight, true: Theme.colors.grayDark }}
-            thumbColor={Theme.colors.bg}
-            ios_backgroundColor={Theme.colors.grayLight}
-            onValueChange={onPress}
-            value={switchValue}
-          />
-        )}
-        {Icon ? (
-          <Icon size={16} color={variant === 'danger' && Theme.colors.danger} />
-        ) : icon === 'next' ? (
-          <IconArrow size={20} />
-        ) : icon ? (
-          <Text style={Theme.typography.secondary}>{icon}</Text>
-        ) : null}
-      </View>
+      </>
     </Element>
   )
 }
@@ -78,10 +93,15 @@ const Styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    // backgroundColor: Theme.colors.yellow,
   },
   text: {
     flexShrink: 1,
     marginRight: 16,
+  },
+  divider: {
+    borderTopWidth: 1,
+    marginHorizontal: 16,
+    marginVertical: 4,
+    borderTopColor: Theme.colors.grayLight,
   },
 })

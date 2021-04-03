@@ -14,6 +14,7 @@ import ListTeams from '@components/list-teams'
 
 import SettingsProfile from './SettingsProfile.js'
 import SettingsGame from './SettingsGame.js'
+import SettingsProfileAvatar from './SettingsProfileAvatar.js'
 import Account from './Account.js'
 import AccountDeletion from './AccountDeletion.js'
 import Experimental from './Experimental.js'
@@ -63,6 +64,7 @@ export default function Settings(props) {
         </>
       ) : null}
       <Stack.Screen name="settings-profile" component={SettingsProfile} />
+      <Stack.Screen name="settings-profile-avatar" component={SettingsProfileAvatar} />
       <Stack.Screen name="settings-account" component={Account} />
       <Stack.Screen name="settings-accountDeletion" component={AccountDeletion} />
       <Stack.Screen name="settings-privacy" component={Privacy} />

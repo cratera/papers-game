@@ -1,12 +1,12 @@
 import React from 'react'
-import { StyleSheet, TouchableHighlight, ScrollView, View, Text } from 'react-native'
+import { StyleSheet, TouchableOpacity, ScrollView, View, Text, TextInput } from 'react-native'
 import PropTypes from 'prop-types'
 
 import PapersContext from '@store/PapersContext.js'
 import * as Theme from '@theme'
 
 import Page from '@components/page'
-import { IconArrow } from '@components/icons'
+import { IconPencil } from '@components/icons'
 
 import Avatar from '@components/avatar'
 import MoreOptions from './MoreOptions.js'
@@ -14,6 +14,7 @@ import { useSubHeader } from './utils'
 
 export default function SettingsProfile({ navigation }) {
   const Papers = React.useContext(PapersContext)
+  const [name, setName] = React.useState('')
   const { profile } = Papers.state
 
   useSubHeader(navigation, 'Settings')
@@ -22,27 +23,51 @@ export default function SettingsProfile({ navigation }) {
     <Page>
       <Page.Main headerDivider>
         <ScrollView style={[Theme.u.scrollSideOffset, { paddingTop: 0 }]}>
-          <TouchableHighlight
+          <TouchableOpacity
+            activeOpacity={0.7}
             style={Theme.u.cardEdge}
-            underlayColor={Theme.colors.primaryLight}
-            onPress={() => navigation.navigate('settings-account')}
+            onPress={() => navigation.navigate('settings-profile-avatar')}
           >
             <View style={Styles.accountTap}>
               <Avatar
                 style={Styles.accountTap_avatar}
                 src={profile.avatar}
-                size="ll"
+                size="xxl"
                 stroke={1}
                 alt=""
               />
-              <View style={{ flexGrow: 1 }}>
-                <Text style={[Theme.typography.small]}>Account</Text>
-                <Text style={[Theme.typography.body]}>{profile.name}</Text>
+              <View style={Styles.accountTap_avatarIcon}>
+                <IconPencil size={24} color={Theme.colors.bg} />
               </View>
-              <IconArrow size={20} style={{ marginRight: 16 }} />
             </View>
-          </TouchableHighlight>
-          <MoreOptions navigation={navigation} />
+          </TouchableOpacity>
+          <View style={[Theme.u.flexBetween]}>
+            <Text nativeID="inputNameLabel" style={Theme.typography.body}>
+              Name
+            </Text>
+            <TextInput
+              style={Styles.input}
+              inputAccessoryViewID="name"
+              nativeID="inputNameLabel"
+              defaultValue={profile.name}
+              maxLength={10}
+              returnKeyType="done"
+              onChangeText={text => setName(text)}
+              onBlur={() => name && Papers.updateProfile({ name })}
+            />
+          </View>
+          <MoreOptions
+            navigation={navigation}
+            list={[
+              {
+                id: 'del',
+                title: 'Delete account',
+                onPress: () => navigation.navigate('settings-accountDeletion'),
+                variant: 'danger',
+                hasDivider: true,
+              },
+            ]}
+          ></MoreOptions>
         </ScrollView>
       </Page.Main>
     </Page>
@@ -56,26 +81,30 @@ SettingsProfile.propTypes = {
 const Styles = StyleSheet.create({
   accountTap: {
     display: 'flex',
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
-    marginTop: -1,
-    borderBottomColor: Theme.colors.grayDark,
-    borderTopColor: Theme.colors.grayDark,
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
   },
-  accountTap_avatar: {
-    marginRight: 16,
-    marginTop: -1, // to hide double border
-    marginBottom: -1,
+  accountTap_avatar: {},
+  accountTap_avatarIcon: {
+    width: 32,
+    height: 32,
+    backgroundColor: Theme.colors.grayDark,
+    borderRadius: 12,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: -16 - 8,
+    marginLeft: '50%',
+    transform: [{ translateX: -16 - 8 }],
   },
   input: {
     borderColor: 'transparent',
     borderWidth: 0,
-    padding: 12,
+    paddingVertical: 12,
+    paddingRight: 6,
     marginTop: 4,
     fontSize: Theme.fontSize.base,
-    color: Theme.colors.grayDark,
+    color: Theme.colors.grayMedium,
     backgroundColor: Theme.colors.bg,
   },
   list: {

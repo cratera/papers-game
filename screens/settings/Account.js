@@ -44,7 +44,6 @@ export default function SettingsAccount({ navigation }) {
                 inputAccessoryViewID="name"
                 nativeID="inputNameLabel"
                 defaultValue={profile.name}
-                value={profile.name}
                 maxLength={10}
                 returnKeyType="done"
                 onChangeText={text => setName(text)}

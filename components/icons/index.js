@@ -174,6 +174,16 @@ export const IconExternal = ({ size, color, style, ...props }) /* eslint-disable
   )
 }
 
+export const IconPencil = ({ size, color, style, ...props }) /* eslint-disable-line */ => {
+  const { styleWithSize, baseColor } = useProps(size, color, style)
+  // prettier-ignore
+  return (
+    <Svg  style={ styleWithSize } xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <Path fill={baseColor} d="M14.1 7.6a.3.3 0 00-.4 0C4 17.6 5 16.4 5 16.6l-1 2.8a.5.5 0 00.4.7h.3l3-1 8.7-8.8a.3.3 0 000-.3l-2.3-2.4zM16.7 4.6l-1.3 1.3a.3.3 0 000 .4l2.3 2.3a.3.3 0 00.4 0l1.3-1.3a2 2 0 00.6-1.4c0-1.7-2-2.5-3.3-1.3z" />
+    </Svg>
+  )
+}
+
 export const IllustrationStars = props =>
   // prettier-ignore
   <Svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 229 273" {...props}>

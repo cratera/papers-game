@@ -69,8 +69,8 @@ const Styles = StyleSheet.create({
     height: 104,
   },
   size_xxl: {
-    width: 120,
-    height: 120,
+    width: 152,
+    height: 152,
   },
   size_xxxl: {
     width: 295,
