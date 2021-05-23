@@ -145,5 +145,5 @@ export function mailToBug(version) {
 }
 
 export function isDebugging(profileName) {
-  return profileName === 'SandyBug'
+  return profileName && profileName.includes('_bug')
 }
