@@ -28,6 +28,7 @@ Here's a list of my learnings while building this mobile game with reac-native.
   - Update 2 days later: Use a React class component with Error Boundary. (App.js -> AppFn.js)
 - Add [firebase-analytics](https://docs.expo.io/versions/latest/sdk/firebase-analytics/). Update. Do NOT forget to [release a iOS build to TestFlight](https://github.com/expo/expo/issues/8277)
 - Use [Sentry expo and web](https://github.com/expo/sentry-expo/issues/77#issuecomment-646099545)
+- CocoaPods - When u need to install the latest version, use `pod update` and `pod install`.
 
 # Releases
 
