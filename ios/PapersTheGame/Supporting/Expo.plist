@@ -9,7 +9,7 @@
 	<key>EXUpdatesLaunchWaitMs</key>
 	<integer>15000</integer>
 	<key>EXUpdatesSDKVersion</key>
-	<string>40.0.0</string>
+	<string>41.0.0</string>
 	<key>EXUpdatesURL</key>
 	<string>https://papers-native.firebaseapp.com/ios-index.json</string>
 </dict>

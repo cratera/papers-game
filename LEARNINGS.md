@@ -131,7 +131,7 @@ Links that helped me during the journey to figure out the release process:
 
 ---
 
-- **Update June 1:**
+- **Update June 1 2020:**
   So far, my biggest learning was to realize that it's okay to not follow best practices while building a side project / prototype.
   - Three components in the same file? No problem at all.
   - A component with 🍝 code? Add a `TODO`.

@@ -141,11 +141,11 @@ PODS:
   - nanopb/decode (2.30907.0)
   - nanopb/encode (2.30907.0)
   - PromisesObjC (1.2.12)
-  - Purchases (3.9.2):
-    - PurchasesCoreSwift (= 3.9.2)
-  - PurchasesCoreSwift (3.9.2)
-  - PurchasesHybridCommon (1.5.0):
-    - Purchases (= 3.9.2)
+  - Purchases (3.10.7):
+    - PurchasesCoreSwift (= 3.10.7)
+  - PurchasesCoreSwift (3.10.7)
+  - PurchasesHybridCommon (1.6.2):
+    - Purchases (= 3.10.7)
   - RCTRequired (0.63.4)
   - RCTTypeSafety (0.63.4):
     - FBLazyVector (= 0.63.4)
@@ -382,8 +382,8 @@ PODS:
     - React
   - RNGestureHandler (1.10.3):
     - React-Core
-  - RNPurchases (4.0.0):
-    - PurchasesHybridCommon (= 1.5.0)
+  - RNPurchases (4.1.2):
+    - PurchasesHybridCommon (= 1.6.2)
     - React-Core
   - RNReanimated (2.1.0):
     - DoubleConversion
@@ -706,9 +706,9 @@ SPEC CHECKSUMS:
   GoogleUtilities: f8a43108b38a68eebe8b3540e1f4f2d28843ce20
   nanopb: 59221d7f958fb711001e6a449489542d92ae113e
   PromisesObjC: 3113f7f76903778cf4a0586bd1ab89329a0b7b97
-  Purchases: d8a798c9c7552fe66b550bf314a143e94ffa70c8
-  PurchasesCoreSwift: ea4eabae180416e580ac60366f41aa1fefec0693
-  PurchasesHybridCommon: d9bfb34309db4c9ba82a6f7f3a6275c13befdca7
+  Purchases: b8b8fb6e856ac8166e217f6e014df894d821dda1
+  PurchasesCoreSwift: 8ae0f08e020f0bc97c1befa4e38a0dbc8e9732e0
+  PurchasesHybridCommon: 5f5c1c245b12fc5e8760af7d11cb10f888109a9b
   RCTRequired: 082f10cd3f905d6c124597fd1c14f6f2655ff65e
   RCTTypeSafety: 8c9c544ecbf20337d069e4ae7fd9a377aadf504b
   React: b0a957a2c44da4113b0c4c9853d8387f8e64e615
@@ -734,7 +734,7 @@ SPEC CHECKSUMS:
   RNCAsyncStorage: f47a7e8f927f7c9da947491fc55752eb9ce17f2d
   RNCMaskedView: 5a8ec07677aa885546a0d98da336457e2bea557f
   RNGestureHandler: a479ebd5ed4221a810967000735517df0d2db211
-  RNPurchases: b0f86f23b23cf238a2dd9bb174b1c9f0aa91f499
+  RNPurchases: 42da7176d5091f95d380968e56c1e33a2040c525
   RNReanimated: 70f662b5232dd5d19ccff581e919a54ea73df51c
   RNScreens: e8e8dd0588b5da0ab57dcca76ab9b2d8987757e0
   RNSVG: ce9d996113475209013317e48b05c21ee988d42e
@@ -753,6 +753,6 @@ SPEC CHECKSUMS:
   UMTaskManagerInterface: 203c11259d2699b5b3a4eda4adbc466f5cb5c561
   Yoga: 4bd86afe9883422a7c4028c00e34790f560923d6
 
-PODFILE CHECKSUM: b705df4c0a738927f469b4cfb1757f8a0512e2ff
+PODFILE CHECKSUM: 95e17b58f011a6369ab658ccc38c5274f2e5c445
 
 COCOAPODS: 1.10.1
