@@ -6,7 +6,7 @@ Papers is the perfect game for your dinner party. Made with love by [Sandrina](s
 
 ## Status
 
-In development... 90% done. We hope to release in a month or two. [Public roadmap](https://github.com/sandrina-p/papers-game/projects/1)
+90% done. It's on hold. [Public roadmap](https://github.com/sandrina-p/papers-game/projects/1)
 
 ## How to play
 
