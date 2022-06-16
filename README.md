@@ -1,6 +1,6 @@
 # Papers
 
-Papers is the perfect game for your dinner party. Made with love by [Sandrina](sandrina-p.net) and [Margarida](https://www.linkedin.com/in/margaridambotelho/) 😎
+Papers is the perfect game for your dinner party. Made with love by [Sandrina]([sandrina-p.net](https://www.sandrina-p.net/)) and [Margarida](https://www.linkedin.com/in/margaridambotelho/) 😎
 
 ---
 
