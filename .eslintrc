@@ -1,0 +1,30 @@
+{
+  "env": {
+    "browser": true,
+    "react-native/react-native": true // whitelists all browser-like globals. https://www.npmjs.com/package/eslint-plugin-react-native
+  },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "settings": {
+    "import/resolver": {
+      "typescript": {}
+    }
+  },
+  "plugins": ["react", "react-native", "@typescript-eslint", "prettier"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:react/jsx-runtime", // https://github.com/jsx-eslint/eslint-plugin-react/blob/master/docs/rules/react-in-jsx-scope.md#when-not-to-use-it
+    "plugin:react-hooks/recommended", // https://reactjs.org/docs/hooks-rules.html
+    "plugin:react-native/all",
+    "plugin:@typescript-eslint/recommended",
+    "prettier"
+  ],
+  "rules": {
+    "prettier/prettier": "error", // flags prettier errors as lint errors. https://github.com/prettier/eslint-plugin-prettier#installation
+    "react-native/sort-styles": "off" // we don't want to sort styles alphabetically in order to avoid bugs/unexpected behaviors
+  }
+}
