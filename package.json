@@ -1,6 +1,11 @@
 {
   "name": "papers-game",
   "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "npm": "please-use-yarn",
+    "yarn": ">=1.22.17"
+  },
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
@@ -58,6 +63,5 @@
     "lint-staged": "^13.2.2",
     "prettier": "^2.8.8",
     "typescript": "^4.9.4"
-  },
-  "private": true
+  }
 }
