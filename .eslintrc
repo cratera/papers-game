@@ -9,6 +9,9 @@
     "sourceType": "module"
   },
   "settings": {
+    "react": {
+      "version": "detect" // tells eslint-plugin-react to automatically detect the version of React we're using
+    },
     "import/resolver": {
       "typescript": {}
     }
