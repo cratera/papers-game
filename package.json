@@ -10,13 +10,17 @@
     "check-types": "tsc --noemit",
     "format": "yarn format:prettier && yarn format:eslint",
     "format:prettier": "prettier --write . --ignore-path .gitignore",
-    "format:eslint": "eslint --fix . --ext .js,.ts,.tsx --ignore-path .gitignore && yarn check-types"
+    "format:eslint": "eslint --fix . --ext .js,.jsx,.ts,.tsx --ignore-path .gitignore"
   },
   "lint-staged": {
-    "*.{js,ts,tsx}": [
+    "*.{js,jsx}": [
       "yarn format"
     ],
-    "*.{json}": [
+    "*.{ts,tsx}": [
+      "yarn format",
+      "yarn check:types"
+    ],
+    "*.json": [
       "yarn format:prettier"
     ]
   },
