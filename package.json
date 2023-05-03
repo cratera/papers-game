@@ -12,6 +12,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "prepare": "husky install",
     "check:writing": "alex .",
     "check:types": "tsc --noemit",
     "format": "yarn format:prettier && yarn format:eslint",
