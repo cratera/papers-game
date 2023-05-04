@@ -1,4 +1,5 @@
 {
+  "root": true,
   "env": {
     "browser": true,
     "react-native/react-native": true // whitelists all browser-like globals. https://www.npmjs.com/package/eslint-plugin-react-native
