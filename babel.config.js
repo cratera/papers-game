@@ -11,6 +11,7 @@ module.exports = function (api) {
             // NOTE: we need to use the same alias as in tsconfig.json
             '@constants': './src/constants',
             '@hooks': './src/hooks',
+            '@services': './src/services',
             '@utils': './src/utils',
           },
         },
