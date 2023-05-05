@@ -1,0 +1,16 @@
+{
+  "recommendations": [
+    // ESLint: https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint
+    "dbaeumer.vscode-eslint",
+    // markdownlint: https://marketplace.visualstudio.com/items?itemName=davidanson.vscode-markdownlint
+    "davidanson.vscode-markdownlint",
+    // AlexJS Linter: https://marketplace.visualstudio.com/items?itemName=tlahmann.alex-linter
+    "tlahmann.alex-linter",
+    // Prettier - Code formatter: https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode
+    "esbenp.prettier-vscode",
+    // Prettier ESLint: https://marketplace.visualstudio.com/items?itemName=rvest.vs-code-prettier-eslint
+    "rvest.vs-code-prettier-eslint",
+    // Path Intellisense: https://marketplace.visualstudio.com/items?itemName=christian-kohler.path-intellisense
+    "christian-kohler.path-intellisense"
+  ]
+}
