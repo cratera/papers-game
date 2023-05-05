@@ -1,8 +1,8 @@
 import { ExpoConfig } from 'expo/config'
 
 const config: ExpoConfig = {
-  name: 'papers-game',
-  slug: 'papers-game',
+  name: 'Papers',
+  slug: 'papers',
   version: '1.0.0',
   orientation: 'portrait',
   icon: './assets/icon.png',
@@ -24,6 +24,12 @@ const config: ExpoConfig = {
   },
   web: {
     favicon: './assets/favicon.png',
+  },
+  owner: 'papers',
+  extra: {
+    eas: {
+      projectId: 'f3247b54-01c0-4013-9388-e3706870bdbd',
+    },
   },
 }
 
