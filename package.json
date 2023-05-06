@@ -30,9 +30,9 @@
     "*.json": [
       "yarn format:prettier"
     ],
-    "*.{md,mdx}": [
+    "*.{md,mdx,txt,html}": [
       "yarn format:prettier",
-      "yarn check:writing"
+      "alex"
     ]
   },
   "dependencies": {
