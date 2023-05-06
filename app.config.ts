@@ -1,14 +1,17 @@
 import { ExpoConfig } from 'expo/config'
 
 const config: ExpoConfig = {
-  name: 'Papers',
-  slug: 'papers',
-  version: '1.0.0',
+  version: '0.0.0',
+  name: 'Papers - The Game',
+  slug: 'papers-game',
+  description: 'The perfect game for your game night with friends or family!',
+  privacy: 'public',
+  platforms: ['ios', 'android', 'web'],
   orientation: 'portrait',
-  icon: './assets/icon.png',
+  icon: './assets/images/icon.png',
   userInterfaceStyle: 'light',
   splash: {
-    image: './assets/splash.png',
+    image: './assets/images/splash.png',
     resizeMode: 'contain',
     backgroundColor: '#ffffff',
   },
@@ -18,12 +21,12 @@ const config: ExpoConfig = {
   },
   android: {
     adaptiveIcon: {
-      foregroundImage: './assets/adaptive-icon.png',
+      foregroundImage: './assets/images/icon.png',
       backgroundColor: '#ffffff',
     },
   },
   web: {
-    favicon: './assets/favicon.png',
+    favicon: './assets/images/icon.png',
   },
   owner: 'papers',
   extra: {

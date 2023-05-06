@@ -1,6 +1,6 @@
 {
   "name": "papers-game",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "private": true,
   "engines": {
     "npm": "please-use-yarn",
@@ -37,6 +37,9 @@
   },
   "dependencies": {
     "expo": "~48.0.15",
+    "expo-font": "~11.1.1",
+    "expo-modules-autolinking": "~1.1.0 || ~1.2.0",
+    "expo-splash-screen": "~0.18.2",
     "expo-status-bar": "~1.4.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -56,6 +59,7 @@
     "@typescript-eslint/eslint-plugin": "^5.59.1",
     "@typescript-eslint/parser": "^5.59.1",
     "alex": "^11.0.0",
+    "babel-plugin-module-resolver": "^5.0.0",
     "eslint": "^8.39.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",
