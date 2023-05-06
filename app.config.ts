@@ -46,6 +46,12 @@ const config: ExpoConfig = {
       },
     ],
   },
+  updates: {
+    url: 'https://u.expo.dev/f071d04b-99d2-40f3-a7e6-734ef20b604e',
+  },
+  runtimeVersion: {
+    policy: 'sdkVersion',
+  },
 }
 
 export default config
