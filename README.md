@@ -2,6 +2,8 @@
 
 Revamp coming...
 
+Build previews of the main branch can be found [here](https://expo.dev/accounts/cratera/projects/papers-game/branches/main).
+
 ## Development
 
 [![runs with Bara Expo](https://img.shields.io/badge/Runs%20with%20Expo-000.svg?style=flat-square&logo=EXPO&labelColor=f3f3f3&logoColor=000)](https://expo.io/)
