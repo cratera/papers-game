@@ -2,8 +2,9 @@ import { ExpoConfig } from 'expo/config'
 
 const config: ExpoConfig = {
   version: '0.0.0',
-  name: 'Papers - The Game',
+  owner: 'cratera',
   slug: 'papers-game',
+  name: 'Papers - The Game',
   description: 'The perfect game for your game night with friends or family!',
   privacy: 'public',
   platforms: ['ios', 'android', 'web'],
@@ -28,10 +29,9 @@ const config: ExpoConfig = {
   web: {
     favicon: './assets/images/icon.png',
   },
-  owner: 'papers',
   extra: {
     eas: {
-      projectId: 'f3247b54-01c0-4013-9388-e3706870bdbd',
+      projectId: 'f071d04b-99d2-40f3-a7e6-734ef20b604e',
     },
   },
   plugins: ['sentry-expo'],
