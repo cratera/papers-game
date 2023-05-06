@@ -1,8 +1,8 @@
-name: 'expo:create-preview'
-on: push
+on:
+  workflow_call:
 
 jobs:
-  update:
+  create_preview:
     name: Create Expo Preview
     runs-on: ubuntu-latest
     permissions:
@@ -35,23 +35,3 @@ jobs:
 
       - name: Publish preview to Expo
         run: eas update --auto --non-interactive --json > build.json
-
-      - name: Extract build IDs from build.json
-        run: |
-          android_id=$(cat build.json | jq -r 'map(select(has("platform") and .platform == "android")) | .[0].id')
-          ios_id=$(cat build.json | jq -r 'map(select(has("platform") and .platform == "ios")) | .[0].id')
-          echo "ANDROID_ID=$android_id" >> $GITHUB_ENV
-          echo "IOS_ID=$ios_id" >> $GITHUB_ENV
-
-      - name: Post comment
-        uses: unsplash/comment-on-pr@v1.3.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          msg: |
-            Preview builds were successfully created:
-            | Android | iOS |
-            | --- | --- |
-            | ![Android QR Code](https://qr.expo.dev/eas-update?updateId=${{ env.ANDROID_ID }}&appScheme=exp&host=u.expo.dev) | ![iOS QR Code](https://qr.expo.dev/eas-update?updateId=${{ env.IOS_ID }}&appScheme=exp&host=u.expo.dev) |
-          check_for_duplicate_msg: false
-          delete_prev_regex_msg: 'Preview builds were successfully created:'

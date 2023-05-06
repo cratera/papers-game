@@ -1,0 +1,9 @@
+name: 'expo:create-main-preview'
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  create_expo_preview:
+    uses: ./.github/workflows/create-preview.yml
