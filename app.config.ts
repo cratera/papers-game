@@ -34,6 +34,18 @@ const config: ExpoConfig = {
       projectId: 'f3247b54-01c0-4013-9388-e3706870bdbd',
     },
   },
+  plugins: ['sentry-expo'],
+  hooks: {
+    postPublish: [
+      {
+        file: 'sentry-expo/upload-sourcemaps',
+        config: {
+          organization: 'sandrina-pereira',
+          project: 'papers-game',
+        },
+      },
+    ],
+  },
 }
 
 export default config
