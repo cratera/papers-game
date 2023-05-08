@@ -8,11 +8,8 @@ module.exports = function (api) {
         {
           root: ['.'],
           alias: {
-            // NOTE: we need to use the same alias as in tsconfig.json
-            '@constants': './src/constants',
-            '@hooks': './src/hooks',
-            '@services': './src/services',
-            '@utils': './src/utils',
+            // These aliases must be duplicated in tsconfig.json
+            '@src': './src',
           },
         },
       ],

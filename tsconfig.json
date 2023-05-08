@@ -1,11 +1,9 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
+    // These aliases must be duplicated in babel.config.js
     "paths": {
-      "@constants/*": ["./src/constants/*"],
-      "@hooks/*": ["./src/hooks/*"],
-      "@services/*": ["./src/services/*"],
-      "@utils/*": ["./src/utils/*"]
+      "@src/*": ["./src/*"]
     }
   },
   "extends": "expo/tsconfig.base"
