@@ -2,6 +2,7 @@
   "name": "papers-game",
   "version": "0.0.0",
   "private": true,
+  "license": "MIT",
   "engines": {
     "npm": "please-use-yarn",
     "yarn": ">=1.22.17",
@@ -51,7 +52,7 @@
     "firebase": "^9.21.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-native": "~0.71.7",
+    "react-native": "0.71.8",
     "react-native-svg": "13.4.0",
     "react-native-web": "~0.18.10",
     "sentry-expo": "~6.1.0"
