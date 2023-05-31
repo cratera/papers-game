@@ -24,17 +24,19 @@
   },
   "lint-staged": {
     "*.{js,jsx}": [
-      "yarn format"
+      "prettier --write",
+      "eslint --fix"
     ],
     "*.{ts,tsx}": [
-      "yarn format",
+      "prettier --write",
+      "eslint --fix",
       "tsc-files --noEmit --pretty"
     ],
     "*.json": [
-      "yarn format:prettier"
+      "prettier --write"
     ],
     "*.{md,mdx,txt,html}": [
-      "yarn format:prettier",
+      "prettier --write",
       "alex"
     ]
   },
