@@ -1,6 +1,8 @@
 // Utils that don't fit anywhere else, we can move them later if we find a better place.
 
-export function isDebugging(profileName: string) {
+export function isDebugging(profileName: string | undefined) {
+  if (!profileName) return false
+
   return profileName.includes('_bug')
 }
 

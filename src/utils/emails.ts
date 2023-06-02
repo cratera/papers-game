@@ -1,4 +1,4 @@
-import Device from 'expo-device'
+import * as Device from 'expo-device'
 import { composeAsync } from 'expo-mail-composer'
 import config from '../../app.config'
 

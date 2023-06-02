@@ -11,6 +11,7 @@ const config: ExpoConfig = {
   orientation: 'portrait',
   icon: './assets/images/icon.png',
   userInterfaceStyle: 'light',
+  scheme: 'myapp',
   splash: {
     image: './assets/images/splash.png',
     resizeMode: 'contain',

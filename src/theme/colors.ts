@@ -10,6 +10,7 @@ export default {
   successLight: '#DCF2E6',
   danger: '#FF005c',
   bg: '#ffffff',
+  transparent: 'transparent',
 
   orange: '#EFA16F',
   orange_desatured: '#EFBD9E',
