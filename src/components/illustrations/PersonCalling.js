@@ -85,8 +85,8 @@ export default function IllustrationPersonCalling(props) {
       <Path
         d="M202 296a4 4 0 01-8 3 4 4 0 118-3v0z"
         stroke="#BFBBB8"
-        stroke-width=".5"
-        stroke-miterlimit="10"
+        strokeWidth=".5"
+        strokeMiterlimit="10"
       />
       <Path d="M230 243a1 1 0 11-2 0 1 1 0 012 0z" fill="#BFBBB8" />
       <Path

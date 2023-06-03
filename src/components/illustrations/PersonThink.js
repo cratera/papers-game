@@ -56,15 +56,15 @@ export default function IllustrationPersonCalling(props) {
       <Path
         d="M213 43a1 1 0 00-1 0h-2c1-1 2-3 1-5a2 2 0 00-2-1 2 2 0 00-2 2v4a3 3 0 01-3 0h0l1-3a3 3 0 000-2 2 2 0 00-3 0 3 3 0 00-1 2v3l-1 1h-1v-6a2 2 0 00-3 1 4 4 0 000 3l1 2s0 0 0 0h-1 0a1 1 0 00-1 1v0a1 1 0 000 0s0 0 0 0"
         stroke="#000"
-        stroke-width=".8"
-        stroke-miterlimit="10"
+        strokeWidth=".8"
+        strokeMiterlimit="10"
       />
       <Path
         d="M217 26a17 17 0 00-17-6c-6 2-10 8-11 13-1 6 2 11 4 15l4 8a3 3 0 00-1 2l-1 1 1 1h0l-1 3 1 1s0 0 0 0a2 2 0 000 3l1 1s0 0 0 0c2 3 3 5 8 5h1c4 0 6-3 6-6h1a3 3 0 000-3 1 1 0 000-1l1-1a3 3 0 00-1-2 2 2 0 001-2 2 2 0 00-2-2l2-5v-1l4-6 3-9c0-3-1-6-4-9zm-17 43h4l6-1c-1 2-2 3-5 3a5 5 0 01-5-2h0zm11-8l1 1-4 1-5 1-4-1h-2v-1l1-1 3 1h3l7-1h0zm-1-3a1 1 0 000 0 1 1 0 001 0v-1l1 1-1 1h-2 0l-7 1h0-3l-1-1a1 1 0 01-1-1 1 1 0 011 0 1 1 0 001 0 1 1 0 000 0 1 1 0 001-1l-5-9-3-6c-1-3-2-6-1-9 0-3 2-6 5-8 2-2 5-4 8-3a16 16 0 0113 7l2 6c0 3-1 6-3 8l-4 7v1a37 37 0 00-3 7h1zm2 7a1 1 0 01-1 0c0 1-2 2-7 2h0-1l-5-1a1 1 0 010-1s0 0 0 0l5 1h1a20 20 0 008-2v1h0z"
         fill="#000"
         stroke="#000"
-        stroke-width=".8"
-        stroke-miterlimit="10"
+        strokeWidth=".8"
+        strokeMiterlimit="10"
       />
     </Svg>
   )
