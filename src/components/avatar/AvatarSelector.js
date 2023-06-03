@@ -6,7 +6,7 @@ import { window } from '@src/utils/device'
 
 import { charactersGroups } from '@src/components/avatar/groups'
 import * as avatars from '@src/components/avatar/Illustrations'
-import { useEffectOnce } from '@src/hooks'
+import { useEffectOnce } from 'usehooks-ts'
 
 const avatarsByName = Object.keys(avatars)
 const avatarsTotal = avatarsByName.length

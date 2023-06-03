@@ -9,8 +9,8 @@ import { headerTheme } from '@src/navigation/headerStuff.js'
 import PapersContext from '@src/store/PapersContext.js'
 import { formatSlug } from '@src/utils/formatting'
 
-import { useEffectOnce } from '@src/hooks'
 import * as Theme from '@src/theme'
+import { useEffectOnce } from 'usehooks-ts'
 import Styles from './AccessGameStyles.js'
 
 const i18n = {

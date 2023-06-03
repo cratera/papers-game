@@ -14,7 +14,7 @@ import IllustrationPersonGuess from '@src/components/illustrations/PersonGuess.j
 import IllustrationPersonThink from '@src/components/illustrations/PersonThink.js'
 import Page from '@src/components/page'
 
-import { useEffectOnce } from '@src/hooks'
+import { useEffectOnce } from 'usehooks-ts'
 import Styles from './TutorialStyles.js'
 
 const { vw } = window

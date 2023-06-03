@@ -9,7 +9,7 @@ import Page from '@src/components/page'
 
 import * as Theme from '@src/theme'
 
-import { useEffectOnce } from '@src/hooks'
+import { useEffectOnce } from 'usehooks-ts'
 import Item from './Item.js'
 import { propTypesCommon } from './utils'
 

@@ -1,6 +1,6 @@
-import { useEffectOnce } from '@src/hooks'
 import React from 'react'
 import { Platform } from 'react-native'
+import { useEffectOnce } from 'usehooks-ts'
 import { getPurchaserType, purchaserTypes } from './purchases.service.js'
 
 const isWeb = Platform.OS === 'web'
