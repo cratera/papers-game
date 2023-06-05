@@ -22,4 +22,4 @@ export default [
   'Tea Spillers',
   'Cupcakes',
   'Young Bucks',
-]
+] satisfies string[]
