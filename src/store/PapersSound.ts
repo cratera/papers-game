@@ -1,5 +1,7 @@
 import * as Sentry from '@src/services/sentry'
 import { Audio } from 'expo-av'
+import { SoundObject } from 'expo-av/build/Audio'
+import { SoundLibrary, SoundName, SoundSkinName } from './PapersSound.types'
 
 const SOUNDS = {
   default: {
@@ -17,10 +19,11 @@ const SOUNDS = {
     wrong:
       'https://firebasestorage.googleapis.com/v0/b/papers-game.appspot.com/o/game%2FWrong_answer.mp3?alt=media&token=35146689-f9ad-4e61-9c27-48ff55cfae48',
   },
-}
-const playset = {}
+} satisfies SoundLibrary
 
-let isSoundActive
+const playset = {} as Record<SoundName, SoundObject['sound']>
+
+let isSoundActive: boolean
 
 export async function init(initialSoundActive = true) {
   setSoundStatus(initialSoundActive)
@@ -28,17 +31,17 @@ export async function init(initialSoundActive = true) {
   Audio.setAudioModeAsync({
     interruptionModeIOS: 0,
     playsInSilentModeIOS: true,
-    // interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
   })
 
   await loadAudioSkin()
 }
 
-async function loadAudioSkin() {
+// TODO: at the moment we only have one skin, but we should support more skins
+async function loadAudioSkin(skin: SoundSkinName = 'default') {
   try {
-    for (const soundId in SOUNDS.default) {
+    for (const soundId in SOUNDS[skin]) {
       const { sound } = await Audio.Sound.createAsync(
-        { uri: SOUNDS.default[soundId] },
+        { uri: SOUNDS[skin][soundId] },
         { shouldPlay: false }
       )
       playset[soundId] = sound
@@ -50,7 +53,7 @@ async function loadAudioSkin() {
   return false
 }
 
-export function setSoundStatus(bool) {
+export function setSoundStatus(bool: boolean) {
   isSoundActive = bool
 }
 
@@ -58,7 +61,7 @@ export function getSoundStatus() {
   return isSoundActive
 }
 
-export function play(soundId) {
+export function play(soundId: SoundName) {
   if (!isSoundActive) {
     // console.warn(`🔊 play: sound is off.`)
     return
