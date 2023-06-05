@@ -49,4 +49,4 @@ export default [
     'explicit',
   ],
   ['black', 'grey', 'white', 'red', 'yellow', 'purple', 'green', 'violet', 'blue', 'brown'],
-]
+] satisfies string[][]
