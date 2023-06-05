@@ -29,6 +29,13 @@
   ],
   "rules": {
     "prettier/prettier": "error", // flags prettier errors as lint errors. https://github.com/prettier/eslint-plugin-prettier#installation
-    "react-native/sort-styles": "off" // we don't want to sort styles alphabetically in order to avoid bugs/unexpected behaviors
+    "react-native/sort-styles": "off", // we don't want to sort styles alphabetically in order to avoid bugs/unexpected behaviors
+    "@typescript-eslint/no-var-requires": "off", // we need to use require() in config files
+    "react-native/no-raw-text": [
+      "error",
+      {
+        "skip": ["Button", "Page.HeaderBtn", "LoadingBadge"]
+      }
+    ]
   }
 }

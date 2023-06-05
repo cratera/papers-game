@@ -11,6 +11,7 @@ const config: ExpoConfig = {
   orientation: 'portrait',
   icon: './assets/images/icon.png',
   userInterfaceStyle: 'light',
+  scheme: 'myapp',
   splash: {
     image: './assets/images/splash.png',
     resizeMode: 'contain',
@@ -28,6 +29,18 @@ const config: ExpoConfig = {
   },
   web: {
     favicon: './assets/images/icon.png',
+    config: {
+      firebase: {
+        apiKey: 'AIzaSyBYB6fczaHoB-SKjMRM4VHradIyLtluBHM',
+        authDomain: 'papers-game.firebaseapp.com',
+        databaseURL: 'https://papers-game.firebaseio.com',
+        projectId: 'papers-game',
+        storageBucket: 'papers-game.appspot.com',
+        messagingSenderId: '381121722531',
+        appId: '1:381121722531:web:5d88b1a0b418e4e8c8e716',
+        measurementId: 'G-BFBZ4MNDX4',
+      },
+    },
   },
   extra: {
     eas: {

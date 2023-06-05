@@ -2,6 +2,7 @@
   "name": "papers-game",
   "version": "0.0.0",
   "private": true,
+  "license": "MIT",
   "engines": {
     "npm": "please-use-yarn",
     "yarn": ">=1.22.17",
@@ -18,38 +19,58 @@
     "check:types": "yarn tsc --p . --noEmit",
     "format": "yarn format:prettier && yarn format:eslint",
     "format:prettier": "prettier --write . --ignore-path .gitignore",
-    "format:eslint": "eslint --fix . --ext .js,.jsx,.ts,.tsx --ignore-path .gitignore"
+    "format:eslint": "eslint --fix . --ext .js,.jsx,.ts,.tsx --ignore-path .gitignore",
+    "test": "jest"
   },
   "lint-staged": {
     "*.{js,jsx}": [
-      "yarn format"
+      "prettier --write",
+      "eslint --fix"
     ],
     "*.{ts,tsx}": [
-      "yarn format",
+      "prettier --write",
+      "eslint --fix",
       "tsc-files --noEmit --pretty"
     ],
     "*.json": [
-      "yarn format:prettier"
+      "prettier --write"
     ],
     "*.{md,mdx,txt,html}": [
-      "yarn format:prettier",
+      "prettier --write",
       "alex"
     ]
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "1.17.11",
+    "@react-native-community/netinfo": "9.3.7",
+    "@react-navigation/native": "^6.1.6",
+    "@react-navigation/stack": "^6.3.16",
     "@sentry/react-native": "4.13.0",
     "expo": "~48.0.15",
     "expo-application": "~5.1.1",
+    "expo-av": "~13.2.1",
     "expo-constants": "~14.2.1",
     "expo-device": "~5.2.1",
     "expo-font": "~11.1.1",
+    "expo-linking": "~4.0.1",
+    "expo-mail-composer": "~12.1.1",
     "expo-modules-autolinking": "~1.1.0",
     "expo-splash-screen": "~0.18.2",
     "expo-status-bar": "~1.4.4",
+    "expo-store-review": "~6.2.1",
     "expo-updates": "~0.16.4",
+    "firebase": "^9.21.0",
+    "jest": "^29.2.1",
+    "jest-expo": "^48.0.2",
+    "pubsub-js": "^1.9.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-native": "~0.71.7",
+    "react-native": "0.71.8",
+    "react-native-gesture-handler": " ~2.9.0",
+    "react-native-reanimated": "~2.14.4",
+    "react-native-safe-area-context": "4.5.0",
+    "react-native-screens": "^3.20.0",
+    "react-native-svg": "13.4.0",
     "react-native-web": "~0.18.10",
     "sentry-expo": "~6.1.0"
   },
@@ -60,7 +81,10 @@
     "@commitlint/config-conventional": "^17.6.1",
     "@commitlint/types": "^17.4.4",
     "@expo/webpack-config": "^18.0.4",
+    "@types/jest": "^29.5.1",
+    "@types/lodash": "^4.14.195",
     "@types/node": "^18.16.3",
+    "@types/pubsub-js": "^1.8.3",
     "@types/react": "~18.0.27",
     "@types/react-dom": "~18.0.10",
     "@typescript-eslint/eslint-plugin": "^5.59.1",
@@ -75,10 +99,12 @@
     "eslint-plugin-react-native": "^4.0.0",
     "husky": "^8.0.3",
     "lint-staged": "^13.2.2",
+    "lodash": "^4.17.15",
     "prettier": "^2.8.8",
     "prettier-plugin-organize-imports": "^3.2.2",
     "ts-node": "^10.9.1",
     "tsc-files": "^1.1.3",
-    "typescript": "^4.9.4"
+    "typescript": "^4.9.4",
+    "usehooks-ts": "^2.9.1"
   }
 }
