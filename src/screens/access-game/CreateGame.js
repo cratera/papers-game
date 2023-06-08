@@ -6,7 +6,7 @@ import { Text, TextInput, View } from 'react-native'
 import { LoadingBadge } from '@src/components/loading'
 import Page from '@src/components/page'
 import { headerTheme } from '@src/navigation/headerStuff.js'
-import PapersContext from '@src/store/PapersContext.js'
+import PapersContext from '@src/store/PapersContext'
 import { formatSlug } from '@src/utils/formatting'
 
 import * as Theme from '@src/theme'
@@ -84,7 +84,7 @@ export default function CreateGame({ navigation }) {
     setCreating(true)
     setState((state) => ({ ...state, errorMsg: null }))
 
-    Papers.accessGame('create', state.gameName, (res, errorMsg, opts = {}) => {
+    Papers.accessGame('create', state.gameName, (_, errorMsg, opts = {}) => {
       if (errorMsg) {
         setCreating(false)
         setState((state) => ({

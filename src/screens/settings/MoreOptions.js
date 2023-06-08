@@ -5,7 +5,7 @@ import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native
 import PropTypes from 'prop-types'
 
 import { IconExternal } from '@src/components/icons'
-import PapersContext from '@src/store/PapersContext.js'
+import PapersContext from '@src/store/PapersContext'
 import * as Theme from '@src/theme'
 import { isDebugging } from '@src/utils/misc'
 import Item from './Item.js'

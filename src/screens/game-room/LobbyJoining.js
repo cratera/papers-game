@@ -5,7 +5,7 @@ import { ScrollView } from 'react-native-gesture-handler'
 
 import { analytics as Analytics } from '@src/services/firebase'
 
-import PapersContext from '@src/store/PapersContext.js'
+import PapersContext from '@src/store/PapersContext'
 
 import * as Theme from '@src/theme'
 import Styles from './LobbyStyles.js'
@@ -102,7 +102,7 @@ export default function LobbyJoining({ navigation }) {
     // 1. Create a game on IOS. Let another player join.
     // 2. Open the file utils.js and edit the file (can be anything, ex: confirmLeaveGame)
     // 3. The page will refresh and PapersContext will return empty {}. (if not, repeat step 2.)
-    //    But the logs at PapersContext.js show all the data as expected.
+    //    But the logs at PapersContext show all the data as expected.
     //
     // Analysis: It seems this component stops receiving new updates from context.
     // Maybe it's a bug with the hot reload (RN or Expo?) It does not happen on browser.
@@ -154,7 +154,7 @@ export default function LobbyJoining({ navigation }) {
         {__DEV__ && game.teams && profileIsAdmin && (
           <Button
             variant="danger"
-            onPress={Papers.setWordsForEveyone}
+            onPress={Papers.setWordsForEveryone}
             styleTouch={{ marginTop: 16 }}
           >
             {"💥 Write everyone's papers 💥"}

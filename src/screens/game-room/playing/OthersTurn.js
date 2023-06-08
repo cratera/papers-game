@@ -4,7 +4,7 @@ import { Text, View } from 'react-native'
 
 import { convertMsToSec } from '@src/utils/formatting'
 
-import PapersContext from '@src/store/PapersContext.js'
+import PapersContext from '@src/store/PapersContext'
 
 import Avatar from '@src/components/avatar'
 import Button from '@src/components/button'
@@ -61,7 +61,7 @@ const OthersTurn = ({
     }
   }, [amIWaiting, isTurnOn, game.hasStarted, playersOffline, turnWhoStringified])
 
-  console.log('...', game.players, playersOffline)
+  // console.log('...', game.players, playersOffline)
 
   return (
     <Page>

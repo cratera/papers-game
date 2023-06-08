@@ -8,7 +8,7 @@ import { analytics as Analytics } from '@src/services/firebase'
 import Button from '@src/components/button'
 import { IconArrow, IconCheck, IllustrationSmile } from '@src/components/icons'
 import Page from '@src/components/page'
-import PapersContext from '@src/store/PapersContext.js'
+import PapersContext from '@src/store/PapersContext'
 import * as Theme from '@src/theme'
 import Styles from './WritePapersStyles.js'
 

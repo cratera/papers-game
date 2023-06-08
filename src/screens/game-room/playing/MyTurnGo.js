@@ -4,7 +4,7 @@ import { Pressable, Text, View } from 'react-native'
 
 import { usePrevious } from '@src/hooks'
 import * as Sentry from '@src/services/sentry'
-import PapersContext from '@src/store/PapersContext.js'
+import PapersContext from '@src/store/PapersContext'
 import { convertMsToSec } from '@src/utils/formatting'
 import { getRandomInt } from '@src/utils/misc'
 

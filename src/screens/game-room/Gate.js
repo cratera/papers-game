@@ -4,7 +4,7 @@ import React from 'react'
 import { analytics as Analytics } from '@src/services/firebase'
 import * as Sentry from '@src/services/sentry'
 
-import PapersContext from '@src/store/PapersContext.js'
+import PapersContext from '@src/store/PapersContext'
 
 import { headerTheme } from '@src/navigation/headerStuff.js'
 

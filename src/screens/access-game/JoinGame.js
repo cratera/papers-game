@@ -7,7 +7,7 @@ import { formatSlug } from '@src/utils/formatting'
 
 import { LoadingBadge } from '@src/components/loading'
 import Page from '@src/components/page'
-import PapersContext from '@src/store/PapersContext.js'
+import PapersContext from '@src/store/PapersContext'
 
 import * as Theme from '@src/theme'
 import Styles from './AccessGameStyles.js'
@@ -207,7 +207,7 @@ export default function JoinGame({ navigation }) {
     const gameSlugged = formatSlug(state.gameName)
     const gameId = `${gameSlugged}_${state.code}`
 
-    Papers.accessGame('join', gameId, (res, errorMsg, opts = {}) => {
+    Papers.accessGame('join', gameId, (_, errorMsg, opts) => {
       if (errorMsg) {
         setJoining(false)
         setState((state) => ({

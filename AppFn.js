@@ -23,7 +23,7 @@ import Home from '@src/screens/home'
 import Settings from '@src/screens/settings'
 import Tutorial from '@src/screens/tutorial'
 import * as Sentry from '@src/services/sentry'
-import { loadProfile, PapersContextProvider } from '@src/store/PapersContext.js'
+import { loadProfile, PapersContextProvider } from '@src/store/PapersContext'
 import { animations } from '@src/theme'
 
 const Stack = createStackNavigator()

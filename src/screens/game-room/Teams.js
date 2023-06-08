@@ -7,8 +7,8 @@ import { analytics as Analytics } from '@src/services/firebase'
 // import Bubbling from '@src/components/bubbling'
 import { LoadingBadge } from '@src/components/loading'
 
-import PapersContext from '@src/store/PapersContext.js'
-import teamNames from '@src/store/teamNames.js'
+import PapersContext from '@src/store/PapersContext'
+import teamNames from '@src/store/teamNames'
 import { getRandomInt } from '@src/utils/misc'
 
 import Button from '@src/components/button'

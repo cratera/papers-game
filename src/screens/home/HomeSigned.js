@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import { Text, TouchableOpacity } from 'react-native'
 
-import PapersContext from '@src/store/PapersContext.js'
+import PapersContext from '@src/store/PapersContext'
 
 import * as Theme from '@src/theme'
 import Styles from './HomeStyles.js'

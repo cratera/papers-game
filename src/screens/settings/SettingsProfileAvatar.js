@@ -1,7 +1,7 @@
 import React from 'react'
 import { Text, View } from 'react-native'
 
-import PapersContext from '@src/store/PapersContext.js'
+import PapersContext from '@src/store/PapersContext'
 import * as Theme from '@src/theme'
 
 import AvatarSelector from '@src/components/avatar/AvatarSelector'

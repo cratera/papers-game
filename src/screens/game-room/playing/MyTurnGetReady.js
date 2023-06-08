@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 
-import PapersContext from '@src/store/PapersContext.js'
+import PapersContext from '@src/store/PapersContext'
 import { isTamagoshi } from '@src/utils/device'
 
 import Avatar from '@src/components/avatar'

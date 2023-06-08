@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 import { analytics as Analytics } from '@src/services/firebase'
 
 import { useCountdown, usePrevious } from '@src/hooks'
-import PapersContext from '@src/store/PapersContext.js'
+import PapersContext from '@src/store/PapersContext'
 
 import { headerTheme } from '@src/navigation/headerStuff.js'
 

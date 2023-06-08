@@ -2,9 +2,9 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import { Alert, Platform, Text, TouchableHighlight, View } from 'react-native'
 
-import PapersContext from '@src/store/PapersContext.js'
+import PapersContext from '@src/store/PapersContext'
 
-import { getTeamId } from '@src/store/papersMethods.js'
+import { getTeamId } from '@src/store/papersMethods'
 
 import Avatar from '@src/components/avatar'
 import Button from '@src/components/button'

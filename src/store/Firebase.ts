@@ -11,11 +11,7 @@ import PubSub from 'pubsub-js'
 import { analytics as Analytics } from '@src/services/firebase'
 import * as Sentry from '@src/services/sentry'
 import { formatSlug } from '@src/utils/formatting'
-
-// Fixing a bug with firebase file upload put() _avatarUpload()
-// https://forums.expo.io/t/imagepicker-base64-to-firebase-storage-problem/1415/11
-// import Base64 from 'base-64';
-// global.atob = Base64.encode;
+import { Game, GameTeams, PapersContextState, Profile, Round, Score } from './PapersContext.types'
 
 const firebaseConfig = {
   // https://stackoverflow.com/questions/37482366/is-it-safe-to-expose-firebase-apikey-to-the-public
@@ -29,8 +25,8 @@ const firebaseConfig = {
   measurementId: 'G-BFBZ4MNDX4',
 }
 
-let LOCAL_PROFILE = {} // not sure if this is good.
-let DB // firebase database
+let LOCAL_PROFILE: Profile // not sure if this is good.
+let DB: firebase.database.Database // firebase database
 
 const PUBLIC_API = {
   on,
@@ -38,7 +34,6 @@ const PUBLIC_API = {
   signIn,
   updateProfile, // setUser?
   resetProfile,
-  getUser,
 
   createGame,
   joinGame,
@@ -64,7 +59,7 @@ const PUBLIC_API = {
   setRound,
 }
 
-export default function init(options) {
+export default function init() {
   if (__DEV__) console.log('⚙️ init()')
 
   if (firebase.apps.length > 0) {
@@ -86,7 +81,6 @@ export default function init(options) {
       PubSub.publish('profile.signed', LOCAL_PROFILE.id)
     } else {
       // User is signed out.
-      // ...
     }
   })
 
@@ -94,241 +88,91 @@ export default function init(options) {
 }
 
 /**
- * PubSub system. Bridge with PapersContext to subscribe to.
- * @param {string} topic - The topic to subscribe to.
- * @param {function} cb - The cb to be executed when the topic is emitted.
- * @example
- * // Topics available:
- * # 'signed'
- * - (id) - the userid from firebase.
+ * PubSub system. Bridge between PapersContext and Firebase events.
  */
-function on(topic, cb) {
-  if (__DEV__) console.log('⚙️ on()', topic)
-  PubSub.subscribe(topic, cb)
+// TODO: create typed PubSub wrapper functions where we can map the event name to the payload type.
+function on(...params: Parameters<typeof PubSub.subscribe>) {
+  if (__DEV__) console.log('⚙️ on()', params[0])
+  PubSub.subscribe(...params)
 }
 
 async function offAll() {
   const gameId = LOCAL_PROFILE.gameId
   if (__DEV__) console.log('⚙️ offAll(), Firebase disconnecting!', gameId)
   PubSub.clearAllSubscriptions()
-  _unsubGame(gameId)
+
+  if (gameId) {
+    _unsubGame(gameId)
+  }
 }
 
-// ============== AUTH / PROFILE
+// ==== AUTH / PROFILE ==== //
 
 /**
  * Do Auth. Needed before accessing to a game
  */
-function signIn({ name, avatar }, cb) {
-  LOCAL_PROFILE = { name, avatar }
+function signIn({ name, avatar }: Pick<Profile, 'name' | 'avatar'>, cb: (error: Error) => void) {
+  LOCAL_PROFILE = { ...LOCAL_PROFILE, name, avatar }
 
   firebase
     .auth()
     .signInAnonymously()
-    .catch(function (error) {
+    .catch(function (error: Error) {
       console.warn('signInAnonymously error:', error)
-      cb(null, error)
+      cb(error)
     })
-}
-
-async function _avatarUpload({ path, fileName, avatar }) {
-  if (__DEV__) console.log('⚙️ _avatarUpload', path, fileName)
-
-  // const base64Match = avatar.match(/image\/(jpeg|jpg|gif|png)/);
-  // const imgMatched = avatar.match(/\.(jpeg|jpg|gif|png)/);
-  // let format;
-  // if (base64Match) {
-  //   format = base64Match && base64Match[1]; // ex: look for "image/png"
-  // } else {
-  //   format = imgMatched && imgMatched[1];
-  // }
-  // const metadata = { contentType: `image/${format}` };
-
-  // Option 3:
-  // https://github.com/expo/expo/issues/2402#issuecomment-443726662
-  // https://github.com/aaronksaunders/expo-rn-firebase-image-upload/blob/master/README.md
-  // 🐛 Still not working properly: https://github.com/facebook/react-native/issues/22681
-  // It seems it failes "Network request failed" when the image is too big. Hum...
-  const response = await fetch(avatar)
-  const blob = await response.blob()
-  const ref = await firebase.storage().ref(path).child(fileName)
-  const task = ref.put(blob) //, metadata);
-
-  return new Promise((resolve, reject) => {
-    task.on(
-      'state_changed',
-      (snapshot) => {},
-      (error) => {
-        Sentry.withScope((scope) => {
-          scope.setExtra('response', JSON.stringify(error))
-          Sentry.captureException(Error('uploadAvatar failed'))
-        })
-        return reject(error)
-      },
-      async () => {
-        const downloadURL = task.snapshot.ref.getDownloadURL()
-        try {
-          await Analytics.setUserProperty('avatar', (blob.size / 1000).toString())
-        } catch (e) {
-          console.warn(':: Analytics/avatar failed', e)
-          Sentry.captureException(e)
-        }
-        resolve(downloadURL)
-      }
-    )
-  })
-}
-
-async function _avatarDelete({ path, fileName }) {
-  if (__DEV__) console.log('⚙️ _avatarDelete', path, fileName)
-  try {
-    const userFolder = await firebase.storage().ref(path)
-
-    const res = await userFolder.listAll()
-
-    for (const index in res.items) {
-      await res.items[index].delete()
-    }
-  } catch (e) {
-    console.warn(':: _avatarDelete failed', e)
-    Sentry.withScope((scope) => {
-      scope.setExtra('response', JSON.stringify(e))
-      Sentry.captureException(Error('uploadAvatar failed'))
-    })
-  }
 }
 
 /**
  * Update profile
- * @param {Object} profile - The params to update the profile
- * @param {Object} profile.id - The profile id
- * @param {Object} profile.name - The profile name
- * @param {Object} profile.avatar - The params avatar - base64
- * @param {Object} profile.gameId - The last gameid they tried to access
  */
-async function updateProfile(profile) {
+async function updateProfile(profile: Partial<Profile>) {
   if (__DEV__) console.log('⚙️ updateProfile()', profile)
 
-  const { /* avatar, */ ...theProfile } = profile
-
   try {
-    // TODO: REFACTOR: Disabled this after updating to Expo SDK40.
-    // It says Yellowbox is deprecated, so I can't see the actual error.
-    // Maybe the API changed?
-    /*
-    const isHTTPLink = avatar && avatar.indexOf('https://') === 0
-    if (avatar && isHTTPLink) {
-      if (__DEV__) console.log(':: avatar ignored because it is a link')
-    }
-    if (avatar && !isHTTPLink) {
-      try {
-        const downloadURL = await _avatarUpload({
-          path: `users/${LOCAL_PROFILE.id}/`,
-          fileName: 'avatar',
-          avatar,
-        })
-        theProfile.avatar = downloadURL
-        LOCAL_PROFILE.avatar = downloadURL
-        if (__DEV__) console.log(':: avatar uploaded!', downloadURL)
-        PubSub.publish('profile.avatarSet', downloadURL)
-      } catch (error) {
-        console.warn(':: avatar upload failed!', error)
-        Sentry.captureException(error)
-        theProfile.avatar = null // delete. Maybe save base64 as fallback?
-      }
-    }
-    if (avatar === null) {
-      theProfile.avatar = null // so avatar can be deleted from DB
-      await _avatarDelete({
-        path: `users/${LOCAL_PROFILE.id}/`,
-        fileName: 'avatar',
-      })
-      // TODO: delete avatar from storage.
-    }
-    */
-    DB.ref('users/' + LOCAL_PROFILE.id).update(theProfile)
+    DB.ref('users/' + LOCAL_PROFILE.id).update(profile)
   } catch (error) {
     console.warn(':: updateProfile failed!', error)
     Sentry.captureException(error)
   }
 
-  return theProfile
+  return profile
 }
 
 /**
  * Reset profile - delete the profile from the DB.
  */
-async function resetProfile(id) {
-  await updateProfile({
-    id: null,
-    name: null,
-    avatar: null, // TODO: delete avatar from storage
-    gameId: null,
-  })
+async function resetProfile(id: Profile['id']) {
+  if (__DEV__) console.log('⚙️ resetProfile()', id)
+
+  await DB.ref('users/' + id).remove()
   Analytics.resetAnalyticsData()
 }
 
-/**
- *
- */
-function getUser(userId) {
-  if (__DEV__) console.log('⚙️ getUser()', LOCAL_PROFILE.id, userId)
+// ==== GAME ==== //
 
-  // var userId = firebase.auth().currentUser.uid;
-  // return firebase
-  //   .database()
-  //   .ref('/users/' + userId)
-  //   .once('value')
-  //   .then(function(snapshot) {
-  //     if (__DEV__) console.log('GET USER!', snapshot.val());
-  //   });
-}
-
-// ============== GAME
-
-const gameInitialState = ({ id, name, code, creatorId }) => ({
-  id, // gameSlugged_code
+const gameInitialState = ({
+  id,
   name,
   code,
-  creatorId: creatorId, // the one that will decide the flow
+  creatorId,
+}: Pick<Game, 'id' | 'name' | 'code' | 'creatorId'>): Game => ({
+  id,
+  name,
+  code,
+  creatorId,
   hasStarted: false,
   players: {
     [creatorId]: {
       isAfk: false,
+      isReady: false,
     },
   },
-  words: {
-    // [playerId]: [String] - list of words - the user submitted their words.
-  },
-  teams: {
-    //   0: {
-    //     id: '0', // team index
-    //     name: 'Dreamers',
-    //     players: [playerdId]
-    //   }
-    // }
-  },
-  papersGuessed: 0, // Number - updated as the player guesses words.
-  round: {
-    // // Empty by default so that markMeAsReady works properly
-    // current: null, // Number - Round index
-    // turnWho: null, // {team: teamId, ...teamId: [playerIndex] }
-    // /* ex: team 1, player 2 is playing.
-    // turnWho: {
-    //   team: 1,
-    //   0: 3,
-    //   1: 2
-    // }
-    // */
-    // turnCount: 0, // Number - Turn index
-    // status: null, // String - 'getReady' | Date.now() | 'timesup'
-    // wordsLeft: null, // Array - words left to guess.
-  },
-  score: [
-    //  Array by round for each player:
-    // { [playerId1]: [wordsGuessed0...], [playerId2]: [wordsGuessed0...] },
-    // { [playerId1]: [wordsGuessed1...], [playerId2]: [wordsGuessed2...] }
-  ],
+  words: null,
+  teams: null,
+  papersGuessed: 0,
+  round: null,
+  score: null,
   settings: {
     roundsCount: 3,
     words: 10,
@@ -338,9 +182,8 @@ const gameInitialState = ({ id, name, code, creatorId }) => ({
 
 /**
  *
- * @param {*} gameName
  */
-async function createGame(gameName) {
+async function createGame(gameName: Game['name']) {
   // TODO: later - "Play again" feature? create game with predefined teams?
   if (__DEV__) console.log(`⚙️ createGame: ${gameName}`, { LOCAL_PROFILE })
   const gameNameLower = gameName.toLowerCase()
@@ -389,9 +232,9 @@ async function createGame(gameName) {
 }
 
 /**
- * gameId = gameSlugged_code
+ *
  */
-async function joinGame(gameId) {
+async function joinGame(gameId: Game['id']) {
   if (__DEV__) console.log(`⚙️ joinGame: ${gameId}`)
 
   // Verify if we can access the game...
@@ -435,9 +278,8 @@ async function joinGame(gameId) {
 
 /**
  *
- * @param {String} gameId
  */
-function _pubGame(gameId) {
+function _pubGame(gameId: Game['id']) {
   LOCAL_PROFILE.gameId = gameId
   if (__DEV__) console.log('⚙️ _pubGame', gameId)
 
@@ -446,10 +288,11 @@ function _pubGame(gameId) {
     const game = data.val()
 
     // Retrieve game players' profiles!
-    const profiles = {}
+    const profiles: PapersContextState['profiles'] = {}
     for (const playerId in game.players) {
       if (playerId === LOCAL_PROFILE.id) {
         profiles[playerId] = {
+          ...profiles[playerId],
           name: LOCAL_PROFILE.name,
           avatar: LOCAL_PROFILE.avatar,
         }
@@ -553,14 +396,14 @@ function _pubGame(gameId) {
   // Prepare in case we get offline.
   // const isAfkRef = firebase.database().ref(`users/${LOCAL_PROFILE.id}/isAfk`)
   // isAfkRef.onDisconnect().set(true) // TODO: subscribe
-  // BUG: isAFK sometimes is a negative positive. dunno why.
+  //  TODO: (BUG) isAFK sometimes is a negative positive. dunno why.
   //    - Workaround: removed it from the UI for now.
 }
 
 /**
  *
  */
-async function leaveGame({ wasKicked = false } = {}) {
+async function leaveGame({ wasKicked }: { wasKicked?: boolean } = {}) {
   if (__DEV__) console.log('⚙️ leaveGame()', { wasKicked }, LOCAL_PROFILE.id)
   const gameId = LOCAL_PROFILE.gameId
 
@@ -578,49 +421,32 @@ async function leaveGame({ wasKicked = false } = {}) {
     }
   }
 
-  // ...just leave/unsb it.
-  // REFACTOR: When leaving the game, this is called twice (see logs).
+  // ...just leave/unsub it.
+  // TODO: When leaving the game, this is called twice (see logs).
   // Not ideally but better twice than never.
   PubSub.publish('game.leave')
 
-  await _unsubGame(gameId)
+  if (gameId) {
+    await _unsubGame(gameId)
+  }
 
   setTimeout(() => {
     if (__DEV__) console.log('⚙️ Unsubscribe game')
     PubSub.unsubscribe('game')
-  }, 0) // Q: Why did I use timeout here?
+  }, 0) // TODO: Why did I use timeout here?
 }
 
-async function _unsubGame(gameId) {
+async function _unsubGame(gameId: Game['id']) {
   if (__DEV__) console.log('⚙️ _unsubGame()', gameId)
 
-  // Disconnect from group
-  const DB_PLAYERS = DB.ref(`games/${gameId}/players`)
-
-  DB_PLAYERS.off('child_added')
-  DB_PLAYERS.off('child_removed')
-  DB_PLAYERS.off('child_changed')
-
-  DB.ref(`games/${gameId}/papersGuessed`).off('value')
-  DB.ref(`games/${gameId}/teams`).off('value')
-
-  DB.ref(`games/${gameId}/words`).off('child_added')
-  DB.ref(`games/${gameId}/words`).off('child_changed')
-
-  DB.ref(`games/${gameId}/hasStarted`).off('value')
-  DB.ref(`games/${gameId}/round`).off('value')
-  DB.ref(`games/${gameId}/score`).off('value')
-
-  const players = await DB.ref(`games/${gameId}/players`).once('value')
-  for (const playerId in players.val()) {
-    DB.ref(`users/${playerId}/isAfk`).off('value')
-  }
+  // Disconnect from game
+  DB.ref(`games/${gameId}`).off()
 }
 
 /**
  *
  */
-async function removePlayer(playerId) {
+async function removePlayer(playerId: Profile['id']) {
   const gameId = LOCAL_PROFILE.gameId
   if (__DEV__) console.log('⚙️ removePlayer()', gameId, playerId)
 
@@ -637,7 +463,7 @@ async function removePlayer(playerId) {
 /**
  *
  */
-async function setTeams(teams) {
+async function setTeams(teams: GameTeams) {
   if (__DEV__) console.log('⚙️ setTeams()')
   const gameId = LOCAL_PROFILE.gameId
 
@@ -652,7 +478,7 @@ async function setTeams(teams) {
 /**
  *
  */
-async function setWords(words) {
+async function setWords(words: string[]) {
   if (__DEV__) console.log('⚙️ setWords()', words)
   const gameId = LOCAL_PROFILE.gameId
   const playerId = LOCAL_PROFILE.id
@@ -682,7 +508,7 @@ async function setWords(words) {
   await DB.ref(`games/${gameId}/words/_all`).transaction((wordsOnce) => {
     const wordsStored = wordsOnce || []
     const wordsCount = wordsStored.length
-    wordsAsKeys = words.map((w, index) => index + wordsCount)
+    wordsAsKeys = words.map((_, index) => index + wordsCount)
     const allWords = [...wordsStored, ...words]
 
     return allWords
@@ -694,7 +520,7 @@ async function setWords(words) {
 /**
  * a shortcut for dev only.
  */
-async function setWordsForEveryone(allWords) {
+async function setWordsForEveryone(allWords: Game['words']) {
   if (__DEV__) console.log('⚙️ setWordsForEveyone()')
   const gameId = LOCAL_PROFILE.gameId
 
@@ -710,7 +536,7 @@ async function startGame() {
   await DB.ref(`games/${gameId}/hasStarted`).set(true)
 }
 
-async function _getIsEveryoneReady(gameId) {
+async function _getIsEveryoneReady(gameId: Game['id']) {
   const playersRef = await DB.ref(`games/${gameId}/players`).once('value')
   const players = playersRef.val()
   const isEveryoneReady = Object.keys(players).every((pId) => players[pId].isReady)
@@ -726,7 +552,7 @@ async function _getIsEveryoneReady(gameId) {
 /**
  *
  */
-async function markMeAsReady(roundStatus, everyonesReadyCb) {
+async function markMeAsReady(roundStatus: Game['round'], everyonesReadyCb: EmptyCallback) {
   if (__DEV__) console.log('⚙️ markMeAsReady()')
   const { gameId, id } = LOCAL_PROFILE
 
@@ -738,7 +564,7 @@ async function markMeAsReady(roundStatus, everyonesReadyCb) {
     await refGameRound.set(roundStatus)
   } else {
     // To save some kb in data ... I guess. but needs improvement.
-    DB.ref(`games/${gameId}/round/wordsLeft`).set(roundStatus.wordsLeft)
+    DB.ref(`games/${gameId}/round/wordsLeft`).set(roundStatus?.wordsLeft)
   }
 
   await DB.ref(`games/${gameId}/players/${id}`).update({ isReady: true })
@@ -746,20 +572,20 @@ async function markMeAsReady(roundStatus, everyonesReadyCb) {
   // REVIEW: Is this the right place?
   // It's a side effect, I never know what's the best place for it.
   // TODO: (POSSIBLE BUG) - Use transaction here to make sure isEveryoneReady for real
-  if (await _getIsEveryoneReady(gameId)) {
+  if (gameId && (await _getIsEveryoneReady(gameId))) {
     // Should this be responsability of context or firebase?
     everyonesReadyCb()
   }
 }
 
-async function markMeAsReadyForNextRound(everyonesReadyCb) {
+async function markMeAsReadyForNextRound(everyonesReadyCb: EmptyCallback) {
   if (__DEV__) console.log('⚙️ markMeAsReadyForNextRound()')
   const { gameId, id } = LOCAL_PROFILE
 
   await DB.ref(`games/${gameId}/players/${id}`).update({ isReady: true })
 
   // Same concern as markMeAsReady
-  if (await _getIsEveryoneReady(gameId)) {
+  if (gameId && (await _getIsEveryoneReady(gameId))) {
     everyonesReadyCb()
   }
 }
@@ -771,12 +597,14 @@ async function pingReadyStatus() {
   if (__DEV__) console.log('⚙️ pingReadyStatus()')
   const { gameId } = LOCAL_PROFILE
 
-  return _getIsEveryoneReady(gameId)
+  if (gameId) {
+    return _getIsEveryoneReady(gameId)
+  }
 }
 /**
  *
  */
-async function startTurn(words) {
+async function startTurn() {
   if (__DEV__) console.log('⚙️ startTurn()')
   const gameId = LOCAL_PROFILE.gameId
 
@@ -785,7 +613,7 @@ async function startTurn(words) {
   await DB.ref(`games/${gameId}/round/status`).set(Date.now())
 }
 
-function setPapersGuessed(count) {
+function setPapersGuessed(count: Game['papersGuessed']) {
   if (__DEV__) console.log('⚙️ setPapersGuessed()', count)
   const gameId = LOCAL_PROFILE.gameId
 
@@ -795,7 +623,13 @@ function setPapersGuessed(count) {
 /**
  *
  */
-async function finishTurn({ playerScore, roundStatus }, cb) {
+async function finishTurn({
+  playerScore,
+  roundStatus,
+}: {
+  playerScore: Score
+  roundStatus: Round
+}) {
   if (__DEV__) console.log('⚙️ finishTurn()')
   const gameId = LOCAL_PROFILE.gameId
 
@@ -820,7 +654,7 @@ async function finishTurn({ playerScore, roundStatus }, cb) {
 /**
  *
  */
-async function skipTurn({ roundStatus }) {
+async function skipTurn({ roundStatus }: { roundStatus: Round }) {
   if (__DEV__) console.log('⚙️ skipTurn()')
   const gameId = LOCAL_PROFILE.gameId
 
@@ -831,7 +665,7 @@ async function skipTurn({ roundStatus }) {
 /**
  *
  */
-async function setRound(roundStatus) {
+async function setRound(roundStatus: Round) {
   if (__DEV__) console.log('⚙️ startNextRound()')
   const gameId = LOCAL_PROFILE.gameId
 

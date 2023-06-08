@@ -5,7 +5,7 @@ import { Animated, Easing, Platform, StyleSheet, View } from 'react-native'
 import { window } from '@src/utils/device'
 import { headerHeight } from '@src/utils/layout'
 
-import PapersContext from '@src/store/PapersContext.js'
+import PapersContext from '@src/store/PapersContext'
 import { useEffectOnce } from 'usehooks-ts'
 
 const Bubbling = ({ bgStart, bgEnd, fromBehind }) => {

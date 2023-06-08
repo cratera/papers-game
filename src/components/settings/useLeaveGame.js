@@ -3,7 +3,7 @@ import { Alert, Platform } from 'react-native'
 
 import * as Sentry from '@src/services/sentry'
 
-import PapersContext from '@src/store/PapersContext.js'
+import PapersContext from '@src/store/PapersContext'
 
 const i18n = {
   leave_title: 'Leave game',

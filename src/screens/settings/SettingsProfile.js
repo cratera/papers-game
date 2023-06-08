@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 
-import PapersContext from '@src/store/PapersContext.js'
+import PapersContext from '@src/store/PapersContext'
 import * as Theme from '@src/theme'
 
 import { IconPencil } from '@src/components/icons'

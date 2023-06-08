@@ -1,27 +1,19 @@
-// Isolated methods, to be easier to test.
+import { Game, GameTeams, Profile, Round, Score, TeamId } from './PapersContext.types'
 
 /**
  * A util to know who is the next one to play.
- * @param {Object} turnWho
- * @param {String} turnWho.team The current teamId playing
- * @param {String} turnWho[team] The current/most recent player of that team playing 
-
- * @param {Object} teams An object with teams (their ids).
- * @param {String[]} teams[team].players List of team's players (String)
- * 
+ *
  * @example
- * // returns { team:1, 0:0, 1:1 }
  * getNextTurn({ team:0, 0:0, 1:0 }, teams)
-* @example
- * // returns { team:0, 0:1, 1:1 }
+ * // returns { team:1, 0:0, 1:1 }
+ * @example
  * getNextTurn({ team:1, 0:0, 1:1 }, teams)
- * @returns {Object} the turnWho state.
+ * // returns { team:0, 0:1, 1:1 }
  */
-export function getNextTurn(turnWho, teams) {
+export function getNextTurn(turnWho: Round['turnWho'], teams: GameTeams) {
   const { team, ...teamWho } = turnWho
-  const teamsCount = Object.keys(teams).length
 
-  const nextTeam = team + 1 >= teamsCount ? 0 : team + 1
+  const nextTeam: Round['turnWho']['team'] = team === 0 ? 1 : 0
   const playersCount = teams[nextTeam].players.length
   const player = teamWho[nextTeam]
   const nextPlayer = player + 1 >= playersCount ? 0 : player + 1
@@ -35,22 +27,18 @@ export function getNextTurn(turnWho, teams) {
 
 /**
  * A util to know who is the next one to play within the same team.
- * @param {Object} turnWho
- * @param {String} turnWho.team The current teamId playing
- * @param {String} turnWho[teamId] The current/most recent player of that team playing 
-
- * @param {Object} teams An object with teams (their ids).
- * @param {String[]} teams[teamId].players List of team's players (String)
- * 
+ *
  * @example
- * // returns { team:1, 0:0, 1:1 }
  * getNextTurn({ team:0, 0:0, 1:0 }, teams)
-* @example
- * // returns { team:0, 0:1, 1:1 }
+ * // returns { team:0, 0:1, 1:0 }
+ * @example
  * getNextTurn({ team:1, 0:0, 1:1 }, teams)
- * @returns {Object} the turnWho state.
+ * // returns { team:1, 0:1, 1:2 }
  */
-export function getNextSkippedTurn(turnWho, teams) {
+export function getNextSkippedTurn(turnWho: Round['turnWho'], teams: GameTeams) {
+  if (!teams) {
+    console.log('')
+  }
   const { team, ...teamWho } = turnWho
 
   const playersCount = teams[team].players.length
@@ -59,7 +47,7 @@ export function getNextSkippedTurn(turnWho, teams) {
 
   return {
     ...turnWho,
-    team: team,
+    team,
     [team]: nextPlayer,
   }
 }
@@ -73,19 +61,36 @@ export function getNextSkippedTurn(turnWho, teams) {
  * @example
  * const scores = React.useMemo(() => formatScores(...), [])
  */
-export function formatScores(gameScore, gameTeams, profileId) {
-  // This is not the best thing ever, but.... it works.
-  const scoreTotal = {}
-  let myTeamId = null
+export function formatScores(
+  gameScore: Game['score'],
+  gameTeams: GameTeams,
+  profileId: Profile['id']
+) {
+  const scoreTotal: Record<string, number> = {}
+  let myTeamId: Maybe<Round['turnWho']['team']>
 
-  const scoreByRound = [1, 2, 3].map((x, roundIx) => {
-    const teamsPlayersScore = {}
-    const playersScore = gameScore ? gameScore[roundIx] : null
-    const teamsScore = {}
-    let bestPlayer = {}
+  const scoreByRound = [...Array(3)].map((_, i) => {
+    const roundIx = i as Round['current']
+
+    if (!gameScore) {
+      return null
+    }
+
+    const teamsPlayersScore = {} as Record<TeamId, { id: string; score: number }[]>
+    const playersScore: Score = gameScore[roundIx]
+    const teamsScore = {} as Record<TeamId, number>
+    let bestPlayer: {
+      id: string
+      score: number
+    } = {
+      id: '',
+      score: 0,
+    }
 
     if (playersScore) {
-      Object.keys(gameTeams).forEach((teamId) => {
+      Object.keys(gameTeams).forEach((_, i) => {
+        const teamId = i as Round['turnWho']['team']
+
         gameTeams[teamId].players.forEach((playerId) => {
           if (!myTeamId) {
             myTeamId = playerId === profileId ? teamId : null
@@ -97,6 +102,7 @@ export function formatScores(gameScore, gameTeams, profileId) {
               score: playerScore,
             }
           }
+
           teamsScore[teamId] = (teamsScore[teamId] || 0) + playerScore
 
           if (!teamsPlayersScore[teamId]) {
@@ -115,8 +121,6 @@ export function formatScores(gameScore, gameTeams, profileId) {
 
     const arrayOfScores = Object.values(teamsScore)
     const arrayOfTeamsId = Object.keys(teamsScore)
-    // const winnerIndex = arrayOfScores.indexOf(Math.max(...arrayOfScores));
-    // const winnerId = arrayOfTeamsId[winnerIndex];
 
     return {
       arrayOfScores,
@@ -127,15 +131,20 @@ export function formatScores(gameScore, gameTeams, profileId) {
     }
   })
 
-  const sortByScore = (p1, p2) => p2.score - p1.score
+  type Player = {
+    score: number
+  }
 
-  function getPlayersSorted(teamId, roundIx, BOAT) {
+  const sortByScore = (p1: Player, p2: Player) => p2.score - p1.score
+
+  function getPlayersSorted(teamId: TeamId, roundIx: number, BOAT: boolean) {
     let playersScore
 
     if (BOAT) {
-      const playersTotalScore = {}
-      scoreByRound.forEach((round) => {
-        round.teamsPlayersScore[teamId].forEach((player) => {
+      const playersTotalScore: Record<Profile['id'], number> = {}
+
+      scoreByRound?.forEach((round) => {
+        round?.teamsPlayersScore[teamId].forEach((player) => {
           if (!playersTotalScore[player.id]) {
             playersTotalScore[player.id] = 0
           }
@@ -145,7 +154,7 @@ export function formatScores(gameScore, gameTeams, profileId) {
 
       playersScore = Object.entries(playersTotalScore).map(([id, score]) => ({ id, score }))
     } else {
-      playersScore = scoreByRound[roundIx].teamsPlayersScore[teamId] || []
+      playersScore = scoreByRound[roundIx]?.teamsPlayersScore[teamId] || []
     }
 
     const playersSorted = playersScore.sort(sortByScore)
@@ -156,10 +165,11 @@ export function formatScores(gameScore, gameTeams, profileId) {
   const arrayOfTeamsId = Object.keys(scoreTotal)
   const winnerScore = Math.max(...arrayOfScores)
   const winnerIndex = arrayOfScores.indexOf(winnerScore)
-  const isMyTeamWinner = myTeamId === arrayOfTeamsId[winnerIndex]
+  const isMyTeamWinner = myTeamId === Number(arrayOfTeamsId[winnerIndex])
   const isTie = arrayOfScores[1] === arrayOfScores[0]
 
-  const sortTeamsByScore = (teamAId, teamBId) => arrayOfScores[teamBId] - arrayOfScores[teamAId]
+  const sortTeamsByScore = (teamAId: TeamId, teamBId: TeamId) =>
+    arrayOfScores[teamBId] - arrayOfScores[teamAId]
 
   return {
     scoreByRound,
@@ -173,11 +183,13 @@ export function formatScores(gameScore, gameTeams, profileId) {
 
 // -------------------------------------------------------------
 
-export function getTeamId(playerId, teams) {
-  let theTeamId
+export function getTeamId(playerId: Profile['id'], teams: Game['teams']) {
+  let theTeamId: TeamId = 0
 
-  for (const teamId in teams) {
-    const isOnTeam = teams[teamId].players.some((pId) => pId === playerId)
+  for (const id in teams) {
+    const teamId = Number(id) as TeamId
+
+    const isOnTeam = teams[teamId].players.some((pId: Profile['id']) => pId === playerId)
     if (isOnTeam) {
       theTeamId = teamId
       break

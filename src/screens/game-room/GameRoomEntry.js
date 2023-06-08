@@ -4,7 +4,7 @@ import React from 'react'
 // import * as WebBrowser from 'expo-web-browser'; // WHAT'S THIS?
 
 import { createStackNavigator } from '@react-navigation/stack'
-import PapersContext from '@src/store/PapersContext.js'
+import PapersContext from '@src/store/PapersContext'
 
 import { headerTheme } from '@src/navigation/headerStuff.js'
 import { animations } from '@src/theme'

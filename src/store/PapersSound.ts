@@ -41,10 +41,10 @@ async function loadAudioSkin(skin: SoundSkinName = 'default') {
   try {
     for (const soundId in SOUNDS[skin]) {
       const { sound } = await Audio.Sound.createAsync(
-        { uri: SOUNDS[skin][soundId] },
+        { uri: SOUNDS[skin][soundId as SoundName] },
         { shouldPlay: false }
       )
-      playset[soundId] = sound
+      playset[soundId as SoundName] = sound
     }
     return true
   } catch (e) {

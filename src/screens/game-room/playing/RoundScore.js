@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import React, { Fragment } from 'react'
 import { ScrollView, Text, View } from 'react-native'
 
-import PapersContext from '@src/store/PapersContext.js'
+import PapersContext from '@src/store/PapersContext'
 
 import Button from '@src/components/button'
 import Page from '@src/components/page'

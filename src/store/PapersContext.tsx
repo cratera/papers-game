@@ -1,22 +1,48 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 
 import * as Sentry from '@src/services/sentry'
 import { isWeb } from '@src/utils/device'
 
-import { getNextSkippedTurn, getNextTurn } from './papersMethods.js'
-import * as PapersSound from './PapersSound.js'
-import wordsForEveryone from './wordsForEveryone.js'
+import { getNextSkippedTurn, getNextTurn } from './papersMethods'
+import * as PapersSound from './PapersSound'
+import wordsForEveryone from './wordsForEveryone'
 
 import { analytics as Analytics } from '@src/services/firebase'
-import serverInit from './Firebase.js'
+import serverInit from './Firebase'
+import {
+  Config,
+  Game,
+  GameTeams,
+  PapersAPIMethods,
+  PapersContextProps,
+  PapersContextState,
+  PapersContextValue,
+  Profile,
+  Round,
+  Team,
+  Turn,
+  Words,
+} from './PapersContext.types'
+import { SoundName } from './PapersSound.types'
 
 const i18nUnexpectedError = 'Unexpected error. Please try again later.'
 
-const PapersContext = React.createContext({})
+const PapersContext = React.createContext<PapersContextValue>({
+  state: {
+    profile: null,
+    game: null,
+    profiles: null,
+    about: null,
+  },
+  ...({} as PapersAPIMethods),
+})
 
-const settingsDefaults = { sound: !__DEV__, motion: !isWeb }
+const settingsDefaults = {
+  sound: !__DEV__,
+  motion: !isWeb,
+} satisfies Profile['settings']
+
 const statsDefaults = {
   // NOTE: If you change this, don't forget Statistics.js
   gamesCreated: 0,
@@ -24,7 +50,7 @@ const statsDefaults = {
   gamesWon: 0,
   gamesLost: 0,
   papersGuessed: 0,
-}
+} satisfies Profile['stats']
 
 export const loadProfile = async () => {
   const id = (await AsyncStorage.getItem('profile_id')) || null
@@ -39,33 +65,37 @@ export const loadProfile = async () => {
     name,
     avatar,
     gameId,
-    settings: JSON.parse(settingsStored) || settingsDefaults,
-    stats: JSON.parse(statsStored) || statsDefaults,
+    settings: settingsStored ? JSON.parse(settingsStored) : settingsDefaults,
+    stats: statsStored ? JSON.parse(statsStored) : statsDefaults,
   }
 }
 
-export class PapersContextProvider extends Component {
-  constructor(props) {
+export class PapersContextProvider extends Component<PapersContextProps, PapersContextState> {
+  config: Config
+  PapersAPI: PapersAPIMethods
+
+  constructor(props: PapersContextProps) {
     super(props)
 
     // TODO: save this on localStorage. Update: Why? lol
     this.config = {
-      // myTeamId: Number,
-      // roundDuration: Number
+      myTeamId: null,
+      roundDuration: null,
     }
 
     this.state = {
       socket: null, // rename to serverAPI?
       profile: {
-        id: props.initialProfile.id,
-        name: props.initialProfile.name,
-        avatar: props.initialProfile.avatar,
-        gameId: props.initialProfile.gameId, // the last game accessed
-        settings: props.initialProfile.settings || {},
-        stats: props.initialProfile.stats,
+        id: this.props.initialProfile.id,
+        name: this.props.initialProfile.name,
+        avatar: this.props.initialProfile.avatar,
+        gameId: this.props.initialProfile.gameId,
+        settings: this.props.initialProfile.settings,
+        stats: this.props.initialProfile.stats,
+        isAfk: false,
       },
-      game: null, // see Firebase.js for structure.
-      profiles: {},
+      game: null,
+      profiles: null,
       about: {
         version: '0.3.2',
         ota: '00',
@@ -75,6 +105,7 @@ export class PapersContextProvider extends Component {
     this._removeGameFromState = this._removeGameFromState.bind(this)
     this._subscribeGame = this._subscribeGame.bind(this)
 
+    // ==== Papers API ==== //
     this.PapersAPI = {
       updateProfile: this.updateProfile.bind(this),
       resetProfile: this.resetProfile.bind(this),
@@ -89,7 +120,7 @@ export class PapersContextProvider extends Component {
 
       setTeams: this.setTeams.bind(this),
       setWords: this.setWords.bind(this),
-      setWordsForEveyone: this.setWordsForEveyone.bind(this),
+      setWordsForEveryone: this.setWordsForEveryone.bind(this),
 
       markMeAsReady: this.markMeAsReady.bind(this),
       markMeAsReadyForNextRound: this.markMeAsReadyForNextRound.bind(this),
@@ -115,28 +146,28 @@ export class PapersContextProvider extends Component {
   }
 
   async componentDidMount() {
-    const { avatar, ...profile } = this.state.profile
+    const profile = this.state.profile
     console.log('Papers mounted:', profile)
     await this.tryToReconnect()
 
-    await PapersSound.init(profile.settings.sound)
+    await PapersSound.init(profile?.settings.sound)
   }
 
   componentWillUnmount() {
-    this.state.socket && this.state.socket.offAll()
+    this.state.socket && this.state.socket?.offAll()
 
     if (__DEV__)
       console.log(`
 ::::::::::::::::::::::::::::::
-  ... Refreshing app ...
-:::::::::::::::::::::::::::::`)
+    ... Refreshing app ...
+::::::::::::::::::::::::::::::
+        `)
   }
 
   render() {
     return (
       <PapersContext.Provider
         value={{
-          // bannerMsg: this.state.bannerMsg, // Don't do this...
           state: {
             profile: this.state.profile,
             game: this.state.game,
@@ -151,7 +182,7 @@ export class PapersContextProvider extends Component {
     )
   }
 
-  // =========== Papers API
+  // ==== Papers API ==== //
 
   init() {
     if (__DEV__) console.log('📌 init()')
@@ -181,6 +212,11 @@ export class PapersContextProvider extends Component {
       console.warn(':: Already connected. Should not happen!')
       Sentry.captureMessage('Warn: tR Socket already connected.')
     } else {
+      if (!this.state.profile) {
+        if (__DEV__) console.log(':: no profile')
+        return
+      }
+
       const { gameId, id } = this.state.profile
 
       if (!id) {
@@ -204,70 +240,76 @@ export class PapersContextProvider extends Component {
     }
   }
 
-  initAndSign(cb) {
+  initAndSign(cb: (error?: string) => void) {
     if (__DEV__) console.log('📌 initAndSign()')
+    if (!this.state.profile) {
+      if (__DEV__) console.log(':: no profile')
+      return
+    }
+
     const { name, avatar } = this.state.profile
 
     if (!name) {
       // TODO: Review all of these edge cases.
       Sentry.captureMessage(`initAndSign: Missing name! ${JSON.stringify(this.state.profile)}`)
-      cb(null, 'missing_name') // TODO convert to Error.
+      cb('missing_name') // TODO: convert to Error.
       return
     }
 
     const socket = this.init()
 
-    socket.on('profile.signed', async (topic, id) => {
+    socket?.on('profile.signed', async (_, id) => {
       if (__DEV__) console.log('📌 on.profile.signed', id)
       await this.PapersAPI.updateProfile({ id }, { ignoreSocket: true })
       cb()
     })
 
-    socket.on('profile.avatarSet', async (topic, avatar) => {
-      if (__DEV__) console.log('📌 on.profile.avatarSet')
-      await this.PapersAPI.updateProfile({ avatar }, { ignoreSocket: true })
-    })
-
-    socket.signIn({ name, avatar }, (res, error) => {
+    socket?.signIn({ name, avatar }, (error) => {
       if (error) {
         Sentry.captureMessage(`socket.signIn: error ${JSON.stringify(error)}`)
       }
     })
   }
 
-  async accessGame(variant, gameName, cb, customOpts = {}) {
-    const opts = {
-      // Pass true when the access is internally made, rather than user interaction (eg on App refresh/restart)
+  async accessGame(
+    variant: 'join' | 'create',
+    /**
+     * It should be the game id if the variant is `join` and the game name if the variant is `create`
+     */
+    gameIdName: Game['id'] | Game['name'],
+    cb: (gameId: Maybe<Game['id']>, errorMsg?: string, opts?: { isUnexError: boolean }) => void,
+    opts: {
+      automatic: boolean
+    } = {
       automatic: false,
-      ...customOpts,
     }
-
-    if (!this.state.socket || !this.state.profile.id) {
+  ) {
+    if (!this.state.socket || !this.state.profile?.id) {
       if (__DEV__) console.log('📌 accessGame() - init needed first')
 
-      this.initAndSign((res, errorMsg) => {
+      this.initAndSign((errorMsg) => {
         if (errorMsg) {
           this._removeGameFromState()
           return cb(null, errorMsg)
         }
-        this.accessGame(variant, gameName, cb, opts)
+        this.accessGame(variant, gameIdName, cb, opts)
       })
       return
     }
 
-    if (__DEV__) console.log('📌 accessGame()', variant, gameName)
+    if (__DEV__) console.log('📌 accessGame()', variant, gameIdName)
 
-    if (!gameName) {
-      return cb(null, new Error('Missing game name'))
+    if (!gameIdName) {
+      return cb(null, 'Missing game name')
     }
 
     if (!variant || ['join', 'create'].indexOf(variant) < 0) {
-      return cb(null, new Error(`variant incorrect - ${variant}`))
+      return cb(null, `variant incorrect - ${variant}`)
     }
 
     // createGame | joinGame
     try {
-      const gameId = await this.state.socket[`${variant}Game`](gameName)
+      const gameId = await this.state.socket[`${variant}Game`](gameIdName)
       this._subscribeGame(gameId)
       this.PapersAPI.updateProfile({ gameId })
 
@@ -280,19 +322,26 @@ export class PapersContextProvider extends Component {
       }
       cb(gameId)
     } catch (e) {
+      type ErrorMsg = keyof typeof errorMsgMap
+      let message: ErrorMsg = 'ups'
+
+      if (e instanceof Error) {
+        message = e.message as ErrorMsg
+      }
+
       const errorMsgMap = {
         notSigned: () => 'Cannot find your profile. Please start over.', // I hope this never happens.
         exists: () => 'Choose another name.', // 0.001% probability because code is random.
-        notFound: () => `Wrong code for ${gameName.split('_')[0]}.`,
+        notFound: () => `Wrong code for ${gameIdName.split('_')[0]}.`,
         alreadyStarted: () => 'That game already started.',
         ups: () => i18nUnexpectedError,
       }
 
-      const errorMsg = (errorMsgMap[e.message] || errorMsgMap.ups)()
-      const isUnexError = !errorMsgMap[e.message]
+      const errorMsg = errorMsgMap[message]() as string
+      const isUnexError = !errorMsgMap[message]
 
       if (isUnexError) {
-        console.warn(':: accessGame failed!', variant, gameName, e, errorMsg)
+        console.warn(':: accessGame failed!', variant, gameIdName, e, errorMsg)
         Sentry.captureException(e, { tags: { pp_action: 'AG_0' } })
       }
       await this._removeGameFromState()
@@ -300,14 +349,14 @@ export class PapersContextProvider extends Component {
     }
   }
 
-  _subscribeGame(gameId) {
+  _subscribeGame(gameId: Game['id']) {
     if (__DEV__) console.log('📌 _subscribeGame', gameId)
 
     const socket = this.state.socket
 
-    const setGame = (cb, afterUpdate) => {
+    const setGame = (cb: (game: Game) => Partial<Game>, afterUpdate?: EmptyCallback) => {
       this.setState((state) => {
-        if (!state.game) return {}
+        if (!state.game) return null
         return {
           game: {
             ...state.game,
@@ -317,19 +366,22 @@ export class PapersContextProvider extends Component {
       }, afterUpdate)
     }
 
-    socket.on('game.set', (topic, data) => {
+    socket?.on('game.set', (topic, data) => {
       if (__DEV__) console.log(`:: on.${topic}`, data.game)
       const { game, profiles } = data
       this.setState({ game, profiles })
 
       if (!game.hasStarted) {
         // Prevent possible memory leaks from an old game.
-        this.config = {}
+        this.config = {
+          myTeamId: null,
+          roundDuration: null,
+        }
         this.PapersAPI.setTurnLocalState(null)
       }
     })
 
-    socket.on('game.players.added', (topic, data) => {
+    socket?.on('game.players.added', (topic, data) => {
       if (__DEV__) console.log(`:: on.${topic}`, data)
       const { id, info, profile } = data
 
@@ -348,11 +400,11 @@ export class PapersContextProvider extends Component {
       }))
     })
 
-    socket.on('game.players.removed', async (topic, data) => {
+    socket?.on('game.players.removed', async (topic, data) => {
       if (__DEV__) console.log(`:: on.${topic}`, data)
       const { id: playerId /*, newAdmin */ } = data
 
-      if (playerId === this.state.profile.id) {
+      if (playerId === this.state.profile?.id) {
         await this.leaveGame({ wasKicked: true })
         return
       }
@@ -369,7 +421,7 @@ export class PapersContextProvider extends Component {
       })
     })
 
-    socket.on('game.players.changed', (topic, data) => {
+    socket?.on('game.players.changed', (topic, data) => {
       if (__DEV__) console.log(`:: on.${topic}`, data)
       const { id, info } = data
 
@@ -384,18 +436,18 @@ export class PapersContextProvider extends Component {
       }))
     })
 
-    socket.on('game.teams.set', (topic, data) => {
+    socket?.on('game.teams.set', (topic, data) => {
       if (__DEV__) console.log(`:: on.${topic}`, data)
       const teams = data
       setGame(
-        (game) => ({
+        () => ({
           teams,
         }),
         () => this._storeMyTeam()
       )
     })
 
-    socket.on('game.words.set', (topic, data) => {
+    socket?.on('game.words.set', (topic, data) => {
       if (__DEV__) console.log(`:: on.${topic}`, data)
       const { pId, words } = data // pId can be '_all' too.
 
@@ -403,58 +455,63 @@ export class PapersContextProvider extends Component {
         words: {
           ...game.words,
           [pId]: words,
-        },
+        } as Game['words'],
       }))
     })
 
-    socket.on('game.hasStarted', (topic, data) => {
+    socket?.on('game.hasStarted', (topic, data) => {
       if (__DEV__) console.log(`:: on.${topic}`, data)
       const hasStarted = data
       if (hasStarted) {
         // REVIEW - This is called on page refresh. it shouldn't happen.
         Analytics.logEvent('game_started', {
-          players: Object.keys(this.state.game.players).length,
+          players: Object.keys(this.state.game?.players || {}).length,
         })
       }
-      setGame((game) => ({
+      setGame(() => ({
         hasStarted,
       }))
     })
 
-    socket.on('game.round', (topic, data) => {
+    socket?.on('game.round', (topic, data) => {
       if (__DEV__) console.log(`:: on.${topic}`)
       const round = data
 
-      setGame((game) => ({
+      setGame(() => ({
         round,
       }))
     })
 
-    socket.on('game.score', (topic, data) => {
+    socket?.on('game.score', (topic, data) => {
       if (__DEV__) console.log(`:: on.${topic}`)
       const score = data
 
-      setGame((game) => ({
+      setGame(() => ({
         score,
       }))
     })
 
-    socket.on('game.papersGuessed', (topic, data) => {
+    socket?.on('game.papersGuessed', (topic, data) => {
       if (__DEV__) console.log(`:: on.${topic}`)
       const papersGuessed = data // Number
 
-      setGame((game) => ({
+      setGame(() => ({
         papersGuessed,
       }))
     })
 
-    socket.on('game.leave', (topic) => {
+    socket?.on('game.leave', (topic) => {
       if (__DEV__) console.log(`:: on.${topic}`)
       this._removeGameFromState()
     })
   }
 
-  async updateProfile(profile, opts = {}) {
+  async updateProfile(
+    profile: Partial<PapersContextState['profile']>,
+    opts: {
+      ignoreSocket: boolean
+    } = { ignoreSocket: false }
+  ) {
     if (__DEV__) console.log('📌 updateProfile()', profile, opts)
     const mapKeys = {
       id: 'profile_id',
@@ -463,12 +520,19 @@ export class PapersContextProvider extends Component {
       gameId: 'profile_gameId',
     }
 
+    if (!profile) {
+      console.warn('updateProfile: profile is empty')
+      return
+    }
+
     try {
       for (const key in profile) {
-        if (typeof profile[key] === 'string') {
-          await AsyncStorage.setItem(mapKeys[key], profile[key])
+        const typedKey = key as keyof PapersContextValue['state']['profile']
+
+        if (typeof profile[typedKey] === 'string') {
+          await AsyncStorage.setItem(mapKeys[typedKey], profile[typedKey])
         } else {
-          await AsyncStorage.removeItem(mapKeys[key])
+          await AsyncStorage.removeItem(mapKeys[typedKey])
         }
       }
     } catch (e) {
@@ -476,12 +540,13 @@ export class PapersContextProvider extends Component {
       Sentry.captureException(e, { tags: { pp_action: 'UP_0' } })
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, gameId, ...serverProfile } = profile
 
     if (!opts.ignoreSocket && Object.keys(serverProfile).length > 0) {
       if (this.state.socket) {
         try {
-          this.state.socket.updateProfile(serverProfile)
+          this.state.socket?.updateProfile(serverProfile)
         } catch (e) {
           console.warn('error: updateProfile socket', e)
           Sentry.captureException(e, { tags: { pp_action: 'UP_1' } })
@@ -492,27 +557,27 @@ export class PapersContextProvider extends Component {
 
     this.setState((state) => ({
       profile: {
-        ...state.profile,
+        ...(state.profile as Profile),
         ...profile,
       },
     }))
   }
 
-  async updateProfileSettings(setting, value) {
+  async updateProfileSettings(setting: keyof Profile['settings'], value: boolean) {
     if (__DEV__) console.log('📌 updateProfileSettings()', setting, value)
 
     this.setState(
       (state) => ({
         profile: {
-          ...state.profile,
+          ...(state.profile as Profile),
           settings: {
-            ...state.profile.settings,
+            ...(state.profile?.settings as Profile['settings']),
             [setting]: value,
           },
         },
       }),
       async () => {
-        const newSettings = this.state.profile.settings
+        const newSettings = this.state.profile?.settings
         try {
           await AsyncStorage.setItem('profile_settings', JSON.stringify(newSettings))
         } catch (e) {
@@ -523,24 +588,24 @@ export class PapersContextProvider extends Component {
     )
   }
 
-  async updateProfileStats(statKey, valueToAdd) {
+  async updateProfileStats(statKey: keyof Profile['stats'], valueToAdd: number) {
     // Similar to updateProfileSettings. Could be DRY but it's ok...
     if (__DEV__) console.log('📌 updateProfileStats()', statKey, valueToAdd)
 
     this.setState(
       (state) => ({
         profile: {
-          ...state.profile,
+          ...(state.profile as Profile),
           stats: {
-            ...state.profile.stats,
-            [statKey]: state.profile.stats[statKey] + valueToAdd,
+            ...(state.profile?.stats as Profile['stats']),
+            [statKey]: (state.profile?.stats ? state.profile.stats[statKey] : 0) + valueToAdd,
           },
         },
       }),
       async () => {
-        const newStats = this.state.profile.stats
+        const newStats = this.state.profile?.stats
         try {
-          await AsyncStorage.setItem('profile_settings', JSON.stringify(newStats))
+          await AsyncStorage.setItem('profile_stats', JSON.stringify(newStats))
         } catch (e) {
           console.warn('error: updateProfileStats', e)
           Sentry.captureException(e, { tags: { pp_action: 'UPS_1' } })
@@ -549,43 +614,43 @@ export class PapersContextProvider extends Component {
     )
   }
 
-  async resetProfile(profile) {
+  async resetProfile() {
     if (__DEV__) console.log('📌 resetProfile()')
     try {
-      await AsyncStorage.removeItem('profile_id')
-      await AsyncStorage.removeItem('profile_name')
-      await AsyncStorage.removeItem('profile_avatar')
-      await AsyncStorage.removeItem('profile_groupId')
-
-      this.setState((state) => ({
-        ...state,
-        profile: {
-          ...state.profile,
-          id: undefined,
-          name: undefined,
-          avatar: undefined,
-          groupId: undefined,
-        },
-      }))
-
-      await this.resetProfileSettings()
-      await this.resetProfileStats()
-
-      if (this.state.socket) {
-        await this.state.socket.resetProfile()
-        this.state.socket.offAll()
+      if (this.state.socket && this.state.profile) {
+        await this.state.socket?.resetProfile(this.state.profile.id)
+        this.state.socket?.offAll()
         this.setState((state) => ({
           ...state,
           socket: null,
         }))
       }
+
+      await AsyncStorage.removeItem('profile_id')
+      await AsyncStorage.removeItem('profile_name')
+      await AsyncStorage.removeItem('profile_avatar')
+      await AsyncStorage.removeItem('profile_gameId')
+
+      this.setState((state) => ({
+        ...(state as PapersContextState),
+        profile: {
+          ...(state.profile as Profile),
+          id: '',
+          name: '',
+          avatar: '',
+          gameId: '',
+        },
+      }))
+
+      await this.resetProfileSettings()
+      await this.resetProfileStats()
     } catch (e) {
       console.warn('error: resetProfile', e)
       Sentry.captureException(e, { tags: { pp_action: 'RP_0' } })
     }
   }
 
-  async resetProfileSettings(profile) {
+  async resetProfileSettings() {
     if (__DEV__) console.log('📌 resetProfileSettings()')
     try {
       await AsyncStorage.setItem('profile_settings', JSON.stringify(settingsDefaults))
@@ -596,13 +661,13 @@ export class PapersContextProvider extends Component {
 
     this.setState((state) => ({
       profile: {
-        ...state.profile,
+        ...(state.profile as Profile),
         settings: settingsDefaults,
       },
     }))
   }
 
-  async resetProfileStats(profile) {
+  async resetProfileStats() {
     if (__DEV__) console.log('📌 resetProfileStats()')
     try {
       await AsyncStorage.setItem('profile_stats', JSON.stringify(statsDefaults))
@@ -613,16 +678,16 @@ export class PapersContextProvider extends Component {
 
     this.setState((state) => ({
       profile: {
-        ...state.profile,
+        ...(state.profile as Profile),
         stats: statsDefaults,
       },
     }))
   }
 
-  async setWords(words) {
+  async setWords(words: string[]) {
     if (__DEV__) console.log('📌 setWords()')
     try {
-      await this.state.socket.setWords(words)
+      await this.state.socket?.setWords(words)
     } catch (e) {
       console.warn('error: setWords', e)
       Sentry.captureException(e, { tags: { pp_action: 'SW_0' } })
@@ -630,23 +695,27 @@ export class PapersContextProvider extends Component {
     }
   }
 
-  async setWordsForEveyone() {
-    if (__DEV__) console.log('📌 setWordsForEveyone()')
-    const allWords = Object.keys(this.state.game.players).reduce((acc, playerId, pIndex) => {
+  async setWordsForEveryone() {
+    if (__DEV__) console.log('📌 setWordsForEveryone()')
+    const allWords = Object.keys(this.state.game?.players || {}).reduce((acc, playerId, pIndex) => {
       return {
         ...acc,
         [playerId]: wordsForEveryone[pIndex].map((w, windex) => windex + pIndex * 10),
       }
-    }, {})
-    allWords._all = wordsForEveryone.slice(0, Object.keys(this.state.game.players).length).flat()
-    await this.state.socket.setWordsForEveryone(allWords)
+    }, {} as Words)
+    allWords._all = wordsForEveryone
+      .slice(0, Object.keys(this.state.game?.players || {}).length)
+      .flat()
+    await this.state.socket?.setWordsForEveryone(allWords)
   }
 
-  async setTeams(teams) {
+  async setTeams(teams: GameTeams) {
     if (__DEV__) console.log('📌 setTeams()')
     try {
-      await this.state.socket.setTeams(teams)
-      Analytics.logEvent('game_setTeams', { players: Object.keys(this.state.game.players).length })
+      await this.state.socket?.setTeams(teams)
+      Analytics.logEvent('game_setTeams', {
+        players: Object.keys(this.state.game?.players || {}).length,
+      })
     } catch (e) {
       console.warn('error: setTeams', e)
       Sentry.captureException(e, { tags: { pp_action: 'STM_0' } })
@@ -663,17 +732,17 @@ export class PapersContextProvider extends Component {
       turnCount: 0,
       status: 'getReady',
       // all words by key to save space
-      wordsLeft: this.state.game.words._all.map((w, i) => i),
-    }
+      wordsLeft: this.state.game?.words?._all?.map((_, i) => i) || [],
+    } satisfies Game['round']
 
     try {
       this.PapersAPI.soundPlay('ready')
-      await this.state.socket.markMeAsReady(roundStatus, () => {
-        this.state.socket.startGame()
+      await this.state.socket?.markMeAsReady(roundStatus, () => {
+        this.state.socket?.startGame()
       })
       this.config.roundDuration = Date.now()
       Analytics.logEvent(`game_imReadyToRound_1`, {
-        players: Object.keys(this.state.game.players).length,
+        players: Object.keys(this.state.game?.players || {}).length,
       })
     } catch (e) {
       console.warn('error: markMeAsReady', e)
@@ -687,14 +756,19 @@ export class PapersContextProvider extends Component {
 
     try {
       this.PapersAPI.soundPlay('ready')
-      await this.state.socket.markMeAsReadyForNextRound(() => {
+      await this.state.socket?.markMeAsReadyForNextRound(() => {
         this._startNextRound()
       })
 
       this.config.roundDuration = Date.now()
-      Analytics.logEvent(`game_imReadyToRound_${this.state.game.round.current + 2}`, {
-        players: Object.keys(this.state.game.players).length,
-      })
+      Analytics.logEvent(
+        `game_imReadyToRound_${
+          this.state.game?.round?.current ? this.state.game.round.current + 2 : 'unknown'
+        }`,
+        {
+          players: Object.keys(this.state.game?.players || {}).length,
+        }
+      )
     } catch (e) {
       console.warn('error: markMeAsReadyForNextRound', e)
       Sentry.captureException(e, { tags: { pp_action: 'MMARNR_0' } })
@@ -705,13 +779,13 @@ export class PapersContextProvider extends Component {
   async pingReadyStatus() {
     if (__DEV__) console.log('📌 pingReadyStatus()')
     try {
-      const isAllReady = await this.state.socket.pingReadyStatus()
+      const isAllReady = await this.state.socket?.pingReadyStatus()
 
       if (!isAllReady) return
 
-      if (!this.state.game.hasStarted) {
+      if (!this.state.game?.hasStarted) {
         console.log(':: start game!')
-        this.state.socket.startGame()
+        this.state.socket?.startGame()
       } else {
         console.log(':: start next round!')
         this._startNextRound()
@@ -727,7 +801,7 @@ export class PapersContextProvider extends Component {
     if (__DEV__) console.log('📌 startTurn()')
     try {
       this.PapersAPI.soundPlay('turnstart')
-      this.state.socket.startTurn()
+      this.state.socket?.startTurn()
     } catch (e) {
       console.warn('error: startTurn', e)
       Sentry.captureException(e, { tags: { pp_action: 'STN_0' } })
@@ -736,11 +810,32 @@ export class PapersContextProvider extends Component {
   }
 
   getNextTurn() {
+    if (!this.state.game) {
+      Sentry.captureMessage('getNextTurn() called before game is ready')
+      return
+    }
+
     const { teams, round } = this.state.game
+
+    if (!round) {
+      Sentry.captureMessage('getNextTurn() called before round is ready')
+      return
+    }
+
+    if (!teams) {
+      Sentry.captureMessage('getNextTurn() called before teams are ready')
+      return
+    }
+
     return getNextTurn(round.turnWho, teams)
   }
 
-  async skipTurn(playerId) {
+  async skipTurn(playerId: Profile['id']) {
+    if (!this.state.game) {
+      Sentry.captureMessage('skipTurn() called before game is ready')
+      return
+    }
+
     const { players, teams, round } = this.state.game
 
     if (players[playerId].isAfk === false) {
@@ -751,10 +846,20 @@ export class PapersContextProvider extends Component {
       return
     }
 
+    if (!round) {
+      Sentry.captureMessage('getNextSkippedTurn() called before round is ready')
+      return
+    }
+
+    if (!teams) {
+      Sentry.captureMessage('getNextSkippedTurn() called before teams are ready')
+      return
+    }
+
     const turnWho = getNextSkippedTurn(round.turnWho, teams)
 
     try {
-      await this.state.socket.skipTurn({
+      await this.state.socket?.skipTurn({
         roundStatus: {
           ...round,
           turnWho,
@@ -768,39 +873,61 @@ export class PapersContextProvider extends Component {
     }
   }
 
-  async finishTurn(papersTurn, cb) {
+  async finishTurn(papersTurn: Turn) {
     if (__DEV__) console.log('📌 finishTurn()')
-    const game = this.state.game
+
+    if (!this.state.profile) {
+      Sentry.captureMessage('finishTurn() called before profile is ready')
+      return
+    }
+
     const profileId = this.state.profile.id
+
+    const game = this.state.game
+
+    if (!game) {
+      Sentry.captureMessage('finishTurn() called before game is ready')
+      return
+    }
+
     const { round } = game
+
+    if (!round) {
+      Sentry.captureMessage('finishTurn() called before round is ready')
+      return
+    }
 
     const roundCurrent = round.current
     const current = papersTurn.current ? [papersTurn.current] : []
     const wordsLeft = [...papersTurn.wordsLeft, ...papersTurn.passed, ...current]
-    const roundStatus =
+    const roundStatus: Round =
       wordsLeft.length > 0
         ? {
             current: roundCurrent,
-            turnWho: this.getNextTurn(),
+            turnWho: this.getNextTurn() || ({} as Round['turnWho']),
             turnCount: round.turnCount + 1,
             status: 'getReady',
             wordsLeft,
           }
         : {
             current: roundCurrent,
+            turnWho: {} as Round['turnWho'],
+            turnCount: 0,
             status: 'finished',
             wordsLeft: [],
           }
 
+    let wordsSoFar: number[] = []
+
     if (!game.score) {
-      game.score = []
-    }
+      game.score = null
+    } else {
+      if (!game?.score[roundCurrent]) {
+        game.score[roundCurrent] = {}
 
-    if (!game.score[roundCurrent]) {
-      game.score[roundCurrent] = {}
+        wordsSoFar = game.score[roundCurrent][profileId]
+      }
     }
-
-    const wordsSoFar = game.score[roundCurrent][profileId] || []
 
     const allValidWordsGuessed = [...wordsSoFar, ...papersTurn.guessed].filter((word) => {
       if (word === undefined) {
@@ -829,16 +956,32 @@ export class PapersContextProvider extends Component {
     })
 
     try {
-      await this.state.socket.finishTurn({
+      if (!profileId) {
+        Sentry.captureMessage('finishTurn() called before profile is ready')
+        return
+      }
+
+      await this.state.socket?.finishTurn({
         playerScore: {
           [profileId]: uniqueWordsGuessed,
         },
         roundStatus,
       })
+
+      if (!game.teams) {
+        Sentry.captureMessage('finishTurn() called before teams are ready')
+        return
+      }
+
+      if (!this.config?.myTeamId) {
+        Sentry.captureMessage('finishTurn() called before myTeamId is ready')
+        return
+      }
+
       Analytics.logEvent('finish_turn', {
         round: roundCurrent + 1,
         turn: round.turnCount + 1,
-        teamSize: game.teams[this.config.myTeamId]?.players.length || 0,
+        teamSize: game?.teams[this.config?.myTeamId]?.players.length || 0,
         yes: papersTurn.guessed.length,
         no: papersTurn.passed.length,
         toggled_to_yes: papersTurn.toggled_to_yes,
@@ -853,13 +996,15 @@ export class PapersContextProvider extends Component {
   }
 
   _storeMyTeam() {
-    const teams = this.state.game.teams
-    let myTeamId
+    const teams = this.state.game?.teams
+    let myTeamId: Team['id'] = 0
 
-    for (const teamId in teams) {
-      const isMyTeam = teams[teamId].players.some((pId) => pId === this.state.profile.id)
+    for (const id in teams) {
+      const teamId = Number(id) as Team['id']
+
+      const isMyTeam = teams[teamId].players.some((pId) => pId === this.state.profile?.id)
       if (isMyTeam) {
-        myTeamId = teamId
+        myTeamId = Number(teamId) as Team['id']
         break
       }
     }
@@ -874,17 +1019,20 @@ export class PapersContextProvider extends Component {
 
     // NOTE: No need for try/catch because it's used in this component
     // only that already has its own try catch
-    await this.state.socket.setRound({
-      current: game.round.current + 1,
+    await this.state.socket?.setRound({
+      current:
+        typeof game?.round?.current === 'number'
+          ? ((game.round.current + 1) as Round['current'])
+          : 0,
       status: 'getReady',
-      turnWho: this.getNextTurn(),
+      turnWho: this.getNextTurn() || ({} as Round['turnWho']),
       turnCount: 0,
       // all words by key to save space // dry across file
-      wordsLeft: game.words._all.map((w, i) => i),
+      wordsLeft: game?.words ? game.words._all.map((_, i) => i) : [],
     })
   }
 
-  async setTurnLocalState(turn) {
+  async setTurnLocalState(turn: Maybe<Turn>) {
     if (__DEV__) console.log('📌 setPaperTurnState()') // a better name perhaps?
 
     try {
@@ -892,9 +1040,9 @@ export class PapersContextProvider extends Component {
         await AsyncStorage.setItem('turn', JSON.stringify(turn))
         const papersGuessed = turn.guessed.length
 
-        if (papersGuessed !== this.state.game.papersGuessed) {
+        if (papersGuessed !== this.state.game?.papersGuessed) {
           // Send this, so all players know N papers were guessed so far.
-          this.state.socket.setPapersGuessed(papersGuessed)
+          this.state.socket?.setPapersGuessed(papersGuessed)
         }
       } else {
         await AsyncStorage.removeItem('turn')
@@ -909,17 +1057,19 @@ export class PapersContextProvider extends Component {
   async getTurnLocalState() {
     if (__DEV__) console.log('📌 getPaperTurnState()')
     const storedTurn = await AsyncStorage.getItem('turn')
-    const turnState = JSON.parse(storedTurn) || {
-      current: null, // String - current paper on the screen (id)
-      passed: [], // [String] - papers passed
-      guessed: [], // [String] - papers guessed
-      sorted: [], // [Number] - papers guessed/passed sorted chronologically
-      wordsLeft: this.state.game.round.wordsLeft, // [String] - words left
-      // For analytics purposes only
-      toggled_to_yes: 0,
-      toggled_to_no: 0,
-      revealed: 0,
-    }
+    const turnState = storedTurn
+      ? JSON.parse(storedTurn)
+      : ({
+          current: 0,
+          passed: [],
+          guessed: [],
+          sorted: [],
+          wordsLeft: this.state.game?.round?.wordsLeft || [],
+          // For analytics purposes only
+          toggled_to_yes: 0,
+          toggled_to_no: 0,
+          revealed: 0,
+        } satisfies Turn)
     return turnState
   }
 
@@ -931,23 +1081,26 @@ export class PapersContextProvider extends Component {
     this.PapersAPI.setTurnLocalState(null)
     await this.PapersAPI.updateProfile({ gameId: null })
     this.setState(
-      (state) => ({ game: null }),
+      () => ({ game: null }),
       () => {
-        this.config = {}
+        this.config = {
+          myTeamId: null,
+          roundDuration: null,
+        }
       }
     )
   }
 
-  async leaveGame(opts = {}) {
+  async leaveGame(opts: { wasKicked?: boolean; gameDeleted?: boolean } = {}) {
     if (__DEV__) console.log('📌 leaveGame()', opts)
 
     try {
       const game = this.state.game
-      await this.state.socket.leaveGame(opts)
+      await this.state.socket?.leaveGame(opts)
 
       if (!opts.wasKicked || !opts.gameDeleted) {
         let gameStatus
-        if (!game.teams) {
+        if (!game?.teams) {
           gameStatus = 'new'
         } else if (!game.round) {
           gameStatus = 'writing'
@@ -967,15 +1120,17 @@ export class PapersContextProvider extends Component {
 
   async abortGameGate() {
     try {
-      await this.state.socket.leaveGame()
-    } catch (e) {}
+      await this.state.socket?.leaveGame({})
+    } catch (e) {
+      Sentry.captureException(e, { tags: { pp_action: 'ABG_0' } })
+    }
     this._removeGameFromState()
   }
 
-  async removePlayer(playerId) {
+  async removePlayer(playerId: Profile['id']) {
     if (__DEV__) console.log('📌 removePlayer()')
     try {
-      await this.state.socket.removePlayer(playerId)
+      await this.state.socket?.removePlayer(playerId)
       Analytics.logEvent('remove_player')
     } catch (e) {
       console.warn('error: removePlayer', e)
@@ -984,9 +1139,9 @@ export class PapersContextProvider extends Component {
   }
 
   async deleteGame() {
-    for (const playerId in this.state.game.players) {
-      if (playerId !== this.state.profile.id) {
-        await this.state.socket.removePlayer(playerId)
+    for (const playerId in this.state.game?.players) {
+      if (playerId !== this.state.profile?.id) {
+        await this.state.socket?.removePlayer(playerId)
       }
     }
     Analytics.logEvent('game_delete')
@@ -994,37 +1149,63 @@ export class PapersContextProvider extends Component {
   }
 
   soundToggleStatus() {
-    const newStatus = !this.state.profile.settings.sound
-    PapersSound.setSoundStatus(newStatus)
-    this.updateProfileSettings('sound', newStatus)
+    const newStatus = !this.state.profile?.settings.sound
+
+    if (newStatus !== undefined) {
+      PapersSound.setSoundStatus(newStatus)
+      this.updateProfileSettings('sound', newStatus)
+    }
   }
 
-  soundPlay(soundId) {
+  soundPlay(soundId: SoundName) {
     PapersSound.play(soundId)
   }
 
   motionToggle() {
-    const newStatus = !this.state.profile.settings.motion
-    this.updateProfileSettings('motion', newStatus)
+    const newStatus = !this.state.profile?.settings.motion
+
+    if (newStatus !== undefined) {
+      this.updateProfileSettings('motion', newStatus)
+    }
   }
 
-  sendTracker(trackName, opts) {
+  sendTracker(
+    trackName: 'game_finishRound',
+    opts: { arrayOfScores: number[]; isMyTeamWinner: boolean; myTotalScore: number } = {
+      arrayOfScores: [],
+      isMyTeamWinner: false,
+      myTotalScore: 0,
+    }
+  ) {
     switch (trackName) {
       case 'game_finishRound': {
         const game = this.state.game
-        const totalScore = opts.arrayOfScores.reduce((acc, cur) => acc + cur, 0)
-        const isFinalRound = game.round.current === game.settings.roundsCount - 1
 
-        Analytics.logEvent(`game_finishRound_${game.round.current + 1}`, {
-          players: Object.keys(game.players).length,
-          turns: game.round.turnCount,
-          duration: Math.round((Date.now() - this.config.roundDuration) / 60000) || 0, // in minutes
-          score: opts.arrayOfScores.join('-'),
-        })
+        if (!game) {
+          if (__DEV__) console.log('📌 sendTracker: game is undefined')
+          return
+        }
+
+        const totalScore = opts.arrayOfScores.reduce((acc, cur) => acc + cur, 0)
+        const isFinalRound = game?.round?.current === game?.settings?.roundsCount - 1
+
+        Analytics.logEvent(
+          `game_finishRound_${
+            typeof game.round?.current === 'number' ? game.round.current + 1 : 'unknown'
+          }`,
+          {
+            players: game?.players ? Object.keys(game?.players).length : 0,
+            turns: game?.round?.turnCount,
+            duration: this.config?.roundDuration
+              ? Math.round((Date.now() - this.config.roundDuration) / 60000) // in minutes
+              : 0,
+            score: opts.arrayOfScores.join('-'),
+          }
+        )
         this.config.roundDuration = undefined
 
-        if (totalScore !== Object.keys(game.players).length * 10) {
-          console.warn('Wrong score!!', totalScore, this.state.profile.id, game)
+        if (totalScore !== Object.keys(game?.players || {}).length * 10) {
+          console.warn('Wrong score!!', totalScore, this.state.profile?.id, game)
           Sentry.withScope((scope) => {
             scope.setExtra('response', JSON.stringify(game))
             Sentry.captureException(Error('Wrong score!'))
@@ -1043,27 +1224,6 @@ export class PapersContextProvider extends Component {
         break
     }
   }
-}
-
-PapersContextProvider.propTypes = {
-  initialProfile: PropTypes.shape({
-    id: PropTypes.string,
-    name: PropTypes.string,
-    avatar: PropTypes.string,
-    gameId: PropTypes.string,
-    settings: PropTypes.shape({
-      sound: PropTypes.bool,
-      motions: PropTypes.bool,
-    }),
-    stats: PropTypes.shape({
-      gamesCreated: PropTypes.number,
-      gamesJoined: PropTypes.number,
-      gamesWon: PropTypes.number,
-      gamesLost: PropTypes.number,
-      papersGuessed: PropTypes.number,
-    }),
-  }),
-  children: PropTypes.node,
 }
 
 export default PapersContext

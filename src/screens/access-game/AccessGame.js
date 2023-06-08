@@ -3,7 +3,7 @@ import React from 'react'
 
 import { analytics as Analytics } from '@src/services/firebase'
 
-import PapersContext from '@src/store/PapersContext.js'
+import PapersContext from '@src/store/PapersContext'
 import CreateGame from './CreateGame.js'
 import JoinGame from './JoinGame.js'
 

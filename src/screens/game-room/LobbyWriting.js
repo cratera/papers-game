@@ -5,7 +5,7 @@ import { ScrollView } from 'react-native-gesture-handler'
 
 import { analytics as Analytics } from '@src/services/firebase'
 
-import PapersContext from '@src/store/PapersContext.js'
+import PapersContext from '@src/store/PapersContext'
 
 import * as Theme from '@src/theme'
 // import Styles from './LobbyStyles.js'
@@ -95,7 +95,7 @@ export default function LobbyWriting({ navigation }) {
         <Page.CTAs hasOffset>
           <Button
             variant="danger"
-            onPress={Papers.setWordsForEveyone}
+            onPress={Papers.setWordsForEveryone}
             styleTouch={{ marginTop: 16 }}
           >
             {"💥 Write everyone's papers 💥"}

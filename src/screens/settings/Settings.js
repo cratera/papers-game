@@ -5,7 +5,7 @@ import { ScrollView, Text } from 'react-native'
 
 import { analytics as Analytics } from '@src/services/firebase'
 
-import PapersContext from '@src/store/PapersContext.js'
+import PapersContext from '@src/store/PapersContext'
 import * as Theme from '@src/theme'
 
 import ListTeams from '@src/components/list-teams'

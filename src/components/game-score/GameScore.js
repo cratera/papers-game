@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import { View } from 'react-native'
 
-import PapersContext from '@src/store/PapersContext.js'
+import PapersContext from '@src/store/PapersContext'
 import { formatScores } from '@src/store/papersMethods'
 
 import CardScore from './CardScore.js'
