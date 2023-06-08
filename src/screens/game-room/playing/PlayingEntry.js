@@ -7,7 +7,7 @@ import { analytics as Analytics } from '@src/services/firebase'
 import { useCountdown, usePrevious } from '@src/hooks'
 import PapersContext from '@src/store/PapersContext'
 
-import { headerTheme } from '@src/navigation/headerStuff.js'
+import { headerTheme } from '@src/navigation/headerStuff'
 
 import Page from '@src/components/page'
 import i18n from '@src/constants/i18n'

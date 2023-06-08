@@ -8,7 +8,7 @@ import * as Theme from '@src/theme'
 import Styles from './HomeStyles.js'
 
 import * as avatars from '@src/components/avatar/Illustrations'
-import { headerTheme } from '@src/navigation/headerStuff.js'
+import { headerTheme } from '@src/navigation/headerStuff'
 
 import Avatar from '@src/components/avatar'
 import Bubbling from '@src/components/bubbling'

@@ -9,7 +9,7 @@ import Styles from './HomeStyles.js'
 import AvatarSelector from '@src/components/avatar/AvatarSelector'
 import Button from '@src/components/button'
 import Page from '@src/components/page'
-import { headerTheme } from '@src/navigation/headerStuff.js'
+import { headerTheme } from '@src/navigation/headerStuff'
 
 import { window } from '@src/utils/device'
 

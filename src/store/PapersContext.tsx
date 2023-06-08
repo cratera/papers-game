@@ -53,18 +53,19 @@ const statsDefaults = {
 } satisfies Profile['stats']
 
 export const loadProfile = async () => {
-  const id = (await AsyncStorage.getItem('profile_id')) || null
-  const name = (await AsyncStorage.getItem('profile_name')) || null
-  const avatar = (await AsyncStorage.getItem('profile_avatar')) || null
-  const gameId = (await AsyncStorage.getItem('profile_gameId')) || null
-  const settingsStored = (await AsyncStorage.getItem('profile_settings')) || null
-  const statsStored = (await AsyncStorage.getItem('profile_stats')) || null
+  const id = (await AsyncStorage.getItem('profile_id')) || ''
+  const name = (await AsyncStorage.getItem('profile_name')) || ''
+  const avatar = (await AsyncStorage.getItem('profile_avatar')) || ''
+  const gameId = (await AsyncStorage.getItem('profile_gameId')) || ''
+  const settingsStored = (await AsyncStorage.getItem('profile_settings')) || ''
+  const statsStored = (await AsyncStorage.getItem('profile_stats')) || ''
 
   return {
     id,
     name,
     avatar,
     gameId,
+    isAfk: false,
     settings: settingsStored ? JSON.parse(settingsStored) : settingsDefaults,
     stats: statsStored ? JSON.parse(statsStored) : statsDefaults,
   }

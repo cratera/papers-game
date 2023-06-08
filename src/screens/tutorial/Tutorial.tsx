@@ -14,6 +14,8 @@ import IllustrationPersonGuess from '@src/components/illustrations/PersonGuess.j
 import IllustrationPersonThink from '@src/components/illustrations/PersonThink.js'
 import Page from '@src/components/page'
 
+import { StackScreenProps } from '@react-navigation/stack'
+import { AppStackParamList } from '@src/navigation/navigation.types.js'
 import { useEffectOnce } from 'usehooks-ts'
 import Styles from './TutorialStyles.js'
 
@@ -67,15 +69,19 @@ const tutorialConfig = [
 
 const stepTotal = tutorialConfig.length
 
-export default function Tutorial({ navigation, isMandatory, onDone }) {
-  const refSlider = React.useRef()
+export default function Tutorial({
+  navigation,
+  route,
+}: StackScreenProps<AppStackParamList, 'tutorial'>) {
+  const refSlider = React.useRef<ScrollView>(null)
   const [stepIndex, setStepIndex] = React.useState(0)
+  const { isMandatory, onDone } = route.params
 
   useEffectOnce(() => {
     Analytics.setCurrentScreen('tutorial')
     navigation.setOptions({
       headerLeft: isMandatory
-        ? null
+        ? undefined
         : function HLB() {
             return (
               <Page.HeaderBtn side="left-close" onPress={navigation.goBack}>
@@ -88,7 +94,7 @@ export default function Tutorial({ navigation, isMandatory, onDone }) {
 
   React.useEffect(() => {
     // Ensure slides is scrolled at the right position
-    refSlider.current.scrollTo({ x: vw * 100 * stepIndex })
+    refSlider.current?.scrollTo({ x: vw * 100 * stepIndex })
   }, [stepIndex])
 
   function handleOnStart() {

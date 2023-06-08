@@ -1,5 +1,4 @@
 import { createStackNavigator } from '@react-navigation/stack'
-import PropTypes from 'prop-types'
 import React from 'react'
 import { ScrollView, Text } from 'react-native'
 
@@ -27,7 +26,7 @@ import { propTypesCommon, useSubHeader } from './utils'
 
 const Stack = createStackNavigator()
 
-export default function Settings(props) {
+export default function Settings() {
   const Papers = React.useContext(PapersContext)
   const { game } = Papers.state
 
@@ -61,10 +60,6 @@ export default function Settings(props) {
       <Stack.Screen name="settings-credits" component={SettingsCredits} />
     </Stack.Navigator>
   )
-}
-
-Settings.propTypes = {
-  navigation: PropTypes.object.isRequired, // react-navigation
 }
 
 // ======

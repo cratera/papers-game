@@ -219,7 +219,7 @@ export type PapersAPIMethods = Pick<
   | 'sendTracker'
 >
 
-export interface PapersContextValue extends PapersAPIMethods {
+export interface PapersContextValue extends Partial<PapersAPIMethods> {
   state: State
 }
 

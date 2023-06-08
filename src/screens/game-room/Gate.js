@@ -6,7 +6,7 @@ import * as Sentry from '@src/services/sentry'
 
 import PapersContext from '@src/store/PapersContext'
 
-import { headerTheme } from '@src/navigation/headerStuff.js'
+import { headerTheme } from '@src/navigation/headerStuff'
 
 import Button from '@src/components/button'
 import { LoadingBadge } from '@src/components/loading'
@@ -22,7 +22,7 @@ export default function Gate({ navigation, route }) {
 
   React.useEffect(() => {
     navigation.setOptions({
-      ...headerTheme({ hiddenTitle: true, hiddenBorder: true }),
+      ...headerTheme({ hiddenTitle: true }),
     })
 
     try {

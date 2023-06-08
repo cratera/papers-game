@@ -15,7 +15,7 @@ import Button from '@src/components/button'
 import ListPlayers from '@src/components/list-players'
 import Page from '@src/components/page'
 
-import { headerTheme } from '@src/navigation/headerStuff.js'
+import { headerTheme } from '@src/navigation/headerStuff'
 import * as Theme from '@src/theme'
 
 function areTeamPlayersEqual(teamsOld, teamsNew) {

@@ -14,7 +14,7 @@ import Button from '@src/components/button'
 import ListTeams from '@src/components/list-teams'
 import Page from '@src/components/page'
 import { useLeaveGame } from '@src/components/settings'
-import { headerTheme } from '@src/navigation/headerStuff.js'
+import { headerTheme } from '@src/navigation/headerStuff'
 
 export default function LobbyWriting({ navigation }) {
   const Papers = React.useContext(PapersContext)

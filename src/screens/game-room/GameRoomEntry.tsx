@@ -1,14 +1,14 @@
-import PropTypes from 'prop-types'
 import React from 'react'
 
 // import * as WebBrowser from 'expo-web-browser'; // WHAT'S THIS?
 
-import { createStackNavigator } from '@react-navigation/stack'
+import { createStackNavigator, StackScreenProps } from '@react-navigation/stack'
 import PapersContext from '@src/store/PapersContext'
 
-import { headerTheme } from '@src/navigation/headerStuff.js'
+import { headerTheme } from '@src/navigation/headerStuff'
 import { animations } from '@src/theme'
 
+import { AppStackParamList } from '@src/navigation/navigation.types'
 import Gate from './Gate'
 import LobbyJoining from './LobbyJoining.js'
 import LobbyWriting from './LobbyWriting.js'
@@ -18,12 +18,12 @@ import WritePapers from './WritePapers'
 
 const Stack = createStackNavigator()
 
-export default function GameRoomEntry({ navigation, route }) {
+export default function GameRoomEntry({ navigation }: StackScreenProps<AppStackParamList, 'room'>) {
   const Papers = React.useContext(PapersContext)
   const { profile, game } = Papers.state
-  const hasGameIdCached = React.useRef(!!profile.gameId).current
-  const profileId = profile.id
-  const profileGameId = profile.gameId
+  const hasGameIdCached = React.useRef(!!profile?.gameId).current
+  const profileId = profile?.id
+  const profileGameId = profile?.gameId
 
   const { id: gameId } = game || {}
 
@@ -86,7 +86,7 @@ export default function GameRoomEntry({ navigation, route }) {
     >
       {isPlaying ? (
         <>
-          <Stack.Screen name="playing" component={Playing} headerTitle="Playing" />
+          <Stack.Screen name="playing" component={Playing} options={{ headerTitle: 'Playing' }} />
         </>
       ) : (
         <>
@@ -114,9 +114,4 @@ export default function GameRoomEntry({ navigation, route }) {
       />
     </Stack.Navigator>
   )
-}
-
-GameRoomEntry.propTypes = {
-  navigation: PropTypes.object, // ReactNavigation
-  route: PropTypes.object, // ReactNavigation
 }

@@ -1,1 +1,1 @@
-export { default } from './AccessGame.js'
+export { default } from './AccessGame'

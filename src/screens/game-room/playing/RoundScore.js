@@ -8,7 +8,7 @@ import Button from '@src/components/button'
 import Page from '@src/components/page'
 import { formatScores, getTeamId } from '@src/store/papersMethods'
 
-import { headerTheme } from '@src/navigation/headerStuff.js'
+import { headerTheme } from '@src/navigation/headerStuff'
 // import EmojiRain from './EmojiRain'
 import GameScore from '@src/components/game-score'
 
@@ -53,7 +53,7 @@ const RoundScore = ({ navigation }) => {
   function handleStartRoundClick() {
     setIsOnRoundIntro(true)
     navigation.setOptions({
-      ...headerTheme({ dark: true, hiddenBorder: true, hiddenTitle: true }),
+      ...headerTheme({ hiddenTitle: true }),
     })
   }
 

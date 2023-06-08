@@ -1,17 +1,21 @@
-import PropTypes from 'prop-types'
 import React from 'react'
 
 import { analytics as Analytics } from '@src/services/firebase'
 
+import { StackScreenProps } from '@react-navigation/stack'
+import { AppStackParamList } from '@src/navigation/navigation.types.js'
 import PapersContext from '@src/store/PapersContext'
 import CreateGame from './CreateGame.js'
 import JoinGame from './JoinGame.js'
 
-export default function AccessGame({ route, navigation }) {
+export default function AccessGame({
+  route,
+  navigation,
+}: StackScreenProps<AppStackParamList, 'access-game'>) {
   const Papers = React.useContext(PapersContext)
   const { game } = Papers.state
   const gameId = game?.id
-  const { variant } = route.params || {}
+  const { variant } = route.params
 
   React.useEffect(() => {
     if (!variant) {
@@ -19,13 +23,13 @@ export default function AccessGame({ route, navigation }) {
     } else {
       Analytics.setCurrentScreen(`${variant}_game`) // join_game || create_game
     }
-  }, [variant])
+  }, [navigation, variant])
 
   React.useEffect(() => {
     if (gameId) {
-      navigation.navigate('room', { screen: 'lobby-joining' })
+      navigation.navigate('room')
     }
-  }, [gameId])
+  }, [gameId, navigation])
 
   if (variant === 'join') {
     return <JoinGame navigation={navigation} />
@@ -33,13 +37,4 @@ export default function AccessGame({ route, navigation }) {
     return <CreateGame navigation={navigation} />
   }
   return null
-}
-
-AccessGame.propTypes = {
-  navigation: PropTypes.object.isRequired, // ReactNavigation
-  route: PropTypes.shape({
-    params: PropTypes.shape({
-      variant: PropTypes.string,
-    }),
-  }).isRequired, // ReactNavigation
 }

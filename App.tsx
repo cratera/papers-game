@@ -3,7 +3,8 @@ import { LogBox } from 'react-native'
 
 import ErrorCrashed from '@src/screens/misc/ErrorCrashed.js'
 import * as Sentry from '@src/services/sentry'
-import AppFn from './AppFn.js'
+import { ErrorInfo } from 'react'
+import AppFn from './AppFn'
 
 if (LogBox) {
   LogBox.ignoreLogs([
@@ -14,27 +15,32 @@ if (LogBox) {
 
 Sentry.init()
 
+type AppState = {
+  hasError: boolean
+  error: Maybe<Error>
+}
+
 // Needed this wrapper to create Error Boundary
 // Every other attempts failed (useErrorBoundary, ErrorUtils, ErrorRecovery, etc...)
 // Hint: On git, blame this line to see the refactor
-export default class App extends React.Component {
-  constructor(props) {
+export default class App extends React.Component<object, AppState> {
+  constructor(props: object) {
     super(props)
     this.state = { hasError: false, error: null }
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(error: Error) {
     return { hasError: true, error }
   }
 
-  componentDidCatch(error) {
-    Sentry.captureException(error, { tags: { pp_page: 'crash' } })
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    Sentry.captureException(JSON.stringify({ error, errorInfo }), { tags: { pp_page: 'crash' } })
   }
 
   // TODO: In web prevent direct opening URLs !== root
   render() {
     if (this.state.hasError) {
-      return <ErrorCrashed error={this.state.error} />
+      return <ErrorCrashed error={this.state.error || { cause: 'unknown' }} />
     }
     return <AppFn {...this.props} />
   }

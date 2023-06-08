@@ -15,8 +15,9 @@ import {
 
 // import Purchases from 'react-native-purchases'
 
-import { headerTheme } from '@src/navigation/headerStuff.js'
+import { headerTheme } from '@src/navigation/headerStuff'
 import linking from '@src/navigation/linking'
+import { AppStackParamList } from '@src/navigation/navigation.types'
 import AccessGame from '@src/screens/access-game'
 import GameRoom from '@src/screens/game-room'
 import Home from '@src/screens/home'
@@ -24,12 +25,13 @@ import Settings from '@src/screens/settings'
 import Tutorial from '@src/screens/tutorial'
 import * as Sentry from '@src/services/sentry'
 import { loadProfile, PapersContextProvider } from '@src/store/PapersContext'
+import { Profile } from '@src/store/PapersContext.types'
 import { animations } from '@src/theme'
 
-const Stack = createStackNavigator()
+const Stack = createStackNavigator<AppStackParamList>()
 
 export default function AppFn() {
-  const [initialProfile, setInitialProfile] = React.useState({})
+  const [initialProfile, setInitialProfile] = React.useState<Maybe<Profile>>(null)
   const [isLoadingComplete, setLoadingComplete] = React.useState(false)
 
   React.useEffect(() => {
@@ -74,7 +76,7 @@ export default function AppFn() {
     return null
   }
 
-  return (
+  return initialProfile ? (
     <PapersContextProvider initialProfile={initialProfile}>
       <View style={Styles.container}>
         {Platform.OS === 'ios' && <StatusBar barStyle="dark-content" />}
@@ -124,7 +126,7 @@ export default function AppFn() {
         </NavigationContainer>
       </View>
     </PapersContextProvider>
-  )
+  ) : null
 }
 
 const Styles = StyleSheet.create({

@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 
 import Page from '@src/components/page'
-import { headerTheme } from '@src/navigation/headerStuff.js'
+import { headerTheme } from '@src/navigation/headerStuff'
 
 function setSubHeader(navigation, title, opts = {}) {
   const { isEntry, ...headerThemeOpts } = opts

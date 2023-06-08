@@ -21,13 +21,13 @@ export default function HomeScreen({ navigation }) {
       Analytics.setCurrentScreen(profile.name ? 'home' : 'profile_creation')
     })
     return unsubscribe
-  }, [navigation])
+  }, [navigation, profile.name])
 
   React.useEffect(() => {
     if (gameId) {
       navigation.navigate('room')
     }
-  }, [gameId])
+  }, [gameId, navigation])
 
   React.useEffect(() => {
     // Bug, on mount this is called twice
@@ -43,7 +43,12 @@ export default function HomeScreen({ navigation }) {
   }
 
   if (!isTutorialDone && !profile.name) {
-    return <Tutorial isMandatory navigation={navigation} onDone={() => setIsTutorialDone(true)} />
+    return (
+      <Tutorial
+        navigation={navigation}
+        route={{ isMandatory: true, onDone: () => setIsTutorialDone(true) }}
+      />
+    )
   }
 
   return !profile.name || !profile.avatar ? (

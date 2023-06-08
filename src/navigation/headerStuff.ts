@@ -1,8 +1,13 @@
-import * as Theme from '@src/theme'
+import { StackNavigationOptions } from '@react-navigation/stack'
 
+import * as Theme from '@src/theme'
 import { statusBarHeight } from '@src/utils/layout'
 
-export const headerTheme = (opts = {}) => ({
+type HeaderOptions = {
+  hiddenTitle?: boolean
+}
+
+export const headerTheme = (opts: HeaderOptions = {}): StackNavigationOptions => ({
   headerTintColor: Theme.colors.grayMedium,
   headerStatusBarHeight: statusBarHeight,
   headerStyle: {
@@ -15,6 +20,6 @@ export const headerTheme = (opts = {}) => ({
     opacity: opts.hiddenTitle ? 0 : 1,
     fontSize: 16,
   },
-  headerRight: null,
-  headerLeft: null,
+  headerRight: undefined,
+  headerLeft: undefined,
 })
