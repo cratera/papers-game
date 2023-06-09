@@ -7,7 +7,7 @@ import PapersContext from '@src/store/PapersContext'
 import * as Theme from '@src/theme'
 import Styles from './HomeStyles.js'
 
-import * as avatars from '@src/components/avatar/Illustrations'
+import avatars from '@src/components/avatar/Illustrations'
 import { headerTheme } from '@src/navigation/headerStuff'
 
 import Avatar from '@src/components/avatar'
@@ -34,7 +34,7 @@ function HeaderMenu({ name, onPress }) /* eslint-disable-line */ {
 export default function HomeSigned({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const { profile } = Papers.state
-  const avatarBg = avatars[profile.avatar]?.bgColor
+  const avatarBg = Theme.colors[avatars[profile.avatar]?.bgColor]
 
   React.useEffect(() => {
     navigation.setOptions({
