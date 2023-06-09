@@ -1,9 +1,9 @@
-import { colors } from '@src/theme'
+import { Color } from '@src/theme/colors'
 import { SvgProps } from 'react-native-svg'
 import avatars from './Illustrations'
 
 export type IllustrationConfig = {
-  bgColor: keyof typeof colors
+  bgColor: Color
   Component: (props: SvgProps) => JSX.Element
 }
 

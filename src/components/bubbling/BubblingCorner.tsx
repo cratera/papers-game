@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import React from 'react'
 import { Animated, Easing, Platform, StyleSheet, View } from 'react-native'
 
@@ -6,9 +5,16 @@ import { window } from '@src/utils/device'
 import { headerHeight } from '@src/utils/layout'
 
 import PapersContext from '@src/store/PapersContext'
+import { colors } from '@src/theme'
 import { useEffectOnce } from 'usehooks-ts'
+import { BubblingCornerProps } from './Bubbling.types'
 
-const getStyles = (corner, backgroundColor, animScaleGrow, inputRange) => ({
+const getStyles = (
+  corner: BubblingCornerProps['corner'],
+  backgroundColor: BubblingCornerProps['bgEnd'],
+  animScaleGrow: Animated.Value,
+  inputRange: number[]
+) => ({
   ...(corner === 'settings'
     ? {
         top: 220,
@@ -18,7 +24,7 @@ const getStyles = (corner, backgroundColor, animScaleGrow, inputRange) => ({
         top: window.height - 76,
         left: corner === 'bottom-right' ? window.width - 62 : 62,
       }),
-  backgroundColor,
+  backgroundColor: colors[backgroundColor],
   transform: [
     {
       translateX: window.height / -2,
@@ -36,9 +42,9 @@ const getStyles = (corner, backgroundColor, animScaleGrow, inputRange) => ({
   ],
 })
 
-const BubblingCorner = ({ duration, forced, corner, bgEnd, bgStart }) => {
+const BubblingCorner = ({ duration, forced, corner, bgEnd, bgStart }: BubblingCornerProps) => {
   const Papers = React.useContext(PapersContext)
-  const motionEnabled = Papers.state.profile.settings.motion || forced
+  const motionEnabled = Papers.state.profile?.settings.motion || forced
   const animScaleGrow = React.useRef(new Animated.Value(0)).current
 
   useEffectOnce(() => {
@@ -58,7 +64,7 @@ const BubblingCorner = ({ duration, forced, corner, bgEnd, bgStart }) => {
         style={[
           StylesBubble.bg,
           {
-            backgroundColor: bgEnd,
+            backgroundColor: colors[bgEnd],
           },
         ]}
       />
@@ -71,7 +77,7 @@ const BubblingCorner = ({ duration, forced, corner, bgEnd, bgStart }) => {
       style={[
         StylesBubble.bg,
         {
-          backgroundColor: bgStart,
+          backgroundColor: colors[bgStart],
           opacity:
             1 ||
             animScaleGrow.interpolate({
@@ -90,14 +96,6 @@ const BubblingCorner = ({ duration, forced, corner, bgEnd, bgStart }) => {
       />
     </Animated.View>
   )
-}
-
-BubblingCorner.propTypes = {
-  bgStart: PropTypes.string.isRequired,
-  bgEnd: PropTypes.string.isRequired,
-  corner: PropTypes.oneOf(['bottom-right', 'bottom-left', 'settings']),
-  duration: PropTypes.number.isRequired,
-  forced: PropTypes.bool, // force animation even when motion is disabled
 }
 
 export default BubblingCorner

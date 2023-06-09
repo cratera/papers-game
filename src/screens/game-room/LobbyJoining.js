@@ -113,7 +113,7 @@ export default function LobbyJoining({ navigation }) {
 
   return (
     <Page>
-      <Bubbling bgStart={Theme.colors.bg} bgEnd={Theme.colors.yellow} />
+      <Bubbling bgStart="bg" bgEnd="yellow" />
       <Page.Main headerDivider>
         {!game.teams ? (
           <>

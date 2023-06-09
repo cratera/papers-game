@@ -46,8 +46,8 @@ export default function SettingsSound({ navigation }) {
           corner="settings" // very special case. I'll regret this
           duration={900}
           forced
-          bgStart={Theme.colors.bg}
-          bgEnd={Theme.colors.yellow}
+          bgStart="bg"
+          bgEnd="yellow"
         />
       )}
       <Page.Main headerDivider>

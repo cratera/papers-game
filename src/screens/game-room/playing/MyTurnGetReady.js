@@ -50,7 +50,7 @@ const MyTurnGetReady = ({ description, amIWaiting }) => {
 
   return (
     <Page>
-      {isAllReady && <Bubbling fromBehind bgStart={Theme.colors.bg} bgEnd={Theme.colors.green} />}
+      {isAllReady && <Bubbling fromBehind bgStart="bg" bgEnd="green" />}
       <Page.Main headerDivider>
         <View style={[Styles.header, { paddingTop: 32 }]}>
           <Text

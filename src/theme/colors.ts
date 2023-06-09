@@ -1,4 +1,6 @@
-export default {
+export type Color = keyof typeof colors
+
+const colors = {
   grayDark: '#000000',
   grayMedium: 'rgba(0, 0, 0, 0.5)',
   grayLight: 'rgba(0, 0, 0, 0.2)',
@@ -25,3 +27,5 @@ export default {
   green: '#A3C764',
   green_desatured: '#B4CF84',
 }
+
+export default colors

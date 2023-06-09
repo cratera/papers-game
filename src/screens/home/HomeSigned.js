@@ -34,7 +34,7 @@ function HeaderMenu({ name, onPress }) /* eslint-disable-line */ {
 export default function HomeSigned({ navigation }) {
   const Papers = React.useContext(PapersContext)
   const { profile } = Papers.state
-  const avatarBg = Theme.colors[avatars[profile.avatar]?.bgColor]
+  const avatarBg = avatars[profile.avatar]?.bgColor
 
   React.useEffect(() => {
     navigation.setOptions({
@@ -58,8 +58,8 @@ export default function HomeSigned({ navigation }) {
   }
 
   return (
-    <Page bgFill={avatarBg}>
-      <Bubbling bgStart={Theme.colors.bg} bgEnd={avatarBg} />
+    <Page bgFill={Theme.colors[avatarBg]}>
+      <Bubbling bgStart="bg" bgEnd={avatarBg} />
       <Page.Main headerDivider style={[Styles.main_signed]}>
         <Avatar src={profile.avatar} stroke={0} size="xxxl" />
         <Text style={[Theme.typography.h3]}>{profile.name}</Text>

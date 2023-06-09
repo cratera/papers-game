@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import React from 'react'
 import { Animated, Easing, Platform, StyleSheet, View } from 'react-native'
 
@@ -6,11 +5,13 @@ import { window } from '@src/utils/device'
 import { headerHeight } from '@src/utils/layout'
 
 import PapersContext from '@src/store/PapersContext'
+import { colors } from '@src/theme'
 import { useEffectOnce } from 'usehooks-ts'
+import { BubblingProps } from './Bubbling.types'
 
-const Bubbling = ({ bgStart, bgEnd, fromBehind }) => {
+const Bubbling = ({ bgStart, bgEnd, fromBehind, ...props }: BubblingProps) => {
   const Papers = React.useContext(PapersContext)
-  const motionEnabled = Papers.state.profile.settings.motion
+  const motionEnabled = Papers.state.profile?.settings.motion
   const animScaleGrow = React.useRef(new Animated.Value(0)).current
 
   useEffectOnce(() => {
@@ -31,7 +32,7 @@ const Bubbling = ({ bgStart, bgEnd, fromBehind }) => {
           style={[
             StylesBubble.bg,
             {
-              backgroundColor: bgEnd,
+              backgroundColor: colors[bgEnd],
             },
           ]}
         />
@@ -45,8 +46,9 @@ const Bubbling = ({ bgStart, bgEnd, fromBehind }) => {
       pointerEvents="none"
       style={[
         StylesBubble.bg,
+        // eslint-disable-next-line react-native/no-inline-styles
         {
-          backgroundColor: bgStart,
+          backgroundColor: colors[bgStart],
           zIndex: fromBehind ? 0 : 1,
           opacity: fromBehind
             ? 1
@@ -56,11 +58,11 @@ const Bubbling = ({ bgStart, bgEnd, fromBehind }) => {
               }),
         },
       ]}
+      {...props}
     >
       <Animated.View
         style={[
           StylesBubble.bubble,
-
           {
             backgroundColor: bgEnd,
 
@@ -84,12 +86,6 @@ const Bubbling = ({ bgStart, bgEnd, fromBehind }) => {
       />
     </Animated.View>
   )
-}
-
-Bubbling.propTypes = {
-  bgStart: PropTypes.string.isRequired,
-  bgEnd: PropTypes.string.isRequired,
-  fromBehind: PropTypes.bool,
 }
 
 export default Bubbling

@@ -24,13 +24,13 @@ const ANIM_PAPER_NEXT = 800
 const BUB_CONFIG_PROPS = {
   nope: {
     corner: 'bottom-left',
-    bgStart: Theme.colors.bg,
-    bgEnd: Theme.colors.grayLight,
+    bgStart: 'bg',
+    bgEnd: 'grayLight',
   },
   gotcha: {
     corner: 'bottom-right',
-    bgStart: Theme.colors.bg,
-    bgEnd: Theme.colors.green,
+    bgStart: 'bg',
+    bgEnd: 'green',
   },
 }
 
