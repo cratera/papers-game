@@ -1,16 +1,17 @@
-import PropTypes from 'prop-types'
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 
 import ListPlayers from '@src/components/list-players'
 import PapersContext from '@src/store/PapersContext'
 
+import { Team, TeamId } from '@src/store/PapersContext.types'
 import * as Theme from '@src/theme'
+import { ListTeamsProps } from './ListTeams.types'
 
-export default function ListTeams({ isStatusVisible, enableKickout, ...otherProps }) {
+export default function ListTeams({ isStatusVisible, enableKickout, ...props }: ListTeamsProps) {
   const Papers = React.useContext(PapersContext)
   const { game } = Papers.state
-  const didSubmitAllWords = (plId) => game?.words[plId]
+  const didSubmitAllWords = (plId: string) => game?.words && game.words[plId]
 
   if (!game) {
     // TODO: add global warning.
@@ -23,18 +24,20 @@ export default function ListTeams({ isStatusVisible, enableKickout, ...otherProp
         players={Object.keys(game.players)}
         enableKickout={enableKickout}
         isStatusVisible={isStatusVisible}
-        {...otherProps}
+        {...props}
       />
     )
   }
 
   return (
-    <View {...otherProps}>
-      {Object.keys(game.teams).map((teamId) => {
-        const { id, name, players } = game.teams[teamId]
-        const playersList = isStatusVisible && Object.values(players)
-        const total = isStatusVisible && playersList.length
-        const done = isStatusVisible && playersList.filter(didSubmitAllWords).length
+    <View {...props}>
+      {Object.keys(game.teams).map((team) => {
+        const teamId = Number(team) as TeamId
+
+        const { id, name, players } = (game.teams && game.teams[teamId]) as Team
+        const playersList = isStatusVisible ? Object.values(players) : []
+        const total = isStatusVisible && playersList?.length
+        const done = isStatusVisible && playersList?.filter(didSubmitAllWords).length
         return (
           <View key={id} style={Styles.team}>
             <View style={Styles.header}>
@@ -55,11 +58,6 @@ export default function ListTeams({ isStatusVisible, enableKickout, ...otherProp
       })}
     </View>
   )
-}
-
-ListTeams.propTypes = {
-  isStatusVisible: PropTypes.bool,
-  enableKickout: PropTypes.bool,
 }
 
 const Styles = StyleSheet.create({
