@@ -24,16 +24,16 @@ function Button({
   style,
   styleTouch,
   disabled,
-  ...otherProps
+  ...props
 }: ButtonProps) {
   const isIcon = variant === 'icon'
   return (
     <TouchableHighlight
-      {...otherProps}
       style={[Styles.touch, styleTouch, place === 'float' && Styles.place_float]}
       activeOpacity={0.5}
       underlayColor="transparent"
       {...(isLoading || disabled ? { disabled: true } : {})}
+      {...props}
     >
       <View style={[Styles.btnWrapper({ variant, size, place, bgColor, disabled }), style]}>
         {!isLoading ? (

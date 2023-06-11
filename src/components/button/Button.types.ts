@@ -1,6 +1,7 @@
 import { TouchableHighlightProps, ViewProps } from 'react-native'
 
-export interface ButtonProps extends Omit<TouchableHighlightProps, 'style'> {
+export interface ButtonProps
+  extends Omit<TouchableHighlightProps, 'style' | 'activeOpacity' | 'underlayColor'> {
   variant?: 'primary' | 'success' | 'blank' | 'danger' | 'light' | 'ghost' | 'flat' | 'icon'
   size?: 'default' | 'sm' | 'lg'
   place?: 'edgeKeyboard' | 'float'
@@ -11,5 +12,4 @@ export interface ButtonProps extends Omit<TouchableHighlightProps, 'style'> {
   bgColor?: string
   textColor?: string
   loadingColor?: string
-  disabled?: boolean
 }
