@@ -1,12 +1,13 @@
 import React from 'react'
 import { Platform } from 'react-native'
 import { useEffectOnce } from 'usehooks-ts'
-import { getPurchaserType, purchaserTypes } from './purchases.service.js'
+import { getPurchaserType } from './purchases.service.js'
+import { PurchaserType } from './purchases.types.js'
 
 const isWeb = Platform.OS === 'web'
 
 export default function usePurchases() {
-  const [purchaserType, setPurchaserType] = React.useState(null)
+  const [purchaserType, setPurchaserType] = React.useState<PurchaserType>()
   useEffectOnce(() => {
     async function getType() {
       const type = await getPurchaserType()
@@ -16,6 +17,6 @@ export default function usePurchases() {
   })
 
   return {
-    isPurchaserFree: !isWeb && purchaserType === purchaserTypes.FREE,
+    isPurchaserFree: !isWeb && purchaserType === 'FREE',
   }
 }
