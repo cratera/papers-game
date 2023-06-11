@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import React from 'react'
 import { Platform, StyleSheet, Text, TouchableHighlight, View } from 'react-native'
 
@@ -6,15 +5,16 @@ import Button from '@src/components/button'
 import Modal from '@src/components/modal'
 
 import * as Theme from '@src/theme'
+import { SheetProps } from './Sheet.types'
 
-const Sheet = React.memo(function Sheet({ visible, list, onClose }) {
+const Sheet = React.memo(function Sheet({ visible, list, onClose }: SheetProps) {
   const [isWeb] = React.useState(Platform.OS === 'web')
   React.useEffect(() => {
     if (isWeb && visible) {
       alert('TODO: Support sheet on web')
       onClose()
     }
-  }, [isWeb, visible])
+  }, [isWeb, onClose, visible])
 
   if (isWeb) {
     return null
@@ -27,14 +27,14 @@ const Sheet = React.memo(function Sheet({ visible, list, onClose }) {
       animationType="fade"
       transparent
       presentationStyle="overFullScreen"
-      style={Styles.modal}
       styleContent={Styles.modalContent}
     >
       <TouchableHighlight onPress={onClose}>
         <Text style={Styles.options_outside} accessible={false}></Text>
       </TouchableHighlight>
+
       <View style={Styles.options}>
-        {list.map(({ Icon, text, variant, onPress }, i) => (
+        {list.map(({ text, onPress }, i) => (
           <Button
             key={i}
             style={Styles.options_btn}
@@ -42,25 +42,13 @@ const Sheet = React.memo(function Sheet({ visible, list, onClose }) {
             onPress={onPress}
             numberOfLines={1}
           >
-            {Icon && (
-              <Icon
-                size={20}
-                color={variant === 'danger' ? Theme.colors.danger : null}
-                style={{ transform: [{ translateY: 4 }] }}
-              />
-            )}
-            <View style={{ width: 8, height: 1 }}></View> {/* lazyness level 99 */}
-            <Text style={{ color: variant === 'danger' ? Theme.colors.danger : undefined }}>
-              {text}
-            </Text>
+            <View style={Styles.spacer} />
+            <Text>{text}</Text>
           </Button>
         ))}
       </View>
 
-      <Button
-        style={{ borderWidth: 0, borderTopRightRadius: 0, borderTopLeftRadius: 0 }}
-        onPress={onClose}
-      >
+      <Button style={Styles.cancel_btn} onPress={onClose}>
         Cancel
       </Button>
     </Modal>
@@ -68,17 +56,6 @@ const Sheet = React.memo(function Sheet({ visible, list, onClose }) {
 })
 
 export default Sheet
-
-Sheet.propTypes = {
-  visible: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  list: PropTypes.arrayOf(
-    PropTypes.shape({
-      text: PropTypes.node.isRequired,
-      onPress: PropTypes.func.isRequired,
-    })
-  ).isRequired,
-}
 
 const Styles = StyleSheet.create({
   options: {
@@ -101,10 +78,16 @@ const Styles = StyleSheet.create({
     paddingVertical: 14,
   },
   modalContent: {
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    backgroundColor: Theme.colors.grayMedium,
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'flex-end',
     paddingBottom: 41,
   },
+  cancel_btn: {
+    borderWidth: 0,
+    borderTopRightRadius: 0,
+    borderTopLeftRadius: 0,
+  },
+  spacer: { width: 8, height: 1 }, // lazyness level 99
 })
