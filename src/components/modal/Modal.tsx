@@ -1,54 +1,55 @@
-import PropTypes from 'prop-types'
-
-// import * as Theme from '@src/theme'
 import { Modal, Platform, StyleSheet, View } from 'react-native'
 
 import Button from '@src/components/button'
+import { colors } from '@src/theme'
+import { ModalWebProps, TheModalProps } from './Modal.types'
 
-const ModalWeb = ({ children, visible, ...otherProps }) => {
+const ModalWeb = ({ children, visible, style, ...props }: ModalWebProps) => {
   if (!visible) {
     return null
   }
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: '0',
-        left: '0',
-        width: '100%',
-        height: '100%',
-        backgroundColor: '#ffffff',
-        zIndex: 4, // TODO:(BUG Web) - header is above Modal.
-      }}
-      {...otherProps}
+    <View
+      style={[
+        // eslint-disable-next-line react-native/no-inline-styles
+        {
+          position: 'fixed' as 'absolute', // View can't have fixed position
+          top: '0',
+          left: '0',
+          width: '100%',
+          height: '100%',
+          backgroundColor: colors.bg,
+          zIndex: 4, // TODO:(BUG Web) - header is above Modal.
+        },
+        style,
+      ]}
+      {...props}
     >
       {children}
-    </div>
+    </View>
   )
-}
-
-ModalWeb.propTypes = {
-  children: PropTypes.node,
-  visible: PropTypes.bool,
 }
 
 export default function TheModal({
   children,
-  visible,
+  visible = false,
+  animationType = 'slide',
+  transparent = false,
+  presentationStyle = 'fullScreen',
   onClose,
   hiddenClose,
   styleContent,
-  ...otherProps
-}) {
+  ...props
+}: TheModalProps) {
   const Component = Platform.OS === 'web' ? ModalWeb : Modal
 
   return (
     <Component
-      animationType="slide"
-      transparent={false}
-      presentationStyle="fullScreen"
+      animationType={animationType}
+      transparent={transparent}
+      presentationStyle={presentationStyle}
       visible={visible}
-      {...otherProps}
+      {...props}
     >
       {!hiddenClose && (
         <View style={Styles.close}>
@@ -60,14 +61,6 @@ export default function TheModal({
       <View style={[Styles.content, styleContent]}>{children}</View>
     </Component>
   )
-}
-
-TheModal.propTypes = {
-  children: PropTypes.node,
-  visible: PropTypes.bool,
-  onClose: PropTypes.func,
-  hiddenClose: PropTypes.bool,
-  styleContent: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
 }
 
 const Styles = StyleSheet.create({
