@@ -10,7 +10,7 @@ export type Profile = {
   /**
    * The last game accessed by the user.
    */
-  gameId: Maybe<Game['id']>
+  gameId: Game['id']
   /**
    * Whether the user is away from keyboard.
    */

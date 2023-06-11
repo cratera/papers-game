@@ -63,8 +63,8 @@ export function getNextSkippedTurn(turnWho: Round['turnWho'], teams: GameTeams) 
  */
 export function formatScores(
   gameScore: Game['score'],
-  gameTeams: GameTeams,
-  profileId: Profile['id']
+  gameTeams: Game['teams'],
+  profileId: Maybe<Profile['id']>
 ) {
   const scoreTotal: Record<string, number> = {}
   let myTeamId: Maybe<Round['turnWho']['team']>
@@ -73,7 +73,7 @@ export function formatScores(
     const roundIx = i as Round['current']
 
     if (!gameScore) {
-      return null
+      return
     }
 
     const teamsPlayersScore = {} as Record<TeamId, { id: string; score: number }[]>
@@ -87,7 +87,7 @@ export function formatScores(
       score: 0,
     }
 
-    if (playersScore) {
+    if (playersScore && gameTeams) {
       Object.keys(gameTeams).forEach((_, i) => {
         const teamId = i as Round['turnWho']['team']
 
@@ -138,18 +138,19 @@ export function formatScores(
   const sortByScore = (p1: Player, p2: Player) => p2.score - p1.score
 
   function getPlayersSorted(teamId: TeamId, roundIx: number, BOAT: boolean) {
-    let playersScore
+    let playersScore = [] as { id: string; score: number }[]
 
     if (BOAT) {
       const playersTotalScore: Record<Profile['id'], number> = {}
 
       scoreByRound?.forEach((round) => {
-        round?.teamsPlayersScore[teamId].forEach((player) => {
-          if (!playersTotalScore[player.id]) {
-            playersTotalScore[player.id] = 0
-          }
-          playersTotalScore[player.id] += player.score
-        })
+        round?.teamsPlayersScore &&
+          round.teamsPlayersScore[teamId].forEach((player) => {
+            if (!playersTotalScore[player.id]) {
+              playersTotalScore[player.id] = 0
+            }
+            playersTotalScore[player.id] += player.score
+          })
       })
 
       playersScore = Object.entries(playersTotalScore).map(([id, score]) => ({ id, score }))
@@ -168,8 +169,8 @@ export function formatScores(
   const isMyTeamWinner = myTeamId === Number(arrayOfTeamsId[winnerIndex])
   const isTie = arrayOfScores[1] === arrayOfScores[0]
 
-  const sortTeamsByScore = (teamAId: TeamId, teamBId: TeamId) =>
-    arrayOfScores[teamBId] - arrayOfScores[teamAId]
+  const sortTeamsByScore = (teamAId: string, teamBId: string) =>
+    arrayOfScores[Number(teamBId)] - arrayOfScores[Number(teamAId)]
 
   return {
     scoreByRound,

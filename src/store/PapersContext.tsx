@@ -1080,7 +1080,7 @@ export class PapersContextProvider extends Component<PapersContextProps, PapersC
     // Don't add try catch. If this fails, its critical,
     // so it's better to show the ErrorRecovery page... i guess.
     this.PapersAPI.setTurnLocalState(null)
-    await this.PapersAPI.updateProfile({ gameId: null })
+    await this.PapersAPI.updateProfile({ gameId: undefined })
     this.setState(
       () => ({ game: null }),
       () => {
