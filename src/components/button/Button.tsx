@@ -1,14 +1,20 @@
 import { IconSpin } from '@src/components/icons'
-import PropTypes from 'prop-types'
 import { memo } from 'react'
 import { Text, TouchableHighlight, View } from 'react-native'
 
-import * as Styles from './ButtonStyles.js'
+import * as Styles from './Button.styles'
+import { ButtonProps } from './Button.types'
+
+export const defaultButtonProps = {
+  variant: 'primary',
+  size: 'default',
+  place: undefined,
+} satisfies ButtonProps
 
 function Button({
-  variant,
-  size,
-  place,
+  variant = defaultButtonProps.variant,
+  size = defaultButtonProps.size,
+  place = defaultButtonProps.place,
   textColor,
   bgColor,
   loadingColor,
@@ -19,7 +25,7 @@ function Button({
   styleTouch,
   disabled,
   ...otherProps
-}) {
+}: ButtonProps) {
   const isIcon = variant === 'icon'
   return (
     <TouchableHighlight
@@ -36,7 +42,7 @@ function Button({
           ) : (
             <Text
               numberOfLines={numberOfLines}
-              style={Styles.btnText({ variant, size, color: textColor })}
+              style={Styles.btnText({ variant, size, textColor })}
             >
               {children}
             </Text>
@@ -47,38 +53,6 @@ function Button({
       </View>
     </TouchableHighlight>
   )
-}
-
-Button.defaultProps = {
-  variant: 'primary',
-  size: 'default',
-  place: null,
-}
-
-Button.propTypes = {
-  variant: PropTypes.oneOf([
-    'primary',
-    'success',
-    'blank',
-    'danger',
-    'light',
-    'ghost',
-    'flat',
-    'icon',
-  ]),
-  size: PropTypes.oneOf(['default', 'sm', 'lg']),
-  place: PropTypes.oneOf(['edgeKeyboard', 'float']),
-  isLoading: PropTypes.bool,
-  children: PropTypes.node,
-  numberOfLines: PropTypes.number,
-
-  // Let's give full freedom while this is a prototype and DS is not yet fully defined.
-  style: PropTypes.oneOfType([PropTypes.array, PropTypes.object, PropTypes.number]),
-  styleTouch: PropTypes.oneOfType([PropTypes.array, PropTypes.object, PropTypes.number]),
-  bgColor: PropTypes.string,
-  textColor: PropTypes.string,
-  loadingColor: PropTypes.string,
-  disabled: PropTypes.bool,
 }
 
 export default memo(Button)

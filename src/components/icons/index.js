@@ -57,7 +57,7 @@ export const IconEyeClosed = ({ size, color, style, ...props }) /* eslint-disabl
   )
 }
 
-export const IconSpin = ({ size, color, style, ...props }) /* eslint-disable-line */ => {
+export const IconSpin = ({ size, color, style = {}, ...props }) /* eslint-disable-line */ => {
   const rotateAnim = React.useRef(new Animated.Value(0)).current // Initial value for opacity: 0
   const { styleWithSize, baseColor } = useProps(size, color, style)
 

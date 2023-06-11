@@ -1,6 +1,8 @@
 import * as Theme from '@src/theme'
 import { isTamagoshi } from '@src/utils/device'
 import { StyleSheet } from 'react-native'
+import { defaultButtonProps } from './Button'
+import { ButtonProps } from './Button.types'
 
 const variants = {
   primary: {
@@ -37,7 +39,7 @@ const variants = {
   },
   icon: {
     bg: 'transparent',
-    color: Theme.colors.grayDark,
+    text: Theme.colors.grayDark,
   },
 }
 
@@ -91,6 +93,10 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: Theme.colors.grayDark,
   },
+  success: {},
+  blank: {},
+  danger: {},
+  ghost: {},
 
   // --------- sizes
   sm: {
@@ -102,13 +108,14 @@ const styles = StyleSheet.create({
     minWidth: 65,
     minHeight: 65,
   },
+  default: {},
 
   // --------- place
   edgeKeyboard: {
     marginBottom: 16,
   },
 
-  place_float: {
+  float: {
     shadowColor: Theme.colors.grayDark,
     shadowOffset: {
       width: 0,
@@ -127,7 +134,13 @@ const stylesSize = {
 }
 
 // TODO: Later - This code is 💩...
-export const btnWrapper = ({ variant, size, place, bgColor, disabled }) => {
+export const btnWrapper = ({
+  variant = defaultButtonProps.variant,
+  size = defaultButtonProps.size,
+  place,
+  bgColor,
+  disabled,
+}: Pick<ButtonProps, 'variant' | 'size' | 'place' | 'bgColor' | 'disabled'>) => {
   const variantToApply = disabled ? 'disabled' : variant
   return [
     styles.base,
@@ -136,18 +149,22 @@ export const btnWrapper = ({ variant, size, place, bgColor, disabled }) => {
     },
     styles[variantToApply],
     styles[size],
-    styles[place],
+    place && styles[place],
   ]
 }
 
-export const btnText = ({ variant, size, color }) => {
+export const btnText = ({
+  variant = defaultButtonProps.variant,
+  size = defaultButtonProps.size,
+  textColor,
+}: Pick<ButtonProps, 'variant' | 'size' | 'textColor'>) => {
   return {
     fontFamily: ['flat', 'ghost'].includes(variant) ? 'Karla-Regular' : 'YoungSerif-Regular',
     fontSize: variant === 'flat' ? 16 : stylesSize[size],
-    color: color || variants[variant].text,
+    color: textColor || variants[variant].text,
   }
 }
 
 export const touch = styles.touch
 
-export const place_float = styles.place_float // eslint-disable-line
+export const place_float = styles.float // eslint-disable-line
