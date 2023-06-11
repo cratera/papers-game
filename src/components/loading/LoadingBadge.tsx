@@ -1,10 +1,15 @@
-import PropTypes from 'prop-types'
 import React from 'react'
 import { Animated, Easing, Platform, StyleSheet, Text, View } from 'react-native'
 
 import * as Theme from '@src/theme'
+import { LoadingBadgeProps } from './LoadingBadge.types'
 
-const LoadingBadge = ({ children, size, variant, style, ...otherProps }) => {
+const sizes = {
+  sm: 16,
+  md: 24,
+}
+
+const LoadingBadge = ({ children, size = 'md', variant, style, ...props }: LoadingBadgeProps) => {
   const animSpin = React.useRef(new Animated.Value(0)).current
 
   React.useEffect(() => {
@@ -20,21 +25,13 @@ const LoadingBadge = ({ children, size, variant, style, ...otherProps }) => {
   }, [animSpin])
 
   return (
-    <View
-      style={[
-        Styles.container,
-        variant === 'page' && {
-          marginTop: 160,
-        },
-        style,
-      ]}
-      {...otherProps}
-    >
+    <View style={[Styles.container, variant === 'page' && Styles.container_page, style]} {...props}>
       <Animated.View
         style={[
           Styles.loader,
-          Styles[`size_${size}`],
           {
+            height: sizes[size],
+            width: sizes[size],
             transform: [
               {
                 rotate: animSpin.interpolate({
@@ -50,26 +47,13 @@ const LoadingBadge = ({ children, size, variant, style, ...otherProps }) => {
       <Text
         style={[
           Theme.typography.secondary,
-          {
-            marginTop: variant === 'page' ? 24 : 12,
-          },
+          variant === 'page' ? Theme.spacing.mt_24 : Theme.spacing.mt_12,
         ]}
       >
         {children}
       </Text>
     </View>
   )
-}
-
-LoadingBadge.defaultProps = {
-  size: 'md',
-}
-
-LoadingBadge.propTypes = {
-  children: PropTypes.string,
-  size: PropTypes.oneOf(['sm', 'md']),
-  variant: PropTypes.oneOf(['page']),
-  style: PropTypes.any,
 }
 
 export default LoadingBadge
@@ -82,16 +66,11 @@ const Styles = StyleSheet.create({
     paddingHorizontal: 2,
     paddingVertical: 2,
   },
+  container_page: {
+    marginTop: 160,
+  },
   loader: {
     borderWidth: 1,
     borderColor: Theme.colors.grayDark,
-  },
-  size_sm: {
-    width: 16,
-    height: 16,
-  },
-  size_md: {
-    width: 24,
-    height: 24,
   },
 })
