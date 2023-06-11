@@ -1,3 +1,4 @@
+import { IllustrationName } from '@src/components/avatar/Illustrations.types'
 import { PropsWithChildren } from 'react'
 import init from './Firebase'
 import { PapersContextProvider } from './PapersContext'
@@ -5,7 +6,7 @@ import { PapersContextProvider } from './PapersContext'
 export type Profile = {
   id: string
   name: string
-  avatar: string
+  avatar: IllustrationName
   /**
    * The last game accessed by the user.
    */
@@ -219,7 +220,7 @@ export type PapersAPIMethods = Pick<
   | 'sendTracker'
 >
 
-export interface PapersContextValue extends Partial<PapersAPIMethods> {
+export interface PapersContextValue extends PapersAPIMethods {
   state: State
 }
 

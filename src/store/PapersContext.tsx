@@ -638,7 +638,7 @@ export class PapersContextProvider extends Component<PapersContextProps, PapersC
           ...(state.profile as Profile),
           id: '',
           name: '',
-          avatar: '',
+          avatar: 'abraul',
           gameId: '',
         },
       }))
