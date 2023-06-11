@@ -1,8 +1,8 @@
-import { Path, Svg } from 'react-native-svg'
+import { Path, Svg, SvgProps } from 'react-native-svg'
 
-export default function IllustrationPersonCalling(props) {
+export default function IllustrationPersonCalling(props: SvgProps) {
   return (
-    <Svg fill="none" viewBox="0 0 270 371" {...props} xmlns="http://www.w3.org/2000/svg">
+    <Svg fill="none" viewBox="0 0 270 371" {...props}>
       <Path d="M160 295l-2 2c-1 6 0 13 4 18l11-5c13-29 6-30-13-15z" fill="#F1C8AD" />
       <Path
         d="M139 105c-1 4-52 67-51 73l-18 31c0 5 38 0 41 1 3 2 2 4 3-2s5-19 10-26 11-14 14-21l10-28c1-5 4-23 2-26-15-15-9-9-11-2z"
