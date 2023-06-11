@@ -99,6 +99,82 @@ export default StyleSheet.create({
     padding: 32,
   },
 
+  pt_4: {
+    paddingTop: 4,
+  },
+  pt_8: {
+    paddingTop: 8,
+  },
+  pt_12: {
+    paddingTop: 12,
+  },
+  pt_16: {
+    paddingTop: 16,
+  },
+  pt_24: {
+    paddingTop: 24,
+  },
+  pt_32: {
+    paddingTop: 32,
+  },
+
+  pb_4: {
+    paddingBottom: 4,
+  },
+  pb_8: {
+    paddingBottom: 8,
+  },
+  pb_12: {
+    paddingBottom: 12,
+  },
+  pb_16: {
+    paddingBottom: 16,
+  },
+  pb_24: {
+    paddingBottom: 24,
+  },
+  pb_32: {
+    paddingBottom: 32,
+  },
+
+  pr_4: {
+    paddingRight: 4,
+  },
+  pr_8: {
+    paddingRight: 8,
+  },
+  pr_12: {
+    paddingRight: 12,
+  },
+  pr_16: {
+    paddingRight: 16,
+  },
+  pr_24: {
+    paddingRight: 24,
+  },
+  pr_32: {
+    paddingRight: 32,
+  },
+
+  pl_4: {
+    paddingLeft: 4,
+  },
+  pl_8: {
+    paddingLeft: 8,
+  },
+  pl_12: {
+    paddingLeft: 12,
+  },
+  pl_16: {
+    paddingLeft: 16,
+  },
+  pl_24: {
+    paddingLeft: 24,
+  },
+  pl_32: {
+    paddingLeft: 32,
+  },
+
   ph_4: {
     paddingHorizontal: 4,
   },

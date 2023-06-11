@@ -72,7 +72,7 @@ const RoundScore = ({ navigation }) => {
 
   if (isOnRoundIntro) {
     return (
-      <Page bgFill={Theme.colors.purple}>
+      <Page bgFill="purple">
         <Page.Main>
           <View
             style={[

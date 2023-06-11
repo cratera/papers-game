@@ -58,7 +58,7 @@ export default function HomeSigned({ navigation }) {
   }
 
   return (
-    <Page bgFill={Theme.colors[avatarBg]}>
+    <Page bgFill={avatarBg}>
       <Bubbling bgStart="bg" bgEnd={avatarBg} />
       <Page.Main headerDivider style={[Styles.main_signed]}>
         <Avatar src={profile.avatar} stroke={0} size="xxxl" />

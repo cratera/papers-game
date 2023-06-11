@@ -106,7 +106,7 @@ export default function Tutorial({
   }
 
   return (
-    <Page bgFill={Theme.colors.bg}>
+    <Page bgFill="bg">
       <Page.Main>
         <ScrollView
           ref={refSlider}

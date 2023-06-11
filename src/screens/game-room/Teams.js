@@ -33,8 +33,8 @@ function areTeamPlayersEqual(teamsOld, teamsNew) {
   return result
 }
 
-const bgStart = Theme.colors.bg // yellow
-const bgEnd = Theme.colors.bg // pink
+const bgStart = 'bg' // yellow
+const bgEnd = 'bg' // pink
 
 export default function Teams({ navigation }) {
   const Papers = React.useContext(PapersContext)

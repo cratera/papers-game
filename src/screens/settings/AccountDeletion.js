@@ -52,7 +52,7 @@ export default function AccountDeletion({ navigation }) {
   }
 
   return (
-    <Page bgFill={Theme.colors.pink_desatured}>
+    <Page bgFill="pink_desatured">
       <Page.Main headerDivider>
         <View style={{ marginTop: 48 }}>
           <Card variant="paper-cry"></Card>

@@ -45,4 +45,13 @@ export default StyleSheet.create({
     right: 0,
     paddingHorizontal: edgeGutter,
   },
+  chevron_left: {
+    transform: [{ rotate: '180deg' }, { translateY: -6 }, { translateX: 7 }],
+    marginRight: -4,
+  },
+  left_close: { width: 16, height: 24 },
+  chevron_right: { transform: [{ translateY: 6 }, { translateX: -4 }], marginRight: -4 },
+
+  spacer: { width: 8, height: 1 },
+  offset: { marginTop: -22 },
 })

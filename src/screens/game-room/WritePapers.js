@@ -178,7 +178,7 @@ export default function WritePapers({ navigation }) {
 
   if (isOnTutorial) {
     return (
-      <Page bannerMsg={errorMsg} bgFill={Theme.colors.purple}>
+      <Page bannerMsg={errorMsg} bgFill="purple">
         <Page.Main headerDivider>
           <View style={[Styles.header]}>
             {/* TODO: use <Card /> */}
@@ -206,7 +206,7 @@ export default function WritePapers({ navigation }) {
   const isWordValid = currentWord && currentWord.trim()
 
   return (
-    <Page bannerMsg={errorMsg} bgFill={Theme.colors.purple}>
+    <Page bannerMsg={errorMsg} bgFill="purple">
       <Page.Main headerDivider>
         <View
           behavior="padding"
