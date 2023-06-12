@@ -8,8 +8,8 @@ export interface PageProps extends SafeAreaViewProps {
   /**
    * @default grayBg
    */
-  bgFill: Color
-  styleInner: ViewProps['style']
+  bgFill?: Color
+  styleInner?: ViewProps['style']
 }
 
 export interface HeaderBtnProps extends Omit<ButtonProps, 'title' | 'color'> {

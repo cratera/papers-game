@@ -1,5 +1,4 @@
-import PropTypes from 'prop-types'
-import React from 'react'
+import React, { useCallback } from 'react'
 
 import { Text, TextInput, View } from 'react-native'
 
@@ -9,9 +8,12 @@ import { headerTheme } from '@src/navigation/headerStuff'
 import PapersContext from '@src/store/PapersContext'
 import { formatSlug } from '@src/utils/formatting'
 
+import { StackScreenProps } from '@react-navigation/stack'
+import { AppStackParamList } from '@src/navigation/navigation.types.js'
+import { Game } from '@src/store/PapersContext.types.js'
 import * as Theme from '@src/theme'
 import { useEffectOnce } from 'usehooks-ts'
-import Styles from './AccessGameStyles.js'
+import Styles from './AccessGame.styles.js'
 
 const i18n = {
   headerTitle: 'New game',
@@ -21,13 +23,15 @@ const i18n = {
 
 const nameMaxSize = 16
 
-export default function CreateGame({ navigation }) {
+export default function CreateGame({
+  navigation,
+}: Pick<StackScreenProps<AppStackParamList, 'access-game'>, 'navigation'>) {
   const Papers = React.useContext(PapersContext)
   const [isCreating, setCreating] = React.useState(false)
   const [state, setState] = React.useState({
     gameName: '',
     isInvalid: false,
-    errorMsg: null,
+    errorMsg: '',
     isUnexError: false,
   })
   const hasValidName = !state.isInvalid && state.gameName && state.gameName.length >= 3
@@ -46,27 +50,43 @@ export default function CreateGame({ navigation }) {
     })
   })
 
+  const submit = useCallback(() => {
+    if (isCreating) {
+      return
+    }
+
+    setCreating(true)
+    setState((state) => ({ ...state, errorMsg: '' }))
+
+    Papers.accessGame('create', state.gameName, (_, errorMsg, opts) => {
+      if (errorMsg) {
+        setCreating(false)
+        setState((state) => ({
+          ...state,
+          errorMsg,
+          isUnexError: Boolean(opts?.isUnexError),
+        }))
+      } else {
+        // AccessGame.js will detect the new gameId from PapersContext and do the redirect.
+      }
+    })
+  }, [Papers, isCreating, state.gameName])
+
   React.useEffect(() => {
     navigation.setOptions({
       headerRight: hasValidName
         ? function HB() {
             return (
-              <Page.HeaderBtn
-                side="right"
-                icon="next"
-                textPrimary
-                isLoading={isCreating}
-                onPress={submit}
-              >
+              <Page.HeaderBtn side="right" isLoading={isCreating} onPress={submit}>
                 Next
               </Page.HeaderBtn>
             )
           }
-        : null,
+        : undefined,
     })
-  }, [hasValidName, state.gameName, isCreating])
+  }, [hasValidName, state.gameName, isCreating, navigation, submit])
 
-  function handleInputChange(gameName) {
+  function handleInputChange(gameName: Game['name']) {
     const isInvalid = formatSlug(gameName) !== gameName.toLowerCase()
 
     setState((state) => ({
@@ -76,35 +96,13 @@ export default function CreateGame({ navigation }) {
     }))
   }
 
-  function submit() {
-    if (isCreating) {
-      return
-    }
-
-    setCreating(true)
-    setState((state) => ({ ...state, errorMsg: null }))
-
-    Papers.accessGame('create', state.gameName, (_, errorMsg, opts = {}) => {
-      if (errorMsg) {
-        setCreating(false)
-        setState((state) => ({
-          ...state,
-          errorMsg,
-          isUnexError: opts.isUnexError,
-        }))
-      } else {
-        // AccessGame.js will detect the new gameId from PapersContext and do the redirect.
-      }
-    })
-  }
-
   function goHome() {
     navigation.navigate('home')
   }
 
   return (
     <Page bannerMsg={state.isUnexError && state.errorMsg}>
-      <Page.Main headerDivider>
+      <Page.Main>
         <View>
           {isCreating ? (
             <LoadingBadge variant="page">Creating game</LoadingBadge>
@@ -156,8 +154,4 @@ export default function CreateGame({ navigation }) {
       </Page.Main>
     </Page>
   )
-}
-
-CreateGame.propTypes = {
-  navigation: PropTypes.object.isRequired, // ReactNavigation
 }

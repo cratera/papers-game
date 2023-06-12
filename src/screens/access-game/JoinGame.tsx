@@ -9,8 +9,11 @@ import { LoadingBadge } from '@src/components/loading'
 import Page from '@src/components/page'
 import PapersContext from '@src/store/PapersContext'
 
+import { StackScreenProps } from '@react-navigation/stack'
+import { AppStackParamList } from '@src/navigation/navigation.types.js'
+import { Game } from '@src/store/PapersContext.types.js'
 import * as Theme from '@src/theme'
-import Styles from './AccessGameStyles.js'
+import Styles from './AccessGame.styles.js'
 
 const i18n = {
   headerTitle: 'Join',
@@ -19,7 +22,9 @@ const i18n = {
   cta: 'Join',
 }
 
-export default function JoinGame({ navigation }) {
+export default function JoinGame({
+  navigation,
+}: Pick<StackScreenProps<AppStackParamList, 'access-game'>, 'navigation'>) {
   const Papers = React.useContext(PapersContext)
   const [isJoining, setJoining] = React.useState(false)
   const [didAutoJoin, setDidAutoJoin] = React.useState(false)
@@ -29,7 +34,7 @@ export default function JoinGame({ navigation }) {
     code: '',
     codePretty: '',
     isInvalid: false,
-    errorMsg: null,
+    errorMsg: '',
     isUnexError: false,
   })
 
@@ -65,11 +70,10 @@ export default function JoinGame({ navigation }) {
               return (
                 <Page.HeaderBtn
                   side="left"
-                  icon="back"
                   onPress={() => {
                     setState((state) => ({
                       ...state,
-                      errorMsg: null,
+                      errorMsg: '',
                     }))
                     setStep(0)
                   }}
@@ -82,7 +86,7 @@ export default function JoinGame({ navigation }) {
         step === 0 && hasValidName
           ? function Next() {
               return (
-                <Page.HeaderBtn side="right" icon="next" textPrimary onPress={() => setStep(1)}>
+                <Page.HeaderBtn side="right" onPress={() => setStep(1)}>
                   Next
                 </Page.HeaderBtn>
               )
@@ -90,12 +94,12 @@ export default function JoinGame({ navigation }) {
           : step === 1 && hasValidCode
           ? function Join() {
               return (
-                <Page.HeaderBtn side="right" textPrimary onPress={submit} isLoading={isJoining}>
+                <Page.HeaderBtn side="right" onPress={submit} isLoading={isJoining}>
                   Join
                 </Page.HeaderBtn>
               )
             }
-          : null,
+          : undefined,
     })
 
     if (hasValidCode && !isJoining && !didAutoJoin) {
@@ -107,12 +111,13 @@ export default function JoinGame({ navigation }) {
 
   return (
     <Page bannerMsg={state.isUnexError && state.errorMsg}>
-      <Page.Main headerDivider>
+      <Page.Main>
         <View>
           {isJoining ? (
             <LoadingBadge variant="page">Joining game</LoadingBadge>
           ) : (
-            <View keyboardShouldPersistTaps="always">
+            // TODO: check if it still works as expected. Previously -> <View keyboardShouldPersistTaps="always">
+            <View>
               {step === 0 ? (
                 <>
                   <Text style={[Styles.title, Theme.typography.body]}>{i18n.nameLabel}</Text>
@@ -177,7 +182,7 @@ export default function JoinGame({ navigation }) {
     </Page>
   )
 
-  function handleNameChange(gameName) {
+  function handleNameChange(gameName: Game['name']) {
     if (isJoining) {
       return false
     }
@@ -188,7 +193,7 @@ export default function JoinGame({ navigation }) {
     }))
   }
 
-  function handleCodeChange(code) {
+  function handleCodeChange(code: string) {
     setState((state) => ({
       ...state,
       code,
@@ -202,7 +207,7 @@ export default function JoinGame({ navigation }) {
 
     setDidAutoJoin(true)
     setJoining(true)
-    setState((state) => ({ ...state, errorMsg: null }))
+    setState((state) => ({ ...state, errorMsg: '' }))
 
     const gameSlugged = formatSlug(state.gameName)
     const gameId = `${gameSlugged}_${state.code}`
@@ -213,7 +218,7 @@ export default function JoinGame({ navigation }) {
         setState((state) => ({
           ...state,
           errorMsg,
-          isUnexError: opts.isUnexError,
+          isUnexError: Boolean(opts?.isUnexError),
         }))
       } else {
         // AccessGame.js will detect the new gameId from PapersContext and do the redirect.
