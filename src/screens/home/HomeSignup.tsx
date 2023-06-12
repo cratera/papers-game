@@ -1,17 +1,18 @@
-import PropTypes from 'prop-types'
 import React from 'react'
 
 import { Text, TextInput, View } from 'react-native'
 
 import * as Theme from '@src/theme'
-import Styles from './HomeStyles.js'
+import Styles from './Home.styles.js'
 
 import AvatarSelector from '@src/components/avatar/AvatarSelector'
 import Button from '@src/components/button'
 import Page from '@src/components/page'
 import { headerTheme } from '@src/navigation/headerStuff'
 
+import { Profile } from '@src/store/PapersContext.types.js'
 import { window } from '@src/utils/device'
+import { HomeSignupProps, HomeSignupState } from './Home.types.js'
 
 const { vh } = window
 
@@ -19,12 +20,12 @@ const { vh } = window
 // When it was a function component, on onChangeText trigger, the TextInput would unmount/mount,
 // causing the keyboard to close.... have no idea why. Google didn't help :(
 
-export default class HomeSignup extends React.Component {
-  constructor(props) {
+export default class HomeSignup extends React.Component<HomeSignupProps, HomeSignupState> {
+  constructor(props: HomeSignupProps) {
     super(props)
     this.state = {
       name: '',
-      avatar: null,
+      avatar: 'abraul',
       step: 0,
     }
 
@@ -42,32 +43,32 @@ export default class HomeSignup extends React.Component {
   componentDidMount() {
     this.props.navigation.setOptions({
       ...headerTheme({ hiddenTitle: true }),
-      headerLeft: null,
-      headerRight: null,
+      headerLeft: undefined,
+      headerRight: undefined,
     })
   }
 
   componentWillUnmount() {
     this.props.navigation.setOptions({
-      headerLeft: null,
-      headerRight: null,
+      headerLeft: undefined,
+      headerRight: undefined,
     })
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate() {
     this.props.navigation.setOptions({
       headerLeft:
         this.state.step === 0
-          ? null
+          ? undefined
           : () => (
-              <Page.HeaderBtn side="left" icon="back" onPress={this.goBackStep}>
+              <Page.HeaderBtn side="left" onPress={this.goBackStep}>
                 Back
               </Page.HeaderBtn>
             ),
       headerRight: () => {
         if (this.state.step === 0 && this.state.name) {
           return (
-            <Page.HeaderBtn side="right" icon="next" textPrimary onPress={this.goNextStep}>
+            <Page.HeaderBtn side="right" onPress={this.goNextStep}>
               Next
             </Page.HeaderBtn>
           )
@@ -78,21 +79,26 @@ export default class HomeSignup extends React.Component {
 
   render() {
     const state = this.state
-    const CurrentStep = {
+
+    const steps = {
       // 0: this.stepWelcome,
       0: this.stepName,
       1: this.stepAvatar,
-    }[state.step]
+    }
+
+    const currentStep = state.step as keyof typeof steps
+
+    const CurrentStep = steps[currentStep]
 
     console.log('xx', this.state.avatar)
     return (
       <Page bgFill="bg">
-        <Page.Main headerDivider={state.step !== 0} style={Styles.main}>
+        <Page.Main style={Styles.main}>
           <CurrentStep />
         </Page.Main>
         <Page.CTAs>
-          {state.step === 0 && <Button onPress={this.goNextStep}>Start</Button>}
-          {state.step === 1 && state.avatar && <Button onPress={this.setProfile}>Choose</Button>}
+          {currentStep === 0 && <Button onPress={this.goNextStep}>Start</Button>}
+          {currentStep === 1 && state.avatar && <Button onPress={this.setProfile}>Choose</Button>}
 
           {/* {state.step === 1 && <Button onPress={this.goNextStep}>Choose</Button>} */}
         </Page.CTAs>
@@ -121,7 +127,7 @@ export default class HomeSignup extends React.Component {
 
   stepName() {
     return (
-      <View style={{ flex: 1, alignSelf: 'stretch' }}>
+      <View style={Styles.container}>
         <Text nativeID="inputNameLabel" style={[Theme.typography.h3, Theme.utils.center]}>
           How should we call you?
         </Text>
@@ -142,24 +148,22 @@ export default class HomeSignup extends React.Component {
 
   stepAvatar() {
     return (
-      <View style={{ flex: 1, alignSelf: 'stretch' }}>
-        <Text style={[Theme.typography.h3, Theme.utils.center, { marginBottom: 16 }]}>
-          Chose your character
+      <View style={Styles.container}>
+        <Text style={[Theme.typography.h3, Theme.utils.center, Theme.spacing.mb_16]}>
+          Choose your character
         </Text>
         <View style={Theme.utils.cardEdge}>
-          {/* <View style={Styles.avatarList}> */}
           <AvatarSelector
             value={this.state.avatar}
             onChange={this.handleChangeAvatar}
             isChangeOnMount
           />
-          {/* </View> */}
         </View>
       </View>
     )
   }
 
-  handleChangeAvatar(avatar) {
+  handleChangeAvatar(avatar: Profile['avatar']) {
     console.log('change', avatar)
     this.setState((state) => ({
       ...state,
@@ -185,9 +189,4 @@ export default class HomeSignup extends React.Component {
     const { name, avatar } = this.state
     this.props.onSubmit({ name, avatar })
   }
-}
-
-HomeSignup.propTypes = {
-  onSubmit: PropTypes.func.isRequired, // (profile: Object)
-  navigation: PropTypes.object, // reactNavigation
 }

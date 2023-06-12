@@ -3,6 +3,6 @@ export type AppStackParamList = {
   'access-game': { variant: 'join' | 'create' }
   room: undefined
   settings: undefined
-  tutorial: { isMandatory: boolean; onDone: EmptyCallback }
+  tutorial: { isMandatory?: boolean; onDone?: EmptyCallback } | undefined
   gate: { goal: 'leave' }
 }

@@ -1,21 +1,23 @@
-import PropTypes from 'prop-types'
 import React from 'react'
 import { Text, TouchableOpacity } from 'react-native'
 
 import PapersContext from '@src/store/PapersContext'
 
 import * as Theme from '@src/theme'
-import Styles from './HomeStyles.js'
+import Styles from './Home.styles.js'
 
 import avatars from '@src/components/avatar/Illustrations'
 import { headerTheme } from '@src/navigation/headerStuff'
 
+import { StackScreenProps } from '@react-navigation/stack'
 import Avatar from '@src/components/avatar'
 import Bubbling from '@src/components/bubbling'
 import Button from '@src/components/button'
 import Page from '@src/components/page'
+import { AppStackParamList } from '@src/navigation/navigation.types.js'
+import { HeaderMenuProps } from './Home.types.js'
 
-function HeaderMenu({ name, onPress }) /* eslint-disable-line */ {
+function HeaderMenu({ onPress }: HeaderMenuProps) {
   return (
     <TouchableOpacity style={{ paddingRight: 24, paddingBottom: 10 }} onPress={onPress}>
       <Text style={Theme.typography.body}>Menu</Text>
@@ -31,27 +33,27 @@ function HeaderMenu({ name, onPress }) /* eslint-disable-line */ {
 //   )
 // }
 
-export default function HomeSigned({ navigation }) {
+export default function HomeSigned({
+  navigation,
+}: Pick<StackScreenProps<AppStackParamList, 'home'>, 'navigation'>) {
   const Papers = React.useContext(PapersContext)
   const { profile } = Papers.state
-  const avatarBg = avatars[profile.avatar]?.bgColor
+  const avatarBg = profile?.avatar ? avatars[profile.avatar]?.bgColor : 'bg'
 
   React.useEffect(() => {
     navigation.setOptions({
       ...headerTheme({
-        hiddenBorder: true,
         hiddenTitle: true,
-        bgColor: Theme.colors.purple,
       }),
       // headerLeft: function HBS() {
-      //   return profile.name ? <HeaderName name={profile.name} onPress={goSettings} /> : null
+      //   return profile?.name ? <HeaderName name={profile?.name} onPress={goSettings} /> : null
       // },
-      headerTitle: profile.name ? 'Home' : 'Create Profile',
+      headerTitle: profile?.name ? 'Home' : 'Create Profile',
       headerRight: function HBS() {
-        return profile.name ? <HeaderMenu name={profile.name} onPress={goSettings} /> : null
+        return profile?.name ? <HeaderMenu onPress={goSettings} /> : null
       },
     })
-  }, [profile.name, profile.avatar])
+  }, [profile?.name, profile?.avatar])
 
   function goSettings() {
     navigation.navigate('settings')
@@ -60,9 +62,9 @@ export default function HomeSigned({ navigation }) {
   return (
     <Page bgFill={avatarBg}>
       <Bubbling bgStart="bg" bgEnd={avatarBg} />
-      <Page.Main headerDivider style={[Styles.main_signed]}>
-        <Avatar src={profile.avatar} stroke={0} size="xxxl" />
-        <Text style={[Theme.typography.h3]}>{profile.name}</Text>
+      <Page.Main style={[Styles.main_signed]}>
+        {profile?.avatar && <Avatar src={profile.avatar} size="xxxl" />}
+        <Text style={[Theme.typography.h3]}>{profile?.name}</Text>
       </Page.Main>
       <Page.CTAs>
         <Button variant="blank" onPress={() => openAccessGameModal('create')}>
@@ -85,11 +87,7 @@ export default function HomeSigned({ navigation }) {
     </Page>
   )
 
-  function openAccessGameModal(variant) {
+  function openAccessGameModal(variant: AppStackParamList['access-game']['variant']) {
     navigation.navigate('access-game', { variant })
   }
-}
-
-HomeSigned.propTypes = {
-  navigation: PropTypes.object, // reactNavigation
 }

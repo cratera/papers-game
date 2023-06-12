@@ -30,6 +30,10 @@ export default StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  container: {
+    flex: 1,
+    alignSelf: 'stretch',
+  },
   paragraph: {
     marginVertical: 16,
     textAlign: 'center',
@@ -54,7 +58,7 @@ export default StyleSheet.create({
     height: vw * 29,
     marginVertical: vw * 2,
     borderWidth: 4,
-    borderColor: 'transparent',
+    borderColor: Theme.colors.transparent,
   },
   avatarItem_active: {
     borderColor: Theme.colors.grayDark,
