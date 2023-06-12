@@ -12,39 +12,47 @@ import { headerTheme } from '@src/navigation/headerStuff'
 // import EmojiRain from './EmojiRain'
 import GameScore from '@src/components/game-score'
 
+import { StackScreenProps } from '@react-navigation/stack'
 import i18n from '@src/constants/i18n'
+import { AppStackParamList } from '@src/navigation/navigation.types.js'
 import * as Theme from '@src/theme'
-import Styles from './PlayingStyles.js'
+import Styles from './Playing.styles.js'
 
 const DESCRIPTIONS = [i18n.round_0_desc, i18n.round_1_desc, i18n.round_2_desc] // REVIEW this
 
-const RoundScore = ({ navigation }) => {
+const RoundScore = ({
+  navigation,
+}: Pick<StackScreenProps<AppStackParamList, 'playing'>, 'navigation'>) => {
   const Papers = React.useContext(PapersContext)
   const { profile, game } = Papers.state
-  const round = game.round
-  const roundIx = round.current
-  const isFinalRound = roundIx === game.settings.roundsCount - 1
+  const round = game?.round
+  const roundIx = round?.current || 0
+  const isFinalRound = roundIx === (game?.settings.roundsCount || 0) - 1
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [isOnRoundIntro, setIsOnRoundIntro] = React.useState(false)
 
   const { isMyTeamWinner, isTie, scoreByRound, getPlayersSorted } = React.useMemo(
-    () => formatScores(game.score, game.teams, profile.id),
+    () => formatScores(game?.score, game?.teams, profile?.id),
     []
   )
 
   function getMyTotalScore() {
     if (!isFinalRound) return null
 
-    const myTeamId = getTeamId(profile.id, game.teams)
-    const playersSorted = getPlayersSorted(myTeamId, roundIx, true)
-    return playersSorted.find((p) => p.id === profile.id)?.score || 0
+    const myTeamId = profile?.id && getTeamId(profile.id, game?.teams)
+    const playersSorted = myTeamId && getPlayersSorted(myTeamId, roundIx, true)
+    return (
+      (typeof playersSorted === 'object' &&
+        playersSorted.find((p) => p.id === profile?.id)?.score) ||
+      0
+    )
   }
 
-  const myTotalScore = getMyTotalScore()
+  const myTotalScore = getMyTotalScore() || 0
 
   React.useEffect(() => {
     Papers.sendTracker('game_finishRound', {
-      arrayOfScores: scoreByRound[roundIx].arrayOfScores,
+      arrayOfScores: scoreByRound[roundIx]?.arrayOfScores || [],
       isMyTeamWinner,
       myTotalScore,
     })
@@ -134,7 +142,7 @@ const RoundScore = ({ navigation }) => {
                   ? "It's a tie!"
                   : isMyTeamWinner
                   ? 'Your team won this round!'
-                  : 'Your team lost this round...'}
+                  : 'Your team lost this round?...'}
               </Text>
             </Fragment>
           )}

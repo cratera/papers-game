@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 
@@ -13,19 +12,21 @@ import { LoadingBadge } from '@src/components/loading'
 import Page from '@src/components/page'
 import * as Theme from '@src/theme'
 
-import Styles from './PlayingStyles.js'
+import Styles from './Playing.styles.js'
+import { MyTurnGetReadyProps } from './Playing.types.js'
 
-const MyTurnGetReady = ({ description, amIWaiting }) => {
+const MyTurnGetReady = ({ description, amIWaiting }: MyTurnGetReadyProps) => {
   const Papers = React.useContext(PapersContext)
   const { game, profile } = Papers.state
-  const round = game.round
-  const roundNr = round.current + (amIWaiting ? 2 : 1)
-  const isAllReady = game.hasStarted && !amIWaiting
+  const round = game?.round
+  const roundNr = round?.current && round.current + (amIWaiting ? 2 : 1)
+  const isAllReady = game?.hasStarted && !amIWaiting
 
   React.useEffect(() => {
-    const pingReadyStatus =
-      !isAllReady &&
-      setInterval(() => {
+    let pingReadyStatus: NodeJS.Timer
+
+    if (!isAllReady) {
+      pingReadyStatus = setInterval(() => {
         try {
           Papers.pingReadyStatus()
         } catch {
@@ -33,36 +34,43 @@ const MyTurnGetReady = ({ description, amIWaiting }) => {
           console.warn('pingReadyStatus failed')
         }
       }, 4000)
+    }
 
     return () => {
       clearTimeout(pingReadyStatus)
     }
-  }, [isAllReady])
+  }, [Papers, isAllReady])
 
   async function onStartClick() {
     try {
       Papers.startTurn()
     } catch (e) {
       // TODO: errorMsg on page.
-      console.warn('start turn failed', e.message)
+      const error = e as Error
+      console.warn('start turn failed', error.message)
     }
   }
 
   return (
     <Page>
       {isAllReady && <Bubbling fromBehind bgStart="bg" bgEnd="green" />}
-      <Page.Main headerDivider>
-        <View style={[Styles.header, { paddingTop: 32 }]}>
+      <Page.Main>
+        <View style={[Styles.header, Theme.spacing.pt_32]}>
           <Text
             style={isTamagoshi ? Theme.typography.h2 : Theme.typography.h1}
           >{`It's your turn!`}</Text>
           <View style={StylesIn.illustration}>
             <IllustrationStars style={StylesIn.svg} />
-            <Avatar src={profile.avatar} alt="" size={isTamagoshi ? 'xl' : 'xxl'} />
+            {profile?.avatar && <Avatar src={profile.avatar} size={isTamagoshi ? 'xl' : 'xxl'} />}
           </View>
           <Text style={Theme.typography.secondary}>Round {roundNr}</Text>
           <Text
-            style={[Theme.typography.body, Theme.utils.center, { marginTop: 12, maxWidth: 300 }]}
+            style={[
+              Theme.typography.body,
+              Theme.utils.center,
+              Theme.spacing.mt_12,
+              StylesIn.description,
+            ]}
           >
             {description}
           </Text>
@@ -73,7 +81,7 @@ const MyTurnGetReady = ({ description, amIWaiting }) => {
           <Button onPress={onStartClick}>Start</Button>
         ) : (
           <>
-            <LoadingBadge size="sm" style={{ marginBottom: 16 }}>
+            <LoadingBadge size="sm" style={Theme.spacing.mb_16}>
               Waiting for other players...
             </LoadingBadge>
           </>
@@ -81,12 +89,6 @@ const MyTurnGetReady = ({ description, amIWaiting }) => {
       </Page.CTAs>
     </Page>
   )
-}
-
-MyTurnGetReady.propTypes = {
-  description: PropTypes.string.isRequired,
-  roundIx: PropTypes.number,
-  amIWaiting: PropTypes.bool,
 }
 
 const areaHeight = {
@@ -111,6 +113,7 @@ const StylesIn = StyleSheet.create({
     width: 229,
     height: isTamagoshi ? areaHeight.sm : areaHeight.md,
   },
+  description: { maxWidth: 300 },
 })
 
 export default MyTurnGetReady

@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import React from 'react'
 import { Text, View } from 'react-native'
 
@@ -11,7 +10,8 @@ import Button from '@src/components/button'
 import Page from '@src/components/page'
 
 import * as Theme from '@src/theme'
-import Styles from './PlayingStyles.js'
+import Styles from './Playing.styles.js'
+import { OtherTurnProps } from './Playing.types.js'
 
 // TODO: REFACTOR later. This really needs some refactor.
 const OthersTurn = ({
@@ -24,44 +24,48 @@ const OthersTurn = ({
   thisTurnTeamName,
   thisTurnPlayer,
   amIWaiting,
-}) => {
+}: OtherTurnProps) => {
   const Papers = React.useContext(PapersContext)
   const { profile, profiles, game } = Papers.state
-  const papersGuessed = game.papersGuessed
-  const isAllWordsGuessed = papersGuessed === game.round.wordsLeft?.length
-  const round = game.round
-  const turnWho = round?.turnWho || {}
-  const roundNr = round.current + (amIWaiting ? 2 : 1)
+  const papersGuessed = game?.papersGuessed
+  const isAllWordsGuessed = papersGuessed === game?.round?.wordsLeft?.length
+  const round = game?.round
+  const turnWho = round?.turnWho
+  const roundNr = (round?.current || 0) + (amIWaiting ? 2 : 1)
   const isTurnOn = !hasCountdownStarted || !!countdownSec // aka: it isn't times up
 
-  const playersOffline = Object.keys(game.players).filter((pId) => game.players[pId].isAfk).length
+  const playersOffline =
+    game?.players && Object.keys(game.players).filter((pId) => game?.players[pId].isAfk).length
   const turnWhoStringified = JSON.stringify(turnWho) // This changing, means a turn was skipped.
 
   const turnStatus = React.useMemo(() => {
     const turnState = isTurnOn && !amIWaiting ? turnWho : Papers.getNextTurn()
-    const teamId = turnState.team
-    const tPlayerIx = turnState[turnState.team]
-    const tPlayerId = game.teams[teamId].players[tPlayerIx]
-    const tPlayer = game.players[tPlayerId] || {}
+    const teamId = turnState?.team
+    const tPlayerIx = turnState && teamId && turnState[teamId]
+    const tPlayerId = game?.teams && teamId && tPlayerIx && game?.teams[teamId].players[tPlayerIx]
+    const tPlayer = tPlayerId && game?.players[tPlayerId]
 
     return {
-      title: isTurnOn && game.hasStarted && !amIWaiting ? 'Playing now:' : 'Next up:',
+      title: isTurnOn && game?.hasStarted && !amIWaiting ? 'Playing now:' : 'Next up:',
       player: {
         id: tPlayerId,
-        isAfk: tPlayer.isAfk,
-        name: tPlayerId === profile.id ? 'You!' : profiles[tPlayerId]?.name || `? ${tPlayerId} ?`,
-        avatar: profiles[tPlayerId]?.avatar,
+        isAfk: tPlayer && tPlayer?.isAfk,
+        name:
+          tPlayerId === profile?.id
+            ? 'You!'
+            : (profiles && tPlayerId && profiles[tPlayerId]?.name) || `? ${tPlayerId} ?`,
+        avatar: profiles && tPlayerId && profiles[tPlayerId]?.avatar,
       },
       teamName:
-        !game.hasStarted || amIWaiting
+        !game?.hasStarted || amIWaiting
           ? 'Waiting for everyone to be ready.'
-          : tPlayerId === profile.id // if we are the next one
+          : tPlayerId === profile?.id // if we are the next one
           ? `Waiting for ${thisTurnPlayer.name || '???'} to finish their turn.`
-          : game.teams[teamId].name,
+          : game?.teams && teamId && game?.teams[teamId].name,
     }
-  }, [amIWaiting, isTurnOn, game.hasStarted, playersOffline, turnWhoStringified])
+  }, [amIWaiting, isTurnOn, game?.hasStarted, playersOffline, turnWhoStringified])
 
-  // console.log('...', game.players, playersOffline)
+  // console.log('...', game?.players, playersOffline)
 
   return (
     <Page>
@@ -110,7 +114,7 @@ const OthersTurn = ({
                 ? 'All papers guessed!'
                 : "Time's up!"}
             </Text>
-            <Avatar size="xl" src={thisTurnPlayer.avatar} alt="" />
+            <Avatar size="xl" src={thisTurnPlayer.avatar} />
 
             {!hasCountdownStarted || (countdownSec && !isAllWordsGuessed) ? (
               <>
@@ -138,7 +142,10 @@ const OthersTurn = ({
                     >
                       They seem offline.
                     </Text>
-                    <Button size="sm" onPress={() => Papers.skipTurn(turnStatus.player.id)}>
+                    <Button
+                      size="sm"
+                      onPress={() => turnStatus.player.id && Papers.skipTurn(turnStatus.player.id)}
+                    >
                       Skip to another team member
                     </Button>
                   </>
@@ -189,18 +196,6 @@ const OthersTurn = ({
       </Page.CTAs>
     </Page>
   )
-}
-
-OthersTurn.propTypes = {
-  description: PropTypes.string.isRequired,
-  hasCountdownStarted: PropTypes.bool.isRequired,
-  countdownSec: PropTypes.number.isRequired,
-  countdown: PropTypes.number.isRequired,
-  initialTimerSec: PropTypes.number.isRequired,
-  initialTimer: PropTypes.number.isRequired,
-  thisTurnTeamName: PropTypes.string,
-  thisTurnPlayer: PropTypes.object.isRequired,
-  amIWaiting: PropTypes.bool,
 }
 
 export default OthersTurn

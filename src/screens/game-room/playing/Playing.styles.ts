@@ -53,6 +53,7 @@ export default StyleSheet.create({
     backgroundColor: Theme.colors.bg,
     marginTop: -100,
   },
+  go_paper_changing: { flexGrow: 1 },
   go_paper_sentence: {
     display: 'flex',
     flexWrap: 'wrap',
@@ -163,5 +164,11 @@ export default StyleSheet.create({
   },
   tscore_itemText: {
     flexShrink: 1,
+  },
+  tscore_title: {
+    maxWidth: 300,
+  },
+  tscore_itemTextGuessed: {
+    textDecorationLine: 'line-through',
   },
 })

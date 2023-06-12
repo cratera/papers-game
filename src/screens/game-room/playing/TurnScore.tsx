@@ -1,18 +1,24 @@
-import PropTypes from 'prop-types'
 import { Platform, Text, TouchableHighlight, View } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 
 import Button from '@src/components/button'
 import Page from '@src/components/page'
-// import i18n from '@src/constants/i18n'
+
 import { IconCheck, IconTimes } from '@src/components/icons'
 
 import * as Theme from '@src/theme'
-import Styles from './PlayingStyles.js'
+import Styles from './Playing.styles.js'
+import { ItemToggleProps, TurnScoreProps } from './Playing.types.js'
 
 const isWeb = Platform.OS === 'web'
 
-const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, isSubmitting, getPaperByKey }) => {
+const TurnScore = ({
+  papersTurn,
+  onTogglePaper,
+  onFinish,
+  isSubmitting,
+  getPaperByKey,
+}: TurnScoreProps) => {
   return (
     <Page styleInner={Styles.tscore_page}>
       <Page.Main>
@@ -24,7 +30,7 @@ const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, isSubmitting, ge
             Theme.utils.borderBottom,
           ]}
         >
-          <Text style={[Theme.typography.h2, Theme.utils.center, { maxWidth: 300 }]}>
+          <Text style={[Theme.typography.h2, Theme.utils.center, Styles.tscore_title]}>
             {papersTurn.sorted.length > 0 ? (
               <>
                 Your team got <Text>{papersTurn.guessed.length}</Text> papers right!
@@ -50,7 +56,6 @@ const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, isSubmitting, ge
                   return (
                     <ItemToggle
                       key={`${i}_${paper}`}
-                      underlayColor={Theme.colors.grayLight}
                       style={Styles.tscore_item}
                       onPress={() => onTogglePaper(paper, !hasGuessed)}
                     >
@@ -73,8 +78,8 @@ const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, isSubmitting, ge
                             Styles.tscore_itemText,
                             {
                               color: Theme.colors[hasGuessed ? 'grayDark' : 'grayMedium'],
-                              textDecorationLine: hasGuessed ? 'none' : 'line-through',
                             },
+                            !hasGuessed && Styles.tscore_itemTextGuessed,
                           ]}
                         >
                           {getPaperByKey(paper)}
@@ -85,7 +90,7 @@ const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, isSubmitting, ge
                 })}
             </View>
           ) : (
-            <Text style={[Theme.typography.secondary, Theme.utils.center, { marginTop: 40 }]}>
+            <Text style={[Theme.typography.secondary, Theme.utils.center, Theme.spacing.mt_40]}>
               More luck next time...
             </Text>
           )}
@@ -100,21 +105,13 @@ const TurnScore = ({ papersTurn, type, onTogglePaper, onFinish, isSubmitting, ge
   )
 }
 
-TurnScore.propTypes = {
-  papersTurn: PropTypes.object.isRequired,
-  type: PropTypes.oneOf(['timesup', 'nowords']).isRequired,
-  onTogglePaper: PropTypes.func.isRequired,
-  onFinish: PropTypes.func.isRequired,
-  isSubmitting: PropTypes.bool,
-  getPaperByKey: PropTypes.func.isRequired,
-}
-
-function ItemToggle(props) {
+function ItemToggle({ onPress, children, ...props }: ItemToggleProps) {
   if (isWeb) {
     return (
-      <View style={props.style}>
-        {props.children}
-        <Button variant="light" size="sm" onPress={props.onPress}>
+      <View {...props}>
+        {children}
+
+        <Button variant="light" size="sm" onPress={onPress}>
           Change
         </Button>
       </View>
@@ -122,12 +119,6 @@ function ItemToggle(props) {
   }
 
   return <TouchableHighlight {...props} />
-}
-
-ItemToggle.propTypes = {
-  children: PropTypes.object.isRequired,
-  onPress: PropTypes.func.isRequired,
-  style: PropTypes.any,
 }
 
 export default TurnScore

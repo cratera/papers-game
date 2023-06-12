@@ -1,5 +1,4 @@
-import PropTypes from 'prop-types'
-import React from 'react'
+import React, { useCallback } from 'react'
 import { Pressable, Text, View } from 'react-native'
 
 import { usePrevious } from '@src/hooks'
@@ -16,8 +15,12 @@ import Page from '@src/components/page'
 import { IconCheck, IconEyeClosed, IconEyeOpen, IconTimes } from '@src/components/icons'
 import TurnScore from './TurnScore'
 
+import { BubblingCornerProps } from '@src/components/bubbling/Bubbling.types'
+import { Turn } from '@src/store/PapersContext.types'
 import * as Theme from '@src/theme'
-import Styles from './PlayingStyles.js'
+import { useEffectOnce } from 'usehooks-ts'
+import Styles from './Playing.styles.js'
+import { MyTurnGoProps } from './Playing.types'
 
 const ANIM_PAPER_NEXT = 800
 
@@ -26,51 +29,51 @@ const BUB_CONFIG_PROPS = {
     corner: 'bottom-left',
     bgStart: 'bg',
     bgEnd: 'grayLight',
+    duration: ANIM_PAPER_NEXT,
   },
   gotcha: {
     corner: 'bottom-right',
     bgStart: 'bg',
     bgEnd: 'green',
+    duration: ANIM_PAPER_NEXT,
   },
-}
+} satisfies Record<string, BubblingCornerProps>
 
-const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, isCount321go }) => {
+const MyTurnGo = ({
+  startedCounting,
+  initialTimerSec,
+  countdown,
+  countdownSec,
+  isCount321go,
+}: MyTurnGoProps) => {
   const Papers = React.useContext(PapersContext)
   const [isDone, setIsDone] = React.useState(false) // All words are guessed or timesups
-  const [papersTurn, setPapersTurn] = React.useState(null)
+  const [papersTurn, setPapersTurn] = React.useState<Turn>()
   const [isPaperChanging, setIsPaperChanging] = React.useState(false)
   const [isFinishingTurn, setIsFinishingTurn] = React.useState(false)
   const [isPaperBlur, setPaperBlur] = React.useState(false)
-  const [paperAnim, setPaperAnimation] = React.useState(null) // gotcha || nope
-  const blurTimeout = React.useRef()
+  const [paperAnim, setPaperAnimation] = React.useState<'gotcha' | 'nope' | null>(null)
+  const blurTimeout = React.useRef<NodeJS.Timeout>()
 
   const { game } = Papers.state
-  const round = game.round
+  const round = game?.round
   const blurTime = 1500 // TODO: game individual setting
   const papersTurnCurrent = papersTurn?.current
   const stillHasWords =
     !papersTurn ||
     papersTurnCurrent !== null ||
-    papersTurn.passed.length > 0 ||
+    // papersTurn.passed.length > 0 ||
     papersTurn.wordsLeft.length > 0
   const doneMsg = !stillHasWords ? 'All papers guessed!' : "Time's up!"
   const prevCountdownSec = usePrevious(countdownSec)
 
-  React.useEffect(() => {
+  useEffectOnce(() => {
     async function getTurnState() {
       const turnState = await Papers.getTurnLocalState()
       setPapersTurn(turnState)
     }
     getTurnState()
-  }, [])
-
-  React.useLayoutEffect(() => {
-    // these two effects (before and this one) need some refactor.
-    // Read more below at pickFirstPaper
-    if (startedCounting) {
-      pickFirstPaper()
-    }
-  }, [startedCounting])
+  })
 
   React.useEffect(() => {
     if (!isCount321go) {
@@ -101,14 +104,14 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
       setIsDone(true)
       setTimeout(resetIsDone, 1500)
     }
-  }, [countdownSec, prevCountdownSec])
+  }, [Papers, countdownSec, prevCountdownSec])
 
   React.useLayoutEffect(() => {
     // REVIEW - Is this safe? In very slow phones may not work. (eg. 5 -> 3 )
     if (prevCountdownSec === 5 && countdownSec === 4 && stillHasWords) {
       Papers.soundPlay('bomb')
     }
-  }, [countdownSec, prevCountdownSec, stillHasWords])
+  }, [Papers, countdownSec, prevCountdownSec, stillHasWords])
 
   React.useLayoutEffect(() => {
     if (!stillHasWords) {
@@ -121,8 +124,8 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
     setIsDone(false)
   }
 
-  function getPaperByKey(key) {
-    const paper = game.words._all[key]
+  function getPaperByKey(key: number) {
+    const paper = game?.words?._all[key]
     if (!paper) {
       if (__DEV__) console.warn(`key "${key}" does not match a paper!`)
       Sentry.withScope((scope) => {
@@ -130,26 +133,26 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
         Sentry.captureException(Error(`PapersByKey ${key} failed.`))
       })
     }
-    return paper
+    return paper || ''
   }
 
   // TODO:(NOTE): pickFirstPaper, pickNextPaper and togglePaper should be on PapersContext
-  function pickFirstPaper() {
+  const pickFirstPaper = useCallback(() => {
     setPapersTurn((realState) => {
       // console.log('PICK_FIRST', realState) // realState is null cause LS wasn't ready yet
       // TODO:(BUG) - This state may colide with papersTurn from getTurnLocalState()...
-      const state = realState || {
-        current: null,
+      const state: Turn = realState || {
+        current: 0,
         passed: [],
         guessed: [],
         sorted: [],
-        wordsLeft: round.wordsLeft,
+        wordsLeft: round?.wordsLeft || [],
         toggled_to_yes: 0,
         toggled_to_no: 0,
         revealed: 0,
       }
 
-      if (round.wordsLeft.length === 0) {
+      if (round?.wordsLeft.length === 0) {
         // words ended
         Papers.setTurnLocalState(state)
         return state
@@ -171,19 +174,32 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
       Papers.setTurnLocalState(state) // REVIEW - this is async and a side effect. is it the right place?
       return state
     })
-  }
+  }, [Papers, round?.wordsLeft])
 
-  function pickNextPaper(hasGuessed) {
+  React.useLayoutEffect(() => {
+    // these two effects (before and this one) need some refactor.
+    // Read more below at pickFirstPaper
+    if (startedCounting) {
+      pickFirstPaper()
+    }
+  }, [pickFirstPaper, startedCounting])
+
+  function pickNextPaper(hasGuessed: boolean) {
     // OPTIMIZE/NOTE : paper & word mean the same.
-    const currentPaper = papersTurn.current
-    let wordsToPick = []
-    let pickingFrom = null // 'left' || 'passed'
+    let currentPaper: number
+
+    if (papersTurn?.current) {
+      currentPaper = papersTurn?.current
+    }
+
+    let wordsToPick: Turn['wordsLeft']
+    let pickingFrom: 'left' | 'passed'
     let wordsEnded = false
 
-    if (papersTurn.wordsLeft.length > 0) {
+    if (papersTurn?.wordsLeft && papersTurn.wordsLeft.length > 0) {
       pickingFrom = 'left'
       wordsToPick = [...papersTurn.wordsLeft]
-    } else if (papersTurn.passed.length > 0) {
+    } else if (papersTurn?.passed && papersTurn.passed.length > 0) {
       pickingFrom = 'passed'
       wordsToPick = [...papersTurn.passed]
     } else {
@@ -191,7 +207,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
     }
 
     setPapersTurn((state) => {
-      const wordsModified = {}
+      const wordsModified = {} as Turn
       const wordIndex = !wordsEnded ? getRandomInt(wordsToPick.length - 1) : 0
       let nextPaper = wordsEnded ? null : wordsToPick[wordIndex]
 
@@ -214,7 +230,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
       }
 
       if (hasGuessed) {
-        wordsModified.guessed = [...state.guessed, currentPaper]
+        wordsModified.guessed = [...(state?.guessed || []), currentPaper]
 
         if (pickingFrom === 'left') {
           wordsModified.wordsLeft = wordsToPick
@@ -224,7 +240,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
       } else {
         if (pickingFrom === 'left') {
           wordsModified.wordsLeft = wordsToPick
-          wordsModified.passed = [...state.passed, currentPaper]
+          wordsModified.passed = [...(state?.passed || []), currentPaper]
         } else if (pickingFrom === 'passed') {
           if (wordsToPick.length > 0) {
             wordsModified.passed = [...wordsToPick, currentPaper]
@@ -237,10 +253,10 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
         }
       }
 
-      const newState = {
+      const newState: Turn = {
         ...state,
         ...wordsModified,
-        sorted: [...state.sorted, currentPaper],
+        sorted: [...(state?.sorted || []), currentPaper],
         current: nextPaper,
       }
 
@@ -252,7 +268,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
     setPaperBlur(false)
   }
 
-  function handlePaperClick(hasGuessed) {
+  function handlePaperClick(hasGuessed: boolean) {
     if (isPaperChanging) {
       return
     }
@@ -271,37 +287,38 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
     }, ANIM_PAPER_NEXT)
   }
 
-  function togglePaper(paper, hasGuessed) {
+  function togglePaper(paper: number, hasGuessed: boolean) {
     setPapersTurn((state) => {
-      const wordsModified = {}
+      const wordsModified = {} as Turn
       if (hasGuessed) {
-        const wordsToPick = [...state.passed]
+        const wordsToPick = [...(state?.passed || [])]
         const wordIndex = wordsToPick.indexOf(paper)
         wordsToPick.splice(wordIndex, 1)
 
-        wordsModified.guessed = [...state.guessed, paper]
+        wordsModified.guessed = [...(state?.guessed || []), paper]
         wordsModified.passed = wordsToPick
-        wordsModified.toggled_to_yes = state.toggled_to_yes + 1
+        wordsModified.toggled_to_yes = (state?.toggled_to_yes || 0) + 1
       } else {
-        const wordsToPick = [...state.guessed]
+        const wordsToPick = [...(state?.guessed || [])]
         const wordIndex = wordsToPick.indexOf(paper)
         wordsToPick.splice(wordIndex, 1)
 
         // It means all papers were guessed before
         // and now there's a new paper to guess!
-        if (countdown && !state.passed.length) {
+        if (countdown && !state?.passed.length) {
           wordsModified.current = paper
         } else {
-          wordsModified.passed = [...state.passed, paper]
+          wordsModified.passed = [...(state?.passed || []), paper]
         }
         wordsModified.guessed = wordsToPick
-        wordsModified.toggled_to_no = state.toggled_to_no + 1
+        wordsModified.toggled_to_no = (state?.toggled_to_no || 0) + 1
       }
 
-      const newState = {
+      const newState: Turn = {
         ...state,
         ...wordsModified,
       }
+
       Papers.soundPlay(hasGuessed ? 'right' : 'wrong')
       Papers.setTurnLocalState(newState)
       return newState
@@ -323,7 +340,9 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
       // A: Keep this. If the user closes/minimize the app (eg. to go to twitter)
       //    and comes back when its their turn again, we guarantee the local state is cleaned.
       Papers.setTurnLocalState(null)
-      Papers.finishTurn(papersTurn)
+      if (papersTurn) {
+        Papers.finishTurn(papersTurn)
+      }
     } catch (e) {
       // TODO: later errorMsg
       setIsFinishingTurn(false)
@@ -381,7 +400,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
 
   return (
     <Page>
-      {paperAnim && <BubblingCorner duration={ANIM_PAPER_NEXT} {...BUB_CONFIG_PROPS[paperAnim]} />}
+      {paperAnim && <BubblingCorner {...BUB_CONFIG_PROPS[paperAnim]} />}
       <Page.Main>
         <Text
           style={[
@@ -395,31 +414,39 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
         <View style={Styles.go_zone}>
           <Pressable
             onPressIn={() => {
-              setPapersTurn((state) => ({
-                ...state,
-                revealed: state.revealed + 1,
-              }))
+              setPapersTurn((state) => {
+                const newState: Turn = {
+                  ...(state || ({} as Turn)),
+                  revealed: (state?.revealed || 0) + 1,
+                }
+
+                return newState
+              })
               setPaperBlur(false)
             }}
             onPressOut={() => setPaperBlur(true)}
           >
             <View style={Styles.go_paper}>
               <View style={Styles.go_paper_sentence}>
-                {(getPaperByKey(papersTurnCurrent) || `😱 BUG 😱 ${papersTurnCurrent} (Click pass)`)
-                  .split(' ')
-                  .map((word, i) => (
-                    <Text
-                      key={`${word}_${i}`}
-                      style={[
-                        Theme.typography.h2,
-                        Styles.go_paper_word,
-                        isPaperBlur && Styles.go_paper_blur,
-                        Styles[`go_paper_word_${paperAnim}`],
-                      ]}
-                    >
-                      {word}
-                    </Text>
-                  ))}
+                {papersTurnCurrent &&
+                  (
+                    getPaperByKey(papersTurnCurrent) ||
+                    `😱 BUG 😱 ${papersTurnCurrent} (Click pass)`
+                  )
+                    .split(' ')
+                    .map((word, i) => (
+                      <Text
+                        key={`${word}_${i}`}
+                        style={[
+                          Theme.typography.h2,
+                          Styles.go_paper_word,
+                          isPaperBlur && Styles.go_paper_blur,
+                          paperAnim && Styles[`go_paper_word_${paperAnim}`],
+                        ]}
+                      >
+                        {word}
+                      </Text>
+                    ))}
               </View>
               <Text style={Styles.go_paper_key}>{String(papersTurnCurrent)}</Text>
               <View style={Styles.go_paper_icon} accessible={false}>
@@ -458,7 +485,7 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
         )}
 
         {isPaperChanging && paperAnim && (
-          <Text style={[Theme.typography.body, Theme.utils.center, { flexGrow: 1 }]}>
+          <Text style={[Theme.typography.body, Theme.utils.center, Styles.go_paper_changing]}>
             {paperAnim === 'gotcha' ? 'Good job!' : 'Damn it...'}
           </Text>
         )}
@@ -476,14 +503,6 @@ const MyTurnGo = ({ startedCounting, initialTimerSec, countdown, countdownSec, i
       </Page.CTAs>
     </Page>
   )
-}
-
-MyTurnGo.propTypes = {
-  startedCounting: PropTypes.bool,
-  initialTimerSec: PropTypes.number,
-  countdown: PropTypes.number,
-  countdownSec: PropTypes.number,
-  isCount321go: PropTypes.bool,
 }
 
 export default MyTurnGo

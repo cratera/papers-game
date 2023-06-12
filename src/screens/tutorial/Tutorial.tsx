@@ -74,7 +74,7 @@ export default function Tutorial({
 }: StackScreenProps<AppStackParamList, 'tutorial'>) {
   const refSlider = React.useRef<ScrollView>(null)
   const [stepIndex, setStepIndex] = React.useState(0)
-  const { isMandatory, onDone } = route.params
+  const { isMandatory, onDone } = route.params || {}
 
   useEffectOnce(() => {
     Analytics.setCurrentScreen('tutorial')

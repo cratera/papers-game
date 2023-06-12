@@ -1058,9 +1058,9 @@ export class PapersContextProvider extends Component<PapersContextProps, PapersC
   async getTurnLocalState() {
     if (__DEV__) console.log('📌 getPaperTurnState()')
     const storedTurn = await AsyncStorage.getItem('turn')
-    const turnState = storedTurn
+    const turnState: Turn = storedTurn
       ? JSON.parse(storedTurn)
-      : ({
+      : {
           current: 0,
           passed: [],
           guessed: [],
@@ -1070,7 +1070,7 @@ export class PapersContextProvider extends Component<PapersContextProps, PapersC
           toggled_to_yes: 0,
           toggled_to_no: 0,
           revealed: 0,
-        } satisfies Turn)
+        }
     return turnState
   }
 

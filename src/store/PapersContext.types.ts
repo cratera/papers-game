@@ -143,7 +143,7 @@ export type Turn = {
   /**
    * Current paper id on the screen.
    */
-  current: number
+  current: Maybe<number>
   /**
    * The id of the papers that were skipped.
    */
@@ -155,7 +155,7 @@ export type Turn = {
   /**
    * The id of the papers that were guessed/passed sorted chronologically.
    */
-  sorted: []
+  sorted: Round['wordsLeft']
   /**
    * The id of the papers that are left to be guessed.
    */
