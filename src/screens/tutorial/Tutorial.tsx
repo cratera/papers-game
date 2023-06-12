@@ -17,7 +17,7 @@ import { StackScreenProps } from '@react-navigation/stack'
 import { AppStackParamList } from '@src/navigation/navigation.types.js'
 import { useEffectOnce } from 'usehooks-ts'
 import Styles from './Tutorial.styles.js'
-import { TutorialStepProps } from './Tutorial.types.js'
+import { TutorialConfig, TutorialStepProps } from './Tutorial.types.js'
 
 const { vw } = window
 
@@ -62,10 +62,9 @@ const tutorialConfig = [
         </Text>
       )
     },
-    bgFill: Theme.colors.yellow,
     Illustration: IllustrationPersonGuess,
   },
-]
+] satisfies TutorialConfig[]
 
 const stepTotal = tutorialConfig.length
 
