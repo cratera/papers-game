@@ -7,8 +7,8 @@ import Page from '@src/components/page'
 import { IconCheck, IconTimes } from '@src/components/icons'
 
 import * as Theme from '@src/theme'
-import Styles from './Playing.styles.js'
-import { ItemToggleProps, TurnScoreProps } from './Playing.types.js'
+import Styles from './Playing.styles'
+import { ItemToggleProps, TurnScoreProps } from './Playing.types'
 
 const isWeb = Platform.OS === 'web'
 

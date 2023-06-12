@@ -19,7 +19,7 @@ import { BubblingCornerProps } from '@src/components/bubbling/Bubbling.types'
 import { Turn } from '@src/store/PapersContext.types'
 import * as Theme from '@src/theme'
 import { useEffectOnce } from 'usehooks-ts'
-import Styles from './Playing.styles.js'
+import Styles from './Playing.styles'
 import { MyTurnGoProps } from './Playing.types'
 
 const ANIM_PAPER_NEXT = 800

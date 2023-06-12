@@ -3,10 +3,10 @@ import React from 'react'
 import { analytics as Analytics } from '@src/services/firebase'
 
 import { StackScreenProps } from '@react-navigation/stack'
-import { AppStackParamList } from '@src/navigation/navigation.types.js'
+import { AppStackParamList } from '@src/navigation/navigation.types'
 import PapersContext from '@src/store/PapersContext'
-import CreateGame from './CreateGame.js'
-import JoinGame from './JoinGame.js'
+import CreateGame from './CreateGame'
+import JoinGame from './JoinGame'
 
 export default function AccessGame({
   route,

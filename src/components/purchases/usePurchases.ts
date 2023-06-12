@@ -1,8 +1,8 @@
 import React from 'react'
 import { Platform } from 'react-native'
 import { useEffectOnce } from 'usehooks-ts'
-import { getPurchaserType } from './purchases.service.js'
-import { PurchaserType } from './purchases.types.js'
+import { getPurchaserType } from './purchases.service'
+import { PurchaserType } from './purchases.types'
 
 const isWeb = Platform.OS === 'web'
 

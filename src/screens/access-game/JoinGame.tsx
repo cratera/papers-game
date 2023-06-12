@@ -10,10 +10,10 @@ import Page from '@src/components/page'
 import PapersContext from '@src/store/PapersContext'
 
 import { StackScreenProps } from '@react-navigation/stack'
-import { AppStackParamList } from '@src/navigation/navigation.types.js'
-import { Game } from '@src/store/PapersContext.types.js'
+import { AppStackParamList } from '@src/navigation/navigation.types'
+import { Game } from '@src/store/PapersContext.types'
 import * as Theme from '@src/theme'
-import Styles from './AccessGame.styles.js'
+import Styles from './AccessGame.styles'
 
 const i18n = {
   headerTitle: 'Join',

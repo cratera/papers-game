@@ -1,1 +1,1 @@
-export { default } from './GameScore.js'
+export { default } from './GameScore'

@@ -10,8 +10,8 @@ import Button from '@src/components/button'
 import Page from '@src/components/page'
 
 import * as Theme from '@src/theme'
-import Styles from './Playing.styles.js'
-import { OtherTurnProps } from './Playing.types.js'
+import Styles from './Playing.styles'
+import { OtherTurnProps } from './Playing.types'
 
 // TODO: REFACTOR later. This really needs some refactor.
 const OthersTurn = ({

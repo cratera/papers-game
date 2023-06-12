@@ -14,9 +14,9 @@ import GameScore from '@src/components/game-score'
 
 import { StackScreenProps } from '@react-navigation/stack'
 import i18n from '@src/constants/i18n'
-import { AppStackParamList } from '@src/navigation/navigation.types.js'
+import { AppStackParamList } from '@src/navigation/navigation.types'
 import * as Theme from '@src/theme'
-import Styles from './Playing.styles.js'
+import Styles from './Playing.styles'
 
 const DESCRIPTIONS = [i18n.round_0_desc, i18n.round_1_desc, i18n.round_2_desc] // REVIEW this
 

@@ -12,8 +12,8 @@ import { LoadingBadge } from '@src/components/loading'
 import Page from '@src/components/page'
 import * as Theme from '@src/theme'
 
-import Styles from './Playing.styles.js'
-import { MyTurnGetReadyProps } from './Playing.types.js'
+import Styles from './Playing.styles'
+import { MyTurnGetReadyProps } from './Playing.types'
 
 const MyTurnGetReady = ({ description, amIWaiting }: MyTurnGetReadyProps) => {
   const Papers = React.useContext(PapersContext)

@@ -10,10 +10,10 @@ import { animations } from '@src/theme'
 
 import { AppStackParamList } from '@src/navigation/navigation.types'
 import Gate from './Gate'
-import LobbyJoining from './LobbyJoining.js'
-import LobbyWriting from './LobbyWriting.js'
+import LobbyJoining from './LobbyJoining'
+import LobbyWriting from './LobbyWriting'
 import Playing from './playing/PlayingEntry'
-import Teams from './Teams.js'
+import Teams from './Teams'
 import WritePapers from './WritePapers'
 
 const Stack = createStackNavigator()

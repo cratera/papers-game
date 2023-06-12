@@ -17,7 +17,7 @@ import * as Theme from '@src/theme'
 
 import Button from '@src/components/button'
 import Page from '@src/components/page'
-import usePurchases from '@src/components/purchases/usePurchases.js'
+import usePurchases from '@src/components/purchases/usePurchases'
 import * as Sentry from '@src/services/sentry'
 
 import { propTypesCommon, useSubHeader } from './utils'

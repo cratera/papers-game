@@ -7,17 +7,17 @@ import { analytics as Analytics } from '@src/services/firebase'
 import { window } from '@src/utils/device'
 
 import Button from '@src/components/button'
-import IllustrationPersonCalling from '@src/components/illustrations/PersonCalling.js'
-import IllustrationPersonGroup from '@src/components/illustrations/PersonGroup.js'
-import IllustrationPersonGuess from '@src/components/illustrations/PersonGuess.js'
-import IllustrationPersonThink from '@src/components/illustrations/PersonThink.js'
+import IllustrationPersonCalling from '@src/components/illustrations/PersonCalling'
+import IllustrationPersonGroup from '@src/components/illustrations/PersonGroup'
+import IllustrationPersonGuess from '@src/components/illustrations/PersonGuess'
+import IllustrationPersonThink from '@src/components/illustrations/PersonThink'
 import Page from '@src/components/page'
 
 import { StackScreenProps } from '@react-navigation/stack'
-import { AppStackParamList } from '@src/navigation/navigation.types.js'
+import { AppStackParamList } from '@src/navigation/navigation.types'
 import { useEffectOnce } from 'usehooks-ts'
-import Styles from './Tutorial.styles.js'
-import { TutorialConfig, TutorialStepProps } from './Tutorial.types.js'
+import Styles from './Tutorial.styles'
+import { TutorialConfig, TutorialStepProps } from './Tutorial.types'
 
 const { vw } = window
 

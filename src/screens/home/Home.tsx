@@ -9,8 +9,8 @@ import { StackNavigationProp, StackScreenProps } from '@react-navigation/stack'
 import { AppStackParamList } from '@src/navigation/navigation.types'
 import { Profile } from '@src/store/PapersContext.types'
 import Tutorial from '../tutorial'
-import HomeSigned from './HomeSigned.js'
-import HomeSignup from './HomeSignup.js'
+import HomeSigned from './HomeSigned'
+import HomeSignup from './HomeSignup'
 
 export default function HomeScreen({ navigation }: StackScreenProps<AppStackParamList, 'home'>) {
   const Papers = React.useContext(PapersContext)

@@ -1,1 +1,1 @@
-export { default } from './Sheet.js'
+export { default } from './Sheet'

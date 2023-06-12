@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { LogBox } from 'react-native'
 
-import ErrorCrashed from '@src/screens/misc/ErrorCrashed.js'
+import ErrorCrashed from '@src/screens/misc/ErrorCrashed'
 import * as Sentry from '@src/services/sentry'
 import { ErrorInfo } from 'react'
 import AppFn from './AppFn'

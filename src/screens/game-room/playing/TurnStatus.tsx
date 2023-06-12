@@ -3,8 +3,8 @@ import { Text, View } from 'react-native'
 import Avatar from '@src/components/avatar'
 
 import * as Theme from '@src/theme'
-import Styles from './Playing.styles.js'
-import { TurnStatusProps } from './Playing.types.js'
+import Styles from './Playing.styles'
+import { TurnStatusProps } from './Playing.types'
 
 const TurnStatus = ({ title, player, teamName, style }: TurnStatusProps) => (
   <View style={[Styles.tst_flex, style]}>

@@ -10,7 +10,7 @@ import Page from '@src/components/page'
 import * as Sentry from '@src/services/sentry'
 
 import Button from '@src/components/button'
-import { getPurchaserType } from '@src/components/purchases/purchases.service.js'
+import { getPurchaserType } from '@src/components/purchases/purchases.service'
 
 import { propTypesCommon, useSubHeader } from './utils'
 

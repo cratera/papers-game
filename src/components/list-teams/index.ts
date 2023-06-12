@@ -1,1 +1,1 @@
-export { default } from './ListTeams.js'
+export { default } from './ListTeams'

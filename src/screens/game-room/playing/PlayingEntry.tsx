@@ -15,8 +15,6 @@ import { StackScreenProps } from '@react-navigation/stack'
 import { AppStackParamList } from '@src/navigation/navigation.types'
 import { Round } from '@src/store/PapersContext.types'
 import { MyTurnGetReady, MyTurnGo, OthersTurn, RoundScore } from './index'
-// import * as Theme from '@src/theme'
-// import Styles from './PlayingStyles.js'
 
 const DESCRIPTIONS = [i18n.round_0_desc, i18n.round_1_desc, i18n.round_2_desc]
 

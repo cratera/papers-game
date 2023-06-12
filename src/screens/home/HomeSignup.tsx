@@ -3,16 +3,16 @@ import React from 'react'
 import { Text, TextInput, View } from 'react-native'
 
 import * as Theme from '@src/theme'
-import Styles from './Home.styles.js'
+import Styles from './Home.styles'
 
 import AvatarSelector from '@src/components/avatar/AvatarSelector'
 import Button from '@src/components/button'
 import Page from '@src/components/page'
 import { headerTheme } from '@src/navigation/headerStuff'
 
-import { Profile } from '@src/store/PapersContext.types.js'
+import { Profile } from '@src/store/PapersContext.types'
 import { window } from '@src/utils/device'
-import { HomeSignupProps, HomeSignupState } from './Home.types.js'
+import { HomeSignupProps, HomeSignupState } from './Home.types'
 
 const { vh } = window
 

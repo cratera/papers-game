@@ -7,8 +7,8 @@ import { IconChevron } from '@src/components/icons'
 import SettingsToggle from '@src/components/settings'
 import * as Theme from '@src/theme'
 import { useEffectOnce } from 'usehooks-ts'
-import Styles from './Page.styles.js'
-import { CTAsProps, HeaderBtnProps, PageProps } from './Page.types.js'
+import Styles from './Page.styles'
+import { CTAsProps, HeaderBtnProps, PageProps } from './Page.types'
 
 const i18nWifi = 'No internet connection'
 

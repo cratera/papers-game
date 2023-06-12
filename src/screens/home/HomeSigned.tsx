@@ -4,7 +4,7 @@ import { Text, TouchableOpacity } from 'react-native'
 import PapersContext from '@src/store/PapersContext'
 
 import * as Theme from '@src/theme'
-import Styles from './Home.styles.js'
+import Styles from './Home.styles'
 
 import avatars from '@src/components/avatar/Illustrations'
 import { headerTheme } from '@src/navigation/headerStuff'
@@ -14,8 +14,8 @@ import Avatar from '@src/components/avatar'
 import Bubbling from '@src/components/bubbling'
 import Button from '@src/components/button'
 import Page from '@src/components/page'
-import { AppStackParamList } from '@src/navigation/navigation.types.js'
-import { HeaderMenuProps } from './Home.types.js'
+import { AppStackParamList } from '@src/navigation/navigation.types'
+import { HeaderMenuProps } from './Home.types'
 
 function HeaderMenu({ onPress }: HeaderMenuProps) {
   return (

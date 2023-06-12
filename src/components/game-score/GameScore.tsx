@@ -4,10 +4,10 @@ import { View } from 'react-native'
 import PapersContext from '@src/store/PapersContext'
 import { formatScores } from '@src/store/papersMethods'
 
-import { TeamId } from '@src/store/PapersContext.types.js'
-import CardScore from './CardScore.js'
-import { CardScoreProps } from './CardScore.types.js'
-import { GameScoreProps } from './GameScore.types.js'
+import { TeamId } from '@src/store/PapersContext.types'
+import CardScore from './CardScore'
+import { CardScoreProps } from './CardScore.types'
+import { GameScoreProps } from './GameScore.types'
 
 const GameScore = ({ BOAT = false, ...props }: GameScoreProps) => {
   const Papers = React.useContext(PapersContext)

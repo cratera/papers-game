@@ -1,1 +1,1 @@
-export { default as LoadingBadge } from './LoadingBadge.js'
+export { default as LoadingBadge } from './LoadingBadge'
