@@ -1,8 +1,7 @@
-import PropTypes from 'prop-types'
 import React from 'react'
 
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { Platform, Text, View } from 'react-native'
+import { Platform, StyleSheet, Text, View } from 'react-native'
 
 import * as Updates from 'expo-updates'
 
@@ -12,13 +11,15 @@ import Button from '@src/components/button'
 import { IconSpin } from '@src/components/icons'
 import Page from '@src/components/page'
 import * as Theme from '@src/theme'
+import { useEffectOnce } from 'usehooks-ts'
+import { ErrorCrashedProps } from './ErrorCrashed.types'
 
 const AUTO_RELOAD = !__DEV__
 
-export default function ErrorCrashed({ error }) {
+export default function ErrorCrashed({ error }: ErrorCrashedProps) {
   const [recoverFailed, setRecoverFailed] = React.useState(false)
 
-  React.useEffect(() => {
+  useEffectOnce(() => {
     Sentry.captureException(error, { tags: { pp_page: 'crash_0' } })
 
     if (AUTO_RELOAD) {
@@ -26,13 +27,13 @@ export default function ErrorCrashed({ error }) {
         tryRecover()
       }, 2500) // Time to user read the page text...
     }
-  }, [])
+  })
 
   async function checkRecoverAttempt() {
     // Excuse my code. Not having a good morning.
     let attempt = 0
     try {
-      attempt = (await AsyncStorage.getItem('recover_attempt')) || '0'
+      attempt = Number(await AsyncStorage.getItem('recover_attempt')) || 0
       console.log('Recovering attempt nr:', attempt)
 
       if (attempt < 3) {
@@ -77,18 +78,28 @@ export default function ErrorCrashed({ error }) {
   return (
     <Page>
       <Page.Main>
-        <View
-          style={{ marginTop: 200, display: 'flex', flexDirection: 'column', alignItems: 'center' }}
-        >
+        <View style={Styles.container}>
           <Text style={[Theme.typography.h1, Theme.utils.center]}>😵</Text>
           <Text
-            style={[Theme.typography.h3, Theme.utils.center, { marginTop: 24, marginBottom: 8 }]}
+            style={[
+              Theme.typography.h3,
+              Theme.utils.center,
+              Theme.spacing.mt_24,
+              Theme.spacing.mb_8,
+            ]}
           >
             Ouch!
           </Text>
 
           <Text style={Theme.typography.secondary}>Something is not right, our head hurts.</Text>
-          <Text style={[Theme.typography.small, { fontSize: 12, marginTop: 8, marginBottom: 32 }]}>
+          <Text
+            style={[
+              Theme.typography.small,
+              Theme.spacing.mt_8,
+              Theme.spacing.mb_32,
+              Styles.small_text,
+            ]}
+          >
             {recoverFailed
               ? "We couldn't fix your game automatically."
               : 'Hang in there, this will be quick!'}
@@ -96,14 +107,19 @@ export default function ErrorCrashed({ error }) {
           {recoverFailed ? (
             <>
               <Button onPress={deleteAndReload}>Go to homepage</Button>
-              <Text style={[Theme.typography.small, { marginTop: 8 }]}>
+              <Text style={[Theme.typography.small, Theme.spacing.mt_8]}>
                 Your game seems to be corrupted.
               </Text>
             </>
           ) : !AUTO_RELOAD ? (
             <>
               <Text
-                style={[Theme.typography.small, { fontSize: 10, marginTop: 8, marginBottom: 24 }]}
+                style={[
+                  Theme.typography.small,
+                  Theme.spacing.mt_8,
+                  Theme.spacing.mb_24,
+                  Styles.error_text,
+                ]}
               >
                 {error.message}
               </Text>
@@ -120,10 +136,17 @@ export default function ErrorCrashed({ error }) {
   )
 }
 
-ErrorCrashed.defaultProps = {
-  error: {},
-}
-
-ErrorCrashed.propTypes = {
-  error: PropTypes.object.isRequired, // Error
-}
+const Styles = StyleSheet.create({
+  container: {
+    marginTop: 200,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  small_text: {
+    fontSize: 12,
+  },
+  error_text: {
+    fontSize: 10,
+  },
+})
