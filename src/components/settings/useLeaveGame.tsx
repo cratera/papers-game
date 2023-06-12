@@ -3,6 +3,8 @@ import { Alert, Platform } from 'react-native'
 
 import * as Sentry from '@src/services/sentry'
 
+import { StackScreenProps } from '@react-navigation/stack'
+import { AppStackParamList } from '@src/navigation/navigation.types'
 import PapersContext from '@src/store/PapersContext'
 
 const i18n = {
@@ -10,9 +12,10 @@ const i18n = {
   leave_confirm_0: 'Are you sure you want to leave the game?',
   leave_confirm_1: "You can't join again.",
 }
-export default function useLeaveGame({ navigation }) {
+
+export default function useLeaveGame({ navigation }: StackScreenProps<AppStackParamList>) {
   const Papers = React.useContext(PapersContext)
-  const hasTeams = !!Papers.state.game.teams
+  const hasTeams = !!Papers.state.game?.teams
   const msg = i18n.leave_confirm_0 + (hasTeams ? ` ${i18n.leave_confirm_1}` : '')
   function leaveGame() {
     if (!navigation) {

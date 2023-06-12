@@ -4,4 +4,5 @@ export type AppStackParamList = {
   room: undefined
   settings: undefined
   tutorial: { isMandatory: boolean; onDone: EmptyCallback }
+  gate: { goal: 'leave' }
 }
