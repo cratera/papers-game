@@ -1,6 +1,5 @@
-import PropTypes from 'prop-types'
 import React from 'react'
-import { ScrollView, Text, View } from 'react-native'
+import { NativeScrollEvent, NativeSyntheticEvent, ScrollView, Text, View } from 'react-native'
 
 import * as Theme from '@src/theme'
 
@@ -17,7 +16,8 @@ import Page from '@src/components/page'
 import { StackScreenProps } from '@react-navigation/stack'
 import { AppStackParamList } from '@src/navigation/navigation.types.js'
 import { useEffectOnce } from 'usehooks-ts'
-import Styles from './TutorialStyles.js'
+import Styles from './Tutorial.styles.js'
+import { TutorialStepProps } from './Tutorial.types.js'
 
 const { vw } = window
 
@@ -151,11 +151,11 @@ export default function Tutorial({
     return papers
   }
 
-  function handleScrollEnd(e) {
+  function handleScrollEnd(e: NativeSyntheticEvent<NativeScrollEvent>) {
     const { contentOffset, layoutMeasurement } = e.nativeEvent
     const pageIndex = Math.floor(contentOffset.x / layoutMeasurement.width)
 
-    setStepIndex(Math.max(Math.min(stepTotal, pageIndex)), 0)
+    setStepIndex(Math.max(Math.min(stepTotal, pageIndex), 0))
   }
 
   function handleClickNext() {
@@ -163,16 +163,9 @@ export default function Tutorial({
   }
 }
 
-Tutorial.propTypes = {
-  navigation: PropTypes.object.isRequired, // react-navigation
-  /** When true, does not allow exit */
-  isMandatory: PropTypes.bool,
-  onDone: PropTypes.func,
-}
-
 // ===============
 
-const TutorialStep = ({ isActive, ix, stepTotal }) => {
+const TutorialStep = ({ isActive, ix, stepTotal }: TutorialStepProps) => {
   const Illustration = tutorialConfig[ix].Illustration
   const Detail = tutorialConfig[ix].detail
   return (
@@ -203,10 +196,4 @@ const TutorialStep = ({ isActive, ix, stepTotal }) => {
       </View>
     </View>
   )
-}
-
-TutorialStep.propTypes = {
-  isActive: PropTypes.bool.isRequired,
-  ix: PropTypes.number.isRequired,
-  stepTotal: PropTypes.number.isRequired,
 }

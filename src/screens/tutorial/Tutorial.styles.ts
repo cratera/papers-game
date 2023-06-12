@@ -19,7 +19,7 @@ export default StyleSheet.create({
     paddingHorizontal: 8,
     marginBottom: 100,
   },
-  slide_isActive: {},
+  step_isActive: {},
   media: {
     display: 'flex',
     flexDirection: 'row',

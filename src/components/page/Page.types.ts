@@ -4,7 +4,7 @@ import { SafeAreaViewProps } from 'react-native-safe-area-context'
 import { ButtonProps } from '../button/Button.types'
 
 export interface PageProps extends SafeAreaViewProps {
-  bannerMsg: string | boolean
+  bannerMsg?: string | boolean
   /**
    * @default grayBg
    */
