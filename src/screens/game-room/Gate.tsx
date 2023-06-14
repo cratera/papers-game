@@ -1,26 +1,30 @@
-import PropTypes from 'prop-types'
 import React from 'react'
 
 import { analytics as Analytics } from '@src/services/firebase'
 import * as Sentry from '@src/services/sentry'
+import * as Theme from '@src/theme'
 
 import PapersContext from '@src/store/PapersContext'
 
 import { headerTheme } from '@src/navigation/headerStuff'
 
+import { StackScreenProps } from '@react-navigation/stack'
 import Button from '@src/components/button'
 import { LoadingBadge } from '@src/components/loading'
 import Page from '@src/components/page'
+import { AppStackParamList } from '@src/navigation/navigation.types'
+import { StyleSheet } from 'react-native'
+import { useEffectOnce } from 'usehooks-ts'
 
-export default function Gate({ navigation, route }) {
+export default function Gate({ navigation, route }: StackScreenProps<AppStackParamList, 'gate'>) {
   const Papers = React.useContext(PapersContext)
   const [isSlow, setIsSlow] = React.useState(false)
 
   const { profile } = Papers.state
-  const profileGameId = profile.gameId || ''
-  const goal = route?.params?.goal || 'rejoin' // rejoin || leave
+  const profileGameId = profile?.gameId || ''
+  const goal = route?.params?.goal || 'rejoin'
 
-  React.useEffect(() => {
+  useEffectOnce(() => {
     navigation.setOptions({
       ...headerTheme({ hiddenTitle: true }),
     })
@@ -30,9 +34,9 @@ export default function Gate({ navigation, route }) {
     } catch (error) {
       Sentry.captureException(error, { tags: { pp_page: 'gate_0' } })
     }
-  }, [])
+  })
 
-  React.useEffect(() => {
+  useEffectOnce(() => {
     const buttonCancel = setTimeout(() => {
       // Taking too long? Try something else.
       setIsSlow(true)
@@ -41,7 +45,7 @@ export default function Gate({ navigation, route }) {
     return () => {
       clearInterval(buttonCancel)
     }
-  }, [])
+  })
 
   async function handleCancel() {
     try {
@@ -59,13 +63,7 @@ export default function Gate({ navigation, route }) {
 
   return (
     <Page>
-      <Page.Main
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
-      >
+      <Page.Main style={Styles.container}>
         <LoadingBadge variant="page">
           {`${goal === 'rejoin' ? 'Rejoining' : 'Leaving'} "${
             profileGameId.split('_')[0]
@@ -73,7 +71,7 @@ export default function Gate({ navigation, route }) {
         </LoadingBadge>
 
         {isSlow ? (
-          <Button style={{ marginTop: 40 }} onPress={handleCancel}>
+          <Button style={Theme.spacing.mt_40} onPress={handleCancel}>
             Go to homepage
           </Button>
         ) : null}
@@ -82,7 +80,10 @@ export default function Gate({ navigation, route }) {
   )
 }
 
-Gate.propTypes = {
-  navigation: PropTypes.object, // ReactNavigation
-  route: PropTypes.object,
-}
+const Styles = StyleSheet.create({
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+})

@@ -1,5 +1,4 @@
-import PropTypes from 'prop-types'
-import React from 'react'
+import React, { useCallback } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 
@@ -15,83 +14,61 @@ import Button from '@src/components/button'
 import ListPlayers from '@src/components/list-players'
 import Page from '@src/components/page'
 
+import { StackScreenProps } from '@react-navigation/stack'
 import { headerTheme } from '@src/navigation/headerStuff'
+import { AppStackParamList } from '@src/navigation/navigation.types'
+import { GameTeams, Profile, Round, Team } from '@src/store/PapersContext.types'
 import * as Theme from '@src/theme'
+import { Color } from '@src/theme/colors'
+import { useEffectOnce } from 'usehooks-ts'
 
-function areTeamPlayersEqual(teamsOld, teamsNew) {
-  const tOld = {}
-  const tNew = {}
-
-  for (const ix in teamsNew) {
-    tNew[ix] = teamsNew[ix].players
+function areTeamPlayersEqual(teamsOld: GameTeams, teamsNew: GameTeams) {
+  const tOld: Record<Round['turnWho']['team'], Team['players']> = {
+    0: [],
+    1: [],
   }
-  for (const ix in teamsOld) {
-    tOld[ix] = teamsOld[ix].players
+  const tNew: Record<Round['turnWho']['team'], Team['players']> = {
+    0: [],
+    1: [],
+  }
+
+  for (const team in teamsNew) {
+    const teamId = Number(team) as keyof GameTeams
+
+    tNew[teamId] = teamsNew[teamId].players
+  }
+  for (const team in teamsOld) {
+    const teamId = Number(team) as keyof GameTeams
+
+    tOld[teamId] = teamsOld[teamId].players
   }
 
   const result = JSON.stringify(tOld) === JSON.stringify(tNew)
   return result
 }
 
-const bgStart = 'bg' // yellow
-const bgEnd = 'bg' // pink
+const bgStart: Color = 'bg' // yellow
+const bgEnd: Color = 'bg' // pink
 
-export default function Teams({ navigation }) {
+export default function Teams({ navigation }: StackScreenProps<AppStackParamList, 'teams'>) {
   const Papers = React.useContext(PapersContext)
   const { game } = Papers.state
-  const playersCount = Object.keys(game.players).length
-  const [tempTeams, setTeams] = React.useState(getRandomTeams)
+  const playersCount = game?.players && Object.keys(game.players).length
+  const [tempTeams, setTeams] = React.useState<GameTeams>()
   const [isLocking, setLocking] = React.useState(false)
-  const [errorMsg, setErrorMsg] = React.useState(null)
+  const [errorMsg, setErrorMsg] = React.useState<string | undefined>(undefined)
   const didMountRef = React.useRef(false)
   const [isFakingLoading, setIsFakingLoading] = React.useState(true) // useFakeLoading
 
-  React.useEffect(() => {
-    setTimeout(() => {
-      if (didMountRef.current) setIsFakingLoading(false)
-    }, 1500)
-  }, [])
-
-  React.useEffect(() => {
-    didMountRef.current = true
-
-    return () => {
-      didMountRef.current = false
-    }
-  }, [])
-
-  React.useEffect(() => {
-    navigation.setOptions({
-      ...headerTheme(),
-      title: 'Teams',
-      headerLeft: function HLB() {
-        return (
-          <Page.HeaderBtn side="left" icon="back" onPress={navigation.goBack}>
-            Back
-          </Page.HeaderBtn>
-        )
-      },
-      headerRight: null,
-    })
-    Analytics.setCurrentScreen('game_teams_creation')
-  }, [])
-
-  React.useEffect(() => {
-    if (didMountRef.current) {
-      // When someone just joined/left...
-      generateTeams()
-    }
-  }, [playersCount])
-
   // TODO: later This could be hook useRandomTeams()
-  function getRandomTeams() {
-    const players = Object.keys(game.players)
+  const getRandomTeams: () => GameTeams = useCallback(() => {
+    const players = (game?.players && Object.keys(game.players)) || []
     const teamsNr = 2 // LATER - Game Setting
-    const teams = Array.from(Array(teamsNr), () => [])
-    const limit = Math.round(players.length / teamsNr)
-    const newTempTeams = {}
+    const teams = Array.from(Array(teamsNr), () => [] as string[])
+    const limit = Math.round((players?.length || 0) / teamsNr)
+    const newTempTeams = {} as GameTeams
 
-    function alocateTo(teamIndex, playerId) {
+    function alocateTo(teamIndex: number, playerId: Profile['id']) {
       if (teams[teamIndex].length === limit) {
         const newIndex = teamIndex === teamsNr - 1 ? 0 : teamIndex + 1
         alocateTo(newIndex, playerId)
@@ -106,8 +83,10 @@ export default function Teams({ navigation }) {
     }
 
     teams.forEach((team, index) => {
-      newTempTeams[index] = {
-        id: index,
+      const teamId = index as keyof GameTeams
+
+      newTempTeams[teamId] = {
+        id: teamId,
         name: teamNames[getRandomInt(teamNames.length - 1)],
         players: team,
       }
@@ -118,17 +97,53 @@ export default function Teams({ navigation }) {
       }
     })
 
-    if (areTeamPlayersEqual(tempTeams, newTempTeams)) {
+    if (tempTeams && areTeamPlayersEqual(tempTeams, newTempTeams)) {
       if (__DEV__) console.log('Equal teams. Randomize again.')
       return getRandomTeams()
     } else {
       return newTempTeams
     }
-  }
+  }, [game?.players, tempTeams])
 
-  function generateTeams() {
+  const generateTeams = useCallback(() => {
     setTeams(getRandomTeams())
-  }
+  }, [getRandomTeams])
+
+  useEffectOnce(() => {
+    didMountRef.current = true
+
+    const timeout = setTimeout(() => {
+      setIsFakingLoading(false)
+    }, 1500)
+
+    return () => {
+      clearTimeout(timeout)
+      didMountRef.current = false
+    }
+  })
+
+  React.useEffect(() => {
+    navigation.setOptions({
+      ...headerTheme(),
+      title: 'Teams',
+      headerLeft: function HLB() {
+        return (
+          <Page.HeaderBtn side="left" onPress={() => navigation.goBack()}>
+            Back
+          </Page.HeaderBtn>
+        )
+      },
+      headerRight: undefined,
+    })
+    Analytics.setCurrentScreen('game_teams_creation')
+  }, [navigation])
+
+  React.useEffect(() => {
+    if (didMountRef.current) {
+      // When someone just joined/left...
+      generateTeams()
+    }
+  }, [generateTeams, playersCount])
 
   // function handleRenameOf(teamId) {
   //   try {
@@ -149,15 +164,19 @@ export default function Teams({ navigation }) {
 
   async function handleLockClick() {
     if (isLocking) return false
-    setErrorMsg(null)
+    setErrorMsg(undefined)
     setLocking(true)
 
     try {
-      await Papers.setTeams(tempTeams)
-      navigation.setOptions({ headerRight: null })
+      if (tempTeams) {
+        await Papers.setTeams(tempTeams)
+      }
+      navigation.setOptions({ headerRight: undefined })
       navigation.navigate('write-papers')
     } catch (e) {
-      setErrorMsg(e.message)
+      const error = e as Error
+
+      setErrorMsg(error.message)
       setLocking(false)
     }
   }
@@ -165,7 +184,7 @@ export default function Teams({ navigation }) {
   if (isFakingLoading) {
     return (
       <Page bannerMsg={errorMsg} bgFill={bgStart}>
-        <Page.Main headerDivider>
+        <Page.Main>
           <LoadingBadge variant="page">Creating teams</LoadingBadge>
         </Page.Main>
       </Page>
@@ -175,34 +194,37 @@ export default function Teams({ navigation }) {
   return (
     <Page bannerMsg={errorMsg} bgFill={bgEnd}>
       {/* <Bubbling bgStart={bgStart} bgEnd={bgEnd} /> */}
-      <Page.Main headerDivider>
+      <Page.Main>
         <ScrollView
           style={Theme.utils.scrollSideOffset}
-          contentContainerStyle={{ paddingBottom: 16 }}
+          contentContainerStyle={Theme.spacing.pb_16}
         >
-          {Object.keys(tempTeams).map((teamId) => {
-            const { id, name, players } = tempTeams[teamId]
+          {tempTeams &&
+            Object.keys(tempTeams).map((team) => {
+              const teamId = Number(team) as keyof GameTeams
 
-            return (
-              <View key={id} style={Styles.team}>
-                <View style={Styles.teamHeader}>
-                  <View style={Styles.teamHeader_title}>
-                    <Text style={Theme.typography.h2}>{name}</Text>
-                    {/* <Button
+              const { id, name, players } = tempTeams[teamId]
+
+              return (
+                <View key={id}>
+                  <View style={Styles.teamHeader}>
+                    <View style={Styles.teamHeader_title}>
+                      <Text style={Theme.typography.h2}>{name}</Text>
+                      {/* <Button
                         variant="icon"
                         accessibilityLabel="Rename team"
                         onPress={() => handleRenameOf(id)}
                         >
                         ✏️
                       </Button> */}
+                    </View>
+                    <Text style={Theme.typography.secondary}>Team {teamId + 1}</Text>
                   </View>
-                  <Text style={Theme.typography.secondary}>Team {teamId + 1}</Text>
+                  <ListPlayers players={players} />
                 </View>
-                <ListPlayers players={players} />
-              </View>
-            )
-          })}
-          <View style={Theme.utils.CTASafeArea} />
+              )
+            })}
+          <View style={Theme.utils.ctaSafeArea} />
         </ScrollView>
       </Page.Main>
       <Page.CTAs hasOffset style={Styles.ctas}>
@@ -212,7 +234,7 @@ export default function Teams({ navigation }) {
           style={Styles.ctas_random}
           accessibilityLabel="Randomize teams"
           onPress={generateTeams}
-          styleTouch={{ marginBottom: 16 }}
+          styleTouch={Theme.spacing.mb_16}
         >
           <Text>🎲</Text>
         </Button>
@@ -230,29 +252,7 @@ export default function Teams({ navigation }) {
   )
 }
 
-Teams.propTypes = {
-  navigation: PropTypes.object.isRequired, // react-navigation
-}
-
 const Styles = StyleSheet.create({
-  cta: {
-    display: 'flex',
-    alignItems: 'center',
-    backgroundColor: Theme.colors.primaryLight,
-    borderRadius: 10,
-    overflow: 'hidden', // so borderRadius works.
-    marginTop: 8,
-    paddingVertical: 64,
-    paddingHorizontal: 16,
-  },
-  cta_icon: {
-    marginBottom: 48,
-    color: Theme.colors.primary,
-  },
-  cta_txt: {
-    fontSize: Theme.fontSize.base,
-    color: Theme.colors.primary,
-  },
   teamHeader: {
     display: 'flex',
     flexDirection: 'column',

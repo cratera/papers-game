@@ -2,12 +2,17 @@ import React from 'react'
 
 // import * as WebBrowser from 'expo-web-browser'; // WHAT'S THIS?
 
-import { createStackNavigator, StackScreenProps } from '@react-navigation/stack'
+import {
+  createStackNavigator,
+  StackNavigationProp,
+  StackScreenProps,
+} from '@react-navigation/stack'
 import PapersContext from '@src/store/PapersContext'
 
 import { headerTheme } from '@src/navigation/headerStuff'
 import { animations } from '@src/theme'
 
+import { RouteProp } from '@react-navigation/native'
 import { AppStackParamList } from '@src/navigation/navigation.types'
 import Gate from './Gate'
 import LobbyJoining from './LobbyJoining'
@@ -16,13 +21,16 @@ import Playing from './playing/PlayingEntry'
 import Teams from './Teams'
 import WritePapers from './WritePapers'
 
-const Stack = createStackNavigator()
+const Stack = createStackNavigator<AppStackParamList>()
 
-export default function GameRoomEntry({ navigation }: StackScreenProps<AppStackParamList, 'room'>) {
+export default function GameRoomEntry({
+  navigation,
+  route,
+}: StackScreenProps<AppStackParamList, 'room'>) {
   const Papers = React.useContext(PapersContext)
   const { profile, game } = Papers.state
   const hasGameIdCached = React.useRef(!!profile?.gameId).current
-  const profileId = profile?.id
+  const profileId = profile?.id || ''
   const profileGameId = profile?.gameId
 
   const { id: gameId } = game || {}
@@ -36,14 +44,14 @@ export default function GameRoomEntry({ navigation }: StackScreenProps<AppStackP
       // TODO later - info the profile is needed first.
       navigation.navigate('home')
     }
-  }, [profileId])
+  }, [navigation, profileId])
 
   React.useEffect(() => {
     // Player left / was kicked, or game was deleted, etc...
     if (!profileGameId && !game) {
       navigation.navigate('home')
     }
-  }, [profileGameId, game])
+  }, [profileGameId, game, navigation])
 
   React.useEffect(() => {
     // Loaded cached game with success
@@ -51,14 +59,14 @@ export default function GameRoomEntry({ navigation }: StackScreenProps<AppStackP
       const redirect = amIReady ? 'playing' : wordsAreStored ? 'lobby-writing' : 'lobby-joining'
       navigation.navigate('room', { screen: redirect })
     }
-  }, [hasGameIdCached, gameId])
+  }, [hasGameIdCached, gameId, amIReady, wordsAreStored, navigation])
 
   React.useEffect(() => {
     // Tried to load cached game but without success
     if (hasGameIdCached && !profileGameId) {
       navigation.navigate('home')
     }
-  }, [hasGameIdCached, profileGameId])
+  }, [hasGameIdCached, navigation, profileGameId])
 
   React.useEffect(() => {
     // Triggered when the player clicks "I'm Ready" at lobby-writting
@@ -66,11 +74,16 @@ export default function GameRoomEntry({ navigation }: StackScreenProps<AppStackP
     if (isPlaying) {
       navigation.navigate('playing')
     }
-  }, [isPlaying])
+  }, [isPlaying, navigation])
 
   // TODO: later... learn routing redirect properly.
   if (!game) {
-    return <Gate navigation={navigation} />
+    return (
+      <Gate
+        navigation={navigation as StackNavigationProp<AppStackParamList, 'gate'>}
+        route={route as unknown as RouteProp<AppStackParamList, 'gate'>}
+      />
+    )
   }
 
   const initialRouter = amIReady ? 'playing' : wordsAreStored ? 'lobby-writing' : 'lobby-joining'

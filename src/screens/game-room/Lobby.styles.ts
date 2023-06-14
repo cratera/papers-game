@@ -1,17 +1,11 @@
 import { StyleSheet } from 'react-native'
-// import * as Theme from '@src/theme'
 
 export default StyleSheet.create({
   header: {
-    // display: 'flex',
-    // flexDirection: 'column',
-    // alignItems: 'center',
     paddingTop: 24,
     paddingBottom: 24,
   },
   header_title: {
-    // display: 'flex',
-    // justifyContent: 'space-between',
     marginTop: 16,
     marginBottom: 16,
   },
@@ -23,9 +17,6 @@ export default StyleSheet.create({
     alignItems: 'center',
     paddingBottom: 8,
     paddingTop: 24,
-    // ${Theme.bp.xs} {
-    //   margin-bottom: 2rem;
-    // }
   },
   header_img: {
     marginTop: 8,

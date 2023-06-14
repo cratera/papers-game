@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import React from 'react'
 import { Text, View } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
@@ -8,31 +7,42 @@ import { analytics as Analytics } from '@src/services/firebase'
 import PapersContext from '@src/store/PapersContext'
 
 import * as Theme from '@src/theme'
-// import Styles from './LobbyStyles.js'
 
+import { StackScreenProps } from '@react-navigation/stack'
 import Button from '@src/components/button'
 import ListTeams from '@src/components/list-teams'
 import Page from '@src/components/page'
 import { useLeaveGame } from '@src/components/settings'
 import { headerTheme } from '@src/navigation/headerStuff'
+import { AppStackParamList } from '@src/navigation/navigation.types'
+import { Profile, Words } from '@src/store/PapersContext.types'
 
-export default function LobbyWriting({ navigation }) {
+export default function LobbyWriting({
+  navigation,
+}: StackScreenProps<AppStackParamList, 'lobby-writing'>) {
   const Papers = React.useContext(PapersContext)
   const [isSubmitting, setIsSubmitting] = React.useState(false)
-  const [errorMsg, setErrorMsg] = React.useState('')
-  const { askToLeaveGame } = useLeaveGame({ navigation })
+  const [errorMsg, setErrorMsg] = React.useState<string>()
+  const { askToLeaveGame } = useLeaveGame({
+    navigation,
+  })
   const { game, profile } = Papers.state || {}
   const hasGame = !!game
-  const gameWords = (hasGame && game.words) || {}
+
   const profileId = profile && profile.id
   const creatorId = hasGame && game.creatorId
   const profileIsAdmin = creatorId === profileId
 
   const didSubmitAllWords = React.useCallback(
-    (plId) => gameWords[plId]?.length === game.settings.words,
-    [gameWords]
+    (plId: Profile['id']) => {
+      const gameWords: Words = (hasGame && game.words) || ({} as Words)
+
+      return gameWords[plId]?.length === game?.settings.words
+    },
+    [game?.settings.words, game?.words, hasGame]
   )
-  const didEveryoneSubmittedTheirWords = Object.keys(game.players).every(didSubmitAllWords)
+  const didEveryoneSubmittedTheirWords =
+    game?.players && Object.keys(game.players).every(didSubmitAllWords)
 
   React.useEffect(() => {
     navigation.setOptions({
@@ -49,10 +59,10 @@ export default function LobbyWriting({ navigation }) {
         return <Page.HeaderBtnSettings />
       },
     })
-    if (game.teams) {
+    if (game?.teams) {
       Analytics.setCurrentScreen('game_lobby_writing')
     }
-  }, [])
+  }, [askToLeaveGame, game?.teams, navigation])
 
   React.useEffect(() => {
     if (didEveryoneSubmittedTheirWords) {
@@ -60,7 +70,7 @@ export default function LobbyWriting({ navigation }) {
         headerTitle: 'All done!',
       })
     }
-  }, [didEveryoneSubmittedTheirWords])
+  }, [didEveryoneSubmittedTheirWords, navigation])
 
   async function handleReadyClick() {
     if (isSubmitting === true) {
@@ -69,13 +79,15 @@ export default function LobbyWriting({ navigation }) {
 
     setIsSubmitting(true)
     if (errorMsg) {
-      setErrorMsg(null)
+      setErrorMsg(undefined)
     }
 
     try {
       await Papers.markMeAsReady()
     } catch (e) {
-      setErrorMsg(e.message)
+      const error = e as Error
+
+      setErrorMsg(error.message)
       setIsSubmitting(false)
     }
   }
@@ -85,10 +97,10 @@ export default function LobbyWriting({ navigation }) {
       {/* {didEveryoneSubmittedTheirWords && (
         <Bubbling fromBehind bgStart={Theme.colors.bg} bgEnd={Theme.colors.purple} />
       )} */}
-      <Page.Main headerDivider>
+      <Page.Main>
         <ScrollView style={Theme.utils.scrollSideOffset}>
-          <ListTeams isStatusVisible style={{ paddingTop: 24 }} />
-          <View style={Theme.utils.CTASafeArea} />
+          <ListTeams isStatusVisible style={Theme.spacing.pt_24} />
+          <View style={Theme.utils.ctaSafeArea} />
         </ScrollView>
       </Page.Main>
       {__DEV__ && profileIsAdmin && (
@@ -96,7 +108,7 @@ export default function LobbyWriting({ navigation }) {
           <Button
             variant="danger"
             onPress={Papers.setWordsForEveryone}
-            styleTouch={{ marginTop: 16 }}
+            styleTouch={Theme.spacing.mt_16}
           >
             {"💥 Write everyone's papers 💥"}
           </Button>
@@ -104,7 +116,7 @@ export default function LobbyWriting({ navigation }) {
       )}
       {didEveryoneSubmittedTheirWords && (
         <Page.CTAs hasOffset>
-          <Text style={[Theme.typography.error, Theme.utils.center, { marginBottom: 8 }]}>
+          <Text style={[Theme.typography.error, Theme.utils.center, Theme.spacing.mb_8]}>
             {errorMsg}
           </Text>
 
@@ -115,8 +127,4 @@ export default function LobbyWriting({ navigation }) {
       )}
     </Page>
   )
-}
-
-LobbyWriting.propTypes = {
-  navigation: PropTypes.object.isRequired, // react-navigation
 }

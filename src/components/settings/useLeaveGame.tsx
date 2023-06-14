@@ -13,7 +13,9 @@ const i18n = {
   leave_confirm_1: "You can't join again.",
 }
 
-export default function useLeaveGame({ navigation }: StackScreenProps<AppStackParamList>) {
+export default function useLeaveGame({
+  navigation,
+}: Pick<StackScreenProps<AppStackParamList>, 'navigation'>) {
   const Papers = React.useContext(PapersContext)
   const hasTeams = !!Papers.state.game?.teams
   const msg = i18n.leave_confirm_0 + (hasTeams ? ` ${i18n.leave_confirm_1}` : '')

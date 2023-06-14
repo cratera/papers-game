@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import React from 'react'
 import { Text, View } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
@@ -8,22 +7,28 @@ import { analytics as Analytics } from '@src/services/firebase'
 import PapersContext from '@src/store/PapersContext'
 
 import * as Theme from '@src/theme'
-import Styles from './LobbyStyles.js'
+import Styles from './Lobby.styles'
 
+import { StackScreenProps } from '@react-navigation/stack'
 import Bubbling from '@src/components/bubbling'
 import Button from '@src/components/button'
 import ListPlayers from '@src/components/list-players'
 import ListTeams from '@src/components/list-teams'
 import Page from '@src/components/page'
 import { useLeaveGame } from '@src/components/settings'
+import { AppStackParamList } from '@src/navigation/navigation.types'
 
-export default function LobbyJoining({ navigation }) {
+export default function LobbyJoining({
+  navigation,
+}: StackScreenProps<AppStackParamList, 'lobby-joining'>) {
   const Papers = React.useContext(PapersContext)
-  const { askToLeaveGame } = useLeaveGame({ navigation })
+  const { askToLeaveGame } = useLeaveGame({
+    navigation,
+  })
   const { game, profile } = Papers.state || {}
   const hasGame = !!game
   const hasTeams = hasGame && !!game.teams
-  const profileId = profile && profile.id
+  const profileId = profile?.id || ''
   const creatorId = hasGame && game.creatorId
   const profileIsAdmin = creatorId === profileId
   const playersKeys = hasGame ? Object.keys(game.players) : []
@@ -43,24 +48,11 @@ export default function LobbyJoining({ navigation }) {
       },
     })
     Analytics.setCurrentScreen('game_lobby_joining')
-  }, [])
+  }, [askToLeaveGame, navigation])
 
   React.useEffect(() => {
     if (canCreateTeam) {
-      navigation.setOptions({
-        // headerRight: function HLB() {
-        //   return (
-        //     <Page.HeaderBtn
-        //       side="right"
-        //       icon="next"
-        //       textPrimary
-        //       onPress={() => navigation.navigate('teams')}
-        //     >
-        //       Teams
-        //     </Page.HeaderBtn>
-        //   )
-        // },
-      })
+      navigation.setOptions({})
     } else if (hasTeams) {
       navigation.setOptions({
         headerRight: function HLB() {
@@ -69,10 +61,10 @@ export default function LobbyJoining({ navigation }) {
       })
     } else {
       navigation.setOptions({
-        headerRight: null,
+        headerRight: undefined,
       })
     }
-  }, [hasTeams, canCreateTeam])
+  }, [hasTeams, canCreateTeam, navigation])
 
   React.useEffect(() => {
     if (hasTeams) {
@@ -80,13 +72,13 @@ export default function LobbyJoining({ navigation }) {
         headerTitle: 'Teams',
       })
     }
-  }, [hasTeams])
+  }, [hasTeams, navigation])
 
   React.useEffect(() => {
     if (wordsAreStored) {
       navigation.navigate('lobby-writing')
     }
-  }, [wordsAreStored])
+  }, [navigation, wordsAreStored])
 
   function goToWritePapers() {
     navigation.navigate('write-papers')
@@ -114,7 +106,7 @@ export default function LobbyJoining({ navigation }) {
   return (
     <Page>
       <Bubbling bgStart="bg" bgEnd="yellow" />
-      <Page.Main headerDivider>
+      <Page.Main>
         {!game.teams ? (
           <>
             <View style={Styles.header}>
@@ -126,12 +118,12 @@ export default function LobbyJoining({ navigation }) {
 
             <ScrollView
               style={[Theme.utils.scrollSideOffset, Styles.list]}
-              contentContainerStyle={{ paddingBottom: 8 }}
+              contentContainerStyle={Theme.spacing.pb_8}
             >
               <ListPlayers players={playersKeys} enableKickout />
 
               {neededPlayers && !profileIsAdmin ? (
-                <Text style={[Theme.typography.secondary, Theme.utils.center, { marginTop: 16 }]}>
+                <Text style={[Theme.typography.secondary, Theme.utils.center, Theme.spacing.mt_16]}>
                   {copyAddPlayers}
                 </Text>
               ) : null}
@@ -139,7 +131,7 @@ export default function LobbyJoining({ navigation }) {
           </>
         ) : (
           <ScrollView style={[Theme.utils.scrollSideOffset, Styles.list]}>
-            <ListTeams enableNameEdition />
+            <ListTeams />
           </ScrollView>
         )}
       </Page.Main>
@@ -155,7 +147,7 @@ export default function LobbyJoining({ navigation }) {
           <Button
             variant="danger"
             onPress={Papers.setWordsForEveryone}
-            styleTouch={{ marginTop: 16 }}
+            styleTouch={Theme.spacing.mt_16}
           >
             {"💥 Write everyone's papers 💥"}
           </Button>
@@ -163,8 +155,4 @@ export default function LobbyJoining({ navigation }) {
       </Page.CTAs>
     </Page>
   )
-}
-
-LobbyJoining.propTypes = {
-  navigation: PropTypes.object.isRequired, // ReactNavigation
 }

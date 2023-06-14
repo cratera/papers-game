@@ -40,7 +40,7 @@ export default StyleSheet.create({
     // borderWidth: 2,
     // borderColor: Theme.colors.grayMedium,
     borderRadius: 12,
-    paddingVertical: Platform === 'web' ? 16 : 0,
+    paddingVertical: Platform.OS === 'web' ? 16 : 0,
     paddingHorizontal: 16,
     marginTop: 16,
     marginBottom: 10,
@@ -49,7 +49,7 @@ export default StyleSheet.create({
     borderColor: Theme.colors.grayDark,
   },
   input: {
-    borderColor: 'transparent',
+    borderColor: Theme.colors.transparent,
     color: Theme.colors.grayDark,
     textAlign: 'center',
     ...(isWeb ? { height: '100' /* 2 lines */, fontSize: 28 } : {}),
