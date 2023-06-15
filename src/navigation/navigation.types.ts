@@ -27,4 +27,6 @@ type SettingsStackParamsList = {
   'settings-credits': undefined
   'settings-profile': undefined
   'settings-profile-avatar': undefined
+  'settings-players': undefined
+  'settings-game': undefined
 }

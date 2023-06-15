@@ -1,15 +1,19 @@
 import React from 'react'
-import { Alert, Platform, Text, View } from 'react-native'
+import { Alert, Platform, StyleSheet, Text, View } from 'react-native'
 
 import PapersContext from '@src/store/PapersContext'
 import * as Theme from '@src/theme'
 
+import { StackScreenProps } from '@react-navigation/stack'
 import Button from '@src/components/button'
 import Card from '@src/components/card'
 import Page from '@src/components/page'
-import { propTypesCommon, useSubHeader } from './utils'
+import { AppStackParamList } from '@src/navigation/navigation.types'
+import { useSubHeader } from './utils'
 
-export default function AccountDeletion({ navigation }) {
+export default function AccountDeletion({
+  navigation,
+}: StackScreenProps<AppStackParamList, 'settings-accountDeletion'>) {
   const Papers = React.useContext(PapersContext)
   useSubHeader(navigation, 'Delete account', {
     hiddenTitle: true,
@@ -19,7 +23,7 @@ export default function AccountDeletion({ navigation }) {
     if (Platform.OS === 'web') {
       if (window.confirm(`This will delete your profile locally and from Papers' servers?`)) {
         await Papers.resetProfile()
-        navigation.getParent().reset({
+        navigation.getParent()?.reset({
           index: 0,
           routes: [{ name: 'home' }],
         })
@@ -33,7 +37,7 @@ export default function AccountDeletion({ navigation }) {
             text: 'Delete profile',
             onPress: async () => {
               await Papers.resetProfile()
-              navigation.getParent().reset({
+              navigation.getParent()?.reset({
                 index: 0,
                 routes: [{ name: 'home' }],
               })
@@ -53,13 +57,13 @@ export default function AccountDeletion({ navigation }) {
 
   return (
     <Page bgFill="pink_desatured">
-      <Page.Main headerDivider>
-        <View style={{ marginTop: 48 }}>
+      <Page.Main>
+        <View style={Theme.spacing.mt_48}>
           <Card variant="paper-cry"></Card>
-          <Text style={[Theme.typography.h2, Theme.utils.center, { marginTop: 32 }]}>
+          <Text style={[Theme.typography.h2, Theme.utils.center, Theme.spacing.mt_32]}>
             Are you sure?
           </Text>
-          <Text style={[Theme.typography.body, Theme.utils.center, { marginTop: 16 }]}>
+          <Text style={[Theme.typography.body, Theme.utils.center, Theme.spacing.mt_16]}>
             All your data will be deleted.
           </Text>
         </View>
@@ -68,14 +72,7 @@ export default function AccountDeletion({ navigation }) {
         <Button variant="blank" onPress={handleDeleteAccount}>
           Yes, delete account
         </Button>
-        <Button
-          variant="ghost"
-          onPress={navigation.goBack}
-          style={{
-            marginTop: 8,
-            marginBottom: -16,
-          }}
-        >
+        <Button variant="ghost" onPress={navigation.goBack} style={Styles.button_back}>
           No, take me back
         </Button>
       </Page.CTAs>
@@ -83,4 +80,9 @@ export default function AccountDeletion({ navigation }) {
   )
 }
 
-AccountDeletion.propTypes = propTypesCommon
+const Styles = StyleSheet.create({
+  button_back: {
+    marginTop: 8,
+    marginBottom: -16,
+  },
+})

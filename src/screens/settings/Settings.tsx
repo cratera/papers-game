@@ -1,4 +1,4 @@
-import { createStackNavigator } from '@react-navigation/stack'
+import { createStackNavigator, StackScreenProps } from '@react-navigation/stack'
 import React from 'react'
 import { ScrollView, Text } from 'react-native'
 
@@ -10,21 +10,22 @@ import * as Theme from '@src/theme'
 import ListTeams from '@src/components/list-teams'
 import Page from '@src/components/page'
 
-import SettingsGame from './SettingsGame.js'
-import SettingsProfile from './SettingsProfile.js'
-import SettingsProfileAvatar from './SettingsProfileAvatar.js'
-// import Account from './Account.js'
-import AccountDeletion from './AccountDeletion.js'
-import Experimental from './Experimental.js'
-import Feedback from './Feedback.js'
-import Privacy from './Privacy.js'
-import Purchases from './Purchases.js'
-import SettingSoundAnimations from './SettingsSoundAnimations.js'
-import Statistics from './Statistics.js'
+import SettingsGame from './SettingsGame'
+import SettingsProfile from './SettingsProfile'
+import SettingsProfileAvatar from './SettingsProfileAvatar'
+// import Account from './Account'
+import AccountDeletion from './AccountDeletion'
+import Experimental from './Experimental'
+import Feedback from './Feedback'
+import Privacy from './Privacy'
+import Purchases from './Purchases'
+import SettingSoundAnimations from './SettingsSoundAnimations'
+import Statistics from './Statistics'
 
-import { propTypesCommon, useSubHeader } from './utils'
+import { AppStackParamList } from '@src/navigation/navigation.types'
+import { useSubHeader } from './utils'
 
-const Stack = createStackNavigator()
+const Stack = createStackNavigator<AppStackParamList>()
 
 export default function Settings() {
   const Papers = React.useContext(PapersContext)
@@ -64,12 +65,12 @@ export default function Settings() {
 
 // ======
 
-function SettingsCredits({ navigation }) {
+function SettingsCredits({ navigation }: StackScreenProps<AppStackParamList, 'settings-credits'>) {
   useSubHeader(navigation, 'Acknowledgements')
 
   return (
     <Page>
-      <Page.Main headerDivider style={{ paddingTop: 24 }}>
+      <Page.Main style={Theme.spacing.pt_24}>
         <ScrollView>
           <Text style={Theme.typography.body}>TODO: Acknowledgments on the way...</Text>
         </ScrollView>
@@ -77,16 +78,15 @@ function SettingsCredits({ navigation }) {
     </Page>
   )
 }
-SettingsCredits.propTypes = propTypesCommon
 
 // ======
 
-function SettingsPlayers({ navigation }) {
+function SettingsPlayers({ navigation }: StackScreenProps<AppStackParamList, 'settings-players'>) {
   useSubHeader(navigation, 'Players')
 
   return (
     <Page>
-      <Page.Main style={{ paddingTop: 16 }}>
+      <Page.Main style={Theme.spacing.pt_16}>
         <ScrollView>
           <ListTeams enableKickout />
         </ScrollView>
@@ -94,5 +94,3 @@ function SettingsPlayers({ navigation }) {
     </Page>
   )
 }
-
-SettingsPlayers.propTypes = propTypesCommon

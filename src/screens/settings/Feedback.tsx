@@ -9,16 +9,27 @@ import Page from '@src/components/page'
 
 import * as Theme from '@src/theme'
 
+import { NavigationProp } from '@react-navigation/native'
+import { StackScreenProps } from '@react-navigation/stack'
+import { AppStackParamList } from '@src/navigation/navigation.types'
 import { useEffectOnce } from 'usehooks-ts'
-import Item from './Item.js'
-import { propTypesCommon } from './utils'
+import Item from './Item'
 
-function updateHeaderBackBtn(navigation, { title, btnText, onPress }) {
-  navigation.getParent().setOptions({
+type HeaderBackBtnOptions = {
+  title: string
+  btnText: string
+  onPress: () => void
+}
+
+function updateHeaderBackBtn(
+  navigation: NavigationProp<AppStackParamList>,
+  { title, btnText, onPress }: HeaderBackBtnOptions
+) {
+  navigation.getParent()?.setOptions({
     headerTitle: title,
     headerLeft: function HB() {
       return (
-        <Page.HeaderBtn side="left" icon="back" onPress={onPress}>
+        <Page.HeaderBtn side="left" onPress={onPress}>
           {btnText}
         </Page.HeaderBtn>
       )
@@ -26,7 +37,9 @@ function updateHeaderBackBtn(navigation, { title, btnText, onPress }) {
   })
 }
 
-export default function Feedback({ navigation }) {
+export default function Feedback({
+  navigation,
+}: StackScreenProps<AppStackParamList, 'settings-feedback'>) {
   useEffectOnce(() => {
     updateHeaderBackBtn(navigation, {
       title: 'Feedback',
@@ -36,7 +49,7 @@ export default function Feedback({ navigation }) {
         updateHeaderBackBtn(navigation, {
           title: 'Settings',
           btnText: 'Back',
-          onPress: () => navigation.getParent().goBack(),
+          onPress: () => navigation.getParent()?.goBack(),
         })
       },
     })
@@ -44,7 +57,7 @@ export default function Feedback({ navigation }) {
 
   return (
     <Page>
-      <Page.Main headerDivider>
+      <Page.Main>
         <ScrollView style={Theme.utils.scrollSideOffset}>
           <View style={Theme.utils.cardEdge}>
             {[
@@ -80,5 +93,3 @@ export default function Feedback({ navigation }) {
     </Page>
   )
 }
-
-Feedback.propTypes = propTypesCommon

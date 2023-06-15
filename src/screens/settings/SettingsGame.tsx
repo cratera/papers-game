@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import React from 'react'
 import { ScrollView, Text, View } from 'react-native'
 
@@ -10,10 +9,14 @@ import { IconTimes } from '@src/components/icons'
 import Page from '@src/components/page'
 import { useLeaveGame } from '@src/components/settings'
 
-import Item from './Item.js'
+import { StackScreenProps } from '@react-navigation/stack'
+import { AppStackParamList } from '@src/navigation/navigation.types'
+import Item from './Item'
 import { useSubHeader } from './utils'
 
-export default function SettingsGame({ navigation }) {
+export default function SettingsGame({
+  navigation,
+}: StackScreenProps<AppStackParamList, 'settings-game'>) {
   const Papers = React.useContext(PapersContext)
   const { askToLeaveGame } = useLeaveGame({ navigation: navigation.getParent() })
   const { game } = Papers.state
@@ -26,13 +29,18 @@ export default function SettingsGame({ navigation }) {
 
   return (
     <Page>
-      <Page.Main headerDivider>
+      <Page.Main>
         <ScrollView style={Theme.utils.scrollSideOffset}>
           <Text style={[Theme.typography.h2, Theme.utils.center]} accessibilityRole="header">
             {game.name}
           </Text>
           <Text
-            style={[Theme.typography.small, Theme.utils.center, { marginTop: 4, marginBottom: 8 }]}
+            style={[
+              Theme.typography.small,
+              Theme.utils.center,
+              Theme.spacing.mt_4,
+              Theme.spacing.mb_8,
+            ]}
             accessibilityLabel={game.code.toString()}
           >
             {game.code.toString().split('').join('・')}
@@ -53,9 +61,4 @@ export default function SettingsGame({ navigation }) {
       </Page.Main>
     </Page>
   )
-}
-
-SettingsGame.propTypes = {
-  onMount: PropTypes.object, // react-navigation
-  navigation: PropTypes.object.isRequired, // react-navigation
 }

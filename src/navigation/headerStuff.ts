@@ -3,7 +3,7 @@ import { StackNavigationOptions } from '@react-navigation/stack'
 import * as Theme from '@src/theme'
 import { statusBarHeight } from '@src/utils/layout'
 
-type HeaderOptions = {
+export type HeaderOptions = {
   hiddenTitle?: boolean
 }
 

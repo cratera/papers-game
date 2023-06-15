@@ -9,17 +9,22 @@ import { BubblingCorner } from '@src/components/bubbling'
 import Button from '@src/components/button'
 import Page from '@src/components/page'
 
+import { StackScreenProps } from '@react-navigation/stack'
+import { AppStackParamList } from '@src/navigation/navigation.types'
+import { SoundName } from '@src/store/PapersSound.types'
 import Item from './Item'
-import { propTypesCommon, useSubHeader } from './utils'
+import { useSubHeader } from './utils'
 
 // OPTMIZE make this dynamic
-const sounds = ['ready', 'turnstart', 'wrong', 'right', 'bomb', 'fivesl', 'timesup']
+const sounds: SoundName[] = ['ready', 'turnstart', 'wrong', 'right', 'bomb', 'fivesl', 'timesup']
 
-export default function SettingsSound({ navigation }) {
+export default function SettingsSound({
+  navigation,
+}: StackScreenProps<AppStackParamList, 'settings-sound'>) {
   const Papers = React.useContext(PapersContext)
   const { profile } = Papers.state
-  const settingsSoundActive = !!profile.settings.sound // need !! in case is undefined
-  const settingsMotion = !!profile.settings.motion
+  const settingsSoundActive = !!profile?.settings.sound // need !! in case is undefined
+  const settingsMotion = !!profile?.settings.motion
   const [motionFeedback, setMotionFeedback] = React.useState(false)
   useSubHeader(navigation, 'Sound & animations')
 
@@ -35,7 +40,7 @@ export default function SettingsSound({ navigation }) {
     Papers.motionToggle()
   }
 
-  async function startSound(soundId) {
+  async function startSound(soundId: SoundName) {
     await Papers.soundPlay(soundId)
   }
 
@@ -50,7 +55,7 @@ export default function SettingsSound({ navigation }) {
           bgEnd="yellow"
         />
       )}
-      <Page.Main headerDivider>
+      <Page.Main>
         <ScrollView style={[Theme.utils.scrollSideOffset]}>
           <View style={Theme.utils.cardEdge}>
             {/*  */}
@@ -86,10 +91,9 @@ export default function SettingsSound({ navigation }) {
           {__DEV__ && (
             <Button onPress={Papers.resetProfileSettings}>Restore default settings</Button>
           )}
-          <View style={Theme.utils.CTASafeArea} />
+          <View style={Theme.utils.ctaSafeArea} />
         </ScrollView>
       </Page.Main>
     </Page>
   )
 }
-SettingsSound.propTypes = propTypesCommon

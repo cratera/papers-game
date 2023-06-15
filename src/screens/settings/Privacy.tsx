@@ -7,12 +7,16 @@ import { isWeb } from '@src/utils/device'
 import { IconExternal } from '@src/components/icons'
 import Page from '@src/components/page'
 
-import Item from './Item.js'
-import { propTypesCommon, useSubHeader } from './utils'
+import Item from './Item'
+import { useSubHeader } from './utils'
 
+import { StackScreenProps } from '@react-navigation/stack'
+import { AppStackParamList } from '@src/navigation/navigation.types'
 import * as Theme from '@src/theme'
 
-export default function Privacy({ navigation }) {
+export default function Privacy({
+  navigation,
+}: StackScreenProps<AppStackParamList, 'settings-privacy'>) {
   const [ads, setAds] = React.useState(false)
 
   useSubHeader(navigation, 'Privacy')
@@ -23,7 +27,7 @@ export default function Privacy({ navigation }) {
 
   return (
     <Page>
-      <Page.Main headerDivider>
+      <Page.Main>
         <ScrollView style={Theme.utils.scrollSideOffset}>
           <View style={Theme.utils.cardEdge}>
             {isWeb ? null : (
@@ -52,5 +56,3 @@ export default function Privacy({ navigation }) {
     </Page>
   )
 }
-
-Privacy.propTypes = propTypesCommon

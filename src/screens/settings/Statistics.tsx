@@ -7,7 +7,9 @@ import * as Theme from '@src/theme'
 import Button from '@src/components/button'
 import Page from '@src/components/page'
 
-import { propTypesCommon, useSubHeader } from './utils'
+import { StackScreenProps } from '@react-navigation/stack'
+import { AppStackParamList } from '@src/navigation/navigation.types'
+import { useSubHeader } from './utils'
 
 // Note: This is directly related to PapersContext - statsDefaults
 const statsI18n = [
@@ -17,16 +19,18 @@ const statsI18n = [
   ['gamesLost', 'Games lost'],
   ['papersGuessed', 'Papers guessed'],
 ]
-export default function SettingsAccount({ navigation }) {
+export default function SettingsAccount({
+  navigation,
+}: StackScreenProps<AppStackParamList, 'settings-statistics'>) {
   const Papers = React.useContext(PapersContext)
-  const { stats } = Papers.state.profile
+  const { stats } = Papers.state.profile || {}
   useSubHeader(navigation, 'Statistics')
 
   async function handleResetStats() {
     if (Platform.OS === 'web') {
       if (window.confirm('This will resets your statistics from your phone. Are you sure?')) {
         await Papers.resetProfile()
-        navigation.getParent().reset({
+        navigation.getParent()?.reset({
           index: 0,
           routes: [{ name: 'home' }],
         })
@@ -56,22 +60,25 @@ export default function SettingsAccount({ navigation }) {
 
   return (
     <Page>
-      <Page.Main headerDivider>
+      <Page.Main>
         <View style={Styles.list}>
-          {statsI18n.map(([statKey, i18n]) => (
-            <View key={statKey} style={Styles.item}>
-              <Text style={Theme.typography.secondary}>{i18n}</Text>
-              <Text style={Theme.typography.body}>{stats[statKey]}</Text>
-            </View>
-          ))}
+          {stats &&
+            statsI18n.map(([statKey, i18n]) => {
+              const key = statKey as keyof typeof stats
+
+              return (
+                <View key={statKey} style={Styles.item}>
+                  <Text style={Theme.typography.secondary}>{i18n}</Text>
+                  <Text style={Theme.typography.body}>{stats[key]}</Text>
+                </View>
+              )
+            })}
         </View>
         <Button onPress={handleResetStats}>Reset statistics</Button>
       </Page.Main>
     </Page>
   )
 }
-
-SettingsAccount.propTypes = propTypesCommon
 
 const Styles = StyleSheet.create({
   list: {

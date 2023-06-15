@@ -24,6 +24,9 @@ export default StyleSheet.create({
   mt_40: {
     marginTop: 40,
   },
+  mt_48: {
+    marginTop: 48,
+  },
 
   mb_4: {
     marginBottom: 4,
@@ -111,6 +114,9 @@ export default StyleSheet.create({
     padding: 32,
   },
 
+  pt_0: {
+    paddingTop: 0,
+  },
   pt_4: {
     paddingTop: 4,
   },
@@ -217,6 +223,9 @@ export default StyleSheet.create({
   },
   pv_16: {
     paddingVertical: 16,
+  },
+  pv_20: {
+    paddingVertical: 20,
   },
   pv_24: {
     paddingVertical: 24,

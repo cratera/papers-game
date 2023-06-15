@@ -7,27 +7,32 @@ import * as Theme from '@src/theme'
 import AvatarSelector from '@src/components/avatar/AvatarSelector'
 import Page from '@src/components/page'
 
-import Item from './Item.js'
-import { propTypesCommon, useSubHeader } from './utils'
+import { StackScreenProps } from '@react-navigation/stack'
+import { AppStackParamList } from '@src/navigation/navigation.types'
+import { Profile } from '@src/store/PapersContext.types'
+import Item from './Item'
+import { useSubHeader } from './utils'
 
-export default function SettingsAccount({ navigation }) {
+export default function SettingsAccount({
+  navigation,
+}: StackScreenProps<AppStackParamList, 'settings'>) {
   const Papers = React.useContext(PapersContext)
   const [name, setName] = React.useState('')
   const { profile } = Papers.state
-  const defaultAvatar = React.useRef(profile.avatar).current
+  const defaultAvatar = React.useRef(profile?.avatar).current
   useSubHeader(navigation, 'Account')
 
-  function handleOnSelectorChange(avatar) {
+  function handleOnSelectorChange(avatar: Profile['avatar']) {
     Papers.updateProfile({ avatar })
   }
 
   return (
     <Page>
-      <Page.Main headerDivider>
+      <Page.Main>
         <ScrollView style={Theme.utils.scrollSideOffset}>
           <View style={Theme.utils.cardEdge}>
             <AvatarSelector
-              value={profile.avatar}
+              value={profile?.avatar || 'abraul'}
               defaultValue={defaultAvatar}
               onChange={handleOnSelectorChange}
             />
@@ -35,14 +40,14 @@ export default function SettingsAccount({ navigation }) {
             <View style={Theme.utils.listDivider} />
 
             <View style={[Theme.utils.flexBetween, Styles.field]}>
-              <Text nativeID="inputNameLabel" style={[Styles.alignLeft, Theme.typography.body]}>
+              <Text nativeID="inputNameLabel" style={Theme.typography.body}>
                 Name
               </Text>
               <TextInput
                 style={Styles.input}
                 inputAccessoryViewID="name"
                 nativeID="inputNameLabel"
-                defaultValue={profile.name}
+                defaultValue={profile?.name}
                 maxLength={10}
                 returnKeyType="done"
                 onChangeText={(text) => setName(text)}
@@ -69,11 +74,9 @@ export default function SettingsAccount({ navigation }) {
   )
 }
 
-SettingsAccount.propTypes = propTypesCommon
-
 const Styles = StyleSheet.create({
   input: {
-    borderColor: 'transparent',
+    borderColor: Theme.colors.transparent,
     borderWidth: 0,
     padding: 20,
     paddingRight: 8,

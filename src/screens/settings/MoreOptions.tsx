@@ -2,21 +2,27 @@ import * as Linking from 'expo-linking'
 import React from 'react'
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
-import PropTypes from 'prop-types'
-
+import { NavigationProp } from '@react-navigation/native'
 import { IconExternal } from '@src/components/icons'
+import { AppStackParamList } from '@src/navigation/navigation.types'
 import PapersContext from '@src/store/PapersContext'
 import * as Theme from '@src/theme'
 import { isDebugging } from '@src/utils/misc'
-import Item from './Item.js'
+import Item from './Item'
+import { ItemProps } from './Item.types'
 
-export default function MoreOptions({ navigation, list }) {
+type MoreOptionsProps = {
+  navigation: NavigationProp<AppStackParamList>
+  list: ItemProps[]
+}
+
+export default function MoreOptions({ navigation, list = [] }: MoreOptionsProps) {
   const Papers = React.useContext(PapersContext)
   const { profile, about } = Papers.state
 
   return (
     <>
-      <View style={[Theme.utils.cardEdge, { paddingTop: 8 }]}>
+      <View style={[Theme.utils.cardEdge, Theme.spacing.pt_8]}>
         {[
           {
             id: 'sd',
@@ -52,7 +58,7 @@ export default function MoreOptions({ navigation, list }) {
             icon: 'next',
             onPress: () => navigation.navigate('settings-privacy'),
           },
-          ...(isDebugging(profile.name)
+          ...(isDebugging(profile?.name)
             ? [
                 {
                   id: 'xp',
@@ -73,18 +79,12 @@ export default function MoreOptions({ navigation, list }) {
         <Text style={[Theme.typography.small, { color: Theme.colors.grayDark }]}>
           Made with 🖤 by Maggie and Sandy.
         </Text>
-        <View style={{ display: 'flex', flexDirection: 'row', marginTop: 8 }}>
+        <View style={Styles.version_wrapper}>
           <Text style={Theme.typography.small}>
-            Version {about.version}@{about.ota} ∙
+            Version {about?.version}@{about?.ota} ∙
           </Text>
           <TouchableOpacity onPress={() => navigation.navigate('settings-credits')}>
-            <Text
-              style={[
-                Theme.typography.small,
-                Theme.utils.center,
-                { textDecorationLine: 'underline', marginLeft: 4 },
-              ]}
-            >
+            <Text style={[Theme.typography.small, Theme.utils.center, Styles.acknowledgments]}>
               Acknowledgments
             </Text>
           </TouchableOpacity>
@@ -94,22 +94,15 @@ export default function MoreOptions({ navigation, list }) {
   )
 }
 
-MoreOptions.defaultProps = {
-  list: [],
-}
-
-MoreOptions.propTypes = {
-  navigation: PropTypes.object,
-  list: PropTypes.array,
-}
-
 const Styles = StyleSheet.create({
-  listSpacer: {
-    height: 8,
-    borderBottomColor: Theme.colors.grayLight,
-    borderBottomWidth: 1,
-    marginBottom: 8,
-    marginHorizontal: 16,
+  version_wrapper: {
+    display: 'flex',
+    flexDirection: 'row',
+    marginTop: 8,
+  },
+  acknowledgments: {
+    textDecorationLine: 'underline',
+    marginLeft: 4,
   },
   footer: {
     marginTop: 8,

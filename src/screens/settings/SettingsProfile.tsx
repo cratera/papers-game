@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import React from 'react'
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 
@@ -8,26 +7,30 @@ import * as Theme from '@src/theme'
 import { IconPencil } from '@src/components/icons'
 import Page from '@src/components/page'
 
+import { StackScreenProps } from '@react-navigation/stack'
 import Avatar from '@src/components/avatar'
-import MoreOptions from './MoreOptions.js'
+import { AppStackParamList } from '@src/navigation/navigation.types'
+import MoreOptions from './MoreOptions'
 import { useSubHeader } from './utils'
 
-export default function SettingsProfile({ navigation }) {
+export default function SettingsProfile({
+  navigation,
+}: StackScreenProps<AppStackParamList, 'settings-profile'>) {
   const Papers = React.useContext(PapersContext)
-  const refInputName = React.useRef()
+  const refInputName = React.useRef<TextInput>(null)
   const [name, setName] = React.useState('')
   const { profile } = Papers.state
 
   useSubHeader(navigation, 'Settings', { isEntry: true })
 
   function handleNameLabelPress() {
-    refInputName.current.focus()
+    refInputName.current?.focus()
   }
 
   return (
     <Page>
-      <Page.Main headerDivider>
-        <ScrollView style={[Theme.utils.scrollSideOffset, { paddingTop: 0 }]}>
+      <Page.Main>
+        <ScrollView style={[Theme.utils.scrollSideOffset, Theme.spacing.pt_0]}>
           <TouchableOpacity
             activeOpacity={0.7}
             style={Theme.utils.cardEdge}
@@ -36,10 +39,8 @@ export default function SettingsProfile({ navigation }) {
             <View style={Styles.accountTap}>
               <Avatar
                 style={Styles.accountTap_avatar}
-                src={profile.avatar}
+                src={profile?.avatar || 'abraul'}
                 size="xxl"
-                stroke={1}
-                alt=""
               />
               <View style={Styles.accountTap_avatarIcon}>
                 <IconPencil size={24} color={Theme.colors.bg} />
@@ -57,7 +58,7 @@ export default function SettingsProfile({ navigation }) {
               style={Styles.input}
               inputAccessoryViewID="name"
               nativeID="inputNameLabel"
-              defaultValue={profile.name}
+              defaultValue={profile?.name}
               maxLength={10}
               returnKeyType="done"
               onChangeText={(text) => setName(text)}
@@ -80,10 +81,6 @@ export default function SettingsProfile({ navigation }) {
       </Page.Main>
     </Page>
   )
-}
-
-SettingsProfile.propTypes = {
-  navigation: PropTypes.object.isRequired, // react-navigation
 }
 
 const Styles = StyleSheet.create({
@@ -112,7 +109,7 @@ const Styles = StyleSheet.create({
     flexGrow: 1,
   },
   input: {
-    borderColor: 'transparent',
+    borderColor: Theme.colors.transparent,
     borderWidth: 0,
     paddingVertical: 12,
     paddingRight: 6,
@@ -120,20 +117,5 @@ const Styles = StyleSheet.create({
     fontSize: Theme.fontSize.base,
     color: Theme.colors.grayMedium,
     backgroundColor: Theme.colors.bg,
-  },
-  list: {
-    marginTop: 10,
-  },
-  alignLeft: {
-    paddingLeft: 8,
-  },
-  item: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 20,
-    paddingBottom: 20, // looks better visually
-    paddingHorizontal: 8,
   },
 })

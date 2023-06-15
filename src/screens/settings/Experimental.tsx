@@ -20,9 +20,13 @@ import Page from '@src/components/page'
 import usePurchases from '@src/components/purchases/usePurchases'
 import * as Sentry from '@src/services/sentry'
 
-import { propTypesCommon, useSubHeader } from './utils'
+import { StackScreenProps } from '@react-navigation/stack'
+import { AppStackParamList } from '@src/navigation/navigation.types'
+import { useSubHeader } from './utils'
 
-export default function SettingsExperimental({ navigation }) {
+export default function SettingsExperimental({
+  navigation,
+}: StackScreenProps<AppStackParamList, 'settings-experimental'>) {
   useSubHeader(navigation, 'Experimental')
   const { isPurchaserFree } = usePurchases()
 
@@ -131,31 +135,33 @@ export default function SettingsExperimental({ navigation }) {
     </Page>
   )
 }
-SettingsExperimental.propTypes = propTypesCommon
 
 // ==========================
 
+type OtaStatus = 'checking' | 'available' | 'not-available' | 'error'
+
 function OtaChecker() {
-  const [status, setstatus] = React.useState('')
-  const [errorMsg, setErrorMsg] = React.useState(null)
+  const [status, setStatus] = React.useState<OtaStatus>('checking')
+  const [errorMsg, setErrorMsg] = React.useState('')
   // eslint-disable-next-line no-unused-vars
-  const [manifest, setManifest] = React.useState(null)
+  const [manifest, setManifest] = React.useState('')
 
   async function handleCheckClick() {
     try {
-      setErrorMsg(null)
-      setstatus('checking')
+      setErrorMsg('')
+      setStatus('checking')
       const update = await Updates.checkForUpdateAsync()
       if (update.isAvailable) {
         await Updates.fetchUpdateAsync()
-        setstatus('available')
+        setStatus('available')
         setManifest(JSON.stringify(update.manifest))
       } else {
-        setstatus('not-available')
+        setStatus('not-available')
       }
     } catch (e) {
-      setstatus('error')
-      setErrorMsg(e.message)
+      const error = e as Error
+      setStatus('error')
+      setErrorMsg(error.message)
     }
   }
 
@@ -169,13 +175,13 @@ function OtaChecker() {
         Check for new updates
       </Button>
       {status === 'available' && (
-        <Button variant="light" isLoading={status === 'checking'} onPress={handleReloadClick}>
+        <Button variant="light" onPress={handleReloadClick}>
           New update available! Reload app.
         </Button>
       )}
       <View style={{ marginTop: 8 }}>
         {status === 'not-available' && (
-          <Text style={[Theme.typography.sencondary, Theme.utils.center]}>
+          <Text style={[Theme.typography.secondary, Theme.utils.center]}>
             App is already updated!
           </Text>
         )}
@@ -186,26 +192,27 @@ function OtaChecker() {
   )
 }
 
+type TestCrashingStatus = 'error' | 'exc' | 'msg' | ''
+
 function TestCrashing() {
-  const [status, setstatus] = React.useState('')
+  const [status, setStatus] = React.useState<TestCrashingStatus>('')
 
   async function forceCrash() {
-    setstatus('error')
+    setStatus('error')
   }
 
   async function sendExc() {
     try {
-      // eslint-disable-next-line no-unused-vars
-      const foo = status.foo.bar
+      throw new Error('Test error')
     } catch (e) {
       Sentry.captureException(e)
-      setstatus('exc')
+      setStatus('exc')
     }
   }
 
   async function sendMsg() {
     Sentry.captureMessage('Easter egg! Heres a msg')
-    setstatus('msg')
+    setStatus('msg')
   }
 
   return (

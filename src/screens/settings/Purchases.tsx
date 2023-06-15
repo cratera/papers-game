@@ -12,7 +12,11 @@ import * as Sentry from '@src/services/sentry'
 import Button from '@src/components/button'
 import { getPurchaserType } from '@src/components/purchases/purchases.service'
 
-import { propTypesCommon, useSubHeader } from './utils'
+import { StackScreenProps } from '@react-navigation/stack'
+import { PurchaserType } from '@src/components/purchases/purchases.types'
+import { AppStackParamList } from '@src/navigation/navigation.types'
+import { useEffectOnce } from 'usehooks-ts'
+import { useSubHeader } from './utils'
 
 const syncTypes = {
   PAYING: 'paying',
@@ -20,18 +24,22 @@ const syncTypes = {
   FORGETTING: 'forgetting',
 }
 
-const packageAds = 'papers_109_remove_ads01'
+type SyncType = 'paying' | 'restoring' | 'forgetting' | 'idle'
 
-export default function PurchasesView({ navigation }) {
-  const [userType, setUserType] = React.useState(null)
-  const [offerings, setOfferings] = React.useState('loading')
-  const [syncingType, setSyncingType] = React.useState(false)
+// const packageAds = 'papers_109_remove_ads01'
+
+export default function PurchasesView({
+  navigation,
+}: StackScreenProps<AppStackParamList, 'settings-purchases'>) {
+  const [userType, setUserType] = React.useState<PurchaserType | null>(null)
+  // const [offerings, setOfferings] = React.useState('loading')
+  const [syncingType, setSyncingType] = React.useState<SyncType>('idle')
 
   useSubHeader(navigation, 'Papers Extras')
 
-  React.useEffect(() => {
+  useEffectOnce(() => {
     loadPurchases()
-  }, [])
+  })
 
   async function loadPurchases() {
     try {
@@ -48,9 +56,9 @@ export default function PurchasesView({ navigation }) {
   }
 
   async function handlePayClick() {
-    const packageRemoveAds = offerings.availablePackages[0]
-    console.log('to pay:', packageRemoveAds)
-    setSyncingType(syncTypes.PAYING)
+    // const packageRemoveAds = offerings.availablePackages[0]
+    // console.log('to pay:', packageRemoveAds)
+    setSyncingType('paying')
 
     try {
       // const { purchaserInfo, productIdentifier } = await Purchases.purchasePackage(packageRemoveAds)
@@ -59,18 +67,18 @@ export default function PurchasesView({ navigation }) {
       //   loadPurchases()
       // }
     } catch (e) {
-      if (e.userCancelled) {
-        console.log('User cancelled')
-      } else {
-        Sentry.captureException(e, { tags: { pp_action: 'PAY_P' } })
-      }
+      // if (e.userCancelled) {
+      //   console.log('User cancelled')
+      // } else {
+      Sentry.captureException(e, { tags: { pp_action: 'PAY_P' } })
+      // }
     } finally {
-      setSyncingType(null)
+      setSyncingType('idle')
     }
   }
 
   async function handleRestoreClick() {
-    setSyncingType(syncTypes.RESTORING)
+    setSyncingType('restoring')
 
     try {
       // await Purchases.restoreTransactions()
@@ -78,12 +86,12 @@ export default function PurchasesView({ navigation }) {
     } catch (e) {
       Sentry.captureException(e, { tags: { pp_action: 'PAY_R' } })
     } finally {
-      setSyncingType(null)
+      setSyncingType('idle')
     }
   }
 
   async function handleForgetClick() {
-    setSyncingType(syncTypes.FORGETTING)
+    setSyncingType('forgetting')
 
     try {
       // await Purchases.identify(Date.now().toString())
@@ -91,13 +99,13 @@ export default function PurchasesView({ navigation }) {
     } catch (e) {
       Sentry.captureException(e, { tags: { pp_action: 'PAY_F' } })
     } finally {
-      setSyncingType(null)
+      setSyncingType('idle')
     }
   }
 
   return (
     <Page>
-      <Page.Main headerDivider>
+      <Page.Main>
         <ScrollView style={Theme.utils.scrollSideOffset}>
           <View>
             <Text>{'\n'}</Text>
@@ -150,5 +158,3 @@ export default function PurchasesView({ navigation }) {
     </Page>
   )
 }
-
-PurchasesView.propTypes = propTypesCommon

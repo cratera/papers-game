@@ -1,9 +1,9 @@
-import PropTypes from 'prop-types'
-import { StyleSheet, Switch, Text, TouchableHighlight, View } from 'react-native'
+import { Pressable, StyleSheet, Switch, Text, View } from 'react-native'
 
 import { IconChevron } from '@src/components/icons'
 
 import * as Theme from '@src/theme'
+import { ItemProps } from './Item.types'
 
 export default function Item({
   title,
@@ -11,36 +11,33 @@ export default function Item({
   icon,
   Icon,
   variant,
-  switchValue,
+  switchValue = undefined,
   onPress,
   hasDivider,
-}) {
+  ...props
+}: ItemProps) {
   const isSwitch = switchValue !== undefined
   function handleOnPress() {
     // when is a switch, the user must click it instead of the whole area
-    if (switchValue === undefined) onPress()
+    if (switchValue === undefined) {
+      onPress && onPress()
+    }
   }
 
-  const Element = isSwitch ? View : TouchableHighlight
+  const Element = isSwitch ? View : Pressable // previously TouchableHighlight
   const elProps = isSwitch
-    ? {}
+    ? props
     : {
-        underlayColor: Theme.colors.salmon_desatured,
+        // underlayColor: Theme.colors.salmon_desatured,
         onPress: handleOnPress,
+        ...props,
       }
 
   return (
     <>
       {hasDivider ? <View style={Styles.divider}></View> : null}
       <Element {...elProps}>
-        <View
-          style={[
-            Styles.item,
-            {
-              paddingVertical: isSwitch ? 20 : 24,
-            },
-          ]}
-        >
+        <View style={[Styles.item, isSwitch ? Theme.spacing.pv_20 : Theme.spacing.pv_24]}>
           <View style={Styles.text}>
             <Text
               style={[
@@ -62,7 +59,7 @@ export default function Item({
             />
           )}
           {Icon ? (
-            <Icon size={24} color={variant === 'danger' && Theme.colors.danger} />
+            <Icon size={24} color={variant === 'danger' ? Theme.colors.danger : undefined} />
           ) : icon === 'next' ? (
             <IconChevron size={24} color={Theme.colors.grayDark} />
           ) : icon ? (
@@ -72,17 +69,6 @@ export default function Item({
       </Element>
     </>
   )
-}
-
-Item.propTypes = {
-  title: PropTypes.string.isRequired,
-  description: PropTypes.string,
-  hasDivider: PropTypes.bool,
-  variant: PropTypes.oneOf(['danger']),
-  icon: PropTypes.string, // Optmize - get rid of this, use only Icon
-  Icon: PropTypes.func,
-  switchValue: PropTypes.bool,
-  onPress: PropTypes.func,
 }
 
 const Styles = StyleSheet.create({
