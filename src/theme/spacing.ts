@@ -94,6 +94,20 @@ export default StyleSheet.create({
     marginRight: 40,
   },
 
+  mv_4: {
+    marginVertical: 4,
+  },
+  mv_8: {
+    marginVertical: 8,
+  },
+  mv_72: {
+    marginVertical: 72,
+  },
+
+  mh_16: {
+    marginHorizontal: 16,
+  },
+
   // Padding
   p_4: {
     padding: 4,
@@ -142,6 +156,9 @@ export default StyleSheet.create({
   pb_8: {
     paddingBottom: 8,
   },
+  pb_10: {
+    paddingBottom: 10,
+  },
   pb_12: {
     paddingBottom: 12,
   },
@@ -153,6 +170,9 @@ export default StyleSheet.create({
   },
   pb_32: {
     paddingBottom: 32,
+  },
+  pb_120: {
+    paddingBottom: 120,
   },
 
   pr_4: {

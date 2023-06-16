@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import React, { Fragment } from 'react'
 import { ScrollView, Text, View } from 'react-native'
 
@@ -33,7 +32,7 @@ const RoundScore = ({
 
   const { isMyTeamWinner, isTie, scoreByRound, getPlayersSorted } = React.useMemo(
     () => formatScores(game?.score, game?.teams, profile?.id),
-    []
+    [game?.score, game?.teams, profile?.id]
   )
 
   function getMyTotalScore() {
@@ -56,7 +55,7 @@ const RoundScore = ({
       isMyTeamWinner,
       myTotalScore,
     })
-  }, [])
+  }, [Papers, isMyTeamWinner, myTotalScore, roundIx, scoreByRound])
 
   function handleStartRoundClick() {
     setIsOnRoundIntro(true)
@@ -82,27 +81,12 @@ const RoundScore = ({
     return (
       <Page bgFill="purple">
         <Page.Main>
-          <View
-            style={[
-              Styles.header,
-              {
-                marginBottom: 16,
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                flexGrow: 1,
-              },
-            ]}
-          >
+          <View style={[Styles.header, Styles.header_roundScore]}>
             <Text style={[Theme.typography.h1, { color: Theme.colors.bg }]}>
               Round {roundIx + 1 + 1}
             </Text>
             <Text
-              style={[
-                Theme.typography.body,
-                Theme.utils.center,
-                { width: 225, color: Theme.colors.bg, marginTop: 24 },
-              ]}
+              style={[Theme.typography.body, Theme.utils.center, Styles.description_roundScore]}
             >
               {DESCRIPTIONS[roundIx + 1]}
             </Text>
@@ -121,7 +105,7 @@ const RoundScore = ({
     <Page>
       {/* {!isTie && isFinalRound && <EmojiRain type={isMyTeamWinner ? 'winner' : 'loser'} />} */}
       <Page.Main>
-        <View style={[{ marginHorizontal: 0, marginTop: 24, marginBottom: 16 }]}>
+        <View style={Styles.normal_round_container}>
           {isFinalRound ? (
             <Fragment>
               <Text style={[Theme.typography.h3, Theme.utils.center]}>
@@ -148,8 +132,8 @@ const RoundScore = ({
           )}
         </View>
         <ScrollView
-          style={[Theme.utils.scrollSideOffset]}
-          contentContainerStyle={{ paddingBottom: 120 }}
+          style={Theme.utils.scrollSideOffset}
+          contentContainerStyle={Theme.spacing.pb_120}
         >
           <GameScore BOAT={isFinalRound} />
         </ScrollView>
@@ -179,10 +163,6 @@ const RoundScore = ({
       </Page.CTAs>
     </Page>
   )
-}
-
-RoundScore.propTypes = {
-  navigation: PropTypes.object.isRequired,
 }
 
 export default RoundScore

@@ -3,7 +3,7 @@ import { captureException } from '@src/services/sentry'
 // import * as Analytics from 'expo-firebase-analytics'
 
 // export default async function setCurrentScreen(...params: Parameters<typeof Analytics.setCurrentScreen>) {
-export default async function setCurrentScreen(...params) {
+export default async function setCurrentScreen(...params: unknown[]) {
   if (__DEV__) {
     console.log('📡 firebase.analytics.setCurrentScreen', ...params)
   } else {

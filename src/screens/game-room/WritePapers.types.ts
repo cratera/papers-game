@@ -1,11 +1,3 @@
-// SlidePaper.propTypes = {
-//   i: PropTypes.number.isRequired,
-//   isActive: PropTypes.bool.isRequired,
-//   onChange: PropTypes.func.isRequired,
-//   onFocus: PropTypes.func.isRequired,
-//   onSubmit: PropTypes.func.isRequired,
-// }
-
 import { TextInputProps } from 'react-native'
 
 export interface SlidePaperProps {

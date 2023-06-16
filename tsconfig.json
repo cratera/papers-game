@@ -3,6 +3,7 @@
   "compilerOptions": {
     "strict": true,
     "pretty": true,
+    "allowJs": false,
     "baseUrl": ".",
     // These aliases must be duplicated in babel.config.js
     "paths": {

@@ -5,16 +5,10 @@ import { Text, TouchableHighlight, View } from 'react-native'
 import * as Styles from './Button.styles'
 import { ButtonProps } from './Button.types'
 
-export const defaultButtonProps = {
-  variant: 'primary',
-  size: 'default',
-  place: undefined,
-} satisfies ButtonProps
-
 function Button({
-  variant = defaultButtonProps.variant,
-  size = defaultButtonProps.size,
-  place = defaultButtonProps.place,
+  variant = Styles.defaultButtonProps.variant,
+  size = Styles.defaultButtonProps.size,
+  place = Styles.defaultButtonProps.place,
   textColor,
   bgColor,
   loadingColor,

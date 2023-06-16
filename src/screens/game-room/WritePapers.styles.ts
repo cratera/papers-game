@@ -13,7 +13,9 @@ export default StyleSheet.create({
   header: {
     paddingVertical: isTamagoshi ? 8 : 16,
   },
-  scrollKAV: {},
+  scrollKAV: {
+    opacity: 1,
+  },
   slides: {
     height: slideHeight,
     maxHeight: paperHeight + 12,
@@ -75,5 +77,8 @@ export default StyleSheet.create({
   ctas_btn_isHidden: {
     opacity: 0,
     // pointerEvents: 'none',
+  },
+  web_left_margin: {
+    width: 1,
   },
 })

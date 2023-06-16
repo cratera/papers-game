@@ -16,7 +16,7 @@ export default function SettingsToggle({
     <TouchableHighlight
       underlayColor={Theme.colors.grayLight}
       onPress={() => navigation.navigate('settings')}
-      style={[Styles.button, Theme.spacing.pv_8, style]}
+      style={[Styles.button, Theme.spacing.p_8, style]}
       {...props}
     >
       <View style={Theme.utils.middle}>

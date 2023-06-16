@@ -1,8 +1,13 @@
 import * as Theme from '@src/theme'
 import { isTamagoshi } from '@src/utils/device'
 import { StyleSheet } from 'react-native'
-import { defaultButtonProps } from './Button'
 import { ButtonProps } from './Button.types'
+
+export const defaultButtonProps = {
+  variant: 'primary',
+  size: 'default',
+  place: undefined,
+} satisfies ButtonProps
 
 const variants = {
   primary: {

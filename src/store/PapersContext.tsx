@@ -52,10 +52,10 @@ const statsDefaults = {
   papersGuessed: 0,
 } satisfies Profile['stats']
 
-export const loadProfile = async () => {
+export const loadProfile = async (): Promise<Profile> => {
   const id = (await AsyncStorage.getItem('profile_id')) || ''
   const name = (await AsyncStorage.getItem('profile_name')) || ''
-  const avatar = (await AsyncStorage.getItem('profile_avatar')) || ''
+  const avatar = ((await AsyncStorage.getItem('profile_avatar')) || '') as Profile['avatar']
   const gameId = (await AsyncStorage.getItem('profile_gameId')) || ''
   const settingsStored = (await AsyncStorage.getItem('profile_settings')) || ''
   const statsStored = (await AsyncStorage.getItem('profile_stats')) || ''

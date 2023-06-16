@@ -64,7 +64,7 @@ const Bubbling = ({ bgStart, bgEnd, fromBehind, ...props }: BubblingProps) => {
         style={[
           StylesBubble.bubble,
           {
-            backgroundColor: bgEnd,
+            backgroundColor: colors[bgEnd],
 
             transform: [
               {

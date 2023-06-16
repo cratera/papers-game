@@ -1,5 +1,4 @@
-import PropTypes from 'prop-types'
-import React from 'react'
+import React, { useCallback } from 'react'
 
 import { Text, TextInput, View } from 'react-native'
 
@@ -13,6 +12,7 @@ import { StackScreenProps } from '@react-navigation/stack'
 import { AppStackParamList } from '@src/navigation/navigation.types'
 import { Game } from '@src/store/PapersContext.types'
 import * as Theme from '@src/theme'
+import { useEffectOnce } from 'usehooks-ts'
 import Styles from './AccessGame.styles'
 
 const i18n = {
@@ -38,7 +38,11 @@ export default function JoinGame({
     isUnexError: false,
   })
 
-  React.useEffect(() => {
+  const goHome = useCallback(() => {
+    navigation.navigate('home')
+  }, [navigation])
+
+  useEffectOnce(() => {
     navigation.setOptions({
       headerTitle: i18n.headerTitle,
       headerLeft: function HLB() {
@@ -49,12 +53,38 @@ export default function JoinGame({
         )
       },
     })
-  }, [])
+  })
 
   React.useEffect(() => {
     const hasValidName = !state.isInvalid && state.gameName && state.gameName.length >= 3
     const has4DigitsCode = state.code.length === 4
     const hasValidCode = state.code && has4DigitsCode
+
+    function submit() {
+      if (isJoining) {
+        return
+      }
+
+      setDidAutoJoin(true)
+      setJoining(true)
+      setState((state) => ({ ...state, errorMsg: '' }))
+
+      const gameSlugged = formatSlug(state.gameName)
+      const gameId = `${gameSlugged}_${state.code}`
+
+      Papers.accessGame('join', gameId, (_, errorMsg, opts) => {
+        if (errorMsg) {
+          setJoining(false)
+          setState((state) => ({
+            ...state,
+            errorMsg,
+            isUnexError: Boolean(opts?.isUnexError),
+          }))
+        } else {
+          // AccessGame.js will detect the new gameId from PapersContext and do the redirect.
+        }
+      })
+    }
 
     navigation.setOptions({
       headerLeft:
@@ -107,7 +137,17 @@ export default function JoinGame({
       console.log('auto joining...')
       submit()
     }
-  }, [step, state.gameName, state.code, didAutoJoin, isJoining])
+  }, [
+    step,
+    state.gameName,
+    state.code,
+    didAutoJoin,
+    isJoining,
+    state.isInvalid,
+    navigation,
+    Papers,
+    goHome,
+  ])
 
   return (
     <Page bannerMsg={state.isUnexError && state.errorMsg}>
@@ -145,7 +185,7 @@ export default function JoinGame({
                             </Text>
                           )}
                         </Text>
-                        {index < 3 && <Text style={[Theme.typography.h1]}>・</Text>}
+                        {index < 3 && <Text style={Theme.typography.h1}>・</Text>}
                       </View>
                     ))}
                     <TextInput
@@ -169,7 +209,7 @@ export default function JoinGame({
               )}
 
               {state.errorMsg && !state.isUnexError && (
-                <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+                <View style={Styles.hintMsg_wrapper}>
                   <Text style={[Theme.typography.small, Styles.hintMsg, Styles.errorMsg]}>
                     {state.errorMsg || 'hello error'}
                   </Text>
@@ -199,38 +239,4 @@ export default function JoinGame({
       code,
     }))
   }
-
-  function submit() {
-    if (isJoining) {
-      return
-    }
-
-    setDidAutoJoin(true)
-    setJoining(true)
-    setState((state) => ({ ...state, errorMsg: '' }))
-
-    const gameSlugged = formatSlug(state.gameName)
-    const gameId = `${gameSlugged}_${state.code}`
-
-    Papers.accessGame('join', gameId, (_, errorMsg, opts) => {
-      if (errorMsg) {
-        setJoining(false)
-        setState((state) => ({
-          ...state,
-          errorMsg,
-          isUnexError: Boolean(opts?.isUnexError),
-        }))
-      } else {
-        // AccessGame.js will detect the new gameId from PapersContext and do the redirect.
-      }
-    })
-  }
-
-  function goHome() {
-    navigation.navigate('home')
-  }
-}
-
-JoinGame.propTypes = {
-  navigation: PropTypes.object.isRequired, // ReactNavigation
 }

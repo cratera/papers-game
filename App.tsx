@@ -40,7 +40,9 @@ export default class App extends React.Component<object, AppState> {
   // TODO: In web prevent direct opening URLs !== root
   render() {
     if (this.state.hasError) {
-      return <ErrorCrashed error={this.state.error || { cause: 'unknown' }} />
+      return (
+        <ErrorCrashed error={this.state.error || { message: 'Unknown error', name: 'Unknown' }} />
+      )
     }
     return <AppFn {...this.props} />
   }

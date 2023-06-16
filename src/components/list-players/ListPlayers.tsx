@@ -45,7 +45,7 @@ export default function ListPlayers({
     return (
       // Pff... not the best UI
       <View>
-        <Text style={[Theme.typography.h3, Theme.utils.center, { marginVertical: 72 }]}>
+        <Text style={[Theme.typography.h3, Theme.utils.center, Theme.spacing.mv_72]}>
           Deleting game...
         </Text>
       </View>
@@ -116,7 +116,7 @@ export default function ListPlayers({
                       {playerId === profileId && <Text> (you)</Text>}
                     </Text>
                     {playerStatus ? (
-                      <Text style={[Theme.typography.badge]}>{playerStatus} </Text>
+                      <Text style={Theme.typography.badge}>{playerStatus} </Text>
                     ) : null}
                     {/* {isAfk && (
                     // This seems buggy... remove it for now.

@@ -38,4 +38,7 @@ export default StyleSheet.create({
   hightlight: {
     color: Theme.colors.pink,
   },
+  web_left_margin: {
+    width: 1,
+  },
 })

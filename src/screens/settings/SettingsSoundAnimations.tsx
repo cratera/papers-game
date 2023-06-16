@@ -1,5 +1,5 @@
 import React from 'react'
-import { ScrollView, Text, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 
 import PapersContext from '@src/store/PapersContext'
 
@@ -56,7 +56,7 @@ export default function SettingsSound({
         />
       )}
       <Page.Main>
-        <ScrollView style={[Theme.utils.scrollSideOffset]}>
+        <ScrollView style={Theme.utils.scrollSideOffset}>
           <View style={Theme.utils.cardEdge}>
             {/*  */}
             <Item title="Play sounds" switchValue={settingsSoundActive} onPress={toggleSoundOn} />
@@ -70,7 +70,7 @@ export default function SettingsSound({
               <View>
                 <View style={Theme.utils.listDivider} />
 
-                <Text style={[Theme.typography.h3, Theme.utils.center, { marginVertical: 8 }]}>
+                <Text style={[Theme.typography.h3, Theme.utils.center, Theme.spacing.mv_8]}>
                   Preview: (dev only)
                 </Text>
                 {sounds.map((soundId) => (
@@ -79,7 +79,7 @@ export default function SettingsSound({
                     variant="light"
                     size="sm"
                     onPress={() => startSound(soundId)}
-                    style={{ marginHorizontal: 16, marginVertical: 4 }}
+                    style={[Theme.spacing.mv_4, Theme.spacing.mh_16]}
                   >
                     🔉 {soundId}
                   </Button>
@@ -87,7 +87,7 @@ export default function SettingsSound({
               </View>
             )}
           </View>
-          <View style={{ height: 40 }} />
+          <View style={Styles.button_wrapper} />
           {__DEV__ && (
             <Button onPress={Papers.resetProfileSettings}>Restore default settings</Button>
           )}
@@ -97,3 +97,9 @@ export default function SettingsSound({
     </Page>
   )
 }
+
+const Styles = StyleSheet.create({
+  button_wrapper: {
+    height: 40,
+  },
+})

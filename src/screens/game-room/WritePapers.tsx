@@ -45,9 +45,7 @@ export default function WritePapers({
         return (
           <Page.HeaderBtn
             side="left"
-            onPress={() =>
-              isOnTutorial ? navigation.navigate('lobby-joining') : setIsOnTutorial(true)
-            }
+            onPress={() => (isOnTutorial ? navigation.navigate('home') : setIsOnTutorial(true))}
           >
             Back
           </Page.HeaderBtn>
@@ -55,13 +53,12 @@ export default function WritePapers({
       },
     })
     Analytics.setCurrentScreen(`game_write_papers`)
-  }, [isOnTutorial])
+  }, [isOnTutorial, navigation])
 
   React.useEffect(() => {
     const onKeyboardDidShow = (e: KeyboardEvent) => {
       const newKbHeight = e.endCoordinates.height
       setkbHeight(newKbHeight)
-      setTimeout(() => {})
 
       refCTAs.current?.measure((x, y, ctaW, ctaH, pX, pY) => {
         const vh100 = vh * 100
@@ -97,7 +94,7 @@ export default function WritePapers({
       // after changing pages. This will make sure it gets closed.
       Keyboard.dismiss()
     }
-  }, [wordsAreStored])
+  }, [navigation, wordsAreStored])
 
   React.useEffect(() => {
     if (!isOnTutorial) {
@@ -108,7 +105,7 @@ export default function WritePapers({
 
   function renderPapers() {
     const papers = [
-      <View key="ml" style={{ width: 1 }}></View>, // force left margin to work on web
+      <View key="ml" style={Styles.web_left_margin} />, // force left margin to work on web
     ]
     for (let i = 0; i < wordsGoal; i++) {
       const isActive = i === paperIndex
@@ -185,7 +182,7 @@ export default function WritePapers({
     return (
       <Page bannerMsg={errorMsg} bgFill="purple">
         <Page.Main>
-          <View style={[Styles.header]}>
+          <View style={Styles.header}>
             {/* TODO: use <Card /> */}
             <View style={Styles.slidePlaceholder}>
               <IllustrationSmile />
@@ -213,14 +210,7 @@ export default function WritePapers({
   return (
     <Page bannerMsg={errorMsg} bgFill="purple">
       <Page.Main>
-        <View
-          style={[
-            Styles.scrollKAV,
-            {
-              opacity: kbHeight !== null ? 1 : 0, // TODO: fadein?
-            },
-          ]}
-        >
+        <View style={[Styles.scrollKAV, !!kbHeight && Theme.utils.invisible]}>
           <ScrollView
             ref={refSlides}
             pagingEnabled
@@ -289,7 +279,7 @@ const SlidePaper = ({ onChange, isActive, onFocus, onSubmit, i }: SlidePaperProp
     if (isActive) {
       elInput.current?.focus()
     }
-  }, [isActive])
+  }, [elInput, isActive])
 
   return (
     <View

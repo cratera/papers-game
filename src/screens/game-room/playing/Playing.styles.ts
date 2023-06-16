@@ -14,6 +14,10 @@ export default StyleSheet.create({
     paddingTop: 30,
     paddingBottom: 32,
   },
+  header_roundScore: {
+    marginBottom: 16,
+    flexGrow: 1,
+  },
   main: {
     display: 'flex',
     flexDirection: 'column',
@@ -170,5 +174,19 @@ export default StyleSheet.create({
   },
   tscore_itemTextGuessed: {
     textDecorationLine: 'line-through',
+  },
+
+  text_max_width: {
+    maxWidth: 320,
+  },
+  description_roundScore: {
+    width: 225,
+    color: Theme.colors.bg,
+    marginTop: 24,
+  },
+  normal_round_container: {
+    marginHorizontal: 0,
+    marginTop: 24,
+    marginBottom: 16,
   },
 })

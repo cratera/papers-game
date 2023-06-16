@@ -19,7 +19,7 @@ import { HeaderMenuProps } from './Home.types'
 
 function HeaderMenu({ onPress }: HeaderMenuProps) {
   return (
-    <TouchableOpacity style={{ paddingRight: 24, paddingBottom: 10 }} onPress={onPress}>
+    <TouchableOpacity style={[Theme.spacing.pr_24, Theme.spacing.pb_10]} onPress={onPress}>
       <Text style={Theme.typography.body}>Menu</Text>
     </TouchableOpacity>
   )
@@ -41,6 +41,10 @@ export default function HomeSigned({
   const avatarBg = profile?.avatar ? avatars[profile.avatar]?.bgColor : 'bg'
 
   React.useEffect(() => {
+    function goSettings() {
+      navigation.navigate('settings')
+    }
+
     navigation.setOptions({
       ...headerTheme({
         hiddenTitle: true,
@@ -53,18 +57,14 @@ export default function HomeSigned({
         return profile?.name ? <HeaderMenu onPress={goSettings} /> : null
       },
     })
-  }, [profile?.name, profile?.avatar])
-
-  function goSettings() {
-    navigation.navigate('settings')
-  }
+  }, [profile?.name, profile?.avatar, navigation])
 
   return (
     <Page bgFill={avatarBg}>
       <Bubbling bgStart="bg" bgEnd={avatarBg} />
-      <Page.Main style={[Styles.main_signed]}>
+      <Page.Main style={Styles.main_signed}>
         {profile?.avatar && <Avatar src={profile.avatar} size="xxxl" />}
-        <Text style={[Theme.typography.h3]}>{profile?.name}</Text>
+        <Text style={Theme.typography.h3}>{profile?.name}</Text>
       </Page.Main>
       <Page.CTAs>
         <Button variant="blank" onPress={() => openAccessGameModal('create')}>
@@ -72,7 +72,7 @@ export default function HomeSigned({
         </Button>
         <Button
           // variant="light"
-          style={{ marginTop: 16 }}
+          style={Theme.spacing.mt_16}
           onPress={() => openAccessGameModal('join')}
         >
           Join

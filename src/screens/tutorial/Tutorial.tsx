@@ -140,7 +140,7 @@ export default function Tutorial({
 
   function renderTutorial() {
     const papers = [
-      <View key="ml" style={{ width: 1 }}></View>, // force left margin to work on web
+      <View key="ml" style={Styles.web_left_margin} />, // force left margin to work on web
     ]
     for (let i = 0; i < stepTotal; i++) {
       const isActive = i === stepIndex
@@ -175,18 +175,12 @@ const TutorialStep = ({ isActive, ix, stepTotal }: TutorialStepProps) => {
       <View style={Styles.content}>
         {
           <Text
-            style={[
-              Theme.typography.small,
-              Theme.utils.center,
-              ix === 0 && {
-                opacity: 0,
-              },
-            ]}
+            style={[Theme.typography.small, Theme.utils.center, ix === 0 && Theme.utils.invisible]}
           >
             Step {ix} out of {stepTotal - 1}
           </Text>
         }
-        <Text style={[Theme.typography.h3, Theme.utils.center, { marginVertical: 8 }]}>
+        <Text style={[Theme.typography.h3, Theme.utils.center, Theme.spacing.mv_8]}>
           {tutorialConfig[ix].title}
         </Text>
         <Text style={[Theme.typography.body, Theme.utils.center]}>

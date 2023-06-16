@@ -1,5 +1,5 @@
 import React from 'react'
-import { Platform, ScrollView, Text, View } from 'react-native'
+import { Platform, ScrollView, StyleSheet, Text, View } from 'react-native'
 
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as Updates from 'expo-updates'
@@ -40,8 +40,6 @@ export default function SettingsExperimental({
     setAd()
   }, [])
 
-  React.useEffect(() => {})
-
   const styleBlock = {
     borderBottomWidth: 2,
     borderColor: Theme.colors.grayMedium,
@@ -52,7 +50,7 @@ export default function SettingsExperimental({
   return (
     <Page>
       <Page.Main>
-        <ScrollView style={{ paddingTop: 32, marginHorizontal: -16 }}>
+        <ScrollView style={Styles.container}>
           <Text style={[Theme.typography.h3, Theme.utils.center]}>🚧 For Devs only! 🚧</Text>
 
           <Text>IsDev: {__DEV__.toString()}</Text>
@@ -77,7 +75,7 @@ export default function SettingsExperimental({
           </View>
 
           <View style={styleBlock}>
-            <Text style={[Theme.typography.h3, Theme.utils.center, { marginBottom: 16 }]}>
+            <Text style={[Theme.typography.h3, Theme.utils.center, Theme.spacing.mb_16]}>
               AdsMob
             </Text>
 
@@ -143,8 +141,7 @@ type OtaStatus = 'checking' | 'available' | 'not-available' | 'error'
 function OtaChecker() {
   const [status, setStatus] = React.useState<OtaStatus>('checking')
   const [errorMsg, setErrorMsg] = React.useState('')
-  // eslint-disable-next-line no-unused-vars
-  const [manifest, setManifest] = React.useState('')
+  // const [manifest, setManifest] = React.useState('')
 
   async function handleCheckClick() {
     try {
@@ -154,7 +151,7 @@ function OtaChecker() {
       if (update.isAvailable) {
         await Updates.fetchUpdateAsync()
         setStatus('available')
-        setManifest(JSON.stringify(update.manifest))
+        // setManifest(JSON.stringify(update.manifest))
       } else {
         setStatus('not-available')
       }
@@ -179,7 +176,7 @@ function OtaChecker() {
           New update available! Reload app.
         </Button>
       )}
-      <View style={{ marginTop: 8 }}>
+      <View style={Theme.spacing.mt_8}>
         {status === 'not-available' && (
           <Text style={[Theme.typography.secondary, Theme.utils.center]}>
             App is already updated!
@@ -230,3 +227,10 @@ function TestCrashing() {
     </View>
   )
 }
+
+const Styles = StyleSheet.create({
+  container: {
+    paddingTop: 32,
+    marginHorizontal: -16,
+  },
+})

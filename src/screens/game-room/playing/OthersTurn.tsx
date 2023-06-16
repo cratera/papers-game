@@ -34,9 +34,9 @@ const OthersTurn = ({
   const roundNr = (round?.current || 0) + (amIWaiting ? 2 : 1)
   const isTurnOn = !hasCountdownStarted || !!countdownSec // aka: it isn't times up
 
-  const playersOffline =
-    game?.players && Object.keys(game.players).filter((pId) => game?.players[pId].isAfk).length
-  const turnWhoStringified = JSON.stringify(turnWho) // This changing, means a turn was skipped.
+  // const playersOffline =
+  //   game?.players && Object.keys(game.players).filter((pId) => game?.players[pId].isAfk).length
+  // const turnWhoStringified = JSON.stringify(turnWho) // This changing, means a turn was skipped.
 
   const turnStatus = React.useMemo(() => {
     const turnState = isTurnOn && !amIWaiting ? turnWho : Papers.getNextTurn()
@@ -63,7 +63,18 @@ const OthersTurn = ({
           ? `Waiting for ${thisTurnPlayer.name || '???'} to finish their turn.`
           : game?.teams && teamId && game?.teams[teamId].name,
     }
-  }, [amIWaiting, isTurnOn, game?.hasStarted, playersOffline, turnWhoStringified])
+  }, [
+    isTurnOn,
+    amIWaiting,
+    turnWho,
+    Papers,
+    game?.teams,
+    game?.players,
+    game?.hasStarted,
+    profile?.id,
+    profiles,
+    thisTurnPlayer.name,
+  ])
 
   // console.log('...', game?.players, playersOffline)
 
@@ -75,8 +86,8 @@ const OthersTurn = ({
             style={[
               Theme.typography.body,
               Styles.go_count321,
+              Theme.spacing.mv_8,
               {
-                marginVertical: 8,
                 color: hasCountdownStarted
                   ? countdown <= 10500
                     ? Theme.colors.danger
@@ -102,7 +113,7 @@ const OthersTurn = ({
             and experimenting and lack of concentration.
             Just make it work, pure caos evil.
           */}
-          <View style={[Styles.tst_flex]}>
+          <View style={Styles.tst_flex}>
             <Text style={[Theme.typography.secondary, Styles.tst_flex_title]}>
               {hasCountdownStarted && countdownSec && !isAllWordsGuessed
                 ? `${papersGuessed} papers guessed`
@@ -122,7 +133,8 @@ const OthersTurn = ({
                   style={[
                     Theme.typography.h3,
                     Theme.utils.center,
-                    { marginTop: 24, marginBottom: 8 },
+                    Theme.spacing.mt_24,
+                    Theme.spacing.mb_8,
                   ]}
                 >
                   {!hasCountdownStarted ? thisTurnPlayer.name : turnStatus.player.name}
@@ -137,7 +149,8 @@ const OthersTurn = ({
                       style={[
                         Theme.typography.error,
                         Theme.utils.center,
-                        { marginTop: 12, marginBottom: 4 },
+                        Theme.spacing.mt_12,
+                        Theme.spacing.mb_4,
                       ]}
                     >
                       They seem offline.
@@ -157,7 +170,8 @@ const OthersTurn = ({
                   style={[
                     Theme.typography.h3,
                     Theme.utils.center,
-                    { marginTop: 24, marginBottom: 8 },
+                    Theme.spacing.mt_24,
+                    Theme.spacing.mb_8,
                   ]}
                 >
                   {turnStatus.player.name}
@@ -168,7 +182,12 @@ const OthersTurn = ({
               </>
             ) : (
               <Text
-                style={[Theme.typography.h3, Theme.utils.center, { marginTop: 32, maxWidth: 320 }]}
+                style={[
+                  Theme.typography.h3,
+                  Theme.utils.center,
+                  Theme.spacing.mt_32,
+                  Styles.text_max_width,
+                ]}
               >
                 {thisTurnTeamName} got {papersGuessed} papers right!
               </Text>
@@ -178,17 +197,27 @@ const OthersTurn = ({
       </Page.Main>
 
       <Page.CTAs>
-        <View style={[Styles.header]}>
+        <View style={Styles.header}>
           <Text style={Theme.typography.secondary}>
             {isAllWordsGuessed ? `End of round ${roundNr}` : `Round ${roundNr}`}
           </Text>
           <Text
-            style={[Theme.typography.body, Theme.utils.center, { marginTop: 8, maxWidth: 300 }]}
+            style={[
+              Theme.typography.body,
+              Theme.utils.center,
+              Theme.spacing.mt_8,
+              Styles.text_max_width,
+            ]}
           >
             {isTurnOn ? description : `Waiting for ${thisTurnPlayer.name}`}
           </Text>
           <Text
-            style={[Theme.typography.small, Theme.utils.center, { marginTop: 8, maxWidth: 300 }]}
+            style={[
+              Theme.typography.small,
+              Theme.utils.center,
+              Theme.spacing.mt_8,
+              Styles.text_max_width,
+            ]}
           >
             {isTurnOn ? '' : `Next up: ${turnStatus.player.name}`}
           </Text>

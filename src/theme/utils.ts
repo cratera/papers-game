@@ -40,6 +40,9 @@ export default StyleSheet.create({
   ctaSafeArea: {
     height: 80,
   },
+  invisible: {
+    opacity: 0,
+  },
   text_primary: { color: colors.primary },
   text_success: { color: colors.success },
   text_danger: { color: colors.danger },

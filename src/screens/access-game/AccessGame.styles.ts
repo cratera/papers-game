@@ -48,6 +48,11 @@ export default StyleSheet.create({
     textAlign: 'center',
     width: 30,
   },
+  hintMsg_wrapper: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
   hintMsg: {
     marginVertical: 16,
     textAlign: 'center',
