@@ -1,0 +1,160 @@
+name: 'Build'
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  dependencies:
+    name: Install and cache dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: 'yarn'
+
+      - uses: actions/cache@v3
+        id: cache-deps
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install dependencies
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+        run: yarn install
+
+  check-types:
+    name: Check types
+    runs-on: ubuntu-latest
+    needs: dependencies
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: 'yarn'
+
+      - name: Restore dependencies cache
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Run yarn check-types
+        run: yarn check-types
+
+  lint:
+    name: Run eslint
+    runs-on: ubuntu-latest
+    needs: dependencies
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: 'yarn'
+
+      - name: Restore dependencies cache
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Run yarn lint
+        run: yarn lint
+
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+    needs: dependencies
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: 'yarn'
+
+      - name: Restore dependencies cache
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Run yarn test
+        run: yarn test
+
+  create-preview:
+    name: Create Expo preview
+    runs-on: ubuntu-latest
+    needs: [check-types, lint, test]
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: 'yarn'
+
+      - name: Restore dependencies cache
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Check for EXPO_TOKEN
+        run: |
+          if [ -z "${{ secrets.EXPO_TOKEN }}" ]; then
+            echo "You must provide an EXPO_TOKEN secret linked to this project's Expo account in this repo's secrets. Learn more: https://docs.expo.dev/eas-update/github-actions"
+            exit 1
+          fi
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Publish preview to Expo
+        run: eas update --auto --non-interactive --json > build.json
+
+  create-preview-comment:
+    name: Create Expo preview comment
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    needs: create-preview
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+
+      - name: Extract build IDs from build.json
+        run: |
+          android_id=$(cat build.json | jq -r 'map(select(has("platform") and .platform == "android")) | .[0].id')
+          ios_id=$(cat build.json | jq -r 'map(select(has("platform") and .platform == "ios")) | .[0].id')
+          echo "ANDROID_ID=$android_id" >> $GITHUB_ENV
+          echo "IOS_ID=$ios_id" >> $GITHUB_ENV
+
+      - name: Post comment
+        uses: unsplash/comment-on-pr@v1.3.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          msg: |
+            Preview builds were successfully created:
+            | Android | iOS |
+            | --- | --- |
+            | ![Android QR Code](https://qr.expo.dev/eas-update?updateId=${{ env.ANDROID_ID }}&appScheme=exp&host=u.expo.dev) | ![iOS QR Code](https://qr.expo.dev/eas-update?updateId=${{ env.IOS_ID }}&appScheme=exp&host=u.expo.dev) |
+          check_for_duplicate_msg: false
+          delete_prev_regex_msg: 'Preview builds were successfully created:'
