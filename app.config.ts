@@ -28,6 +28,7 @@ const config: ExpoConfig = {
     },
   },
   web: {
+    bundler: 'metro',
     favicon: './assets/images/icon.png',
   },
   extra: {
