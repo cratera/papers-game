@@ -3,7 +3,7 @@ import { captureException } from '@src/services/sentry'
 // import * as Analytics from 'expo-firebase-analytics'
 
 // export default async function logEvent(...params: Parameters<typeof Analytics.logEvent>) {
-export default async function logEvent(...params) {
+export default async function logEvent(...params: unknown[]) {
   if (__DEV__) {
     console.log('📡 firebase.analytics.logEvent', ...params)
   } else {

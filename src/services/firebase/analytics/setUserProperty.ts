@@ -3,7 +3,7 @@ import { captureException } from '@src/services/sentry'
 // import * as Analytics from 'expo-firebase-analytics'
 
 // export default async function setUserProperty(...params: Parameters<typeof Analytics.setUserProperty>) {
-export default async function setUserProperty(...params) {
+export default async function setUserProperty(...params: unknown[]) {
   if (__DEV__) {
     console.log('📡 firebase.analytics.setUserProperty', ...params)
   } else {

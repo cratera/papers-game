@@ -19,7 +19,7 @@ export default function useCountdown(
 
   const getTimeLeft = useCallback(
     (datePivot: number) => {
-      const timeLeft = timer - (Date.now() - datePivot)
+      const timeLeft = (timer || 0) - (Date.now() - datePivot)
       return Math.max(0, timeLeft)
     },
     [timer]
@@ -56,5 +56,5 @@ export default function useCountdown(
     return () => clearInterval(interval)
   }, [dateStarted, getTimeLeft, intervalTime])
 
-  return [timeLeft, restartCountdown]
+  return { timeLeft, restartCountdown }
 }

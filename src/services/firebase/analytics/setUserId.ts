@@ -6,7 +6,7 @@ import setUserProperty from './setUserProperty'
 // import * as Analytics from 'expo-firebase-analytics'
 
 // export default function setUserId(...params: Parameters<typeof Analytics.setUserId>) {
-export default async function setUserId(...params) {
+export default async function setUserId(...params: unknown[]) {
   if (__DEV__) {
     console.log('📡 firebase.analytics.setUserId', ...params, {
       os: `${Device.osName} || ${Device.osVersion}`,
