@@ -14,7 +14,8 @@ export default StyleSheet.create({
   },
   pageInner: {
     width: '100%',
-    paddingTop: headerHeight,
+    // paddingTop: headerHeight,
+    paddingTop: 0, // TODO: I set this to 0 for now because it looks bad with expo-router
     maxWidth: 500,
     marginHorizontal: 'auto',
     flexGrow: 1,
