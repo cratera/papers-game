@@ -82,7 +82,7 @@ export default function JoinGame() {
             step === 0
               ? function btnHome() {
                   return (
-                    <Page.HeaderBtn side="left" onPress={() => router.push('/')}>
+                    <Page.HeaderBtn side="left-close" onPress={() => router.push('/')}>
                       Cancel
                     </Page.HeaderBtn>
                   )

@@ -71,7 +71,7 @@ export default function CreateGame() {
           }),
           headerTitle: i18n.headerTitle,
           headerLeft: () => (
-            <Page.HeaderBtn side="left" onPress={() => router.push('/')}>
+            <Page.HeaderBtn side="left-close" onPress={() => router.push('/')}>
               Cancel
             </Page.HeaderBtn>
           ),
