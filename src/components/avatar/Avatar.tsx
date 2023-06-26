@@ -15,7 +15,7 @@ export const sizes = {
 }
 
 export default function Avatar({
-  src,
+  src = 'abraul',
   isAfk,
   hasMargin,
   size = 'md',
@@ -24,9 +24,9 @@ export default function Avatar({
 }: AvatarProps) {
   const avatar = avatars[src]
 
-  if (!avatar) {
-    throw new Error(`Avatar: "${src}" illustration doesn't exist.`)
-  }
+  // if (!avatar) {
+  //   throw new Error(`Avatar: "${src}" illustration doesn't exist.`)
+  // }
 
   const { bgColor, Component } = avatar
 

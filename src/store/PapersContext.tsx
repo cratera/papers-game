@@ -38,6 +38,8 @@ const PapersContext = React.createContext<PapersContextValue>({
   ...({} as PapersAPIMethods),
 })
 
+export const usePapersContext = () => React.useContext(PapersContext)
+
 const settingsDefaults = {
   sound: !__DEV__,
   motion: !isWeb,
