@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 
@@ -53,15 +53,44 @@ const bgEnd: Color = 'bg' // pink
 export default function Teams({ navigation }: StackScreenProps<AppStackParamList, 'teams'>) {
   const Papers = React.useContext(PapersContext)
   const { game } = Papers.state
-  const playersCount = game?.players && Object.keys(game.players).length
+  // const playersCount = game?.players && Object.keys(game.players).length
   const [tempTeams, setTeams] = React.useState<GameTeams>()
   const [isLocking, setLocking] = React.useState(false)
   const [errorMsg, setErrorMsg] = React.useState<string | undefined>(undefined)
   const didMountRef = React.useRef(false)
   const [isFakingLoading, setIsFakingLoading] = React.useState(true) // useFakeLoading
 
+  useEffectOnce(() => {
+    didMountRef.current = true
+
+    const timeout = setTimeout(() => {
+      setIsFakingLoading(false)
+    }, 1500)
+
+    return () => {
+      clearTimeout(timeout)
+      didMountRef.current = false
+    }
+  })
+
+  React.useEffect(() => {
+    navigation.setOptions({
+      ...headerTheme(),
+      title: 'Teams',
+      headerLeft: function HLB() {
+        return (
+          <Page.HeaderBtn side="left" onPress={() => navigation.goBack()}>
+            Back
+          </Page.HeaderBtn>
+        )
+      },
+      headerRight: undefined,
+    })
+    Analytics.setCurrentScreen('game_teams_creation')
+  }, [navigation])
+
   // TODO: later This could be hook useRandomTeams()
-  const getRandomTeams: () => GameTeams = useCallback(() => {
+  const getRandomTeams: () => GameTeams = () => {
     const players = (game?.players && Object.keys(game.players)) || []
     const teamsNr = 2 // LATER - Game Setting
     const teams = Array.from(Array(teamsNr), () => [] as string[])
@@ -103,47 +132,18 @@ export default function Teams({ navigation }: StackScreenProps<AppStackParamList
     } else {
       return newTempTeams
     }
-  }, [game?.players, tempTeams])
+  }
 
-  const generateTeams = useCallback(() => {
+  const generateTeams = () => {
     setTeams(getRandomTeams())
-  }, [getRandomTeams])
+  }
 
   useEffectOnce(() => {
-    didMountRef.current = true
-
-    const timeout = setTimeout(() => {
-      setIsFakingLoading(false)
-    }, 1500)
-
-    return () => {
-      clearTimeout(timeout)
-      didMountRef.current = false
-    }
-  })
-
-  React.useEffect(() => {
-    navigation.setOptions({
-      ...headerTheme(),
-      title: 'Teams',
-      headerLeft: function HLB() {
-        return (
-          <Page.HeaderBtn side="left" onPress={() => navigation.goBack()}>
-            Back
-          </Page.HeaderBtn>
-        )
-      },
-      headerRight: undefined,
-    })
-    Analytics.setCurrentScreen('game_teams_creation')
-  }, [navigation])
-
-  React.useEffect(() => {
     if (didMountRef.current) {
       // When someone just joined/left...
       generateTeams()
     }
-  }, [generateTeams, playersCount])
+  })
 
   // function handleRenameOf(teamId) {
   //   try {
