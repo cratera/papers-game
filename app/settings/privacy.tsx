@@ -1,6 +1,6 @@
 import * as Linking from 'expo-linking'
 import { Stack, useRouter } from 'expo-router'
-import React from 'react'
+import { useState } from 'react'
 import { ScrollView, View } from 'react-native'
 
 import { IconExternal } from '@src/components/icons'
@@ -11,7 +11,7 @@ import * as Theme from '@src/theme'
 import { isWeb } from '@src/utils/device'
 
 export default function Privacy() {
-  const [ads, setAds] = React.useState(false)
+  const [ads, setAds] = useState(false)
   const router = useRouter()
 
   function handleCustomAdsToggle() {

@@ -1,16 +1,15 @@
 import { Stack, useRouter } from 'expo-router'
-import React from 'react'
 import { Alert, Platform, StyleSheet, Text, View } from 'react-native'
 
 import Button from '@src/components/button'
 import Card from '@src/components/card'
 import Page from '@src/components/page'
 import headerTheme from '@src/navigation/headerTheme'
-import PapersContext from '@src/store/PapersContext'
+import { usePapersContext } from '@src/store/PapersContext'
 import * as Theme from '@src/theme'
 
 export default function AccountDeletion() {
-  const Papers = React.useContext(PapersContext)
+  const Papers = usePapersContext()
   const router = useRouter()
 
   async function handleDeleteAccount() {

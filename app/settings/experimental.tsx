@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Stack, useRouter } from 'expo-router'
 import * as Updates from 'expo-updates'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Platform, ScrollView, StyleSheet, Text, View } from 'react-native'
 
 // TODO: expo-ads-admob is longer supported by Expo managed workflow, find alternative
@@ -24,7 +24,7 @@ export default function ExperimentalSettings() {
   const { isPurchaserFree } = usePurchases()
   const router = useRouter()
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (Platform.OS === 'web') return
 
     async function setAd() {

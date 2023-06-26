@@ -1,11 +1,11 @@
 import { Stack, useRouter } from 'expo-router'
-import React, { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { StyleSheet, Text, TextInput, View } from 'react-native'
 
 import { LoadingBadge } from '@src/components/loading'
 import Page from '@src/components/page'
 import headerTheme from '@src/navigation/headerTheme'
-import PapersContext from '@src/store/PapersContext'
+import { usePapersContext } from '@src/store/PapersContext'
 import { Game } from '@src/store/PapersContext.types'
 import * as Theme from '@src/theme'
 import { formatSlug } from '@src/utils/formatting'
@@ -19,10 +19,10 @@ const i18n = {
 const nameMaxSize = 16
 
 export default function CreateGame() {
-  const Papers = React.useContext(PapersContext)
-  const [isCreating, setCreating] = React.useState(false)
+  const Papers = usePapersContext()
+  const [isCreating, setCreating] = useState(false)
   const router = useRouter()
-  const [state, setState] = React.useState({
+  const [state, setState] = useState({
     gameName: '',
     isInvalid: false,
     errorMsg: '',
@@ -48,6 +48,11 @@ export default function CreateGame() {
         }))
       } else {
         // AccessGame.js will detect the new gameId from PapersContext and do the redirect.
+        setState((state) => ({
+          ...state,
+          gameName: '',
+          isInvalid: false,
+        }))
       }
     })
   }, [Papers, isCreating, state.gameName])
@@ -84,6 +89,7 @@ export default function CreateGame() {
             : undefined,
         }}
       />
+
       <Page.Main>
         <View>
           {isCreating ? (

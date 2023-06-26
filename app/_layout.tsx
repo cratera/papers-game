@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { LogBox, StatusBar, StyleSheet, View } from 'react-native'
 import { useEffectOnce } from 'usehooks-ts'
 
+import RootRedirects from '@src/components/redirects/RootRedirects'
 import ErrorPage from '@src/screens/misc/ErrorPage'
 import * as Sentry from '@src/services/sentry'
 import { loadProfile, PapersContextProvider } from '@src/store/PapersContext'
@@ -65,6 +66,8 @@ export default function Layout() {
   if (initialProfile) {
     return (
       <PapersContextProvider initialProfile={initialProfile}>
+        <RootRedirects />
+
         <View style={Styles.container}>
           <Stack />
         </View>

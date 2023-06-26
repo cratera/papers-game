@@ -1,5 +1,4 @@
 import { Stack, useRouter } from 'expo-router'
-import React from 'react'
 import { ScrollView, Text, View } from 'react-native'
 
 import GameScore from '@src/components/game-score'
@@ -8,11 +7,11 @@ import Page from '@src/components/page'
 import Item from '@src/components/settings/Item'
 import useLeaveGame from '@src/components/settings/useLeaveGame2'
 import headerTheme from '@src/navigation/headerTheme'
-import PapersContext from '@src/store/PapersContext'
+import { usePapersContext } from '@src/store/PapersContext'
 import * as Theme from '@src/theme'
 
 export default function GameSettings() {
-  const Papers = React.useContext(PapersContext)
+  const Papers = usePapersContext()
   const { game } = Papers.state
   const router = useRouter()
   const { askToLeaveGame } = useLeaveGame()

@@ -1,5 +1,5 @@
 import { Stack, useRouter } from 'expo-router'
-import React from 'react'
+import { useState } from 'react'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 
 import { BubblingCorner } from '@src/components/bubbling'
@@ -7,7 +7,7 @@ import Button from '@src/components/button'
 import Page from '@src/components/page'
 import Item from '@src/components/settings/Item'
 import headerTheme from '@src/navigation/headerTheme'
-import PapersContext from '@src/store/PapersContext'
+import { usePapersContext } from '@src/store/PapersContext'
 import { SoundName } from '@src/store/PapersSound.types'
 import * as Theme from '@src/theme'
 
@@ -15,11 +15,11 @@ import * as Theme from '@src/theme'
 const sounds: SoundName[] = ['ready', 'turnstart', 'wrong', 'right', 'bomb', 'fivesl', 'timesup']
 
 export default function SoundAnimationsSettings() {
-  const Papers = React.useContext(PapersContext)
+  const Papers = usePapersContext()
   const { profile } = Papers.state
   const settingsSoundActive = !!profile?.settings.sound // need !! in case is undefined
   const settingsMotion = !!profile?.settings.motion
-  const [motionFeedback, setMotionFeedback] = React.useState(false)
+  const [motionFeedback, setMotionFeedback] = useState(false)
   const router = useRouter()
 
   function toggleSoundOn() {

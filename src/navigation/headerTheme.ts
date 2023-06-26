@@ -17,6 +17,6 @@ export default (opts: HeaderOptions = {}): ComponentProps<typeof Stack.Screen>['
     ...(opts.hiddenTitle ? { color: Theme.colors.transparent } : {}),
   },
   headerBackVisible: false,
-  headerRight: undefined,
-  headerLeft: undefined,
+  headerRight: () => undefined,
+  headerLeft: () => undefined,
 })

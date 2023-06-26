@@ -1,20 +1,20 @@
 import { Stack, useRouter } from 'expo-router'
-import React from 'react'
+import { useRef, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 
 import AvatarSelector from '@src/components/avatar/AvatarSelector'
 import Button from '@src/components/button'
 import Page from '@src/components/page'
 import headerTheme from '@src/navigation/headerTheme'
-import PapersContext from '@src/store/PapersContext'
+import { usePapersContext } from '@src/store/PapersContext'
 import { Profile } from '@src/store/PapersContext.types'
 import * as Theme from '@src/theme'
 
 export default function EditAvatar() {
-  const Papers = React.useContext(PapersContext)
+  const Papers = usePapersContext()
   const { profile } = Papers.state
-  const [avatar, setAvatar] = React.useState<Profile['avatar']>('abraul')
-  const defaultAvatar = React.useRef(profile?.avatar).current
+  const [avatar, setAvatar] = useState<Profile['avatar']>('abraul')
+  const defaultAvatar = useRef(profile?.avatar).current
   const router = useRouter()
 
   function handleOnSelectorChange(avatar: Profile['avatar']) {

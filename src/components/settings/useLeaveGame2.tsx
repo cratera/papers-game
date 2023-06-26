@@ -17,7 +17,7 @@ export default function useLeaveGame() {
   const msg = i18n.leave_confirm_0 + (hasTeams ? ` ${i18n.leave_confirm_1}` : '')
 
   function leaveGame() {
-    router.push('/game-room/gate?goal=leave')
+    router.push('/room/gate?goal=leave')
 
     Papers.leaveGame()
   }

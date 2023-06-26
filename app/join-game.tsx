@@ -1,11 +1,11 @@
 import { Stack, useRouter } from 'expo-router'
-import React, { useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { StyleSheet, Text, TextInput, View } from 'react-native'
 
 import { LoadingBadge } from '@src/components/loading'
 import Page from '@src/components/page'
 import headerTheme from '@src/navigation/headerTheme'
-import PapersContext from '@src/store/PapersContext'
+import { usePapersContext } from '@src/store/PapersContext'
 import { Game } from '@src/store/PapersContext.types'
 import * as Theme from '@src/theme'
 import { formatSlug } from '@src/utils/formatting'
@@ -18,12 +18,12 @@ const i18n = {
 }
 
 export default function JoinGame() {
-  const Papers = React.useContext(PapersContext)
+  const Papers = usePapersContext()
   const router = useRouter()
-  const [isJoining, setJoining] = React.useState(false)
-  const [didAutoJoin, setDidAutoJoin] = React.useState(false)
-  const [step, setStep] = React.useState(0)
-  const [state, setState] = React.useState({
+  const [isJoining, setJoining] = useState(false)
+  const [didAutoJoin, setDidAutoJoin] = useState(false)
+  const [step, setStep] = useState(0)
+  const [state, setState] = useState({
     gameName: '',
     code: '',
     codePretty: '',
@@ -62,7 +62,7 @@ export default function JoinGame() {
     })
   }, [isJoining, state.gameName, state.code, Papers])
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (hasValidCode && !isJoining && !didAutoJoin) {
       // use didAutoJoin to avoid retry autoJoin in case of failure
       console.log('auto joining...')
@@ -134,6 +134,7 @@ export default function JoinGame() {
               {step === 0 ? (
                 <>
                   <Text style={[Styles.title, Theme.typography.body]}>{i18n.nameLabel}</Text>
+
                   <TextInput
                     key="name"
                     style={[Theme.typography.h2, Styles.input]}

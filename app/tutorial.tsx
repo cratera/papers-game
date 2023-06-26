@@ -1,5 +1,5 @@
 import { Stack, useRouter } from 'expo-router'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -78,11 +78,11 @@ const stepTotal = tutorialConfig.length
 
 export default function Tutorial() {
   const refSlider = React.useRef<ScrollView>(null)
-  const [stepIndex, setStepIndex] = React.useState(0)
+  const [stepIndex, setStepIndex] = useState(0)
   const router = useRouter()
   const { state } = usePapersContext()
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Ensure slides is scrolled at the right position
     refSlider.current?.scrollTo({ x: vw * 100 * stepIndex })
   }, [stepIndex])

@@ -127,7 +127,7 @@ export default function ListPlayers({
                   </View>
                 </View>
                 <View style={Styles.ctas}>
-                  {canKickOut && Platform.OS === 'web' && (
+                  {canKickOut && (
                     <Button
                       variant="light"
                       size="sm"

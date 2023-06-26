@@ -1,5 +1,5 @@
 import { Stack, useRouter } from 'expo-router'
-import React from 'react'
+import { useRef, useState } from 'react'
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 
 import Avatar from '@src/components/avatar'
@@ -7,13 +7,13 @@ import { IconPencil } from '@src/components/icons'
 import Page from '@src/components/page'
 import MoreOptions from '@src/components/settings/MoreOptions'
 import headerTheme from '@src/navigation/headerTheme'
-import PapersContext from '@src/store/PapersContext'
+import { usePapersContext } from '@src/store/PapersContext'
 import * as Theme from '@src/theme'
 
 export default function Settings() {
-  const Papers = React.useContext(PapersContext)
-  const refInputName = React.useRef<TextInput>(null)
-  const [name, setName] = React.useState('')
+  const Papers = usePapersContext()
+  const refInputName = useRef<TextInput>(null)
+  const [name, setName] = useState('')
   const { profile } = Papers.state
   const router = useRouter()
 
@@ -28,7 +28,7 @@ export default function Settings() {
           ...headerTheme({}),
           headerTitle: 'Settings',
           headerLeft: () => (
-            <Page.HeaderBtn side="left-close" onPress={() => router.push('/')}>
+            <Page.HeaderBtn side="left-close" onPress={() => router.back()}>
               Close
             </Page.HeaderBtn>
           ),

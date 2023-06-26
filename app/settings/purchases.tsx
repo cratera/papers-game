@@ -1,5 +1,5 @@
 import { Stack, useRouter } from 'expo-router'
-import React from 'react'
+import { useState } from 'react'
 import { ScrollView, Text, View } from 'react-native'
 import { useEffectOnce } from 'usehooks-ts'
 
@@ -25,9 +25,9 @@ type SyncType = 'paying' | 'restoring' | 'forgetting' | 'idle'
 // const packageAds = 'papers_109_remove_ads01'
 
 export default function Purchases() {
-  const [userType, setUserType] = React.useState<PurchaserType | null>(null)
-  // const [offerings, setOfferings] = React.useState('loading')
-  const [syncingType, setSyncingType] = React.useState<SyncType>('idle')
+  const [userType, setUserType] = useState<PurchaserType | null>(null)
+  // const [offerings, setOfferings] = useState('loading')
+  const [syncingType, setSyncingType] = useState<SyncType>('idle')
   const router = useRouter()
 
   useEffectOnce(() => {

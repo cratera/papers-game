@@ -1,11 +1,10 @@
 import { Stack, useRouter } from 'expo-router'
-import React from 'react'
 import { Alert, Platform, StyleSheet, Text, View } from 'react-native'
 
 import Button from '@src/components/button'
 import Page from '@src/components/page'
 import headerTheme from '@src/navigation/headerTheme'
-import PapersContext from '@src/store/PapersContext'
+import { usePapersContext } from '@src/store/PapersContext'
 import * as Theme from '@src/theme'
 
 // Note: This is directly related to PapersContext - statsDefaults
@@ -17,7 +16,7 @@ const statsI18n = [
   ['papersGuessed', 'Papers guessed'],
 ]
 export default function Statistics() {
-  const Papers = React.useContext(PapersContext)
+  const Papers = usePapersContext()
   const { stats } = Papers.state.profile || {}
   const router = useRouter()
 

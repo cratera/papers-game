@@ -1,5 +1,4 @@
-import { Redirect, Stack, useRouter } from 'expo-router'
-import { useState } from 'react'
+import { Stack, useRouter } from 'expo-router'
 import { StyleSheet, Text, TouchableOpacity } from 'react-native'
 
 import Avatar from '@src/components/avatar'
@@ -13,25 +12,10 @@ import * as Theme from '@src/theme'
 
 export default function Home() {
   const router = useRouter()
-  const Papers = usePapersContext()
-  const { profile, game } = Papers.state
-  const [isTutorialDone, setIsTutorialDone] = useState(false)
-  const gameId = game?.id
+  const {
+    state: { profile },
+  } = usePapersContext()
   const avatarBg = profile?.avatar ? avatars[profile.avatar]?.bgColor : 'bg'
-
-  if (!isTutorialDone) {
-    setIsTutorialDone(true)
-
-    return <Redirect href="/tutorial" />
-  }
-
-  if (!profile?.name || !profile?.avatar) {
-    return <Redirect href="/sign-up" />
-  }
-
-  if (gameId) {
-    return <Redirect href="/game-room" />
-  }
 
   return (
     <Page bgFill={avatarBg}>
